@@ -16,13 +16,13 @@ datasource db {
 
 model Subapp {
   id         Int       @id @default(autoincrement())
-  subappName String
+  subappName String    @unique
   versions   Version[]
 }
 
 model Version {
   id           Int     @id @default(autoincrement())
-  versionName  String
+  versionName  String  @unique
   versionEntry String
   subapp       Subapp? @relation(fields: [subappId], references: [id])
   subappId     Int?

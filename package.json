@@ -11,6 +11,7 @@
     "migrate:dev": "pnpm dotenv -e .env.dev -- npx prisma migrate deploy",
     "migrate:prod": "pnpm dotenv -e .env.prod -- npx prisma migrate deploy",
     "start": "nest start",
+    "start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js --watch",
     "start:debug": "nest start --debug --watch",
     "deploy:prod": "pnpm dotenv -e .env.prod -- pm2 start dist/main",
     "deploy:dev": "pnpm dotenv -e .env -- pm2 start dist/main",

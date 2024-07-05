@@ -1,7 +1,5 @@
-// const nodeExternals = require('webpack-node-externals');
-// const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
-import { nodeExternals } from 'webpack-node-externals';
-import { RunScriptWebpackPlugin } from 'run-script-webpack-plugin';
+const nodeExternals = require('webpack-node-externals');
+const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
 
 module.exports = function (options, webpack) {
   return {
