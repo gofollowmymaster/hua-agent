@@ -1,6 +1,4 @@
-FROM registry.cn-hangzhou.aliyuncs.com/app-backend/node_pnpm:20.15.0
-
-RUN pnpm i -g @nestjs/cli
+FROM registry.cn-hangzhou.aliyuncs.com/app-backend/node-pnpm-pi:20.15.0
 
 WORKDIR /opt
 COPY dist ./dist
