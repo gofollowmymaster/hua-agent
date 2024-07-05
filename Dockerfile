@@ -1,11 +1,4 @@
-FROM registry.cn-hangzhou.aliyuncs.com/app-backend/node:20.15.0
-# 设置 PNPM_HOME 环境变量，并添加到 PATH
-ENV PNPM_HOME=/root/.local/share/pnpm
-ENV PATH=$PNPM_HOME:$PATH
-
-RUN npm install pnpm -g 
-RUN pnpm i pm2
-RUN pnpm i -g @nestjs/cli
+FROM registry.cn-hangzhou.aliyuncs.com/app-backend/node-pnpm-pi:20.15.0
 
 WORKDIR /opt
 COPY dist ./dist
