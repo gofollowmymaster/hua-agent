@@ -3,7 +3,10 @@ FROM registry.cn-hangzhou.aliyuncs.com/app-backend/node:20.15.0
 ENV PNPM_HOME=/root/.local/share/pnpm
 ENV PATH=$PNPM_HOME:$PATH
 
-RUN npm install pnpm -g && pnpm i pm2 && pnpm i -g @nestjs/cli
+RUN npm install pnpm -g 
+RUN pnpm i pm2
+RUN pnpm i -g @nestjs/cli
+
 WORKDIR /opt
 COPY dist ./dist
 
