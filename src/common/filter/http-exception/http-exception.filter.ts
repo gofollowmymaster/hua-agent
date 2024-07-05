@@ -32,7 +32,7 @@ export class UniqueConstraintExceptionFilter implements ExceptionFilter {
 
     response.status(status).json({
       code: status,
-      message: 'subappName已存在！',
+      message: 'Unique constraint violation',
       error: exception.message,
     });
   }
