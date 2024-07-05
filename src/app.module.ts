@@ -5,7 +5,13 @@ import { SubappModule } from './subapp/subapp.module';
 import { VersionModule } from './version/version.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), SubappModule, VersionModule],
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: ['.env', '.env.prod'],
+    }),
+    SubappModule,
+    VersionModule,
+  ],
   providers: [PrismaService],
 })
 export class AppModule {}
