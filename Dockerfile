@@ -4,4 +4,4 @@ WORKDIR /opt
 COPY . ./
 
 EXPOSE 3000 
-ENTRYPOINT ["sh","-c","pnpm deploy:dev"]
+#ENTRYPOINT ["sh","-c","pnpm deploy:dev"]
