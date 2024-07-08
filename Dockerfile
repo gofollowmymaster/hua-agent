@@ -5,7 +5,7 @@ COPY dist ./dist
 COPY prisma ./prisma
 COPY .env ./
 COPY ecosystem.config.js ./
-CPOY package.json ./
+COPY package.json ./
 RUN ls /opt/dist
 
 EXPOSE 3000 
