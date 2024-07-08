@@ -21,9 +21,16 @@ export class SubappController {
     return this.subappService.createSubapp(createSubappDto);
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<SubappModel> {
+  @Get('id/:id')
+  async findOneById(@Param('id') id: string): Promise<SubappModel> {
     return this.subappService.findSubapp({ id: Number(id) });
+  }
+
+  @Get('name/:subappName')
+  async findOneByName(
+    @Param('subappName') subappName: string,
+  ): Promise<SubappModel> {
+    return this.subappService.findSubapp({ subappName });
   }
 
   @Put(':id')
