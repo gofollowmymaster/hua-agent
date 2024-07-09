@@ -4,4 +4,8 @@ WORKDIR /opt
 COPY . ./
 
 EXPOSE 3000 
-ENTRYPOINT ["sh","-c","pnpm deploy:dev"]
+# Install pm2 globally
+RUN pnpm install pm2 -g
+
+# Use pm2-runtime to start the application
+CMD ["pm2-runtime", "ecosystem.config.js", "--env", "dev"]
