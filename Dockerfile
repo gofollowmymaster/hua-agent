@@ -8,4 +8,4 @@ EXPOSE 3000
 RUN pnpm install pm2 -g
 
 # Use pm2-runtime to start the application
-CMD ["pm2-runtime", "ecosystem.config.js", "--env", "dev"]
+CMD ["pm2-runtime", "ecosystem.config.js", "--env", "prod"]
