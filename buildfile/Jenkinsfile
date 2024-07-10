@@ -50,10 +50,10 @@ pipeline {
                   sh 'export tag=$PROFILE-$BUILD_ID && envsubst < $K8S_FILE > docker-compose-deploy.yaml'
                 script {
                     sh "npm config set registry https://registry.npmmirror.com "
-                    sh "export NODE_OPTIONS=--max-old-space-size=16384 " 
-                    sh "npm install pnpm@8.15.0  -g "
-                    sh "pnpm install --no-frozen-lockfile"
-                    sh " pnpm run build:$PROFILE"
+                    sh "export NODE_OPTIONS=--max-old-space-size=16384"
+                    sh "/usr/local/bin/corepack enable"
+                    sh "pnpm install"
+                    sh "pnpm build"
                     
                 }
                 
