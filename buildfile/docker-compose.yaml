@@ -1,0 +1,18 @@
+services:
+  aplus-user-main:
+    container_name: aplus-sql-service
+    image: registry.cn-hangzhou.aliyuncs.com/app-backend/aplus-user-aplus-sql-service:${tag}
+    restart: always
+    ports:
+      - '3000:3000'
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '100m'
+        max-file: '3'
+    networks:
+      - appnet
+networks:
+  appnet:
+    external: true
+    name: appnet
