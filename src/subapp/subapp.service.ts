@@ -34,12 +34,13 @@ export class SubappService {
     });
     if (exitSubapp) {
       return exitSubapp;
+    } else {
+      return this.prisma.subapp.create({
+        data: {
+          subappName,
+        },
+      });
     }
-    return this.prisma.subapp.create({
-      data: {
-        subappName,
-      },
-    });
   }
 
   async updateSubapp(params: {
