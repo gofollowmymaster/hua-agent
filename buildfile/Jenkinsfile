@@ -47,13 +47,14 @@ pipeline {
 
         stage('compile & buildImage->push') {
             steps {
-                  sh 'export tag=$PROFILE-$BUILD_ID && envsubst < $K8S_FILE > docker-compose-deploy.yaml'
+                  //sh 'export tag=$PROFILE-$BUILD_ID && envsubst < $K8S_FILE > docker-compose-deploy.yaml'
                 script {
                     sh "npm config set registry https://registry.npmmirror.com "
-                    sh "export NODE_OPTIONS=--max-old-space-size=16384"
+                    sh "export NODE_OPTIONS=--max-old-space-size=16384 " 
                     sh "/usr/local/bin/corepack enable"
+                    //sh "npm install pnpm@9.0.6 -g"
                     sh "pnpm install"
-                    sh "pnpm build"
+                    sh " pnpm run build:$PROFILE"
                     
                 }
                 
@@ -71,7 +72,7 @@ pipeline {
         stage('deploy') {
             agent none
             steps {
-                //sh 'export tag=$PROFILE-$BUILD_ID && envsubst < $DOCKER_COMPOSE_FILE > docker-compose-deploy.yaml'
+                sh 'export tag=$PROFILE-$BUILD_ID && envsubst < $DOCKER_COMPOSE_FILE > docker-compose-deploy.yaml'
                 script {
                     def dockerCredentialsId
                     def dockerUri
