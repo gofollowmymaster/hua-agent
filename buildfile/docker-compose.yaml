@@ -12,6 +12,7 @@ services:
         max-file: '3'
     networks:
       - appnet
+
 networks:
   appnet:
     external: true
