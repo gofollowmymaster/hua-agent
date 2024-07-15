@@ -23,6 +23,26 @@ export class SubappService {
     });
   }
 
+  async findOrAddSubapp(subappName: string): Promise<Subapp | null> {
+    const exitSubapp = await this.prisma.subapp.findUnique({
+      where: {
+        subappName,
+      },
+      include: {
+        versions: true,
+      },
+    });
+    if (exitSubapp) {
+      return exitSubapp;
+    } else {
+      return this.prisma.subapp.create({
+        data: {
+          subappName,
+        },
+      });
+    }
+  }
+
   async updateSubapp(params: {
     where: { id: number };
     data: Prisma.SubappUpdateInput;

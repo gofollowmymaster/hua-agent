@@ -25,12 +25,12 @@ export class SubappController {
   async findOneById(@Param('id') id: string): Promise<SubappModel> {
     return this.subappService.findSubapp({ id: Number(id) });
   }
-
+  // 通过name查询时，如果没有查询到，那么应该创建一条该name的子应用数据
   @Get('name/:subappName')
   async findOneByName(
     @Param('subappName') subappName: string,
   ): Promise<SubappModel> {
-    return this.subappService.findSubapp({ subappName });
+    return this.subappService.findOrAddSubapp(subappName);
   }
 
   @Put(':id')
