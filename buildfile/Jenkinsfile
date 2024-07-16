@@ -53,6 +53,7 @@ pipeline {
                     sh "export NODE_OPTIONS=--max-old-space-size=16384"
                     sh "/usr/local/bin/corepack enable"
                     sh "pnpm install"
+                    sh "pnpm install -g npx"
                     sh "pnpm migrate:dev"
                     sh "pnpm build"
                 }
