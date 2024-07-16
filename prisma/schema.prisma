@@ -24,6 +24,8 @@ model Version {
   id           Int     @id @default(autoincrement())
   versionName  String  @unique
   versionEntry String
+  reqKey       String
+  reqVal       String
   subapp       Subapp? @relation(fields: [subappId], references: [id])
   subappId     Int?
 }
