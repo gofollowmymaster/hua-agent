@@ -17,7 +17,6 @@ export class VersionService {
     data: Prisma.VersionUpdateInput;
   }): Promise<Version> {
     const { data, where } = params;
-    console.log('aaa');
     return this.prisma.version.update({
       data,
       where,
