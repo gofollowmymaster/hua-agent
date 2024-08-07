@@ -21,11 +21,18 @@ model Subapp {
 }
 
 model Version {
-  id           Int     @id @default(autoincrement())
-  versionName  String  @unique
+  id           Int          @id @default(autoincrement())
+  versionName  String       @unique
   versionEntry String
-  reqKey       String
-  reqVal       String
-  subapp       Subapp? @relation(fields: [subappId], references: [id])
-  subappId     Int?
+  headerTags   HeaderTags[]
+  subapp       Subapp       @relation(fields: [subappId], references: [id])
+  subappId     Int
+}
+
+model HeaderTags {
+  id        Int     @id @default(autoincrement())
+  reqKey    String
+  reqValue  String
+  version   Version @relation(fields: [versionId], references: [id])
+  versionId Int
 }
