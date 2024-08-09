@@ -29,7 +29,11 @@ export class SubappService {
         subappName,
       },
       include: {
-        versions: true,
+        versions: {
+          include: {
+            headerTags: true,
+          },
+        },
       },
     });
     if (exitSubapp) {

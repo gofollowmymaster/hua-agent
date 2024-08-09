@@ -3,9 +3,8 @@ import { Prisma } from '@prisma/client';
 export class CreateVersionDto {
   versionName: string;
   versionEntry?: string;
-  headerTags?: { reqKey: string; reqValue: string }[];
-  headerTagsId?: string;
-  subappId: string;
+  headerTags?: { tagKey: string; tagValue: string }[];
+  subapp: string;
   id?: string;
 }
 

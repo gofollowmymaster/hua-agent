@@ -19,55 +19,70 @@ export class VersionController {
     @Body()
     postData: CreateVersionDto,
   ): Promise<VersionModel> {
-    const { versionName, versionEntry, subappId, headerTags } = postData;
-    console.log('aaa', postData);
-    // 创建版本时，如果传了headerTags，那么先创建版本，再创建headerTags
-    // 如果没有headerTags，直接创建headerTags
+    const { versionName, versionEntry, subapp, headerTags } = postData;
+
     return this.prismaService.$transaction(async () => {
       const version = await this.versionService.createVersion({
         versionName,
         versionEntry,
         subapp: {
-          connect: { id: Number(subappId) },
+          connect: { id: Number(subapp) },
+        },
+        headerTags: {
+          create: headerTags,
         },
       });
-      console.log('version', version);
-      if (headerTags && headerTags.length) {
-        const args = headerTags.map((i) => ({
-          versionId: version.id,
-          reqKey: i.reqKey,
-          reqValue: i.reqValue,
-        }));
-        console.log('args', args);
-        await this.headerTagsService.createHeaderTags(args);
-      }
-
       return version;
     });
   }
 
   // 更新版本
-  @Put(':id/subapp/:subappId')
+  @Put(':versionId/subapp/:subappId')
   async update(
     @Param('subappId') subappId: string,
-    @Param('id') id: string,
+    @Param('versionId') versionId: string,
     @Body()
-    updateVersionDto: {
-      versionName: string;
-      versionEntry: string;
-      reqVal: string;
-      reqKey: string;
-    },
+    updateVersionData,
   ) {
-    return this.versionService.updateVersion({
-      where: { subappId: Number(subappId), id: Number(id) },
-      data: updateVersionDto,
+    return this.prismaService.$transaction(async () => {
+      console.log('id', subappId, versionId);
+      const version = await this.versionService.updateVersion({
+        where: {
+          id: Number(versionId),
+        },
+        data: {
+          subapp: {
+            connect: { id: Number(subappId) },
+          },
+          versionEntry: updateVersionData.versionEntry,
+          versionName: updateVersionData.versionName,
+          headerTags: {
+            deleteMany: {},
+            create: updateVersionData.headerTags,
+          },
+        },
+      });
+
+      return version;
     });
   }
 
   // 删除版本
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.versionService.delVersion({ id: Number(id) });
+  @Delete(':versionId')
+  remove(@Param('versionId') versionId: string) {
+    return this.prismaService.$transaction(async () => {
+      // 先删除和version关联的headerTags数据，再删除verison
+      await this.headerTagsService.delHeaderTags({
+        where: {
+          versionId: Number(versionId),
+        },
+      });
+      await this.versionService.delVersion({
+        where: { id: Number(versionId) },
+        include: {
+          headerTags: true,
+        },
+      });
+    });
   }
 }

@@ -29,10 +29,7 @@ export class VersionService {
    * @param params.data - 包含要更新的字段数据的对象
    * @returns Promise<Version> - 一个 Promise，解析为更新后的版本记录
    */
-  async updateVersion(params: {
-    where: Prisma.VersionWhereUniqueInput;
-    data: Prisma.VersionUpdateInput;
-  }): Promise<Version> {
+  async updateVersion(params: Prisma.VersionUpdateArgs) {
     const { data, where } = params;
     return this.prisma.version.update({
       data,
@@ -47,9 +44,7 @@ export class VersionService {
    * @param where - 一个对象，包含要删除的版本记录的唯一标识符（ID）
    * @returns Promise<void> - 一个 Promise，当删除操作成功完成时解析
    */
-  async delVersion(where: { id: number }) {
-    return this.prisma.version.delete({
-      where,
-    });
+  async delVersion(params: Prisma.VersionDeleteArgs) {
+    return this.prisma.version.delete(params);
   }
 }
