@@ -4,7 +4,7 @@ import {
   Body,
   HttpException,
   HttpStatus,
-  Res,
+  // Res,
 } from '@nestjs/common';
 import { VerifyService } from './verify.service';
 import { Prisma, VerifyMCodeAndDCode as VerifyModel } from '@prisma/client';
@@ -28,7 +28,7 @@ export class SubappController {
       DId: string;
       CompanyName: string;
     },
-    @Res() response,
+    // @Res() response,
   ): Promise<VerifyModel> {
     const { MId, DId, CompanyName } = body;
     console.log('existingVerify-body', body);
@@ -42,7 +42,7 @@ export class SubappController {
     if (!existingVerify) {
       console.log('！existingVerify', existingVerify);
       // MId 不存在，返回错误
-      throw new HttpException('MId 不存在', HttpStatus.BAD_REQUEST);
+      throw new HttpException('false', HttpStatus.OK);
     } else if (existingVerify && !existingVerify.DId) {
       // 如果mid存在但是did不存在，说明该mid还没被使用过，将mid与did关联，并根据mid创建companyName
       const verifyRes = await this.verifyService.updateVerifyByMId({
@@ -60,17 +60,15 @@ export class SubappController {
         },
       });
       console.log('Mid存在，Did不存在', verifyRes, companyRes);
-      return response.status(200).json({
-        message: 'MId不存在，已创建MId',
-        data: resData,
-      });
+      // return response.status(200).json({
+      //   message: 'MId不存在，已创建MId',
+      //   data: resData,
+      // });
+      throw new HttpException('true', HttpStatus.OK);
     } else if (existingVerify && existingVerify.DId) {
       // 如果mid和did都存在，先根据mid从verify表中查找该mid数据，如果查询数据res中的did能与传入的did匹配，那么继续走，校验/创建companyName
       if (DId !== existingVerify.DId) {
-        throw new HttpException(
-          'MId与DId不匹配，请确认MId与DId是否输入正确',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new HttpException('false', HttpStatus.OK);
       } else {
         console.log('mid和did都存在且匹配');
         await this.verifyService.updateComponyNameByMid({
@@ -86,11 +84,12 @@ export class SubappController {
           where: { MId },
         });
         console.log('Mid,Did存在且匹配', findRes);
-        return response.status(200).json({
-          message: 'Mid,Did存在且匹配',
-          data: findRes,
-          code: 200,
-        });
+        // return response.status(200).json({
+        //   message: 'Mid,Did存在且匹配',
+        //   data: findRes,
+        //   code: 200,
+        // });
+        throw new HttpException('true', HttpStatus.OK);
       }
     }
     return resData;
