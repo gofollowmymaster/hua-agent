@@ -20,6 +20,21 @@ export class SubappController {
     return this.verifyService.createVerify(createSubappDto);
   }
 
+  // @Post('create')
+  // async createMids(
+  //   @Body()
+  //   body: {
+  //     count: number;
+  //   }
+
+  // ): Promise<VerifyModel> {
+  //   return this.verifyService.createMIds({
+  //     data: [
+
+  //     ]
+  //   });
+  // }
+
   @Post('search-verify')
   async findVerifyById(
     @Body()

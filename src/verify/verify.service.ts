@@ -14,6 +14,14 @@ export class VerifyService {
     });
   }
 
+  async createMIds(
+    data: Prisma.VerifyMCodeAndDCodeCreateInput,
+  ): Promise<Prisma.BatchPayload> {
+    return this.prisma.verifyMCodeAndDCode.createMany({
+      data,
+    });
+  }
+
   // 根据Mid查询verify值
   async findVerifyById(
     VerifyWhereUniqueInput: Prisma.VerifyMCodeAndDCodeWhereUniqueInput,
