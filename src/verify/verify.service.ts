@@ -15,11 +15,9 @@ export class VerifyService {
   }
 
   async createMIds(
-    data: Prisma.VerifyMCodeAndDCodeCreateInput,
+    postData: Prisma.VerifyMCodeAndDCodeCreateManyArgs,
   ): Promise<Prisma.BatchPayload> {
-    return this.prisma.verifyMCodeAndDCode.createMany({
-      data,
-    });
+    return this.prisma.verifyMCodeAndDCode.createMany(postData);
   }
 
   // 根据Mid查询verify值

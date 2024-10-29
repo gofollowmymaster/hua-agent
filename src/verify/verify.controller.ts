@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { VerifyService } from './verify.service';
 import { Prisma, VerifyMCodeAndDCode as VerifyModel } from '@prisma/client';
+import { buildUUID } from 'src/utils/uuid';
 
 @Controller('aplus-frontend-verify')
 export class SubappController {
@@ -20,20 +21,23 @@ export class SubappController {
     return this.verifyService.createVerify(createSubappDto);
   }
 
-  // @Post('create')
-  // async createMids(
-  //   @Body()
-  //   body: {
-  //     count: number;
-  //   }
-
-  // ): Promise<VerifyModel> {
-  //   return this.verifyService.createMIds({
-  //     data: [
-
-  //     ]
-  //   });
-  // }
+  @Post('create')
+  async createMids(
+    @Body()
+    body: {
+      count: number;
+    },
+  ): Promise<VerifyModel> {
+    const data = [];
+    for (let i = 0; i < body.count; i++) {
+      data.push({ MId: buildUUID(), DId: '' });
+    }
+    console.log('data--create', data);
+    await this.verifyService.createMIds({
+      data: data as Prisma.VerifyMCodeAndDCodeCreateManyInput[],
+    });
+    throw new HttpException('true', HttpStatus.OK);
+  }
 
   @Post('search-verify')
   async findVerifyById(
