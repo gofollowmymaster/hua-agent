@@ -19,4 +19,5 @@ export class MessageFromRobotDto {
   //关键词前的内容 string
   preKeywordContent: string;
   records?: records;
+  data?: object;
 }

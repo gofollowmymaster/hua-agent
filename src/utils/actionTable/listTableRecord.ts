@@ -1,5 +1,5 @@
 import client from './client';
-export async function checkTableRecord(app_token: string, table_id: string) {
+export async function listTableRecord(app_token: string, table_id: string) {
   try {
     const list = client.bitable.appTableRecord.list;
     const sendParams = {
