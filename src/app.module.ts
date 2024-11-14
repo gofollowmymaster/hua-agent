@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { SubappModule } from './subapp/subapp.module';
 import { VersionModule } from './version/version.module';
 import { VerifyModule } from './verify/verify.module';
+import { RobotModule } from './robot/robot.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { VerifyModule } from './verify/verify.module';
     SubappModule,
     VersionModule,
     VerifyModule,
+    RobotModule,
   ],
   providers: [PrismaService],
 })
