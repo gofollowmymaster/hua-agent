@@ -20,4 +20,5 @@ export class MessageFromRobotDto {
   preKeywordContent: string;
   records?: records;
   data?: object;
+  record_id?: string;
 }
