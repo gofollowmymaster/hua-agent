@@ -38,6 +38,7 @@ export class RobotController {
     @Headers('tableId') tableId: string,
     @Body() MessageFromRobot: Partial<MessageFromRobotDto>,
   ) {
+    console.log(tableId);
     if (appToken && tableId) {
       const res = await this.robotService.createRecord(MessageFromRobot, {
         appToken,
