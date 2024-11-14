@@ -1,6 +1,7 @@
+import type { records } from '../../utils/actionTable/interface';
 export class MessageFromRobotDto {
   //创建时间 string
-  createTime: string;
+  createTime: number;
   //发送人 string
   sender: string;
   //源消息内容 去掉 @ string
@@ -17,4 +18,5 @@ export class MessageFromRobotDto {
   keyword: string;
   //关键词前的内容 string
   preKeywordContent: string;
+  records?: records;
 }
