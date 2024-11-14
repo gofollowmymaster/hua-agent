@@ -15,6 +15,7 @@ export async function addTableRecord(
         fields: records,
       },
     });
+    console.log(res);
     return res;
   } catch (err) {
     return false;
