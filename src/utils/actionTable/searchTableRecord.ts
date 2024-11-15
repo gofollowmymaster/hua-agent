@@ -4,21 +4,17 @@ export async function searchTableRecord(
   table_id: string,
   data: object,
 ) {
-  try {
-    const list = client.bitable.appTableRecord.search;
-    const sendParams = {
-      data,
-      path: {
-        app_token: app_token,
-        table_id: table_id,
-      },
-      params: {
-        page_size: 500,
-      },
-    };
-    const res = await list(sendParams);
-    return res;
-  } catch (err) {
-    return false;
-  }
+  const list = client.bitable.appTableRecord.search;
+  const sendParams = {
+    data,
+    path: {
+      app_token: app_token,
+      table_id: table_id,
+    },
+    params: {
+      page_size: 500,
+    },
+  };
+  const res = await list(sendParams);
+  return res;
 }
