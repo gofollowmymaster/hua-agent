@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'aplus_prod_sql',
       script: './dist/main.js',
-      env_test: {
+      env_prod: {
         PORT: 3002,
         DATABASE_URL:
           'mysql://front_user:Di8fdYVc5xMPr@rm-bp10m699hk3sxeb8i.mysql.rds.aliyuncs.com:3306/frontend',
