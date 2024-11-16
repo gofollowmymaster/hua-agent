@@ -85,3 +85,6 @@ export function returnMessage(
     message,
   };
 }
+export function removeAtXiaoA(content: string): string {
+  return content.replace(/@小A/g, '');
+}

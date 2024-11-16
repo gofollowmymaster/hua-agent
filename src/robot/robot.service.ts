@@ -9,6 +9,7 @@ import { searchTableRecord } from '../utils/actionTable/searchTableRecord';
 import { updateTableRecord } from '../utils/actionTable/updateTableRecord';
 import { deleteTableRecord } from '../utils/actionTable/deleteTableRecord';
 import { feishuSenceService } from './logic/feishu.sence.service';
+import { removeAtXiaoA } from './logic';
 @Injectable()
 export class RobotService {
   constructor(private readonly feishuSence: feishuSenceService) {}
@@ -76,6 +77,9 @@ export class RobotService {
     }
     // 场景 3 使用引用消息 @小A 但是@小A后有内容 则认为为这是一个需要记录的回复（“引用消息”就作为本次回复内容，需要去表里面查找是否有对应的问题）
     if (originalContent && replyContent) {
+      MessageFromRobot.replyContent = removeAtXiaoA(
+        MessageFromRobot.replyContent,
+      );
       const res = await this.feishuSence.runSenceTwo(MessageFromRobot, headers);
       return res;
     }
