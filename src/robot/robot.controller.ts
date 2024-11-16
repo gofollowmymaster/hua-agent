@@ -11,6 +11,7 @@ import {
   MessageFromRobotDto,
   SearchParamsDto,
 } from './dto/post-message-from-robot.dto';
+
 @Controller('robot')
 export class RobotController {
   constructor(private readonly robotService: RobotService) {}
