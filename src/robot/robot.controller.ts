@@ -113,4 +113,9 @@ export class RobotController {
       );
     }
   }
+  //删除表格记录
+  @Post('feishuFlowMessage')
+  async feishuFlowMessage(@Body() MessageFromRobotDto: MessageFromRobotDto) {
+    return MessageFromRobotDto;
+  }
 }
