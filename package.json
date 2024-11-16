@@ -30,11 +30,13 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.0.0",
     "@prisma/client": "5.16.1",
+    "dayjs": "^1.11.13",
     "dotenv-cli": "^7.4.2",
     "pm2": "^5.4.1",
     "prisma": "^5.16.1",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

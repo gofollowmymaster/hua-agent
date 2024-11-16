@@ -7,7 +7,10 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { RobotService } from './robot.service';
-import { MessageFromRobotDto } from './dto/post-message-from-robot.dto';
+import {
+  MessageFromRobotDto,
+  SearchParamsDto,
+} from './dto/post-message-from-robot.dto';
 @Controller('robot')
 export class RobotController {
   constructor(private readonly robotService: RobotService) {}
@@ -16,10 +19,9 @@ export class RobotController {
   async getList(
     @Headers('appToken') appToken: string,
     @Headers('tableId') tableId: string,
-    @Body() MessageFromRobot: Partial<MessageFromRobotDto>,
   ) {
     if (appToken && tableId) {
-      const res = await this.robotService.getList(MessageFromRobot, {
+      const res = await this.robotService.getList({
         appToken,
         tableId,
       });
@@ -36,11 +38,10 @@ export class RobotController {
   async createRecord(
     @Headers('appToken') appToken: string,
     @Headers('tableId') tableId: string,
-    @Body() MessageFromRobot: Partial<MessageFromRobotDto>,
+    @Body() SearchParams: Pick<SearchParamsDto, 'records'>,
   ) {
-    console.log(tableId);
     if (appToken && tableId) {
-      const res = await this.robotService.createRecord(MessageFromRobot, {
+      const res = await this.robotService.createRecord(SearchParams, {
         appToken,
         tableId,
       });
@@ -57,10 +58,10 @@ export class RobotController {
   async searchRecord(
     @Headers('appToken') appToken: string,
     @Headers('tableId') tableId: string,
-    @Body() MessageFromRobot: Partial<MessageFromRobotDto>,
+    @Body() SearchParams: Pick<SearchParamsDto, 'data'>,
   ) {
     if (appToken && tableId) {
-      const res = await this.robotService.searchRecord(MessageFromRobot, {
+      const res = await this.robotService.searchRecord(SearchParams, {
         appToken,
         tableId,
       });
@@ -77,10 +78,10 @@ export class RobotController {
   async updateRecord(
     @Headers('appToken') appToken: string,
     @Headers('tableId') tableId: string,
-    @Body() MessageFromRobot: Partial<MessageFromRobotDto>,
+    @Body() SearchParams: Pick<SearchParamsDto, 'record_id' | 'records'>,
   ) {
     if (appToken && tableId) {
-      const res = await this.robotService.updateRecord(MessageFromRobot, {
+      const res = await this.robotService.updateRecord(SearchParams, {
         appToken,
         tableId,
       });
@@ -97,10 +98,10 @@ export class RobotController {
   async deleteRecord(
     @Headers('appToken') appToken: string,
     @Headers('tableId') tableId: string,
-    @Body() MessageFromRobot: Partial<MessageFromRobotDto>,
+    @Body() SearchParams: Pick<SearchParamsDto, 'record_id'>,
   ) {
     if (appToken && tableId) {
-      const res = await this.robotService.deleteRecord(MessageFromRobot, {
+      const res = await this.robotService.deleteRecord(SearchParams, {
         appToken,
         tableId,
       });
