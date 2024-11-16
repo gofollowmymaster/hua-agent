@@ -4,18 +4,14 @@ export async function deleteTableRecord(
   table_id: string,
   record_id: string,
 ) {
-  try {
-    const deleteFn = client.bitable.appTableRecord.delete;
-    const sendParams = {
-      path: {
-        app_token: app_token,
-        table_id: table_id,
-        record_id: record_id,
-      },
-    };
-    const res = await deleteFn(sendParams);
-    return res;
-  } catch (err) {
-    return false;
-  }
+  const deleteFn = client.bitable.appTableRecord.delete;
+  const sendParams = {
+    path: {
+      app_token: app_token,
+      table_id: table_id,
+      record_id: record_id,
+    },
+  };
+  const res = await deleteFn(sendParams);
+  return res;
 }

@@ -18,6 +18,8 @@ export class MessageFromRobotDto {
   keyword: string;
   //关键词前的内容 string
   preKeywordContent: string;
+}
+export class SearchParamsDto {
   records?: records;
   data?: object;
   record_id?: string;

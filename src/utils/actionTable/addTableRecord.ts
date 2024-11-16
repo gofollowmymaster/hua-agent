@@ -5,19 +5,14 @@ export async function addTableRecord(
   table_id: string,
   records: records,
 ) {
-  try {
-    const res = await client.bitable.appTableRecord.create({
-      path: {
-        app_token: app_token,
-        table_id: table_id,
-      },
-      data: {
-        fields: records,
-      },
-    });
-    console.log(res);
-    return res;
-  } catch (err) {
-    return false;
-  }
+  const res = await client.bitable.appTableRecord.create({
+    path: {
+      app_token: app_token,
+      table_id: table_id,
+    },
+    data: {
+      fields: records,
+    },
+  });
+  return res;
 }
