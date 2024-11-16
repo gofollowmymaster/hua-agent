@@ -47,3 +47,12 @@ export type searchParams = Partial<{
   page_token?: string;
   page_size?: number;
 }>;
+
+export type Field = {
+  field_id: string;
+  field_name: string;
+  is_primary: boolean;
+  property: any; // 如果你知道 property 的具体类型，可以替换 any
+  type: number;
+  ui_type: string;
+};

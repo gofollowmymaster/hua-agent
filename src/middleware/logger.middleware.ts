@@ -1,7 +1,9 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import * as winston from 'winston';
+import { config } from './logger.config';
 const dayjs = require('dayjs');
+winston.addColors(config.colors);
 export const logger = winston.createLogger({
   level: 'info',
   levels: winston.config.npm.levels,
