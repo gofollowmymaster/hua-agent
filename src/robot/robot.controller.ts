@@ -115,7 +115,15 @@ export class RobotController {
   }
   //删除表格记录
   @Post('feishuFlowMessage')
-  async feishuFlowMessage(@Body() MessageFromRobotDto: MessageFromRobotDto) {
-    return MessageFromRobotDto;
+  async feishuFlowMessage(
+    @Headers('appToken') appToken: string,
+    @Headers('tableId') tableId: string,
+    @Body() MessageFromRobot: MessageFromRobotDto,
+  ) {
+    const res = await this.robotService.feishuFlowMessage(MessageFromRobot, {
+      appToken,
+      tableId,
+    });
+    return res;
   }
 }
