@@ -10,6 +10,7 @@ import { updateTableRecord } from '../utils/actionTable/updateTableRecord';
 import { deleteTableRecord } from '../utils/actionTable/deleteTableRecord';
 import { feishuSenceService } from './logic/feishu.sence.service';
 import { removeAtXiaoA } from './logic';
+import { logger } from '../middleware/logger.middleware';
 @Injectable()
 export class RobotService {
   constructor(private readonly feishuSence: feishuSenceService) {}
@@ -63,6 +64,10 @@ export class RobotService {
     MessageFromRobot: MessageFromRobotDto,
     headers: { appToken: string; tableId: string },
   ) {
+    logger.warn(
+      '【feishuFlowMessage】请求入参格式: ',
+      `【${MessageFromRobot}】`,
+    );
     // 场景 1 @小A 这是一个问题 但消息内容上无引用内容 则认为为这是一个需要记录的问题
     // 场景 2 使用引用消息 @小A 但是@小A后无内容 则同样认为为这是一个需要记录的问题
 
