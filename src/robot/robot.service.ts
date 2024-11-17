@@ -77,7 +77,7 @@ export class RobotService {
       (originalContent == '' && replyContent !== '')
     ) {
       const res = await this.feishuSence.runSenceOne(MessageFromRobot, headers);
-
+      logger.info('res-------', res);
       return res;
     }
     // 场景 3 使用引用消息 @小A 但是@小A后有内容 则认为为这是一个需要记录的回复（“引用消息”就作为本次回复内容，需要去表里面查找是否有对应的问题）
@@ -86,6 +86,7 @@ export class RobotService {
         MessageFromRobot.replyContent,
       );
       const res = await this.feishuSence.runSenceTwo(MessageFromRobot, headers);
+      logger.info('res-------', res);
       return res;
     }
   }

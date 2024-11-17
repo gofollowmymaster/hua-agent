@@ -14,6 +14,7 @@ import { addTableRecord } from '../../utils/actionTable/addTableRecord';
 import { listTableField } from '../../utils/actionTable/listTableField';
 import { updateTableRecord } from '../../utils/actionTable/updateTableRecord';
 import { ErrorMessages, ErrorMessagesCode } from './errEnum';
+import { logger } from '../../middleware/logger.middleware';
 const dayjs = require('dayjs');
 
 @Injectable()
@@ -40,6 +41,7 @@ export class feishuSenceService {
 
     //如果消息已经存在于表格中则不再写入
     if (isMessageExist) {
+      logger.info(`【${writeContent}】消息已存在,时间为${time}`);
       return returnMessage(
         ErrorMessagesCode.MESSAGE_EXIST_CODE,
         res.record_id,
@@ -59,12 +61,14 @@ export class feishuSenceService {
         computedPayloadFields(list, writeContent, sender),
       );
       if (addRes.code === 0) {
+        logger.info(`【${writeContent}】消息写入成功,时间为${time}`);
         return returnMessage(
           0,
           res.record_id,
           `【${writeContent}】消息写入成功,时间为${time}`,
         );
       } else {
+        logger.info(`【${writeContent}】消息写入失败,时间为${time}`);
         return returnMessage(
           10000,
           res.record_id,
@@ -72,6 +76,9 @@ export class feishuSenceService {
         );
       }
     } else {
+      logger.info(
+        `【${ErrorMessages.COLUMNS_NOT_EXIST}】消息写入失败,时间为${time}`,
+      );
       return returnMessage(
         ErrorMessagesCode.COLUMNS_NOT_EXIST,
         null,
@@ -104,7 +111,9 @@ export class feishuSenceService {
       //const res = await updateTableRecord(appToken, tableId, record_id, {
       //查询当前多维表格列记录
       const listFieldRes = await listTableField(appToken, tableId);
-
+      logger.info(
+        `【${listFieldRes.data.items}查询当前多维表格列记录,时间为${time}`,
+      );
       if (listFieldRes.code >= 0 && listFieldRes.data.items.length > 0) {
         const list = listFieldRes.data.items;
         //如果消息不存在于表格中则写入
@@ -115,12 +124,14 @@ export class feishuSenceService {
           computedPayloadRelateToFields(list, originalContent, sender),
         );
         if (addRes.code === 0) {
+          logger.info(`【${originalContent}】消息修改成功,时间为${time}`);
           return returnMessage(
             0,
             res.record_id,
             `【${originalContent}】消息修改成功,时间为${time}`,
           );
         } else {
+          logger.info(`【${originalContent}】消息修改失败,时间为${time}`);
           return returnMessage(
             10000,
             res.record_id,
@@ -128,6 +139,9 @@ export class feishuSenceService {
           );
         }
       } else {
+        logger.info(
+          `【${ErrorMessages.COLUMNS_NOT_EXIST}】消息写入失败,时间为${time}`,
+        );
         return returnMessage(
           ErrorMessagesCode.COLUMNS_NOT_EXIST,
           null,
