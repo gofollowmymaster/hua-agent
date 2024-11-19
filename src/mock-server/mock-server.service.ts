@@ -4,7 +4,6 @@ import { ErrorMessagesCode, ErrorMessages } from './errEnum';
 import { getGateWayName, getMockServerFilePath } from '@utils/mockserverUtils';
 import { logger } from '@src/middleware/logger.middleware';
 import fs from 'fs-extra';
-import e from 'express';
 //录制操作
 //1.查看createParams的url 比如url是/catalog/aplus/newermodel/page
 //2.根据url获取网关名称 比如获取到的网关名称是catalog
