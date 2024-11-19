@@ -3,11 +3,11 @@ import {
   SearchParamsDto,
   MessageFromRobotDto,
 } from './dto/post-message-from-robot.dto';
-import { listTableRecord } from '../utils/actionTable/listTableRecord';
-import { addTableRecord } from '../utils/actionTable/addTableRecord';
-import { searchTableRecord } from '../utils/actionTable/searchTableRecord';
-import { updateTableRecord } from '../utils/actionTable/updateTableRecord';
-import { deleteTableRecord } from '../utils/actionTable/deleteTableRecord';
+import { listTableRecord } from '@utils/actionTable/listTableRecord';
+import { addTableRecord } from '@utils/actionTable/addTableRecord';
+import { searchTableRecord } from '@utils/actionTable/searchTableRecord';
+import { updateTableRecord } from '@utils/actionTable/updateTableRecord';
+import { deleteTableRecord } from '@utils/actionTable/deleteTableRecord';
 import { feishuSenceService } from './logic/feishu.sence.service';
 import { removeAtXiaoA } from './logic';
 import { logger } from '../middleware/logger.middleware';
