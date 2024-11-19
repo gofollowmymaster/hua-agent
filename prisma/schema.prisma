@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
@@ -30,4 +30,20 @@ model HeaderTags {
   tagKey    String
   tagValue  String
   version   Version @relation(fields: [versionId], references: [id])
+}
+
+model VerifyMCodeAndDCode {
+  id           Int            @id @default(autoincrement())
+  MId          String         @unique
+  DId          String?
+  CompanyNames CompanyNames[]
+  createTime   DateTime       @default(now()) // 新增 createTime 属性，默认值为当前时间
+}
+
+model CompanyNames {
+  id          Int                 @id @default(autoincrement())
+  MId         String
+  CompanyName String
+  mid         VerifyMCodeAndDCode @relation(fields: [MId], references: [MId])
+  createTime  DateTime            @default(now()) // 新增 createTime 属性，默认值为当前时间
 }
