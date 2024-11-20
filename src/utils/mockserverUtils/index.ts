@@ -5,8 +5,8 @@ import { join } from 'path';
  * @param path:string
  * @returns string | null
  */
-export function getGateWayName(path: string): string | null {
-  const match = path.match(/^\/([^\/]+)\//);
+export function getGateWayName(url: string): string | null {
+  const match = url.match(/^https?:\/\/[^\/]+\/([^\/]+)\//);
   return match ? match[1] : null;
 }
 export function getMockServerFilePath(gateWayName: string): string {

@@ -1,0 +1,10 @@
+{
+	"http://api.dev.elnkpro.com/catalog/aplus/product/getPage": {
+		"a": 1,
+		"b": 2
+	},
+	"http://api.dev.elnkpro.com/catalog/aplus/product/getDetail?productId=15649": {
+		"a": 1,
+		"b": 2
+	}
+}
