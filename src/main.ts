@@ -5,7 +5,7 @@ import {
   UniqueConstraintExceptionFilter,
 } from './common/filter/http-exception/http-exception.filter';
 import { TransformInterceptor } from './common/interceptor/transform/transform.interceptor';
-
+import * as bodyParser from 'body-parser';
 declare const module: any;
 
 async function bootstrap() {
@@ -16,6 +16,9 @@ async function bootstrap() {
     new UniqueConstraintExceptionFilter(),
   );
   app.useGlobalInterceptors(new TransformInterceptor());
+  // 增加请求体大小限制
+  app.use(bodyParser.json({ limit: '50mb' }));
+  app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
   await app.listen(3000);
 
   if (module.hot) {
