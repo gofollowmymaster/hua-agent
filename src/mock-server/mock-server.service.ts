@@ -29,7 +29,9 @@ export class MockServerService {
     const isFileExist = await fs.pathExists(path);
     if (isFileExist) {
       try {
-        await fs.writeJson(path, { [url]: response }, { spaces: '\t' });
+        const sourceJson = await fs.readJson(path);
+        const newJson = { ...sourceJson, [url]: response };
+        await fs.writeJson(path, newJson, { spaces: '\t' });
       } catch (e) {
         return {
           code: ErrorMessagesCode.WRITE_ERROR,
