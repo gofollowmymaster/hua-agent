@@ -35,19 +35,21 @@ export class MockServerService {
       } catch (e) {
         return {
           code: ErrorMessagesCode.WRITE_ERROR,
-          message: `【${url}】ErrorMessages.WRITE_ERROR`,
+          message: `【${url}】【${ErrorMessages.WRITE_ERROR}】`,
           error: e,
         };
       }
     } else {
       try {
         await fs.ensureFile(path);
-        await fs.writeJson(path, { [url]: response }, { spaces: '\t' });
-      } catch (e) {
+        const sourceJson = await fs.readJson(path);
+        const newJson = { ...sourceJson, [url]: response };
+        await fs.writeJson(path, newJson, { spaces: '\t' });
+      } catch (err) {
         return {
           code: ErrorMessagesCode.WRITE_ERROR,
-          message: `【${url}】ErrorMessages.WRITE_ERROR`,
-          error: e,
+          message: `【${url}】【${ErrorMessages.WRITE_ERROR}】`,
+          error: err,
         };
       }
     }
