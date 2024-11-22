@@ -1,6 +1,7 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import * as winston from 'winston';
+import { isArray, isObject } from '@utils/is';
 import { config } from './logger.config';
 const dayjs = require('dayjs');
 winston.addColors(config.colors);
@@ -28,11 +29,13 @@ export const logger = winston.createLogger({
 export class LoggerMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     logger.info(
-      `${req.method} ${req.originalUrl} ${dayjs().format('YYYY-MM-DD HH:mm:ss')}`,
+      `请求开始【${req.method} - ${req.originalUrl}】 请求头:【${JSON.stringify(req.headers)}】请求体参数:【${JSON.stringify(req.body)}】时间:【${dayjs().format('YYYY-MM-DD HH:mm:ss')}】`,
     );
+
+    // 打印请求结束时的响应数据
     res.on('finish', () => {
       logger.info(
-        `${res.statusCode} ${res.statusMessage}; ${res.get('Content-Length') || 0}b sent`,
+        `请求结束 【${res.statusCode} - ${res.statusMessage}】 时间:【${dayjs().format('YYYY-MM-DD HH:mm:ss')}】`,
       );
     });
     next();
