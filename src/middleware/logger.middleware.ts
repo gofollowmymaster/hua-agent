@@ -1,7 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import * as winston from 'winston';
-import { isArray, isObject } from '@utils/is';
 import { config } from './logger.config';
 const dayjs = require('dayjs');
 winston.addColors(config.colors);
