@@ -32,11 +32,17 @@ model HeaderTags {
   version   Version @relation(fields: [versionId], references: [id])
 }
 
+enum MIdStatusEnum {
+  Enable
+  Disable
+}
+
 model VerifyMCodeAndDCode {
   id           Int            @id @default(autoincrement())
   MId          String         @unique
   DId          String?
   CompanyNames CompanyNames[]
+  MIdStatus    MIdStatusEnum? @default(Enable)
   createTime   DateTime       @default(now()) // 新增 createTime 属性，默认值为当前时间
 }
 
