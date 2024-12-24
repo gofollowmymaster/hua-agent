@@ -57,7 +57,7 @@ model CompanyNames {
 
 model AlertMessage {
   id         Int      @id @default(autoincrement())
-  messageId  String
+  messageId  String   @unique
   userId     String
   content    String
   readTime   DateTime?

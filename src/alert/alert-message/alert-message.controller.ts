@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 
-import { SentryAlertDto } from './dto/sentry-alert.dto';
+import { ReadMsgCallbackDto, SentryAlertDto } from './dto/sentry-alert.dto';
 import { AlertMsgService } from './alert-message.service';
 import { isNeedSendAlertMsg } from './utils';
 
@@ -19,8 +19,10 @@ export class AlertMsgController {
   }
   @Post('readMsgCallback')
   // 接收已读webhook
-  async readMsgCallback(@Body() callbackInfo: SentryAlertDto) {
+  async readMsgCallback(@Body() callbackInfo: ReadMsgCallbackDto) {
     console.log('[readMsg]:', callbackInfo);
+    // 标记已读
+    this.alertMsgService.markAsReaded(callbackInfo.event.message_id_list[0]);
   }
 
   @Post('readMsgCallback')

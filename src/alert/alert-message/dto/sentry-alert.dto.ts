@@ -19,3 +19,11 @@ export class SentryAlertDto {
 
   timeStamp: number; //事件发布时间戳
 }
+
+export class ReadMsgCallbackDto {
+  schema: string;
+
+  header: Record<string, any>;
+
+  event: Record<string, any>;
+}

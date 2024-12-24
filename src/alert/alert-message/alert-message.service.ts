@@ -3,6 +3,7 @@ import { SentryAlertDto } from './dto/sentry-alert.dto';
 import feishuClient from '@src/common/feishu/client';
 import { addRetryJob } from '@src/utils/job';
 import { PrismaService } from '@src/prisma.service';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class AlertMsgService {
@@ -91,5 +92,15 @@ export class AlertMsgService {
       },
     });
     return !!message.readTime;
+  }
+  async markAsReaded(messageId: string) {
+    await this.prisma.alertMessage.update({
+      where: {
+        messageId,
+      },
+      data: {
+        readTime: new Date(),
+      },
+    });
   }
 }
