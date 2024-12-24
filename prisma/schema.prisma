@@ -22,6 +22,8 @@ model Version {
   subappId     Int
   headerTags   HeaderTags[]
   subapp       Subapp       @relation(fields: [subappId], references: [id])
+
+  @@index([subappId], map: "Version_subappId_fkey")
 }
 
 model HeaderTags {
@@ -30,26 +32,39 @@ model HeaderTags {
   tagKey    String
   tagValue  String
   version   Version @relation(fields: [versionId], references: [id])
-}
 
-enum MIdStatusEnum {
-  Enable
-  Disable
+  @@index([versionId], map: "HeaderTags_versionId_fkey")
 }
 
 model VerifyMCodeAndDCode {
   id           Int            @id @default(autoincrement())
   MId          String         @unique
   DId          String?
-  CompanyNames CompanyNames[]
+  createTime   DateTime       @default(now())
   MIdStatus    MIdStatusEnum? @default(Enable)
-  createTime   DateTime       @default(now()) // 新增 createTime 属性，默认值为当前时间
+  CompanyNames CompanyNames[]
 }
 
 model CompanyNames {
   id          Int                 @id @default(autoincrement())
   MId         String
   CompanyName String
+  createTime  DateTime            @default(now())
   mid         VerifyMCodeAndDCode @relation(fields: [MId], references: [MId])
-  createTime  DateTime            @default(now()) // 新增 createTime 属性，默认值为当前时间
+
+  @@index([MId], map: "CompanyNames_MId_fkey")
+}
+
+model AlertMessage {
+  id         Int      @id @default(autoincrement())
+  messageId  String
+  userId     String
+  content    String
+  readTime   DateTime?
+  createTime DateTime @default(now())
+}
+
+enum MIdStatusEnum {
+  Enable
+  Disable
 }

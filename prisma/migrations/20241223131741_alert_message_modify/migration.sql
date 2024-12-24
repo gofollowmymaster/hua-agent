@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `AlertMessage` MODIFY `createTime` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3);

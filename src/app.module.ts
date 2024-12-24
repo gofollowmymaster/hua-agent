@@ -9,6 +9,8 @@ import { VerifyModule } from './verify/verify.module';
 import { RobotModule } from './robot/robot.module';
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { MockServerModule } from './mock-server/mock-server.module';
+import { AlertMsgModule } from '@src/alert/alert-message/alert-message.module';
+import { ScheduleModule } from '@nestjs/schedule';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -23,6 +25,8 @@ import { MockServerModule } from './mock-server/mock-server.module';
     VerifyModule,
     RobotModule,
     MockServerModule,
+    AlertMsgModule,
+    ScheduleModule.forRoot(),
   ],
   providers: [PrismaService],
 })
