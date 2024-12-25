@@ -1,19 +1,22 @@
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import {
   HttpExceptionFilter,
   UniqueConstraintExceptionFilter,
 } from './common/filter/http-exception/http-exception.filter';
+import { AllExceptionsFilter } from './common/filter/all-exception/all-exception.filter';
 import { TransformInterceptor } from './common/interceptor/transform/transform.interceptor';
 import * as bodyParser from 'body-parser';
 declare const module: any;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const httpAdapter = app.get(HttpAdapterHost);
   app.enableCors();
   app.useGlobalFilters(
     new HttpExceptionFilter(),
     new UniqueConstraintExceptionFilter(),
+    new AllExceptionsFilter(httpAdapter),
   );
   app.useGlobalInterceptors(new TransformInterceptor());
   // 增加请求体大小限制

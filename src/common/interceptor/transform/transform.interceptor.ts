@@ -19,8 +19,10 @@ export class TransformInterceptor<T>
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<Response<T>> {
-    return next
-      .handle()
-      .pipe(map((data) => ({ code: 200, body: data, message: '请求成功' })));
+    return next.handle().pipe(
+      map((data) => {
+        return { code: 200, body: data, message: '请求成功' };
+      }),
+    );
   }
 }

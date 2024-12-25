@@ -9,7 +9,7 @@ export class SentryAlertDto {
 
   project: string; //项目,
 
-  sentryUrl: string; //URL,
+  linkUrl: string; //URL,
 
   level: string; //报警级别,
 
