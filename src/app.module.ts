@@ -10,6 +10,7 @@ import { RobotModule } from './robot/robot.module';
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { MockServerModule } from './mock-server/mock-server.module';
 import { AlertMsgModule } from '@src/alert/alert-message/alert-message.module';
+import { LoggerModule } from './common/service/logger/logger.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -25,6 +26,7 @@ import { AlertMsgModule } from '@src/alert/alert-message/alert-message.module';
     RobotModule,
     MockServerModule,
     AlertMsgModule,
+    LoggerModule,
   ],
   providers: [PrismaService],
 })

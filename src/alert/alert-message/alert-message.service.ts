@@ -3,18 +3,20 @@ import { SentryAlertDto } from './dto/sentry-alert.dto';
 import feishuClient from '@src/common/feishu/client';
 import { addRetryJob } from '@src/utils/job';
 import { PrismaService } from '@src/prisma.service';
-import dayjs from 'dayjs';
-
+import { LoggerService } from '@src/common/service/logger/logger.service';
+import appUserMap from './app-user-map';
 @Injectable()
 export class AlertMsgService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly logger: LoggerService,
+  ) {}
   /**
    * 发送消息
    * @param alertInfo
    */
   async sendFsAlertMsg(alertInfo: SentryAlertDto) {
     //构建消息内容
-    console.log('[ alertInfo ] >', alertInfo);
 
     // 发送群消息
     const msgInfo = await feishuClient.im.message.create({
@@ -27,15 +29,17 @@ export class AlertMsgService {
         receive_id_type: 'chat_id',
       },
     });
-
-    console.log('[msgInfo]:', msgInfo);
+    this.logger.info('[发送消息]：' + JSON.stringify(msgInfo));
     const messageId = msgInfo.data.message_id;
     if (!messageId) {
+      this.logger.error('[发送消息]：' + JSON.stringify(msgInfo));
       throw new Error('消息发送失败，message_id为空');
     }
 
     //获取飞书用户userid（todo） -> 消息加急
-    await this.sendFsAlertMsgToUser(msgInfo, '762a5468');
+    const feishuUserId = appUserMap[alertInfo.project];
+
+    await this.sendFsAlertMsgToUser(msgInfo, feishuUserId || '762a5468');
     //获取leader飞书userid（todo） -> 消息加急
     // await this.sendFsAlertMsgToUser(msgInfo, '762a5468');
     //获取leader的leader飞书userid（todo） -> 消息加急
@@ -60,7 +64,8 @@ export class AlertMsgService {
         message_id: messageId,
       },
     });
-    console.log('[ urgentInfo ] >', urgentInfo);
+    this.logger.info('[消息加急]：' + JSON.stringify(urgentInfo));
+
     //记录已经发出的加急消息信息
     const alertMsgInfo = await this.prisma.alertMessage.create({
       data: {
@@ -69,7 +74,8 @@ export class AlertMsgService {
         content: msgInfo.data.body?.content || '',
       },
     });
-    console.log('[ alertMsgInfo ] >', alertMsgInfo);
+    this.logger.info('[记录消息]：' + JSON.stringify(alertMsgInfo));
+
     //每1分钟查看消息是否已读
     await addRetryJob(
       async () => {

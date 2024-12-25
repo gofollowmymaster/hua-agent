@@ -13,9 +13,9 @@ export class AlertMsgController {
     //写入多维表格
 
     //发送消息
-    if (isNeedSendAlertMsg()) {
-      this.alertMsgService.sendFsAlertMsg(alertInfo);
-    }
+    // if (isNeedSendAlertMsg()) {
+    this.alertMsgService.sendFsAlertMsg(alertInfo);
+    // }
   }
   @Post('readMsgCallback')
   // 接收已读webhook
