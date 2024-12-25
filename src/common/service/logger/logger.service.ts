@@ -50,7 +50,7 @@ export class LoggerService {
 
   // 错误日志记录
 
-  error(message: string, ctx?: any, meta?: Record<string, any>): Logger {
+  error(message: any, ctx?: any, meta?: Record<string, any>): Logger {
     return this.logger.error({
       message,
       contextNmae: this.context,
@@ -61,7 +61,7 @@ export class LoggerService {
 
   // 警告日志记录
 
-  warn(message: string, ctx?: any, meta?: Record<string, any>): Logger {
+  warn(message: any, ctx?: any, meta?: Record<string, any>): Logger {
     return this.logger.warn({
       message: JSON.stringify(message),
       contextNmae: this.context,
@@ -72,7 +72,7 @@ export class LoggerService {
 
   // debug日志记录
 
-  debug(message: string, ctx: any, meta?: Record<string, any>): Logger {
+  debug(message: any, ctx?: any, meta?: Record<string, any>): Logger {
     return this.logger.debug({
       message: JSON.stringify(message),
       contextNmae: this.context,
@@ -83,7 +83,7 @@ export class LoggerService {
 
   // 基本日志记录
 
-  info(message: string, ctx?: any, meta?: Record<string, any>): Logger {
+  info(message: any, ctx?: any, meta?: Record<string, any>): Logger {
     return this.logger.info({
       message: JSON.stringify(message),
       contextNmae: this.context,

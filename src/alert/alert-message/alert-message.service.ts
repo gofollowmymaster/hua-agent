@@ -5,41 +5,45 @@ import { addRetryJob } from '@src/utils/job';
 import { PrismaService } from '@src/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import appUserMap from './app-user-map';
+import { buildFeishuTemplateCardMsg } from './utils';
 @Injectable()
 export class AlertMsgService {
   constructor(
     private prisma: PrismaService,
     private readonly logger: LoggerService,
   ) {}
+
   /**
    * 发送消息
    * @param alertInfo
    */
   async sendFsAlertMsg(alertInfo: SentryAlertDto) {
     //构建消息内容
-
+    const content = buildFeishuTemplateCardMsg(alertInfo);
     // 发送群消息
     const msgInfo = await feishuClient.im.message.create({
       data: {
         receive_id: 'oc_5d491e2bc0287cba81e8cf85765aea8d',
-        msg_type: 'text',
-        content: `{"text":"${alertInfo.level} 错误：${alertInfo.errorMessage}  环境：${alertInfo.environment} 项目：${alertInfo.project}"}`,
+        msg_type: 'interactive',
+        content,
+        // content: `{"text":"${alertInfo.level} 错误：${alertInfo.errorMessage}  环境：${alertInfo.environment} 项目：${alertInfo.project}"}`,
       },
       params: {
         receive_id_type: 'chat_id',
       },
     });
-    this.logger.info('[发送消息]：' + JSON.stringify(msgInfo));
+
+    this.logger.debug(msgInfo);
     const messageId = msgInfo.data.message_id;
     if (!messageId) {
-      this.logger.error('[发送消息]：' + JSON.stringify(msgInfo));
+      this.logger.error(msgInfo);
       throw new Error('消息发送失败，message_id为空');
     }
 
     //获取飞书用户userid（todo） -> 消息加急
     const feishuUserId = appUserMap[alertInfo.project];
 
-    await this.sendFsAlertMsgToUser(msgInfo, feishuUserId || '762a5468');
+    await this.sendFsAlertMsgToUser(msgInfo, feishuUserId || '13aabc6b');
     //获取leader飞书userid（todo） -> 消息加急
     // await this.sendFsAlertMsgToUser(msgInfo, '762a5468');
     //获取leader的leader飞书userid（todo） -> 消息加急
@@ -64,7 +68,7 @@ export class AlertMsgService {
         message_id: messageId,
       },
     });
-    this.logger.info('[消息加急]：' + JSON.stringify(urgentInfo));
+    this.logger.info(urgentInfo);
 
     //记录已经发出的加急消息信息
     const alertMsgInfo = await this.prisma.alertMessage.create({
@@ -74,7 +78,7 @@ export class AlertMsgService {
         content: msgInfo.data.body?.content || '',
       },
     });
-    this.logger.info('[记录消息]：' + JSON.stringify(alertMsgInfo));
+    this.logger.info(alertMsgInfo);
 
     //每1分钟查看消息是否已读
     await addRetryJob(

@@ -59,7 +59,7 @@ model AlertMessage {
   id         Int      @id @default(autoincrement())
   messageId  String   @unique
   userId     String
-  content    String
+  content    String   @db.Text 
   readTime   DateTime?
   createTime DateTime @default(now())
 }
