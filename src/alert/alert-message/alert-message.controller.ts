@@ -15,17 +15,20 @@ export class AlertMsgController {
 
   @Post('send')
   async sendMsg(@Body() alertInfo: SentryAlertDto) {
+    dayjs.tz.setDefault('America/New_York');
+
     //写入多维表格
 
     //发送消息
-    if (isNeedSendAlertMsg()) {
+    if (isNeedSendAlertMsg(alertInfo.timeStamp)) {
       this.alertMsgService.sendFsAlertMsg(alertInfo);
     }
+
     this.logger.info(
       "[ dayjs().format('YYYY-MM-DD HH') ] >",
-      dayjs().format('YYYY-MM-DD HH'),
+      dayjs(alertInfo.timeStamp * 1000).format('YYYY-MM-DD HH'),
     );
-    return { data: isNeedSendAlertMsg() };
+    return { data: isNeedSendAlertMsg(alertInfo.timeStamp) };
   }
   @Post('readMsgCallback')
   // 接收已读webhook

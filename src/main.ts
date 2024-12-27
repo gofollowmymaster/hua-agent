@@ -7,7 +7,14 @@ import {
 import { AllExceptionsFilter } from './common/filter/all-exception/all-exception.filter';
 import { TransformInterceptor } from './common/interceptor/transform/transform.interceptor';
 import * as bodyParser from 'body-parser';
+import utc from 'dayjs/plugin/utc'; // nodejs
+import timezone from 'dayjs/plugin/timezone'; // nodejs
+import dayjs from 'dayjs';
+
 declare const module: any;
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

@@ -4,23 +4,33 @@ import { SentryAlertDto } from './dto/sentry-alert.dto';
 const { isHoliday } = require('chinese-workday');
 
 dayjs.extend(isBetween);
-export const hourTimeBetween = (startHour: number, endHour: number) => {
-  return dayjs(dayjs().format('YYYY-MM-DD HH')).isBetween(
-    dayjs().hour(startHour).format('YYYY-MM-DD HH'),
-    dayjs().hour(endHour).format('YYYY-MM-DD HH'),
-    'hour',
-  );
+export const hourTimeBetween = (
+  startHour: number,
+  endHour: number,
+  time: number,
+) => {
+  return dayjs(dayjs(time).tz('Asia/Shanghai').format('YYYY-MM-DD HH'))
+    .tz('Asia/Shanghai')
+    .isBetween(
+      dayjs().tz('Asia/Shanghai').hour(startHour).format('YYYY-MM-DD HH'),
+      dayjs().tz('Asia/Shanghai').hour(endHour).format('YYYY-MM-DD HH'),
+      'hour',
+    );
 };
 
 /**
  * 是否需要发送加急报警消息
  * @returns boolean
  */
-export const isNeedSendAlertMsg = () => {
-  if (isHoliday(dayjs().format('YYYY-MM-DD')) && hourTimeBetween(18, 24)) {
+export const isNeedSendAlertMsg = (time: number) => {
+  time = time * 1000;
+  if (
+    isHoliday(dayjs(time).format('YYYY-MM-DD')) &&
+    hourTimeBetween(18, 24, time)
+  ) {
     return true;
   }
-  if (hourTimeBetween(18, 24)) {
+  if (hourTimeBetween(18, 24, time)) {
     return true;
   }
   return false;
