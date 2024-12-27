@@ -9,7 +9,8 @@ import { VerifyModule } from './verify/verify.module';
 import { RobotModule } from './robot/robot.module';
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { MockServerModule } from './mock-server/mock-server.module';
-import { AlertMsgModule } from '@src/alert/alert-message/alert-message.module';
+import { AlertMsgModule } from '@src/feishu/alert-message/alert-message.module';
+import { FeishuEventModule } from '@src/feishu/event/event.module';
 import { LoggerModule } from './common/service/logger/logger.module';
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { LoggerModule } from './common/service/logger/logger.module';
     MockServerModule,
     AlertMsgModule,
     LoggerModule,
+    FeishuEventModule,
   ],
   providers: [PrismaService],
 })

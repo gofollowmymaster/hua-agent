@@ -46,4 +46,10 @@ export class AlertMsgController {
     console.log('[readMsg]:', callbackInfo);
     return { list: [] };
   }
+  @Post('callback')
+  // 接收已表情回复webhook
+  async feishuEventCallback(@Body() callbackInfo: SentryAlertDto) {
+    console.log('[readMsg]:', callbackInfo);
+    return { list: [] };
+  }
 }
