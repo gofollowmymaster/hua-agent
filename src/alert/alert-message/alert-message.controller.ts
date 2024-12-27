@@ -4,6 +4,7 @@ import { ReadMsgCallbackDto, SentryAlertDto } from './dto/sentry-alert.dto';
 import { AlertMsgService } from './alert-message.service';
 import { isNeedSendAlertMsg } from './utils';
 import { LoggerService } from '@src/common/service/logger/logger.service';
+import dayjs from 'dayjs';
 
 @Controller('alert-message')
 export class AlertMsgController {
@@ -20,6 +21,10 @@ export class AlertMsgController {
     if (isNeedSendAlertMsg()) {
       this.alertMsgService.sendFsAlertMsg(alertInfo);
     }
+    this.logger.info(
+      "[ dayjs().format('YYYY-MM-DD HH') ] >",
+      dayjs().format('YYYY-MM-DD HH'),
+    );
     return { data: isNeedSendAlertMsg() };
   }
   @Post('readMsgCallback')
