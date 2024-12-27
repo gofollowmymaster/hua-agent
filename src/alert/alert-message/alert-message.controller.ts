@@ -20,7 +20,7 @@ export class AlertMsgController {
     if (isNeedSendAlertMsg()) {
       this.alertMsgService.sendFsAlertMsg(alertInfo);
     }
-    // return { data: isNeedSendAlertMsg() };
+    return { data: isNeedSendAlertMsg() };
   }
   @Post('readMsgCallback')
   // 接收已读webhook

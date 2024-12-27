@@ -5,6 +5,10 @@ const { isHoliday } = require('chinese-workday');
 
 dayjs.extend(isBetween);
 export const hourTimeBetween = (startHour: number, endHour: number) => {
+  console.log(
+    "[ dayjs().format('YYYY-MM-DD HH') ] >",
+    dayjs().format('YYYY-MM-DD HH'),
+  );
   return dayjs(dayjs().format('YYYY-MM-DD HH')).isBetween(
     dayjs().hour(startHour).format('YYYY-MM-DD HH'),
     dayjs().hour(endHour).format('YYYY-MM-DD HH'),
