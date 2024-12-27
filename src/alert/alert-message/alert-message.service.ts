@@ -26,7 +26,6 @@ export class AlertMsgService {
         receive_id: 'oc_5d491e2bc0287cba81e8cf85765aea8d',
         msg_type: 'interactive',
         content,
-        // content: `{"text":"${alertInfo.level} 错误：${alertInfo.errorMessage}  环境：${alertInfo.environment} 项目：${alertInfo.project}"}`,
       },
       params: {
         receive_id_type: 'chat_id',
