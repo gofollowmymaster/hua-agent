@@ -16,12 +16,11 @@ export class AlertMsgController {
   async sendMsg(@Body() alertInfo: SentryAlertDto) {
     //写入多维表格
 
-    this.logger.info('[ isNeedSendAlertMsg() ] >', isNeedSendAlertMsg());
     //发送消息
     if (isNeedSendAlertMsg()) {
       this.alertMsgService.sendFsAlertMsg(alertInfo);
     }
-    return { data: isNeedSendAlertMsg() };
+    // return { data: isNeedSendAlertMsg() };
   }
   @Post('readMsgCallback')
   // 接收已读webhook

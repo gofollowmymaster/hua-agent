@@ -5,9 +5,9 @@ const { isHoliday } = require('chinese-workday');
 
 dayjs.extend(isBetween);
 export const hourTimeBetween = (startHour: number, endHour: number) => {
-  return dayjs().isBetween(
-    dayjs().startOf('day').hour(startHour),
-    dayjs().startOf('day').hour(endHour),
+  return dayjs(dayjs().format('YYYY-MM-DD HH')).isBetween(
+    dayjs().hour(startHour).format('YYYY-MM-DD HH'),
+    dayjs().hour(endHour).format('YYYY-MM-DD HH'),
     'hour',
   );
 };
@@ -17,10 +17,10 @@ export const hourTimeBetween = (startHour: number, endHour: number) => {
  * @returns boolean
  */
 export const isNeedSendAlertMsg = () => {
-  if (isHoliday(dayjs().format('YYYY-MM-DD')) && hourTimeBetween(19, 24)) {
+  if (isHoliday(dayjs().format('YYYY-MM-DD')) && hourTimeBetween(18, 24)) {
     return true;
   }
-  if (hourTimeBetween(19, 24)) {
+  if (hourTimeBetween(18, 24)) {
     return true;
   }
   return false;
