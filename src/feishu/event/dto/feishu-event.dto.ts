@@ -23,7 +23,8 @@ export type MsgReadEvent = {
 export type FeishuEventCallbackBase = {
   schema: string;
   header: FeishuEventHeader;
-  challenge?:string
+  challenge?:string;
+  type?:string
 };
 
 export type FeishuEventCallbackDto = FeishuEventCallbackBase & {

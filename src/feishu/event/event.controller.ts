@@ -14,6 +14,9 @@ export class FeishuEventController {
   @Post('callback')
   // 接收已表情回复webhook
   async feishuEventCallback(@Body() callbackInfo: FeishuEventCallbackDto) {
+    if(callbackInfo.type === 'url_verification'){
+      return {challenge:callbackInfo.challenge};
+    } 
     const res = await this.feishuEventService.handle(callbackInfo);
     this.logger.info('res:', res);
     return {challenge:callbackInfo.challenge, data: res };
