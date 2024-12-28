@@ -25,7 +25,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const message = exception.message || 'Internal Server Error';
     const responseBody = {
       code: httpStatus,
-      timestamp: new Date().toISOString(),
+      // timestamp: new Date().toISOString(),
       message,
       path: httpAdapter.getRequestUrl(ctx.getRequest()),
     };
