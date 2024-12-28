@@ -20,10 +20,13 @@ export class AlertMsgService {
   async sendFsAlertMsg(alertInfo: SentryAlertDto) {
     //构建消息内容
     const content = buildFeishuTemplateCardMsg(alertInfo);
+      //获取飞书用户userid（todo）群Id -> 消息加急
+      const {userId:feishuUserId,groupId:feishuGroupId} = appUserMap[alertInfo.project];
+
     // 发送群消息
     const msgInfo = await feishuClient.im.message.create({
       data: {
-        receive_id: 'oc_5d491e2bc0287cba81e8cf85765aea8d',
+        receive_id: feishuGroupId,
         msg_type: 'interactive',
         content,
       },
@@ -39,9 +42,7 @@ export class AlertMsgService {
       throw new Error('消息发送失败，message_id为空');
     }
 
-    //获取飞书用户userid（todo） -> 消息加急
-    const feishuUserId = appUserMap[alertInfo.project];
-
+  
     await this.sendFsAlertMsgToUser(msgInfo, feishuUserId || '13aabc6b');
     //获取leader飞书userid（todo） -> 消息加急
     // await this.sendFsAlertMsgToUser(msgInfo, '762a5468');

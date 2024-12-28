@@ -24,32 +24,10 @@ export class AlertMsgController {
       this.alertMsgService.sendFsAlertMsg(alertInfo);
     }
 
-    this.logger.info(
-      "[ dayjs().format('YYYY-MM-DD HH') ] >",
-      dayjs(alertInfo.timeStamp * 1000).format('YYYY-MM-DD HH'),
-    );
+   
     return { data: isNeedSendAlertMsg(alertInfo.timeStamp) };
   }
-  @Post('readMsgCallback')
-  // 接收已读webhook
-  async readMsgCallback(@Body() callbackInfo: ReadMsgCallbackDto) {
-    // 标记已读
-    await this.alertMsgService.markAsReaded(
-      callbackInfo.event.message_id_list[0],
-    );
-    return { list: [] };
-  }
 
-  @Post('readMsgCallback')
-  // 接收已表情回复webhook
-  async reactionMsgCallback(@Body() callbackInfo: SentryAlertDto) {
-    console.log('[readMsg]:', callbackInfo);
-    return { list: [] };
-  }
-  @Post('callback')
-  // 接收已表情回复webhook
-  async feishuEventCallback(@Body() callbackInfo: SentryAlertDto) {
-    console.log('[readMsg]:', callbackInfo);
-    return { list: [] };
-  }
+
+
 }
