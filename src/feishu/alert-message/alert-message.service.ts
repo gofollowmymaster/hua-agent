@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SentryAlertDto } from './dto/sentry-alert.dto';
-import feishuClient from '@src/common/feishu/client';
+import feishuClient from '@src/feishu/common/client';
 import { addRetryJob } from '@src/utils/job';
 import { PrismaService } from '@src/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
@@ -23,7 +23,7 @@ export class AlertMsgService {
     // 发送群消息
     const msgInfo = await feishuClient.im.message.create({
       data: {
-        receive_id: 'oc_5d491e2bc0287cba81e8cf85765aea8d',
+        receive_id: 'oc_b030f5155cad2838eeacadc977f403b0',
         msg_type: 'interactive',
         content,
       },

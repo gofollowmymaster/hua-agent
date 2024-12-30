@@ -20,9 +20,9 @@ export class AlertMsgController {
     //写入多维表格
 
     //发送消息
-    if (isNeedSendAlertMsg(alertInfo.timeStamp)) {
-      this.alertMsgService.sendFsAlertMsg(alertInfo);
-    }
+    // if (isNeedSendAlertMsg(alertInfo.timeStamp)) {
+    this.alertMsgService.sendFsAlertMsg(alertInfo);
+    // }
 
     this.logger.info(
       "[ dayjs().format('YYYY-MM-DD HH') ] >",
