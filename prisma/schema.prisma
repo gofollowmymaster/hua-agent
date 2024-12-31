@@ -61,6 +61,7 @@ model AlertMessage {
   userId     String
   content    String   @db.Text 
   readTime   DateTime?
+  reactionTime   DateTime?
   createTime DateTime @default(now())
 }
 

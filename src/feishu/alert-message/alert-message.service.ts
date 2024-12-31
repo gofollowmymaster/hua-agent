@@ -25,7 +25,7 @@ export class AlertMsgService {
       appUserMap[alertInfo.project];
 
     // 发送群消息
-    const msgInfo = await feishuClient.im.message.create({
+    const groupMsgInfo = await feishuClient.im.message.create({
       data: {
         receive_id: feishuGroupId,
         msg_type: 'interactive',
@@ -35,18 +35,34 @@ export class AlertMsgService {
         receive_id_type: 'chat_id',
       },
     });
+    this.logger.debug(groupMsgInfo);
 
-    this.logger.debug(msgInfo);
-    const messageId = msgInfo.data.message_id;
+    const userMsgInfo = await feishuClient.im.message.create({
+      data: {
+        receive_id: feishuUserId,
+        msg_type: 'interactive',
+        content,
+      },
+      params: {
+        receive_id_type: 'user_id',
+      },
+    });
+
+    const messageId = userMsgInfo.data.message_id;
     if (!messageId) {
-      this.logger.error(msgInfo);
+      this.logger.error(userMsgInfo);
       throw new Error('消息发送失败，message_id为空');
     }
 
-    await this.sendFsAlertMsgToUser(msgInfo, feishuUserId || '13aabc6b');
+    let res = await this.sendFsAlertMsgToUser(
+      userMsgInfo,
+      feishuUserId || '13aabc6b',
+    );
     //获取leader飞书userid（todo） -> 消息加急
-    // await this.sendFsAlertMsgToUser(msgInfo, '762a5468');
+    !res && (res = await this.sendFsAlertMsgToUser(userMsgInfo, '13aabc6b'));
     //获取leader的leader飞书userid（todo） -> 消息加急
+    // !res && (res = await this.sendFsAlertMsgToUser(msgInfo, '13aabc6b'));
+
     // await this.sendFsAlertMsgToUser(msgInfo, '762a5468');
   }
   /**
@@ -81,7 +97,7 @@ export class AlertMsgService {
     this.logger.info(alertMsgInfo);
 
     //每1分钟查看消息是否已读
-    await addRetryJob(
+    return await addRetryJob(
       async () => {
         return this.checkMsgIsRead(alertMsgInfo.id);
       },
@@ -101,16 +117,6 @@ export class AlertMsgService {
         id,
       },
     });
-    return !!message.readTime;
-  }
-  async markAsReaded(messageId: string) {
-    await this.prisma.alertMessage.update({
-      where: {
-        messageId,
-      },
-      data: {
-        readTime: new Date(),
-      },
-    });
+    return !!message.readTime || !!message.reactionTime;
   }
 }

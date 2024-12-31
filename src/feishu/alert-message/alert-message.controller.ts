@@ -24,10 +24,6 @@ export class AlertMsgController {
     this.alertMsgService.sendFsAlertMsg(alertInfo);
     // }
 
-   
     return { data: isNeedSendAlertMsg(alertInfo.timeStamp) };
   }
-
-
-
 }

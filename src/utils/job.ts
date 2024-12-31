@@ -23,11 +23,11 @@ export async function addRetryJob(
         //5分钟后还没有读取消息，通知leader
         if (num >= time) {
           clearInterval(intervalHandler);
-          reject();
+          resolve(false);
         }
       } catch (error) {
         clearInterval(intervalHandler);
-        reject(error);
+        resolve(false);
       }
     }, seconds);
   });

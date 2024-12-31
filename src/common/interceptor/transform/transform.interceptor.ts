@@ -20,12 +20,12 @@ export class TransformInterceptor<T>
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<Response<T>> {
-    const controllerName =  context.getClass().name
+    const controllerName = context.getClass().name;
     return next.handle().pipe(
       map((data) => {
         // 判断是否是飞书事件回调
-        if(controllerName === 'FeishuEventController'){
-          return data
+        if (controllerName === 'FeishuEventController') {
+          return data;
         }
         return { code: 200, body: data, message: '请求成功' };
       }),

@@ -15,11 +15,11 @@ export class FeishuEventController {
   // 接收已表情回复webhook
   async feishuEventCallback(@Body() callbackInfo: FeishuEventCallbackDto) {
     // 验证
-    if(callbackInfo.type === 'url_verification'){
-      return {challenge:callbackInfo.challenge};
-    } 
+    if (callbackInfo.type === 'url_verification') {
+      return { challenge: callbackInfo.challenge };
+    }
     const res = await this.feishuEventService.handle(callbackInfo);
     this.logger.info('res:', res);
-    return {challenge:callbackInfo.challenge, data: res };
+    return { challenge: callbackInfo.challenge, data: res, code: 200 };
   }
 }
