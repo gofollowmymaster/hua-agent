@@ -15,13 +15,13 @@ export class AlertMsgController {
 
   @Post('send')
   async sendMsg(@Body() alertInfo: SentryAlertDto) {
-    dayjs.tz.setDefault('America/New_York');
+    // dayjs.tz.setDefault('America/New_York');
 
     //写入多维表格
 
     //发送消息
     // if (isNeedSendAlertMsg(alertInfo.timeStamp)) {
-    this.alertMsgService.sendFsAlertMsg(alertInfo);
+    await this.alertMsgService.sendFsAlertMsg(alertInfo);
     // }
 
     return { data: isNeedSendAlertMsg(alertInfo.timeStamp) };
