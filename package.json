@@ -9,7 +9,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "migrate:dev": "pnpm dotenv -e .env -- npx prisma migrate dev --create-only",
-    "migrate:test": "pnpm dotenv -e .env.test -- npx prisma migrate test --create-only",
+    "migrate:test": "pnpm dotenv -e .env.test -- npx prisma migrate dev --create-only",
     "migrate:prod": "pnpm dotenv -e .env.prod -- npx prisma migrate deploy",
     "start": "nest start",
     "start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js --watch",

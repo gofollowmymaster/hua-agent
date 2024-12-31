@@ -37,29 +37,18 @@ export class AlertMsgService {
     });
     this.logger.debug(groupMsgInfo);
 
-    const userMsgInfo = await feishuClient.im.message.create({
-      data: {
-        receive_id: feishuUserId,
-        msg_type: 'interactive',
-        content,
-      },
-      params: {
-        receive_id_type: 'user_id',
-      },
-    });
-
-    const messageId = userMsgInfo.data.message_id;
+    const messageId = groupMsgInfo.data.message_id;
     if (!messageId) {
-      this.logger.error(userMsgInfo);
+      this.logger.error(groupMsgInfo);
       throw new Error('消息发送失败，message_id为空');
     }
 
     let res = await this.sendFsAlertMsgToUser(
-      userMsgInfo,
+      groupMsgInfo,
       feishuUserId || '13aabc6b',
     );
     //获取leader飞书userid（todo） -> 消息加急
-    !res && (res = await this.sendFsAlertMsgToUser(userMsgInfo, '13aabc6b'));
+    !res && (res = await this.sendFsAlertMsgToUser(groupMsgInfo, '13aabc6b'));
     //获取leader的leader飞书userid（todo） -> 消息加急
     // !res && (res = await this.sendFsAlertMsgToUser(msgInfo, '13aabc6b'));
 
@@ -71,7 +60,7 @@ export class AlertMsgService {
    * @param userId
    */
   async sendFsAlertMsgToUser(msgInfo: Record<string, any>, userId: string) {
-    const messageId = msgInfo.data.message_id;
+    const fMessageId = msgInfo.data.message_id;
     // 发送加急消息
     const urgentInfo = await feishuClient.im.message.urgentPhone({
       data: {
@@ -81,7 +70,7 @@ export class AlertMsgService {
         user_id_type: 'user_id',
       },
       path: {
-        message_id: messageId,
+        message_id: fMessageId,
       },
     });
     this.logger.info(urgentInfo);
@@ -89,9 +78,15 @@ export class AlertMsgService {
     //记录已经发出的加急消息信息
     const alertMsgInfo = await this.prisma.alertMessage.create({
       data: {
-        messageId,
-        userId,
+        fMessageId,
         content: msgInfo.data.body?.content || '',
+        userAlerted: {
+          create: [
+            {
+              fUserId: userId,
+            },
+          ],
+        },
       },
     });
     this.logger.info(alertMsgInfo);
@@ -99,7 +94,7 @@ export class AlertMsgService {
     //每1分钟查看消息是否已读
     return await addRetryJob(
       async () => {
-        return this.checkMsgIsRead(alertMsgInfo.id);
+        return this.checkMsgIsRead(alertMsgInfo.fMessageId, userId);
       },
       60 * 1000,
       5,
@@ -107,16 +102,25 @@ export class AlertMsgService {
   }
   /**
    * 是否已读
-   * @param id
+   * @param fMessageId
    * @returns
    */
-  async checkMsgIsRead(id: number) {
+  async checkMsgIsRead(fMessageId: string, fUserId: string) {
     // 查询消息是否已读
     const message = await this.prisma.alertMessage.findUnique({
       where: {
-        id,
+        fMessageId,
+        userAlerted: {
+          some: {
+            fUserId: fUserId,
+          },
+        },
+      },
+      select: {
+        userAlerted: true,
+        // reactionTime: true,
       },
     });
-    return !!message.readTime || !!message.reactionTime;
+    return !!message.userAlerted.reactionTime;
   }
 }
