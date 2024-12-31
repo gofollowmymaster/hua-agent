@@ -8,11 +8,11 @@ const MsgReactionHandler: CustomEventHandleType<
   console.log('user_id:', user_id);
 
   const PrismaService = service.prisma;
-  await PrismaService.alertMessageUser.update({
+  await PrismaService.alertMessageUser.updateMany({
     where: {
-      message: {},
-      // messageId,
-      // fUserId: user_id.user_id,
+      // message: {},
+      messageId,
+      fUserId: user_id.user_id,
     },
     data: {
       reactionTime: new Date(),

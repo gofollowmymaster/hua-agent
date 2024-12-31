@@ -121,6 +121,6 @@ export class AlertMsgService {
         // reactionTime: true,
       },
     });
-    return !!message.userAlerted.reactionTime;
+    return !!message.userAlerted[0].reactionTime;
   }
 }

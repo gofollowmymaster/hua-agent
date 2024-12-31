@@ -8,9 +8,10 @@ const MsgReadHandler: CustomEventHandleType<
   console.log('message_id_list:', message_id_list);
   const messageId = message_id_list[0];
   const PrismaService = service.prisma;
-  await PrismaService.alertMessageUser.update({
+  await PrismaService.alertMessageUser.updateMany({
     where: {
       messageId,
+      fUserId: reader.reader_id.user_id,
     },
     data: {
       readTime: new Date(),
