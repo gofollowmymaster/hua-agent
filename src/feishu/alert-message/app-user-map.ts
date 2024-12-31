@@ -16,11 +16,11 @@ export default {
     userId: 'c4534fad',
   },
   'aplus-admin-wms': {
-    groupId: 'oc_b030f5155cad2838eeacadc977f403b0',
+    groupId: 'oc_ca28717489700c2fe873406fcfa867a4',
     userId: '762a5468',
   },
   'aplus-user-wms': {
-    groupId: 'oc_b030f5155cad2838eeacadc977f403b0',
+    groupId: 'oc_ca28717489700c2fe873406fcfa867a4',
     userId: '762a5468',
   },
   'aplus-admin-main': {
