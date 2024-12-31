@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween'; // nodejs
 import { SentryAlertDto } from './dto/sentry-alert.dto';
-const { isHoliday } = require('chinese-workday');
+const { isWorkday } = require('chinese-workday');
 
 dayjs.extend(isBetween);
 export const hourTimeBetween = (
@@ -25,12 +25,12 @@ export const hourTimeBetween = (
 export const isNeedSendAlertMsg = (time: number) => {
   time = time * 1000;
   if (
-    isHoliday(dayjs(time).format('YYYY-MM-DD')) &&
+    isWorkday(dayjs(time).tz('Asia/Shanghai').format('YYYY-MM-DD')) &&
     hourTimeBetween(18, 24, time)
   ) {
     return true;
   }
-  if (hourTimeBetween(18, 24, time)) {
+  if (hourTimeBetween(8, 24, time)) {
     return true;
   }
   return false;

@@ -1,6 +1,8 @@
 import MsgReadHandler from './msg-read-handler';
-
+import MsgReactionHandler from './msg-reaction-handler';
 const EventHandler = {
   'im.message.message_read_v1': MsgReadHandler,
+  'im.message.receive_v1': ()=>{},
+  'im.message.reaction.created_v1':MsgReactionHandler
 };
 export default EventHandler;

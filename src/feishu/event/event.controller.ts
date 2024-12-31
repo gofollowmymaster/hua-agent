@@ -5,7 +5,7 @@ import { FeishuEventService } from './event.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 
 @Controller('feishu-event')
-export class EventController {
+export class FeishuEventController {
   constructor(
     private readonly feishuEventService: FeishuEventService,
     private readonly logger: LoggerService,
@@ -14,8 +14,12 @@ export class EventController {
   @Post('callback')
   // 接收已表情回复webhook
   async feishuEventCallback(@Body() callbackInfo: FeishuEventCallbackDto) {
+    // 验证
+    if(callbackInfo.type === 'url_verification'){
+      return {challenge:callbackInfo.challenge};
+    } 
     const res = await this.feishuEventService.handle(callbackInfo);
     this.logger.info('res:', res);
-    return { data: res };
+    return {challenge:callbackInfo.challenge, data: res };
   }
 }
