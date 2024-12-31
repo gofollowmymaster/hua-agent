@@ -21,8 +21,7 @@ export class TransformInterceptor<T>
     next: CallHandler,
   ): Observable<Response<T>> {
     const controllerName = context.getClass().name;
-    return;
-    next.handle().pipe(
+    return next.handle().pipe(
       map((data) => {
         // 判断是否是飞书事件回调
         if (controllerName === 'FeishuEventController') {

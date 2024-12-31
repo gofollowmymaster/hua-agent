@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SentryAlertDto } from './dto/sentry-alert.dto';
-import feishuClient from '@src/feishu/common/client';
+import feishuClient from '@src/alert/common/client';
 import { addRetryJob } from '@src/utils/job';
 import { PrismaService } from '@src/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
