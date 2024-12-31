@@ -6,4 +6,4 @@ COPY . ./
 EXPOSE 3000 
 
 # Use pm2-runtime to start the application
-CMD ["pm2-runtime", "ecosystem.config.js", "--env", "prod"]
+CMD ["pm2-runtime", "ecosystem.config.js", "--env", "test"]
