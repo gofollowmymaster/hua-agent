@@ -1,10 +1,9 @@
 import { Body, Controller, Post } from '@nestjs/common';
 
-import { ReadMsgCallbackDto, SentryAlertDto } from './dto/sentry-alert.dto';
+import { SentryAlertDto } from './dto/sentry-alert.dto';
 import { AlertMsgService } from './alert-message.service';
 import { isNeedSendAlertMsg } from './utils';
 import { LoggerService } from '@src/common/service/logger/logger.service';
-import dayjs from 'dayjs';
 
 @Controller('alert-message')
 export class AlertMsgController {
@@ -21,7 +20,7 @@ export class AlertMsgController {
 
     //发送消息
     // if (isNeedSendAlertMsg(alertInfo.timeStamp)) {
-    await this.alertMsgService.sendFsAlertMsg(alertInfo);
+    this.alertMsgService.sendFsAlertMsg(alertInfo);
     // }
 
     return { data: isNeedSendAlertMsg(alertInfo.timeStamp) };
