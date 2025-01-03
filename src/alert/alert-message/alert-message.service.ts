@@ -43,6 +43,10 @@ export class AlertMsgService {
       throw new Error('消息发送失败，message_id为空');
     }
 
+    if (alertInfo.level !== 'fatal') {
+      return;
+    }
+
     let res = await this.sendFsAlertMsgToUser(
       groupMsgInfo,
       feishuUserId || '13aabc6b',
