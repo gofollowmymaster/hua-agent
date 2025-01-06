@@ -30,7 +30,7 @@ export const isNeedSendAlertMsg = (time: number) => {
   ) {
     return true;
   }
-  if (hourTimeBetween(8, 24, time)) {
+  if (hourTimeBetween(18, 24, time)) {
     return true;
   }
   return false;
