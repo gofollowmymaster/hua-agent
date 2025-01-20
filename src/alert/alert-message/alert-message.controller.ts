@@ -19,9 +19,9 @@ export class AlertMsgController {
     //写入多维表格
 
     //发送消息
-    if (isNeedSendAlertMsg(alertInfo.timeStamp)) {
-      this.alertMsgService.sendFsAlertMsg(alertInfo);
-    }
+    // if (isNeedSendAlertMsg(alertInfo.timeStamp)) {
+    this.alertMsgService.sendFsAlertMsg(alertInfo);
+    // }
 
     return { data: isNeedSendAlertMsg(alertInfo.timeStamp) };
   }

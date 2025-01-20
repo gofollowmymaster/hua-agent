@@ -12,15 +12,11 @@ export class FeishuEventService {
   ) {}
 
   async handle(callbackInfo: FeishuEventCallbackDto) {
-    const { schema, header, event } = callbackInfo;
+    const { header, event } = callbackInfo;
 
-    this.logger.info('schema:' + schema);
-    this.logger.info('event_type:' + header.event_type);
-    this.logger.info('create_time:' + header.create_time);
     const handler = EventHandler[header.event_type];
     if (handler) {
       const res = await handler(event, this);
-      console.log('[ return ] >', res);
       return res;
     }
     throw new Error('未知事件类型');

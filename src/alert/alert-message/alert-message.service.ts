@@ -5,7 +5,11 @@ import { addRetryJob } from '@src/utils/job';
 import { PrismaService } from '@src/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import getSendInfoByProject from './app-user-map';
-import { buildFeishuTemplateCardMsg } from './utils';
+import {
+  buildAtUserMsg,
+  buildFeishuTemplateCardMsg,
+  isNeedSendAlertMsg,
+} from './utils';
 @Injectable()
 export class AlertMsgService {
   constructor(
@@ -18,11 +22,12 @@ export class AlertMsgService {
    * @param alertInfo
    */
   async sendFsAlertMsg(alertInfo: SentryAlertDto) {
-    //构建消息内容
-    const content = buildFeishuTemplateCardMsg(alertInfo);
     //获取飞书用户userid（todo）群Id -> 消息加急
     const { userId: feishuUserId, groupId: feishuGroupId } =
       getSendInfoByProject(alertInfo.project);
+
+    //构建消息内容
+    const content = buildFeishuTemplateCardMsg({ ...alertInfo });
 
     // 发送群消息
     const groupMsgInfo = await feishuClient.im.message.create({
@@ -35,9 +40,19 @@ export class AlertMsgService {
         receive_id_type: 'chat_id',
       },
     });
+    const messageId = groupMsgInfo.data.message_id;
+
+    // await feishuClient.im.message.reply({
+    //   data: {
+    //     msg_type: 'text',
+    //     content: buildAtUserMsg(alertInfo, feishuUserId),
+    //   },
+    //   path: {
+    //     message_id: messageId,
+    //   },
+    // });
     this.logger.debug(groupMsgInfo);
 
-    const messageId = groupMsgInfo.data.message_id;
     if (!messageId) {
       this.logger.error(groupMsgInfo);
       throw new Error('消息发送失败，message_id为空');
@@ -47,10 +62,11 @@ export class AlertMsgService {
       return;
     }
 
-    let res = await this.sendFsAlertMsgToUser(
-      groupMsgInfo,
-      feishuUserId || '13aabc6b',
-    );
+    if (!isNeedSendAlertMsg(alertInfo.timeStamp)) {
+      return;
+    }
+
+    let res = await this.sendFsAlertMsgToUser(groupMsgInfo, feishuUserId);
     //获取leader飞书userid（todo） -> 消息加急
     !res && (res = await this.sendFsAlertMsgToUser(groupMsgInfo, '13aabc6b'));
     //获取leader的leader飞书userid（todo） -> 消息加急
@@ -125,6 +141,7 @@ export class AlertMsgService {
         // reactionTime: true,
       },
     });
+    console.log('[ message ] >', message);
     return !!message.userAlerted[0].reactionTime;
   }
 }
