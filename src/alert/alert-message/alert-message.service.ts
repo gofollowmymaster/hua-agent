@@ -4,7 +4,7 @@ import feishuClient from '@src/alert/common/client';
 import { addRetryJob } from '@src/utils/job';
 import { PrismaService } from '@src/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
-import appUserMap from './app-user-map';
+import getSendInfoByProject from './app-user-map';
 import { buildFeishuTemplateCardMsg } from './utils';
 @Injectable()
 export class AlertMsgService {
@@ -22,7 +22,7 @@ export class AlertMsgService {
     const content = buildFeishuTemplateCardMsg(alertInfo);
     //获取飞书用户userid（todo）群Id -> 消息加急
     const { userId: feishuUserId, groupId: feishuGroupId } =
-      appUserMap[alertInfo.project];
+      getSendInfoByProject(alertInfo.project);
 
     // 发送群消息
     const groupMsgInfo = await feishuClient.im.message.create({

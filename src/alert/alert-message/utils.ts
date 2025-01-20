@@ -9,6 +9,14 @@ export const hourTimeBetween = (
   endHour: number,
   time: number,
 ) => {
+  console.log(
+    '[ startHour ] >',
+    startHour,
+    endHour,
+    dayjs().tz('Asia/Shanghai').hour(startHour).format('YYYY-MM-DD HH'),
+    dayjs().tz('Asia/Shanghai').hour(endHour).format('YYYY-MM-DD HH'),
+    dayjs(time).tz('Asia/Shanghai').format('YYYY-MM-DD HH'),
+  );
   return dayjs(dayjs(time).tz('Asia/Shanghai').format('YYYY-MM-DD HH'))
     .tz('Asia/Shanghai')
     .isBetween(
@@ -24,13 +32,18 @@ export const hourTimeBetween = (
  */
 export const isNeedSendAlertMsg = (time: number) => {
   time = time * 1000;
+  console.log(
+    '[ time ] >',
+    isWorkday(dayjs(time).tz('Asia/Shanghai').format('YYYY-MM-DD')),
+    // hourTimeBetween(18, 24, time),
+  );
   if (
     isWorkday(dayjs(time).tz('Asia/Shanghai').format('YYYY-MM-DD')) &&
     hourTimeBetween(18, 24, time)
   ) {
     return true;
   }
-  if (hourTimeBetween(18, 24, time)) {
+  if (hourTimeBetween(9, 24, time)) {
     return true;
   }
   return false;

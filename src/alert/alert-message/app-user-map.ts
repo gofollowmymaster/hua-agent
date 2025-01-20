@@ -1,4 +1,4 @@
-export default {
+export const appUserMap = {
   'aplus-admin-bms': {
     groupId: 'oc_ff9b51aa0f916fa8b8a372e0919b1159',
     userId: '3fd2f4f7',
@@ -31,4 +31,14 @@ export default {
     groupId: 'oc_1f846787d104e26e5bd50b7a25894f05',
     userId: 'a439d3fe',
   },
+};
+
+export default (projectName: string) => {
+  if (process.env.NODE_ENV == 'dev') {
+    return {
+      groupId: 'oc_b030f5155cad2838eeacadc977f403b0',
+      userId: '762a5468',
+    };
+  }
+  return appUserMap[projectName];
 };

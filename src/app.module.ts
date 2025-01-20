@@ -12,10 +12,11 @@ import { MockServerModule } from './mock-server/mock-server.module';
 import { AlertMsgModule } from '@src/alert/alert-message/alert-message.module';
 import { FeishuEventModule } from '@src/alert/event/event.module';
 import { LoggerModule } from './common/service/logger/logger.module';
+const envFilePath = [`.env.${process.env.NODE_ENV || 'dev'}`, '.env'];
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['.env', '.env.prod'],
+      envFilePath: envFilePath,
     }),
     // 静态资源服务
     ServeStaticModule.forRoot({
