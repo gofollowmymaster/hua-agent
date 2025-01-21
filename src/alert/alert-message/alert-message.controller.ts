@@ -23,6 +23,6 @@ export class AlertMsgController {
     this.alertMsgService.sendFsAlertMsg(alertInfo);
     // }
 
-    return { data: isNeedSendAlertMsg(alertInfo.timeStamp) };
+    return { data: process.env.DATABASE_URL };
   }
 }

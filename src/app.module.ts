@@ -12,7 +12,8 @@ import { MockServerModule } from './mock-server/mock-server.module';
 import { AlertMsgModule } from '@src/alert/alert-message/alert-message.module';
 import { FeishuEventModule } from '@src/alert/event/event.module';
 import { LoggerModule } from './common/service/logger/logger.module';
-const envFilePath = [`.env.${process.env.NODE_ENV || 'dev'}`, '.env'];
+const envFilePath = [`.env.${process.env.NODE_ENV}`, '.env'];
+console.log('[ process.env.NODE_ENV ] >', process.env.NODE_ENV);
 @Module({
   imports: [
     ConfigModule.forRoot({
