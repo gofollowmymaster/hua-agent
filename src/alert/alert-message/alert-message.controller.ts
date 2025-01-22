@@ -16,7 +16,7 @@ export class AlertMsgController {
     //写入多维表格
 
     //发送消息
-    this.alertMsgService.sendFsAlertMsg(alertInfo);
+    await this.alertMsgService.sendFsAlertMsg(alertInfo);
 
     return { data: process.env.NODE_ENV };
   }

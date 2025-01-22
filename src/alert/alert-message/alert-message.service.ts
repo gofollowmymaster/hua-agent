@@ -6,7 +6,7 @@ import { PrismaService } from '@src/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import getSendInfoByProject from './app-user-map';
 import {
-  buildAtUserMsg,
+  // buildAtUserMsg,
   buildFeishuTemplateCardMsg,
   isNeedSendAlertMsg,
 } from './utils';
@@ -65,7 +65,15 @@ export class AlertMsgService {
     if (!isNeedSendAlertMsg(alertInfo.timeStamp)) {
       return;
     }
-
+    //不加await 使接口不需要等待加急消息发送
+    this.messageAlert(groupMsgInfo, feishuUserId);
+  }
+  /**
+   * 加急消息
+   * @param groupMsgInfo
+   * @param feishuUserId
+   */
+  async messageAlert(groupMsgInfo: Record<string, any>, feishuUserId: string) {
     let res = await this.sendFsAlertMsgToUser(groupMsgInfo, feishuUserId);
     //获取leader飞书userid（todo） -> 消息加急
     !res && (res = await this.sendFsAlertMsgToUser(groupMsgInfo, '13aabc6b'));
@@ -75,7 +83,7 @@ export class AlertMsgService {
     // await this.sendFsAlertMsgToUser(msgInfo, '762a5468');
   }
   /**
-   * 消息加急
+   * 消息加急单个用户
    * @param msgInfo
    * @param userId
    */

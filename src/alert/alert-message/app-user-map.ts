@@ -34,7 +34,6 @@ export const appUserMap = {
 };
 
 export default (projectName: string) => {
-  console.log('[ NODE_ENV=dev ] >', process.env.NODE_ENV);
   if (process.env.NODE_ENV == 'dev') {
     return {
       groupId: 'oc_b030f5155cad2838eeacadc977f403b0',
