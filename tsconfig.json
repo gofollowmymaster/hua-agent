@@ -17,13 +17,13 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "esModuleInterop":true,
+    "esModuleInterop": true,
     "paths": {
       "@utils/*": ["src/utils/*"],
       "@src/*": ["src/*"],
-      "@mockServer/*": ["mockServer/*"],
+      "@mockServer/*": ["mockServer/*"]
     }
   },
-  "include": ["src/**/*.ts","type/**/*.ts"],
+  "include": ["src/**/*.ts", "type/**/*.ts", "ecosystem.config.js"],
   "exclude": ["node_modules", "dist"]
 }
