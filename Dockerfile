@@ -9,4 +9,4 @@ EXPOSE 3000
 # Use pm2-runtime to start the application
 # CMD "/opt/pnpm env:"$PM2_PROFILES_ACTIVE" && /opt/pm2-runtime ecosystem.config.js --env "$PM2_PROFILES_ACTIVE
 
-CMD ["pm2-runtime", "ecosystem.config.js", "--env", "$PM2_PROFILES_ACTIVE"]
+CMD ["pnpm", "docker:"$PM2_PROFILES_ACTIVE]
