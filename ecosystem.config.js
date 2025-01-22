@@ -10,6 +10,8 @@ module.exports = {
       },
       env_dev: {
         name: 'aplus_dev_sql',
+        DATABASE_URL:
+          'mysql://front_user:front123@mysql.dev.elnkpro.com:3306/test',
       },
     },
   ],
