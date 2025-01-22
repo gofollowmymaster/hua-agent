@@ -149,7 +149,6 @@ export class AlertMsgService {
         // reactionTime: true,
       },
     });
-    console.log('[ message ] >', message);
     return !!message.userAlerted[0].reactionTime;
   }
 }
