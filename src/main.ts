@@ -10,6 +10,7 @@ import * as bodyParser from 'body-parser';
 import utc from 'dayjs/plugin/utc'; // nodejs
 import timezone from 'dayjs/plugin/timezone'; // nodejs
 import dayjs from 'dayjs';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 declare const module: any;
 
@@ -18,6 +19,7 @@ dayjs.extend(timezone);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   const httpAdapter = app.get(HttpAdapterHost);
   app.enableCors();
   app.useGlobalFilters(
@@ -29,6 +31,19 @@ async function bootstrap() {
   // 增加请求体大小限制
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
+  if (process.env.NODE_ENV == 'dev') {
+    const config = new DocumentBuilder()
+      .setTitle('Aplus Frontend Node')
+      .setDescription('The Aplus Frontend Node API description')
+      .setVersion('1.0')
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('swagger', app, document,{
+      jsonDocumentUrl: 'swagger/json',
+    });
+  }
+
   await app.listen(3000);
 
   if (module.hot) {

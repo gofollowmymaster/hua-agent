@@ -10,12 +10,40 @@ import { RobotService } from './robot.service';
 import {
   MessageFromRobotDto,
   SearchParamsDto,
+  TableRecordId,
+  TableRecords,
+  TableRecordsOrId,
 } from './dto/post-message-from-robot.dto';
-
+import {
+  ApiBody,
+  ApiCreatedResponse,
+  ApiHeaders,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { records } from '@utils/actionTable/interface';
+import { AplusResponse } from '@src/type/global';
+@ApiTags('飞书多维表格')
+@ApiHeaders([
+  {
+    name: 'appToken',
+    description: '多维表格appToken',
+  },
+  {
+    name: 'tableId',
+    description: '多维表格appToken',
+  },
+])
 @Controller('robot')
 export class RobotController {
   constructor(private readonly robotService: RobotService) {}
-  //列出表格记录
+
+  @ApiOperation({
+    summary: '列出表格记录',
+    description: '列出表格记录',
+  })
+  @ApiOkResponse({ type: AplusResponse<records[]> })
   @Post('getRecord')
   async getList(
     @Headers('appToken') appToken: string,
@@ -34,7 +62,12 @@ export class RobotController {
       );
     }
   }
-  //创建表格记录
+  @ApiOperation({
+    summary: '创建表格记录',
+    description: '创建表格记录',
+  })
+  @ApiBody({ type: TableRecords })
+  @ApiCreatedResponse({ type: AplusResponse<records> })
   @Post('createRecord')
   async createRecord(
     @Headers('appToken') appToken: string,
@@ -54,7 +87,12 @@ export class RobotController {
       );
     }
   }
-  //查询表格记录
+  @ApiOperation({
+    summary: '查询表格记录',
+    description: '查询表格记录',
+  })
+  // @ApiBody({ type:   })
+  @ApiOkResponse({ type: AplusResponse<records[]> })
   @Post('searchRecord')
   async searchRecord(
     @Headers('appToken') appToken: string,
@@ -74,7 +112,15 @@ export class RobotController {
       );
     }
   }
-  //查询表格记录
+
+  @ApiOperation({
+    summary: '修改表格记录',
+    description: '修改表格记录',
+  })
+  @ApiBody({
+    type: TableRecordsOrId,
+  })
+  @ApiOkResponse({ type: AplusResponse<records[]> })
   @Post('updateRecord')
   async updateRecord(
     @Headers('appToken') appToken: string,
@@ -94,7 +140,12 @@ export class RobotController {
       );
     }
   }
-  //删除表格记录
+  @ApiOperation({
+    summary: '删除表格记录',
+    description: '删除表格记录',
+  })
+  @ApiBody({ type: TableRecordId })
+  @ApiOkResponse({ type: AplusResponse<records> })
   @Post('deleteRecord')
   async deleteRecord(
     @Headers('appToken') appToken: string,
@@ -115,6 +166,12 @@ export class RobotController {
     }
   }
   //删除表格记录
+  @ApiOperation({
+    summary: '回复飞书消息',
+    description: '回复飞书消息',
+  })
+  @ApiBody({ type: MessageFromRobotDto })
+  @ApiOkResponse({ type: AplusResponse<records> })
   @Post('feishuFlowMessage')
   async feishuFlowMessage(
     @Headers('appToken') appToken: string,

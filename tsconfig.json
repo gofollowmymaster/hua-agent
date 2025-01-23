@@ -22,7 +22,9 @@
       "@utils/*": ["src/utils/*"],
       "@src/*": ["src/*"],
       "@mockServer/*": ["mockServer/*"]
-    }
+    },
+    "typeRoots": ["./node_modules/@types", "./type"]
+
   },
   "include": ["src/**/*.ts", "type/**/*.ts", "ecosystem.config.js"],
   "exclude": ["node_modules", "dist"]
