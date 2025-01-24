@@ -12,6 +12,8 @@ import { MockServerModule } from './mock-server/mock-server.module';
 import { AlertMsgModule } from '@src/alert/alert-message/alert-message.module';
 import { FeishuEventModule } from '@src/alert/event/event.module';
 import { LoggerModule } from './common/service/logger/logger.module';
+import configuration from './config';
+
 const envFilePath = [
   `.env.${process.env.NODE_ENV}.local`,
   `.env.${process.env.NODE_ENV}`,
@@ -22,6 +24,7 @@ const envFilePath = [
     ConfigModule.forRoot({
       envFilePath: envFilePath,
       isGlobal: true,
+      load: [configuration],
     }),
     // 静态资源服务
     ServeStaticModule.forRoot({

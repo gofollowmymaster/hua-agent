@@ -4,17 +4,19 @@ import feishuClient from '@src/common/feishu-robot/alert-client';
 import { addRetryJob } from '@src/utils/job';
 import { PrismaService } from '@src/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
-import getSendInfoByProject from './app-user-map';
+import { appUserMap } from './app-user-map';
 import {
   // buildAtUserMsg,
   buildAlertMsg,
   isNeedSendAlertMsg,
 } from './utils';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AlertMsgService {
   constructor(
     private prisma: PrismaService,
     private readonly logger: LoggerService,
+    private readonly config: ConfigService,
   ) {}
 
   /**
@@ -24,11 +26,10 @@ export class AlertMsgService {
   async sendFsAlertMsg(alertInfo: SentryAlertDto) {
     //获取飞书用户userid（todo）群Id -> 消息加急
     const { userId: feishuUserId, groupId: feishuGroupId } =
-      getSendInfoByProject(alertInfo.project);
+      this.getGroupAndUserByProject(alertInfo.project);
 
     //构建消息内容
-    const content = buildAlertMsg({ ...alertInfo });
-
+    const content = buildAlertMsg({ ...alertInfo }, feishuUserId);
     // 发送群消息
     const groupMsgInfo = await feishuClient.im.message.create({
       data: {
@@ -40,6 +41,7 @@ export class AlertMsgService {
         receive_id_type: 'chat_id',
       },
     });
+
     const messageId = groupMsgInfo.data.message_id;
 
     // await feishuClient.im.message.reply({
@@ -51,7 +53,6 @@ export class AlertMsgService {
     //     message_id: messageId,
     //   },
     // });
-    this.logger.debug(groupMsgInfo);
 
     if (!messageId) {
       this.logger.error(groupMsgInfo);
@@ -63,6 +64,7 @@ export class AlertMsgService {
     }
 
     if (!isNeedSendAlertMsg(alertInfo.timeStamp)) {
+      this.logger.info(alertInfo.timeStamp + '当前时间不需要加急通知');
       return;
     }
     //不加await 使接口不需要等待加急消息发送
@@ -150,5 +152,20 @@ export class AlertMsgService {
       },
     });
     return !!message.userAlerted[0].reactionTime;
+  }
+
+  getGroupAndUserByProject(projectName: string) {
+    console.log('[ groupId ] >', this.config.get('DefaultAlertFeishuGroupId'));
+    if (process.env.NODE_ENV == 'dev') {
+      return {
+        groupId: this.config.get('DefaultAlertFeishuGroupId'),
+        userId: this.config.get('DefaultAlertFeishuUserId'),
+      };
+    }
+    /**
+     * 解码并处理有空格的情况
+     */
+    projectName = decodeURIComponent(projectName).trim();
+    return appUserMap[projectName];
   }
 }

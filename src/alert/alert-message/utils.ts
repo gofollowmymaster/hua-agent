@@ -1,15 +1,13 @@
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween'; // nodejs
 import { SentryAlertDto } from './dto/sentry-alert.dto';
-import getSendInfoByProject from './app-user-map';
 import { buildFeishuTemplateCardMsg } from '@utils/feishu-message';
 
 const { isWorkday } = require('chinese-workday');
 
-const isHoliday = (day: number) => {
+const isHoliday = (day: number = dayjs().valueOf()) => {
   console.log(
-    '[ 1737367108 ] >',
-    !isWorkday(day),
+    `[ dayTimeBetween('2025-01-22', '2025-02-05', day) ] >`,
     dayTimeBetween('2025-01-22', '2025-02-05', day),
   );
   return !isWorkday(day) || dayTimeBetween('2025-01-22', '2025-02-05', day);
@@ -19,13 +17,13 @@ dayjs.extend(isBetween);
 export const hourTimeBetween = (
   startHour: number,
   endHour: number,
-  time: number,
+  time: number = dayjs().valueOf(),
 ) => {
   return dayjs(dayjs(time).tz('Asia/Shanghai').format('YYYY-MM-DD HH'))
     .tz('Asia/Shanghai')
     .isBetween(
-      dayjs().tz('Asia/Shanghai').hour(startHour).format('YYYY-MM-DD HH'),
-      dayjs().tz('Asia/Shanghai').hour(endHour).format('YYYY-MM-DD HH'),
+      dayjs(time).tz('Asia/Shanghai').hour(startHour).format('YYYY-MM-DD HH'),
+      dayjs(time).tz('Asia/Shanghai').hour(endHour).format('YYYY-MM-DD HH'),
       'hour',
     );
 };
@@ -33,7 +31,7 @@ export const hourTimeBetween = (
 export const dayTimeBetween = (
   startDay: string,
   endDay: string,
-  time: number,
+  time: number = dayjs().valueOf(),
 ) => {
   return dayjs(dayjs(time).tz('Asia/Shanghai').format('YYYY-MM-DD'))
     .tz('Asia/Shanghai')
@@ -44,9 +42,8 @@ export const dayTimeBetween = (
  * 是否需要发送加急报警消息
  * @returns boolean
  */
-export const isNeedSendAlertMsg = (time: number) => {
+export const isNeedSendAlertMsg = (time: number = dayjs().valueOf()) => {
   time = time * 1000;
-  console.log('[ time ] >', isHoliday(time), hourTimeBetween(18, 24, time));
   if (isHoliday(time) && hourTimeBetween(9, 24, time)) {
     return true;
   }
@@ -78,9 +75,9 @@ export const buildFeishuCardMsg = (data: SentryAlertDto, userId: string) => {
   };
 };
 
-export const buildAlertMsg = (alertInfo: SentryAlertDto) => {
+export const buildAlertMsg = (alertInfo: SentryAlertDto, userId: string) => {
   // const AtUser = userId ? `<at user_id="${userId}"></at>` : '';
-  const { userId } = getSendInfoByProject(alertInfo.project);
+
   const errorTime = dayjs(alertInfo.timeStamp * 1000).format(
     'YYYY-MM-DD HH:mm:ss',
   );

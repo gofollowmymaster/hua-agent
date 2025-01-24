@@ -20,6 +20,6 @@ export class AlertMsgController {
     //发送消息
     await this.alertMsgService.sendFsAlertMsg(alertInfo);
 
-    return { data: this.config.get('DATABASE_URL') };
+    // return { data: this.config.get('DATABASE_URL') };
   }
 }

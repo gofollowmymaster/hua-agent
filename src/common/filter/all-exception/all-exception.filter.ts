@@ -5,13 +5,19 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost } from '@nestjs/core';
 import feishuClient from '@src/common/feishu-robot/alert-client';
 import { buildFeishuTemplateCardMsg } from '@utils/feishu-message';
+import dayjs from 'dayjs';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
-  constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
+  constructor(
+    private readonly httpAdapterHost: HttpAdapterHost,
+    // private readonly alertInfo: Record<string, any>,
+    private readonly config: ConfigService,
+  ) {}
 
   catch(exception: Error, host: ArgumentsHost): void {
     // In certain situations `httpAdapter` might not be available in the
@@ -31,12 +37,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
     };
 
     //构建消息内容
-    const content = buildFeishuTemplateCardMsg({ ...alertInfo });
+    const content = buildFeishuTemplateCardMsg({
+      title: '异常报警',
+      project: 'aplus-sql-server',
+      color: 'red',
+      errorMessage: message,
+      errorTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+    });
+
+    console.log('[ this.config ] >', this.config)
 
     // 发送群消息
     feishuClient.im.message.create({
       data: {
-        receive_id: feishuGroupId,
+        receive_id: this.config.get('DefaultAlertFeishuGroupId'),
         msg_type: 'interactive',
         content,
       },
