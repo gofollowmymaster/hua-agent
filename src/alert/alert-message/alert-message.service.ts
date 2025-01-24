@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { SentryAlertDto } from './dto/sentry-alert.dto';
-import feishuClient from '@src/alert/common/client';
+import feishuClient from '@src/common/feishu-robot/alert-client';
 import { addRetryJob } from '@src/utils/job';
 import { PrismaService } from '@src/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import getSendInfoByProject from './app-user-map';
 import {
   // buildAtUserMsg,
-  buildFeishuTemplateCardMsg,
+  buildAlertMsg,
   isNeedSendAlertMsg,
 } from './utils';
 @Injectable()
@@ -27,7 +27,7 @@ export class AlertMsgService {
       getSendInfoByProject(alertInfo.project);
 
     //构建消息内容
-    const content = buildFeishuTemplateCardMsg({ ...alertInfo });
+    const content = buildAlertMsg({ ...alertInfo });
 
     // 发送群消息
     const groupMsgInfo = await feishuClient.im.message.create({

@@ -1,7 +1,8 @@
-import dayjs, { Dayjs, OpUnitType } from 'dayjs';
+import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween'; // nodejs
 import { SentryAlertDto } from './dto/sentry-alert.dto';
 import getSendInfoByProject from './app-user-map';
+import { buildFeishuTemplateCardMsg } from '@utils/feishu-message';
 
 const { isWorkday } = require('chinese-workday');
 
@@ -77,9 +78,7 @@ export const buildFeishuCardMsg = (data: SentryAlertDto, userId: string) => {
   };
 };
 
-const AlertTemplateId = 'AAqSyNBCovM2j';
-const AlertTemplateVersion = '1.0.8';
-export const buildFeishuTemplateCardMsg = (alertInfo: SentryAlertDto) => {
+export const buildAlertMsg = (alertInfo: SentryAlertDto) => {
   // const AtUser = userId ? `<at user_id="${userId}"></at>` : '';
   const { userId } = getSendInfoByProject(alertInfo.project);
   const errorTime = dayjs(alertInfo.timeStamp * 1000).format(
@@ -87,23 +86,14 @@ export const buildFeishuTemplateCardMsg = (alertInfo: SentryAlertDto) => {
   );
   const title = alertInfo.level == 'fatal' ? '高危报警' : '异常报警';
   const color = alertInfo.level == 'fatal' ? 'red' : 'orange';
-  const content = {
-    type: 'template',
-    data: {
-      template_id: AlertTemplateId,
-      template_version_name: AlertTemplateVersion,
-      template_variable: { ...alertInfo, errorTime, userId, title, color },
-    },
-  };
-  return JSON.stringify(content);
+
+  return buildFeishuTemplateCardMsg({
+    ...alertInfo,
+    errorTime,
+    userId,
+    title,
+    color,
+  });
 };
 
-export const buildAtUserMsg = (data: SentryAlertDto, userId: string) => {
-  const AtUser = userId ? `<at user_id="${userId}"></at>` : '';
-  console.log('[ buildFeishuTextMsg ] >', data);
-  const content = {
-    text: `${AtUser}`,
-  };
-  return JSON.stringify(content);
-};
 // <at user_id="ou_xxxxxxx">用户名（可不填）</at>

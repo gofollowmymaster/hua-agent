@@ -34,11 +34,16 @@ export const appUserMap = {
 };
 
 export default (projectName: string) => {
+  console.log('[ projectName ] >', decodeURIComponent(projectName));
   if (process.env.NODE_ENV == 'dev') {
     return {
       groupId: 'oc_b030f5155cad2838eeacadc977f403b0',
       userId: '762a5468',
     };
   }
+  /**
+   * 解码并处理有空格的情况
+   */
+  projectName = decodeURIComponent(projectName).trim();
   return appUserMap[projectName];
 };

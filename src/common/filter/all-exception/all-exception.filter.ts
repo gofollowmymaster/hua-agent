@@ -6,6 +6,8 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
+import feishuClient from '@src/common/feishu-robot/alert-client';
+import { buildFeishuTemplateCardMsg } from '@utils/feishu-message';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -17,7 +19,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const { httpAdapter } = this.httpAdapterHost;
 
     const ctx = host.switchToHttp();
-    console.log('[  --------exception------- ] >', exception);
     const httpStatus =
       exception instanceof HttpException
         ? exception.getStatus()
@@ -25,11 +26,24 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const message = exception.message || 'Internal Server Error';
     const responseBody = {
       code: httpStatus,
-      // timestamp: new Date().toISOString(),
       message,
       path: httpAdapter.getRequestUrl(ctx.getRequest()),
     };
 
+    //构建消息内容
+    const content = buildFeishuTemplateCardMsg({ ...alertInfo });
+
+    // 发送群消息
+    feishuClient.im.message.create({
+      data: {
+        receive_id: feishuGroupId,
+        msg_type: 'interactive',
+        content,
+      },
+      params: {
+        receive_id_type: 'chat_id',
+      },
+    });
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
   }
 }
