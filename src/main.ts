@@ -11,6 +11,7 @@ import utc from 'dayjs/plugin/utc'; // nodejs
 import timezone from 'dayjs/plugin/timezone'; // nodejs
 import dayjs from 'dayjs';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 
 declare const module: any;
 
@@ -21,11 +22,12 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const httpAdapter = app.get(HttpAdapterHost);
+  const config = app.get(ConfigService);
   app.enableCors();
   app.useGlobalFilters(
     new HttpExceptionFilter(),
     new UniqueConstraintExceptionFilter(),
-    new AllExceptionsFilter(httpAdapter),
+    new AllExceptionsFilter(httpAdapter, config),
   );
   app.useGlobalInterceptors(new TransformInterceptor());
   // 增加请求体大小限制
@@ -39,7 +41,7 @@ async function bootstrap() {
       .setVersion('1.0')
       .build();
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('swagger', app, document,{
+    SwaggerModule.setup('swagger', app, document, {
       jsonDocumentUrl: 'swagger/json',
     });
   }
