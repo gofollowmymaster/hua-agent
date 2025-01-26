@@ -7,17 +7,25 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost } from '@nestjs/core';
+import FeishuAlertClient from '@src/common/feishu/clients/alert-client';
+import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 // import feishuClient from '@src/common/feishu-robot/alert-client';
 import { buildFeishuTemplateCardMsg } from '@utils/feishu-message';
 import dayjs from 'dayjs';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
+  private messagerHelper;
   constructor(
     private readonly httpAdapterHost: HttpAdapterHost,
     // private readonly alertInfo: Record<string, any>,
     private readonly config: ConfigService,
-  ) {}
+    // private readonly messagerHelper: FeishuMessageHelper,
+  ) {
+    this.messagerHelper = new FeishuMessageHelper(
+      new FeishuAlertClient(config),
+    );
+  }
 
   catch(exception: Error, host: ArgumentsHost): void {
     // In certain situations `httpAdapter` might not be available in the
@@ -47,6 +55,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
     });
 
     // 发送群消息
+    this.messagerHelper.createInteractToGroup(
+      content,
+      this.config.get('DefaultAlertFeishuGroupId'),
+    );
     // feishuClient.im.message.create({
     //   data: {
     //     receive_id: this.config.get('DefaultAlertFeishuGroupId'),

@@ -6,8 +6,15 @@ export const Clents = {
   AlertClient,
 };
 export class ClientFactory {
+  private static clientContainer = {};
+  //   constructor() {
+  //     this.clientContainer = {};
+  //   }
   static async create(clientName: FeishuApp, config: ConfigService) {
     // await nextTick();
-    return new Clents[clientName](config);
+    if (!this.clientContainer[clientName]) {
+      this.clientContainer[clientName] = new Clents[clientName](config);
+    }
+    return this.clientContainer[clientName];
   }
 }

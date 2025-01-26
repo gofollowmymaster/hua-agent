@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 class FeishuAlertClient extends FeishuClient {
+  private readonly instance;
   // constructor(private readonly config: ConfigService) {
   //   const AlertAppId = config.get('AlertAppId');
   //   const AlertAppSecret = config.get('AlertAppSecret');
@@ -11,7 +12,7 @@ class FeishuAlertClient extends FeishuClient {
   //   console.log('[ AlertAppSecret ] >', AlertAppSecret)
   //   super(AlertAppId, AlertAppSecret);
   // }
-  constructor(private config?: any) {
+  constructor(private config?: ConfigService) {
     // const AlertAppId1 = config.get('AlertAppId');
     // const AlertAppSecret1 = config.get('AlertAppSecret');
     // console.log('[ AlertAppId1 ] >', AlertAppId1);
@@ -26,6 +27,7 @@ class FeishuAlertClient extends FeishuClient {
     console.log('[ AlertAppId ] >', AlertAppId);
     console.log('[ AlertAppSecret ] >', AlertAppSecret);
     super('cli_a7c7e073b579500e', 'M8jpmdjcb8wvAxjU2Wlk2cULx0Cobeap');
+    // if (this.instance) return this.instance;
   }
 }
 
