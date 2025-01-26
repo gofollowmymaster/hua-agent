@@ -3,7 +3,10 @@ import { AlertMsgController } from './alert-message.controller';
 import { AlertMsgService } from './alert-message.service';
 import { PrismaService } from '@src/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
+import { FeishuHelperModule } from '@src/common/feishu/hepler/helper.module';
+import { FeishuApp } from '@src/common/feishu/clients/enum';
 @Module({
+  imports: [FeishuHelperModule.forRoot(FeishuApp.AlertClient)],
   controllers: [AlertMsgController],
   providers: [AlertMsgService, PrismaService, LoggerService],
   exports: [AlertMsgService],

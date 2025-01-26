@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost } from '@nestjs/core';
-import feishuClient from '@src/common/feishu-robot/alert-client';
+// import feishuClient from '@src/common/feishu-robot/alert-client';
 import { buildFeishuTemplateCardMsg } from '@utils/feishu-message';
 import dayjs from 'dayjs';
 
@@ -35,6 +35,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message,
       path: httpAdapter.getRequestUrl(ctx.getRequest()),
     };
+    // console.error('[ exception ] >', exception)
 
     //构建消息内容
     const content = buildFeishuTemplateCardMsg({
@@ -45,19 +46,17 @@ export class AllExceptionsFilter implements ExceptionFilter {
       errorTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
     });
 
-    console.log('[ this.config ] >', this.config)
-
     // 发送群消息
-    feishuClient.im.message.create({
-      data: {
-        receive_id: this.config.get('DefaultAlertFeishuGroupId'),
-        msg_type: 'interactive',
-        content,
-      },
-      params: {
-        receive_id_type: 'chat_id',
-      },
-    });
+    // feishuClient.im.message.create({
+    //   data: {
+    //     receive_id: this.config.get('DefaultAlertFeishuGroupId'),
+    //     msg_type: 'interactive',
+    //     content,
+    //   },
+    //   params: {
+    //     receive_id_type: 'chat_id',
+    //   },
+    // });
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
   }
 }

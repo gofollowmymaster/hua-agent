@@ -1,0 +1,1 @@
+export const FEISHU_CLIENT_ID = 'FEISHU_CLIENT_ID';

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SentryAlertDto } from './dto/sentry-alert.dto';
-import feishuClient from '@src/common/feishu-robot/alert-client';
+// import feishuClient from '@src/common/feishu-robot/alert-client';
 import { addRetryJob } from '@src/utils/job';
 import { PrismaService } from '@src/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
@@ -11,12 +11,16 @@ import {
   isNeedSendAlertMsg,
 } from './utils';
 import { ConfigService } from '@nestjs/config';
+import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 @Injectable()
 export class AlertMsgService {
+  // private messageHelper;
+  private client;
   constructor(
     private prisma: PrismaService,
     private readonly logger: LoggerService,
     private readonly config: ConfigService,
+    private readonly messageHelper: FeishuMessageHelper,
   ) {}
 
   /**
@@ -31,16 +35,13 @@ export class AlertMsgService {
     //构建消息内容
     const content = buildAlertMsg({ ...alertInfo }, feishuUserId);
     // 发送群消息
-    const groupMsgInfo = await feishuClient.im.message.create({
-      data: {
-        receive_id: feishuGroupId,
-        msg_type: 'interactive',
-        content,
-      },
-      params: {
-        receive_id_type: 'chat_id',
-      },
-    });
+
+    const groupMsgInfo = await this.messageHelper.create(
+      content,
+      feishuGroupId,
+    );
+
+    // this.logger.error(JSON.stringify(groupMsgInfo));
 
     const messageId = groupMsgInfo.data.message_id;
 
@@ -55,7 +56,7 @@ export class AlertMsgService {
     // });
 
     if (!messageId) {
-      this.logger.error(groupMsgInfo);
+      this.logger.error(JSON.stringify(groupMsgInfo));
       throw new Error('消息发送失败，message_id为空');
     }
 
@@ -92,18 +93,18 @@ export class AlertMsgService {
   async sendFsAlertMsgToUser(msgInfo: Record<string, any>, userId: string) {
     const fMessageId = msgInfo.data.message_id;
     // 发送加急消息
-    const urgentInfo = await feishuClient.im.message.urgentPhone({
-      data: {
-        user_id_list: [userId],
-      },
-      params: {
-        user_id_type: 'user_id',
-      },
-      path: {
-        message_id: fMessageId,
-      },
-    });
-    this.logger.info(urgentInfo);
+    // const urgentInfo = await feishuClient.im.message.urgentPhone({
+    //   data: {
+    //     user_id_list: [userId],
+    //   },
+    //   params: {
+    //     user_id_type: 'user_id',
+    //   },
+    //   path: {
+    //     message_id: fMessageId,
+    //   },
+    // });
+    // this.logger.info(urgentInfo);
 
     //记录已经发出的加急消息信息
     const alertMsgInfo = await this.prisma.alertMessage.create({
@@ -158,8 +159,8 @@ export class AlertMsgService {
     console.log('[ groupId ] >', this.config.get('DefaultAlertFeishuGroupId'));
     if (process.env.NODE_ENV == 'dev') {
       return {
-        groupId: this.config.get('DefaultAlertFeishuGroupId'),
-        userId: this.config.get('DefaultAlertFeishuUserId'),
+        groupId: this.config.getOrThrow('DefaultAlertFeishuGroupId'),
+        userId: this.config.getOrThrow('DefaultAlertFeishuUserId'),
       };
     }
     /**
