@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Controller } from '@nestjs/common';
 
 export interface Response<T> {
   body: T;

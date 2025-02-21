@@ -1,7 +1,8 @@
+import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger';
 import type { records } from '../../utils/actionTable/interface';
 /**
  * 
- * {
+  参考一下数据帮我生成一个包含支持nestjs/swagger的类{
     "sender": "Ollie.liu",
     "messageType": "GROUP",
     "keyword": "--",
@@ -14,30 +15,76 @@ import type { records } from '../../utils/actionTable/interface';
 }
  */
 export class MessageFromRobotDto {
-  //创建时间 string
+  @ApiProperty({
+    type: Number,
+    description: '创建时间',
+  })
   createTime: number;
-  //发送人 string
+  @ApiProperty({
+    type: String,
+    description: '发送人',
+  })
   sender: string;
-  //源消息内容 去掉 @ string
+  @ApiProperty({
+    type: String,
+    description: '源消息内容',
+  })
   originalContent: string;
-  //消息内容 string
+  @ApiProperty({
+    type: String,
+    description: '消息内容',
+  })
   content: string;
-  //消息类型 string
+  @ApiProperty({
+    type: String,
+    description: '消息类型',
+  })
   messageType: string;
-  //被回复的消息内容 string
+  @ApiProperty({
+    type: String,
+    description: '被回复的消息内容',
+  })
   replyContent: string;
   //关键词后的内容 string;
+  @ApiPropertyOptional({
+    type: String,
+    description: '关键词后的内容',
+  })
   bacKeywordContent: string;
-  //关键词 string
+  @ApiProperty({
+    type: String,
+    description: '关键词',
+  })
   keyword: string;
-  //关键词前的内容 string
+  @ApiPropertyOptional({
+    type: String,
+    description: '关键词前的内容',
+  })
   preKeywordContent: string;
 }
 export class SearchParamsDto {
+  @ApiPropertyOptional({
+    type: Object,
+    description: '记录数据',
+  })
   records?: records;
+  @ApiPropertyOptional({
+    type: Object,
+    description: '其他数据',
+  })
   data?: object;
+  @ApiPropertyOptional({
+    type: String,
+    description: '记录id',
+  })
   record_id?: string;
 }
+export class TableRecords extends PickType(SearchParamsDto, ['records']) {}
+export class TableRecordId extends PickType(SearchParamsDto, ['record_id']) {}
+export class TableRecordsOrId extends PickType(SearchParamsDto, [
+  'records',
+  'record_id',
+]) {}
 
 export type customResponse = {
   code: number;

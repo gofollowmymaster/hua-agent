@@ -9,7 +9,9 @@ import {
 } from '@nestjs/common';
 import { SubappService } from './subapp.service';
 import { Prisma, Subapp as SubappModel } from '@prisma/client';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('subapp')
 export class SubappController {
   constructor(private readonly subappService: SubappService) {}
