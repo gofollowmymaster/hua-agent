@@ -15,7 +15,6 @@ import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 @Injectable()
 export class AlertMsgService {
   // private messageHelper;
-  private client;
   constructor(
     private prisma: PrismaService,
     private readonly logger: LoggerService,

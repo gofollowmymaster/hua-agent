@@ -15,9 +15,9 @@ import { LoggerModule } from './common/service/logger/logger.module';
 import configuration from './config';
 
 const envFilePath = [
-  `.env.${process.env.NODE_ENV}.local`,
-  `.env.${process.env.NODE_ENV}`,
   '.env',
+  `.env.${process.env.NODE_ENV}`,
+  `.env.${process.env.NODE_ENV}.local`,
 ];
 @Module({
   imports: [
