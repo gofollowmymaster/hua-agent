@@ -185,11 +185,12 @@ export class AlertMsgService {
     if (isApiAlert) {
       const record = this.sentryApiAlertAdapter.toApiAlertTableData();
       console.log('[ record ] >', record);
-      const res = await this.feishuApiTable.create(record);
-      console.log('[ res ] >', res);
+      // 异步记录到多维表格
+      this.feishuApiTable.create(record);
     } else {
+      // 异步记录到多维表格
       const record = this.sentryApiAlertAdapter.toFrontendAlertTableData();
-      await this.feishuFrontendTable.create(record);
+      this.feishuFrontendTable.create(record);
     }
     const msgData = this.sentryApiAlertAdapter.toFeishuMessageData();
     // 异步发送飞书消息
