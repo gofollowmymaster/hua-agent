@@ -3,12 +3,11 @@ export interface ApiAlertTableDto {
   http状态码: string;
   业务状态码: string;
   请求参数: string;
+  响应数据: string;
   错误信息: string;
   业务线: [string];
   应用名: [string];
   发生时间: number;
-
-  // 人员: FeishuUser[];
 }
 
 export interface FrontendAlertTableDto {

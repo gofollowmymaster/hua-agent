@@ -32,6 +32,9 @@ abstract class FeishuTable {
       this.tableId,
       record,
     );
+    if (res.code !== 0) {
+      throw new Error(res.msg + '->' + JSON.stringify(res));
+    }
     this.syncToCache();
     return res;
   }

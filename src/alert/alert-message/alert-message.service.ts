@@ -184,7 +184,9 @@ export class AlertMsgService {
 
     if (isApiAlert) {
       const record = this.sentryApiAlertAdapter.toApiAlertTableData();
-      await this.feishuApiTable.create(record);
+      console.log('[ record ] >', record);
+      const res = await this.feishuApiTable.create(record);
+      console.log('[ res ] >', res);
     } else {
       const record = this.sentryApiAlertAdapter.toFrontendAlertTableData();
       await this.feishuFrontendTable.create(record);

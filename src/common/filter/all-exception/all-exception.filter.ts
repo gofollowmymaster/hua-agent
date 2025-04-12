@@ -51,6 +51,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       color: 'red',
       errorMessage: message,
       errorTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+      url: '',
     });
 
     // 发送群消息
