@@ -29,10 +29,10 @@ export class AlertMsgService {
   ) {}
 
   /**
-   * 发送消息
+   * 飞书消息发送
    * @param alertInfo
    */
-  async sendFsAlertMsg(alertInfo: SentryAlertDto) {
+  async sendFeishuMsg(alertInfo: SentryAlertDto) {
     //获取飞书用户userid（todo）群Id -> 消息加急
     const { userId: feishuUserId, groupId: feishuGroupId } =
       this.getGroupAndUserByProject(alertInfo.project);
@@ -45,7 +45,15 @@ export class AlertMsgService {
       content,
       feishuGroupId,
     );
+    return groupMsgInfo;
+  }
 
+  /**
+   * 发送消息
+   * @param alertInfo
+   */
+  async sendFsAlertMsg(alertInfo: SentryAlertDto) {
+    const groupMsgInfo = await this.sendFeishuMsg(alertInfo);
     // this.logger.error(JSON.stringify(groupMsgInfo));
 
     const messageId = groupMsgInfo.data.message_id;
@@ -63,6 +71,9 @@ export class AlertMsgService {
       this.logger.info(alertInfo.timeStamp + '当前时间不需要加急通知');
       return;
     }
+    const { userId: feishuUserId } = this.getGroupAndUserByProject(
+      alertInfo.project,
+    );
     //不加await 使接口不需要等待加急消息发送
     this.messageAlert(groupMsgInfo, feishuUserId);
   }
@@ -157,33 +168,29 @@ export class AlertMsgService {
     return appUserMap[projectName];
   }
 
+  /**
+   * sentry webhook处理
+   * @param alertInfo
+   */
   async sentryAlertHook(alertInfo: SentryRawDto) {
     // const line = await this.feishuTable.list(
     //   'EBNCbnWotaltJRsd0oDcs00Bnkg',
     //   'tbl1aLjbTNgbgaT6',
     // );
-    // console.log('[ line ] >', JSON.stringify(line));
     const isApiAlert = alertInfo.message.includes('请求错误');
     this.sentryApiAlertAdapter = new SentryApiAlertAdapter(alertInfo);
-
+    const appToken = this.config.getOrThrow('AlertTableAppToken');
+    const apiTableId = this.config.getOrThrow('AlertApiTableId');
+    const frontendTableId = this.config.getOrThrow('AlertFrontendAppId');
     if (!isApiAlert) {
       const record = this.sentryApiAlertAdapter.toApiAlertTableData();
-      console.log('[ record ] >', record);
-      //
-      await this.feishuTable.create(
-        'EBNCbnWotaltJRsd0oDcs00Bnkg',
-        'tbl1KP45cBuwRKGv',
-        record,
-      );
+      await this.feishuTable.create(appToken, apiTableId, record);
     } else {
       const record = this.sentryApiAlertAdapter.toFrontendAlertTableData();
-      await this.feishuTable.create(
-        'EBNCbnWotaltJRsd0oDcs00Bnkg',
-        'tblY0wFuAKkx9Kuy',
-        record,
-      );
+      await this.feishuTable.create(appToken, frontendTableId, record);
     }
     const msgData = this.sentryApiAlertAdapter.toFeishuMessageData();
+    // 异步发送飞书消息
     this.sendFsAlertMsg(msgData);
   }
 }
