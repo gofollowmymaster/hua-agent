@@ -5,7 +5,6 @@ const MsgReactionHandler: CustomEventHandleType<
 > = async (event, service) => {
   const { message_id: messageId, reaction_type, user_id } = event;
   console.log('reaction_type:', reaction_type);
-  console.log('user_id:', user_id);
 
   const PrismaService = service.prisma;
   await PrismaService.alertMessageUser.updateMany({

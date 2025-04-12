@@ -33,7 +33,6 @@ export const buildFeishuTemplateCardMsg = (alertInfo: AlertInfo) => {
 
 export const buildAtUserMsg = (data: Record<string, any>, userId: string) => {
   const AtUser = userId ? `<at user_id="${userId}"></at>` : '';
-  console.log('[ buildFeishuTextMsg ] >', data);
   const content = {
     text: `${AtUser}`,
   };

@@ -5,12 +5,13 @@ import { ConfigService } from '@nestjs/config';
 export const Clents = {
   AlertClient,
 };
+/**
+ * @description: 飞书客户端工厂类
+ */
 export class ClientFactory {
   private static clientContainer = {};
-  //   constructor() {
-  //     this.clientContainer = {};
-  //   }
-  static async create(clientName: FeishuApp, config: ConfigService) {
+
+  static create(clientName: FeishuApp, config: ConfigService) {
     // await nextTick();
     if (!this.clientContainer[clientName]) {
       this.clientContainer[clientName] = new Clents[clientName](config);

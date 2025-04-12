@@ -6,15 +6,10 @@ import { ConfigService } from '@nestjs/config';
 class FeishuAlertClient extends FeishuClient {
   // private readonly instance;
 
-  constructor(private config?: ConfigService) {
+  constructor(config?: ConfigService) {
     const AlertAppId = config.get('AlertAppId');
     const AlertAppSecret = config.get('AlertAppSecret');
-    console.log('[ AlertAppId ] >', AlertAppId);
-    console.log('[ AlertAppSecret ] >', AlertAppSecret);
-    super('cli_a7c7e073b579500e', 'M8jpmdjcb8wvAxjU2Wlk2cULx0Cobeap');
-
-    // super(AlertAppId, AlertAppSecret);
-    // if (this.instance) return this.instance;
+    super(AlertAppId, AlertAppSecret);
   }
 }
 

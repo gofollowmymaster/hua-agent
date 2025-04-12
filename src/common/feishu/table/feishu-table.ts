@@ -1,0 +1,39 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable } from '@nestjs/common';
+import { Cache } from 'cache-manager';
+import FeishuTableHelper from '../hepler/table-helper';
+// import { ConfigService } from '@nestjs/config';
+@Injectable()
+abstract class FeishuTable {
+  protected readonly tableHelper: FeishuTableHelper;
+  // protected readonly config: ConfigService;
+  @Inject(CACHE_MANAGER) protected cacheManager: Cache;
+  protected appToken = '';
+  protected tableId = '';
+
+  async syncToCache() {
+    // const list = await this.tableHelper.list(this.appToken, this.tableId);
+    // const {
+    //   data: { items },
+    // } = list;
+    // this.cacheManager.set(this.appToken + this.tableId, items);
+    // return list;
+  }
+  async list() {
+    const list = await this.cacheManager.get(this.appToken + this.tableId);
+    if (!list) {
+      return await this.syncToCache();
+    }
+    return list;
+  }
+  async create(record) {
+    const res = await this.tableHelper.create(
+      this.appToken,
+      this.tableId,
+      record,
+    );
+    this.syncToCache();
+    return res;
+  }
+}
+export default FeishuTable;

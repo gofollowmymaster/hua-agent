@@ -13,7 +13,8 @@ import {
 import { ConfigService } from '@nestjs/config';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import { SentryRawDto } from './dto/sentry-raw.dto';
-import FeishuTable from '@src/common/feishu/table/table';
+import FeishuApiAlertTable from '@src/common/feishu/table/api-alert-table';
+import FeishuFrontendAlertTable from '@src/common/feishu/table/frontend-alert-table';
 import SentryApiAlertAdapter from './adapter/sentry-alert-adapter';
 @Injectable()
 export class AlertMsgService {
@@ -25,7 +26,8 @@ export class AlertMsgService {
     private readonly logger: LoggerService,
     private readonly config: ConfigService,
     private readonly messageHelper: FeishuMessageHelper,
-    private readonly feishuTable: FeishuTable,
+    private readonly feishuApiTable: FeishuApiAlertTable,
+    private readonly feishuFrontendTable: FeishuFrontendAlertTable,
   ) {}
 
   /**
@@ -177,18 +179,15 @@ export class AlertMsgService {
     //   'EBNCbnWotaltJRsd0oDcs00Bnkg',
     //   'tbl1aLjbTNgbgaT6',
     // );
-    const isApiAlert = alertInfo.message.includes('请求错误');
+    const isApiAlert = alertInfo.culprit.includes('请求错误');
     this.sentryApiAlertAdapter = new SentryApiAlertAdapter(alertInfo);
-    const appToken = this.config.getOrThrow('AlertTableAppToken');
-    const apiTableId = this.config.getOrThrow('AlertApiTableId');
-    const frontendTableId = this.config.getOrThrow('AlertFrontendAppId');
-    console.log('[ frontendTableId ] >', appToken, apiTableId, frontendTableId);
-    if (!isApiAlert) {
+
+    if (isApiAlert) {
       const record = this.sentryApiAlertAdapter.toApiAlertTableData();
-      await this.feishuTable.create(appToken, apiTableId, record);
+      await this.feishuApiTable.create(record);
     } else {
       const record = this.sentryApiAlertAdapter.toFrontendAlertTableData();
-      await this.feishuTable.create(appToken, frontendTableId, record);
+      await this.feishuFrontendTable.create(record);
     }
     const msgData = this.sentryApiAlertAdapter.toFeishuMessageData();
     // 异步发送飞书消息

@@ -7,9 +7,9 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost } from '@nestjs/core';
-import FeishuAlertClient from '@src/common/feishu/clients/alert-client';
+import { ClientFactory } from '@src/common/feishu/clients';
+import { FeishuApp } from '@src/common/feishu/clients/enum';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
-// import feishuClient from '@src/common/feishu-robot/alert-client';
 import { buildFeishuTemplateCardMsg } from '@utils/feishu-message';
 import dayjs from 'dayjs';
 
@@ -23,7 +23,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // private readonly messagerHelper: FeishuMessageHelper,
   ) {
     this.messagerHelper = new FeishuMessageHelper(
-      new FeishuAlertClient(config),
+      ClientFactory.create(FeishuApp.AlertClient, config),
     );
   }
 
@@ -43,11 +43,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message,
       path: httpAdapter.getRequestUrl(ctx.getRequest()),
     };
-    // console.error('[ exception ] >', exception)
 
     //构建消息内容
     const content = buildFeishuTemplateCardMsg({
-      title: '异常报警',
+      title: 'Node Server异常报警',
       project: 'aplus-sql-server',
       color: 'red',
       errorMessage: message,
@@ -59,16 +58,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       content,
       this.config.get('DefaultAlertFeishuGroupId'),
     );
-    // feishuClient.im.message.create({
-    //   data: {
-    //     receive_id: this.config.get('DefaultAlertFeishuGroupId'),
-    //     msg_type: 'interactive',
-    //     content,
-    //   },
-    //   params: {
-    //     receive_id_type: 'chat_id',
-    //   },
-    // });
+
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
   }
 }

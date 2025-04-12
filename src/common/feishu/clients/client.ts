@@ -3,6 +3,9 @@ import * as lark from '@larksuiteoapi/node-sdk';
 class FeishuClient {
   public client: lark.Client;
   constructor(appId: string, appSecret: string) {
+    if (!appId || !appSecret) {
+      throw new Error('AppId and AppSecret are required');
+    }
     /**
      * 报警监控机器人
      */
