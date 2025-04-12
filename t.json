@@ -1,0 +1,56 @@
+{
+  "人员": [
+    {
+      "id": "ou_2910013f1e6456f16a0ce75ede9abcef"
+    },
+    {
+      "id": "ou_e04138c9633dd0d2ea166d79f54abcef"
+    }
+  ],
+  "任务名称": "拜访潜在客户",
+  "单向关联": [
+    "recHTLvO7x",
+    "recbS8zb2m"
+  ],
+  "单选": "选项1",
+  "双向关联": [
+    "recHTLvO7x",
+    "recbS8zb2m"
+  ],
+  "地理位置": "116.397755,39.903179",
+  "复选框": true,
+  "多选": [
+    "选项1",
+    "选项2"
+  ],
+  "工时": 10,
+  "日期": 1674206443000,
+  "条码": "+$$3170930509104X512356",
+  "电话号码": "13026162666",
+  "群组": [
+    {
+      "id": "oc_cd07f55f14d6f4a4f1b51504e7e97f48"
+    }
+  ],
+  "评分": 3,
+  "货币": 3,
+  "超链接": {
+    "link": "https://www.feishu.cn/product/base",
+    "text": "飞书多维表格官网"
+  },
+  "进度": 0.25,
+  "附件": [
+    {
+      "file_token": "DRiFbwaKsoZaLax4WKZbEGCccoe"
+    },
+    {
+      "file_token": "BZk3bL1Enoy4pzxaPL9bNeKqcLe"
+    },
+    {
+      "file_token": "EmL4bhjFFovrt9xZgaSbjJk9c1b"
+    },
+    {
+      "file_token": "Vl3FbVkvnowlgpxpqsAbBrtFcrd"
+    }
+  ]
+}

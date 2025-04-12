@@ -9,7 +9,6 @@ class FeishuMessageHelper {
     @Inject(FEISHU_CLIENT_ID) private readonly client: FeishuClient,
   ) {}
   createInteractToGroup(content, feishuGroupId) {
-    console.log('[ feishuGroupId ] >', feishuGroupId);
     return this.client.client.im.message.create({
       data: {
         receive_id: feishuGroupId,

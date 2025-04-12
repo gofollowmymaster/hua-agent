@@ -12,14 +12,20 @@ import {
 } from './utils';
 import { ConfigService } from '@nestjs/config';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import { SentryRawDto } from './dto/sentry-raw.dto';
+import FeishuTable from '@src/common/feishu/table/table';
+import SentryApiAlertAdapter from './adapter/sentry-alert-adapter';
 @Injectable()
 export class AlertMsgService {
   // private messageHelper;
+  private sentryApiAlertAdapter: SentryApiAlertAdapter;
+
   constructor(
     private prisma: PrismaService,
     private readonly logger: LoggerService,
     private readonly config: ConfigService,
     private readonly messageHelper: FeishuMessageHelper,
+    private readonly feishuTable: FeishuTable,
   ) {}
 
   /**
@@ -138,7 +144,6 @@ export class AlertMsgService {
   }
 
   getGroupAndUserByProject(projectName: string) {
-    console.log('[ groupId ] >', this.config.get('DefaultAlertFeishuGroupId'));
     if (process.env.NODE_ENV == 'dev') {
       return {
         groupId: this.config.getOrThrow('DefaultAlertFeishuGroupId'),
@@ -150,5 +155,35 @@ export class AlertMsgService {
      */
     projectName = decodeURIComponent(projectName).trim();
     return appUserMap[projectName];
+  }
+
+  async sentryAlertHook(alertInfo: SentryRawDto) {
+    // const line = await this.feishuTable.list(
+    //   'EBNCbnWotaltJRsd0oDcs00Bnkg',
+    //   'tbl1aLjbTNgbgaT6',
+    // );
+    // console.log('[ line ] >', JSON.stringify(line));
+    const isApiAlert = alertInfo.message.includes('请求错误');
+    this.sentryApiAlertAdapter = new SentryApiAlertAdapter(alertInfo);
+
+    if (!isApiAlert) {
+      const record = this.sentryApiAlertAdapter.toApiAlertTableData();
+      console.log('[ record ] >', record);
+      //
+      await this.feishuTable.create(
+        'EBNCbnWotaltJRsd0oDcs00Bnkg',
+        'tbl1KP45cBuwRKGv',
+        record,
+      );
+    } else {
+      const record = this.sentryApiAlertAdapter.toFrontendAlertTableData();
+      await this.feishuTable.create(
+        'EBNCbnWotaltJRsd0oDcs00Bnkg',
+        'tblY0wFuAKkx9Kuy',
+        record,
+      );
+    }
+    const msgData = this.sentryApiAlertAdapter.toFeishuMessageData();
+    this.sendFsAlertMsg(msgData);
   }
 }

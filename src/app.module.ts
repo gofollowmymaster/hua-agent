@@ -13,6 +13,7 @@ import { AlertMsgModule } from '@src/alert/alert-message/alert-message.module';
 import { FeishuEventModule } from '@src/alert/event/event.module';
 import { LoggerModule } from './common/service/logger/logger.module';
 import configuration from './config';
+import { CacheModule } from '@nestjs/cache-manager';
 
 const envFilePath = [
   '.env',
@@ -25,6 +26,10 @@ const envFilePath = [
       envFilePath: envFilePath,
       isGlobal: true,
       load: [configuration],
+    }),
+    CacheModule.register({
+      ttl: 60 * 60 * 24, // 24小时缓存
+      isGlobal: true,
     }),
     // 静态资源服务
     ServeStaticModule.forRoot({

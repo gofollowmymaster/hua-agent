@@ -1,0 +1,378 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+export enum ErrorLevel {
+  FATAL = 'fatal',
+  ERROR = 'error',
+  WARING = 'waring',
+  INFO = 'info',
+}
+export enum Environment {
+  PROD = 'production',
+  UAT = 'uat',
+  TEST = 'test',
+  DEV = 'dev',
+}
+
+export class SentryRawDto {
+  @ApiProperty({
+    type: String,
+    description: 'sentry 打点数据',
+  })
+  culprit: string;
+  @ApiProperty({
+    type: Event,
+    description: 'sentry事件信息',
+  })
+  event: Event;
+  @ApiProperty({
+    type: String,
+    description: 'sentry事件ID',
+  })
+  id: string;
+  @ApiProperty({
+    enum: ErrorLevel,
+    description: '报警级别',
+  })
+  level: ErrorLevel;
+  logger: null;
+  @ApiProperty({
+    type: String,
+    description: 'sentry事件文案消息',
+  })
+  message: string;
+  @ApiProperty({
+    type: String,
+    description: 'sentry事件所属项目',
+  })
+  project: string;
+  project_name: string;
+  project_slug: string;
+  @ApiProperty({
+    type: Array<string>,
+    description: 'sentry事件触发规则',
+  })
+  triggering_rules: string[];
+  @ApiProperty({
+    type: String,
+    description: 'sentry页面连接',
+  })
+  readonly url: string;
+}
+
+interface Event {
+  _dsc: Dsc;
+  _meta: Meta;
+  _metrics: Metrics;
+  _ref: number;
+  _ref_version: number;
+  breadcrumbs: Breadcrumbs2;
+  contexts: Contexts;
+  culprit: string;
+  debug_meta: Debugmeta;
+
+  environment: Environment;
+  event_id: string;
+  exception: Exception;
+  fingerprint: string[];
+  grouping_config: Groupingconfig;
+  hashes: string[];
+  id: string;
+  key_id: string;
+  level: string;
+  location: string;
+  logentry: Logentry;
+  logger: string;
+  metadata: Metadata;
+  nodestore_insert: number;
+  platform: string;
+  project: number;
+  received: number;
+  release: string;
+  request: Request;
+  scraping_attempts: Scrapingattempt[];
+  sdk: Sdk;
+  tags: string[][];
+  timestamp: number;
+  title: string;
+  transaction: string;
+  readonly type: string;
+  user: User;
+  version: string;
+  extra?: {
+    subAppName: subAppName;
+    __serialized__: {
+      code: number;
+      payload: string;
+      resData: {
+        path: string;
+        requestId: string;
+        status: number;
+        timestamp: '2025-04-11 13:50:09';
+        error: string;
+        message: null;
+      };
+      traceId: string;
+      url: string;
+      message: string;
+      method: 'get' | 'post' | 'put' | 'delete';
+      transactionMessage: string;
+    };
+  };
+}
+
+interface User {
+  ip_address: string;
+  sentry_user: string;
+}
+
+interface Sdk {
+  integrations: string[];
+  name: string;
+  packages: Package[];
+  version: string;
+}
+
+interface Package {
+  name: string;
+  version: string;
+}
+
+interface Scrapingattempt {
+  status: string;
+  url: string;
+}
+
+interface Request {
+  fragment: string;
+  headers: string[][];
+  url: string;
+}
+
+interface Metadata {
+  filename: string;
+  function: string;
+  in_app_frame_mix: string;
+  type: string;
+  value: string;
+}
+
+interface Logentry {
+  formatted: string;
+}
+
+interface Groupingconfig {
+  enhancements: string;
+  id: string;
+}
+
+interface Exception {
+  values: Value2[];
+}
+
+interface Value2 {
+  mechanism: Mechanism;
+  raw_stacktrace: Rawstacktrace;
+  stacktrace: Stacktrace;
+  type: string;
+  value: string;
+}
+
+interface Stacktrace {
+  frames: Frame2[];
+}
+
+interface Frame2 {
+  abs_path: string;
+  colno?: number;
+  context_line?: string;
+  data?: Data3;
+  filename: string;
+  function: string;
+  in_app: boolean;
+  lineno?: number;
+  module?: string;
+  post_context?: string[];
+  pre_context?: string[];
+}
+
+interface Data3 {
+  resolved_with: string;
+  sourcemap: string;
+  sourcemap_origin: Sourcemaporigin;
+  symbolicated: boolean;
+}
+
+interface Sourcemaporigin {
+  bundled: (Bundled | string)[];
+}
+
+interface Bundled {
+  source_map: Sourcemap;
+}
+
+interface Sourcemap {
+  abs_path: string;
+  debug_id: string;
+}
+
+interface Rawstacktrace {
+  frames: Frame[];
+}
+
+interface Frame {
+  abs_path: string;
+  colno?: number;
+  context_line?: string;
+  filename: string;
+  function?: string;
+  in_app: boolean;
+  lineno?: number;
+  post_context?: string[];
+  pre_context?: string[];
+}
+
+interface Mechanism {
+  handled: boolean;
+  type: string;
+}
+
+interface Debugmeta {
+  images: Image[];
+}
+
+interface Image {
+  code_file: string;
+  debug_id: string;
+  type: string;
+}
+
+interface Contexts {
+  browser: Browser;
+  device: Device;
+  os: Browser;
+  trace: Trace;
+}
+
+interface Trace {
+  client_sample_rate: number;
+  span_id: string;
+  status: string;
+  trace_id: string;
+  type: string;
+}
+
+interface Device {
+  brand: string;
+  family: string;
+  model: string;
+  type: string;
+}
+
+interface Browser {
+  name: string;
+  type: string;
+  version: string;
+}
+
+interface Breadcrumbs2 {
+  values: Value[];
+}
+
+interface Value {
+  category: string;
+  data: Data2;
+  level: string;
+  timestamp: number;
+  type: string;
+  message?: string;
+}
+
+interface Data2 {
+  from?: string;
+  to?: string;
+  method?: string;
+  status_code?: number;
+  url?: string;
+  arguments?: (Argument | string | string)[];
+  logger?: string;
+  __span?: string;
+}
+
+interface Argument {
+  antdLocale: string;
+  btrOrder: string;
+  businessQuotation: string;
+  common: string;
+  component: string;
+  layout: string;
+  member: string;
+  organization: string;
+  product: string;
+  productionList: string;
+  rantmember: string;
+  routes: string;
+  sales: string;
+  sys: string;
+  vcAccount: string;
+}
+
+type subAppName =
+  | 'aplus-admin-bms'
+  | 'aplus-user-bms'
+  | 'aplus-admin-mos'
+  | 'aplus-user-mos'
+  | 'aplus-admin-wms'
+  | 'aplus-user-wms'
+  | 'aplus-admin-main'
+  | 'aplus-user-main';
+interface Metrics {
+  'bytes.ingested.event': number;
+  'bytes.stored.event': number;
+}
+
+interface Meta {
+  breadcrumbs: Breadcrumbs;
+}
+
+interface Breadcrumbs {
+  values: Values;
+}
+
+interface Values {
+  '2': _2;
+  '31': _2;
+  '32': _2;
+  '37': _2;
+  '38': _2;
+  '39': _2;
+  '46': _2;
+}
+
+interface _2 {
+  data: Data;
+}
+
+interface Data {
+  url: Url;
+}
+
+interface Url {
+  '': _;
+}
+
+interface _ {
+  len: number;
+  rem: (number | string)[][];
+}
+
+interface Dsc {
+  environment: Environment;
+  public_key: string;
+  release: string;
+  replay_id: null;
+  sample_rand: string;
+  sample_rate: string;
+  sampled: boolean;
+  trace_id: string;
+  transaction: string;
+}
