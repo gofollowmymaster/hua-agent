@@ -182,6 +182,7 @@ export class AlertMsgService {
     const appToken = this.config.getOrThrow('AlertTableAppToken');
     const apiTableId = this.config.getOrThrow('AlertApiTableId');
     const frontendTableId = this.config.getOrThrow('AlertFrontendAppId');
+    console.log('[ frontendTableId ] >', appToken, apiTableId, frontendTableId);
     if (!isApiAlert) {
       const record = this.sentryApiAlertAdapter.toApiAlertTableData();
       await this.feishuTable.create(appToken, apiTableId, record);
