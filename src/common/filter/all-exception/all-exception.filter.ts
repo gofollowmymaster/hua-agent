@@ -33,15 +33,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const { httpAdapter } = this.httpAdapterHost;
 
     const ctx = host.switchToHttp();
+    const request = ctx.getRequest();
+    const path = httpAdapter.getRequestUrl(request);
+    const data = request.body;
+
     const httpStatus =
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
-    const message = exception.message || 'Internal Server Error';
+    let message = path + JSON.stringify(data);
+    message += exception.message || 'Internal Server Error';
     const responseBody = {
       code: httpStatus,
       message,
-      path: httpAdapter.getRequestUrl(ctx.getRequest()),
+      path,
     };
 
     //构建消息内容
@@ -51,7 +56,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       color: 'red',
       errorMessage: message,
       errorTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-      url: '',
+      url: 'https://sls.console.aliyun.com/lognext/project/k8s-log-c893ce02efe464e778e67c48016348406/logsearch/elnkpro-prod-log?encode%3Dbase64%26queryString%3DIF9jb250YWluZXJfbmFtZV86IGFwbHVzLXNxbC1zZXJ2aWNlLXByb2Q%3D%26filterInfo%3DeyJmamNvZGUiOiIoKSIsImZxIjoiIn0%3D%26queryTimeType%3D99%26startTime%3D1731892962%26endTime%3D1731896562',
     });
 
     // 发送群消息
