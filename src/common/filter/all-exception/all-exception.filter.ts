@@ -64,7 +64,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
       content,
       this.config.get('DefaultAlertFeishuGroupId'),
     );
-
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
   }
 }
