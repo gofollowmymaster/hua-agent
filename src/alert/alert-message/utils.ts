@@ -53,28 +53,6 @@ export const isNeedSendAlertMsg = (time: number = dayjs().valueOf()) => {
   return false;
 };
 
-export const buildFeishuCardMsg = (data: SentryAlertDto, userId: string) => {
-  // const AtUser = userId ? `<at user_id="${userId}"></at>` : '';
-  return {
-    elements: [
-      {
-        tag: 'div',
-        text: {
-          content: `你有致命错误需要尽快处理`,
-          tag: 'plain_text',
-        },
-      },
-    ],
-    header: {
-      template: 'red',
-      title: {
-        content: `【${data.level}]你有致命错误需要尽快处理`,
-        tag: 'plain_text',
-      },
-    },
-  };
-};
-
 export const buildAlertMsg = (alertInfo: SentryAlertDto, userId: string) => {
   // const AtUser = userId ? `<at user_id="${userId}"></at>` : '';
 

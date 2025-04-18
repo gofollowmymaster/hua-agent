@@ -41,8 +41,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = path + JSON.stringify(data);
-    message += exception.message || 'Internal Server Error';
+    const culprit = path + JSON.stringify(data);
+    const message = exception.message || 'Internal Server Error';
     const responseBody = {
       code: httpStatus,
       message,
@@ -54,6 +54,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       title: 'Node Server异常报警',
       project: 'aplus-sql-server',
       color: 'red',
+      culprit,
       errorMessage: message,
       errorTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
       url: 'https://sls.console.aliyun.com/lognext/project/k8s-log-c893ce02efe464e778e67c48016348406/logsearch/elnkpro-prod-log?encode%3Dbase64%26queryString%3DIF9jb250YWluZXJfbmFtZV86IGFwbHVzLXNxbC1zZXJ2aWNlLXByb2Q%3D%26filterInfo%3DeyJmamNvZGUiOiIoKSIsImZxIjoiIn0%3D%26queryTimeType%3D99%26startTime%3D1731892962%26endTime%3D1731896562',

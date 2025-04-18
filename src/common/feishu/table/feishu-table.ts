@@ -12,12 +12,18 @@ abstract class FeishuTable {
   protected tableId = '';
 
   async syncToCache() {
-    // const list = await this.tableHelper.list(this.appToken, this.tableId);
-    // const {
-    //   data: { items },
-    // } = list;
-    // this.cacheManager.set(this.appToken + this.tableId, items);
-    // return list;
+    const res = await this.tableHelper.list(this.appToken, this.tableId);
+
+    const {
+      msg,
+      code,
+      data: { items },
+    } = res;
+    if (code !== 0) {
+      throw new Error(msg + '->' + JSON.stringify(res));
+    }
+    this.cacheManager.set(this.appToken + this.tableId, items);
+    return items;
   }
   async list() {
     const list = await this.cacheManager.get(this.appToken + this.tableId);

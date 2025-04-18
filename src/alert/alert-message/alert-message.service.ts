@@ -16,6 +16,7 @@ import { SentryRawDto } from './dto/sentry-raw.dto';
 import FeishuApiAlertTable from '@src/common/feishu/table/api-alert-table';
 import FeishuFrontendAlertTable from '@src/common/feishu/table/frontend-alert-table';
 import SentryApiAlertAdapter from './adapter/sentry-alert-adapter';
+import FeishuBusinessLineTable from '@src/common/feishu/table/business-line-table';
 @Injectable()
 export class AlertMsgService {
   // private messageHelper;
@@ -28,6 +29,7 @@ export class AlertMsgService {
     private readonly messageHelper: FeishuMessageHelper,
     private readonly feishuApiTable: FeishuApiAlertTable,
     private readonly feishuFrontendTable: FeishuFrontendAlertTable,
+    private readonly feishuBusinessLineTable: FeishuBusinessLineTable,
   ) {}
 
   /**
@@ -175,25 +177,29 @@ export class AlertMsgService {
    * @param alertInfo
    */
   async sentryAlertHook(alertInfo: SentryRawDto) {
-    // const line = await this.feishuTable.list(
-    //   'EBNCbnWotaltJRsd0oDcs00Bnkg',
-    //   'tbl1aLjbTNgbgaT6',
-    // );
     const isApiAlert = alertInfo.culprit.includes('请求错误');
     this.sentryApiAlertAdapter = new SentryApiAlertAdapter(alertInfo);
-
     if (isApiAlert) {
       const record = this.sentryApiAlertAdapter.toApiAlertTableData();
-      console.log('[ record ] >', record);
+      // console.log('[ record ] >', record);
       // 异步记录到多维表格
-      this.feishuApiTable.create(record);
+      await this.feishuApiTable.create(record);
     } else {
       // 异步记录到多维表格
       const record = this.sentryApiAlertAdapter.toFrontendAlertTableData();
-      this.feishuFrontendTable.create(record);
+      // console.log('[ record ] >', record);
+
+      await this.feishuFrontendTable.create(record);
     }
+
     const msgData = this.sentryApiAlertAdapter.toFeishuMessageData();
     // 异步发送飞书消息
     this.sendFsAlertMsg(msgData);
+  }
+
+  async loadFeishuAplusBussnessList() {
+    const list = await this.feishuBusinessLineTable.list();
+
+    return list;
   }
 }

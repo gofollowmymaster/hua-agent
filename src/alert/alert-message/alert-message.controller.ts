@@ -37,4 +37,15 @@ export class AlertMsgController {
     // 添加到多维表格
     await this.alertMsgService.sentryAlertHook(alertInfo);
   }
+
+  @ApiOperation({
+    summary: '业务线列表',
+    description: '飞书业务线列表信息',
+  })
+  @ApiBody({ type: SentryRawDto })
+  @Post('business-line-list')
+  async aplusBussnessList() {
+    // 添加到多维表格
+    return await this.alertMsgService.loadFeishuAplusBussnessList();
+  }
 }

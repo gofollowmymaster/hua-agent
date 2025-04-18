@@ -1,5 +1,5 @@
 const AlertTemplateId = 'AAqSyNBCovM2j';
-const AlertTemplateVersion = '1.0.8';
+const AlertTemplateVersion = '1.0.9';
 type AlertInfo = {
   project: string;
   level?: string;
@@ -9,6 +9,7 @@ type AlertInfo = {
   errorTime: string;
   title: string;
   color: string;
+  culprit?: string;
   [key: string]: any;
 };
 /**

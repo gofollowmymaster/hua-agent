@@ -28,13 +28,13 @@ export const appUserMap: Record<string, AppInfo> = {
   },
   'aplus-admin-wms': {
     groupId: 'oc_ca28717489700c2fe873406fcfa867a4',
-    userId: '762a5468',
+    userId: 'ou_d81434213768e37b46e24266f72b6085',
     bu: 'recuwVEngy1rzk',
     id: 'opt8tgefSL',
   },
   'aplus-user-wms': {
     groupId: 'oc_ca28717489700c2fe873406fcfa867a4',
-    userId: '762a5468',
+    userId: 'ou_d81434213768e37b46e24266f72b6085',
     bu: 'recuwVEngy1rzk',
     id: 'opt8tgefSL',
   },
@@ -46,5 +46,11 @@ export const appUserMap: Record<string, AppInfo> = {
     groupId: 'oc_1f846787d104e26e5bd50b7a25894f05',
     userId: 'a439d3fe',
     bu: 'recuwVEngyXUnD',
+  },
+  'login-center': {
+    groupId: 'oc_1f846787d104e26e5bd50b7a25894f05',
+    userId: 'ou_d81434213768e37b46e24266f72b6085',
+    bu: 'recuwVEngyXUnD',
+    id: 'opt8tgefSL',
   },
 };

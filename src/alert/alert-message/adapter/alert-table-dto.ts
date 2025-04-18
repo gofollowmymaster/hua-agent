@@ -6,8 +6,9 @@ export interface ApiAlertTableDto {
   响应数据: string;
   错误信息: string;
   业务线: [string];
-  应用名: [string];
+  应用名: string;
   发生时间: number;
+  RawData: string;
 }
 
 export interface FrontendAlertTableDto {
@@ -15,15 +16,16 @@ export interface FrontendAlertTableDto {
   链接信息: string;
   是否解决: boolean;
   // 优先级: ;
-  负责人: [string];
+  负责人: { id: string }[];
   错误原因: string;
   解决方案: string;
-  来源: [string];
+  来源: string;
   报警级别: string;
   描述信息: string;
   应用名: [string];
   业务线: [string];
   环境: string;
+  RawData: string;
 }
 // interface FeishuUser {
 //   id: string;
