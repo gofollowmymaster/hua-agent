@@ -6,7 +6,7 @@ export interface ApiAlertTableDto {
   响应数据: string;
   错误信息: string;
   业务线: [string];
-  应用名: string;
+  应用名: [string];
   发生时间: number;
   RawData: string;
 }

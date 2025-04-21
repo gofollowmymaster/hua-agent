@@ -22,7 +22,7 @@ export default class SentryApiAlertAdapter {
       响应数据: JSON.stringify(requestData.resData),
       错误信息: requestData.message,
       业务线: [appUserMap[subAppName]?.bu],
-      应用名: subAppName + '',
+      应用名: [subAppName + ''],
       发生时间: this.sentryData.event.timestamp * 1000,
       RawData: JSON.stringify(this.sentryData),
     };
