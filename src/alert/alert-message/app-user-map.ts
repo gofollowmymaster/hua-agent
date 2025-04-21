@@ -38,11 +38,11 @@ export const appUserMap: Record<string, AppInfo> = {
     bu: 'recuwVEngy1rzk',
     id: 'opt8tgefSL',
   },
-  'aplus-admin-main': {
+  'aplus-admin-base': {
     groupId: 'oc_1f846787d104e26e5bd50b7a25894f05',
     userId: 'a439d3fe',
   },
-  'aplus-user-main': {
+  'aplus-user-base': {
     groupId: 'oc_1f846787d104e26e5bd50b7a25894f05',
     userId: 'a439d3fe',
     bu: 'recuwVEngyXUnD',
