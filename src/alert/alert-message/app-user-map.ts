@@ -38,8 +38,19 @@ export const appUserMap: Record<string, AppInfo> = {
   'aplus-admin-base': {
     groupId: 'oc_1f846787d104e26e5bd50b7a25894f05',
     userId: 'ou_343656b12664a8f692eb03873d98fa59',
+    bu: 'recuwVEngyXUnD',
   },
   'aplus-user-base': {
+    groupId: 'oc_1f846787d104e26e5bd50b7a25894f05',
+    userId: 'ou_343656b12664a8f692eb03873d98fa59',
+    bu: 'recuwVEngyXUnD',
+  },
+  'aplus-admin-main': {
+    groupId: 'oc_1f846787d104e26e5bd50b7a25894f05',
+    userId: 'ou_343656b12664a8f692eb03873d98fa59',
+    bu: 'recuwVEngyXUnD',
+  },
+  'aplus-user-main': {
     groupId: 'oc_1f846787d104e26e5bd50b7a25894f05',
     userId: 'ou_343656b12664a8f692eb03873d98fa59',
     bu: 'recuwVEngyXUnD',
