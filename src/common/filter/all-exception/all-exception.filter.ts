@@ -30,18 +30,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost): void {
     // In certain situations `httpAdapter` might not be available in the
     // constructor method, thus we should resolve it here.
+
     const { httpAdapter } = this.httpAdapterHost;
 
     const ctx = host.switchToHttp();
     const request = ctx.getRequest();
     const path = httpAdapter.getRequestUrl(request);
+    const hostName = httpAdapter.getRequestHostname(request);
     const data = request.body;
 
     const httpStatus =
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
-    const culprit = path + JSON.stringify(data);
+    const culprit = hostName + path + JSON.stringify(data);
     const message = exception.message || 'Internal Server Error';
     const responseBody = {
       code: httpStatus,

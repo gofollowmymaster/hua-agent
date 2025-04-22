@@ -25,9 +25,9 @@ async function bootstrap() {
   const config = app.get(ConfigService);
   app.enableCors();
   app.useGlobalFilters(
+    new AllExceptionsFilter(httpAdapter, config),
     new HttpExceptionFilter(),
     new UniqueConstraintExceptionFilter(),
-    new AllExceptionsFilter(httpAdapter, config),
   );
   app.useGlobalInterceptors(new TransformInterceptor());
   // 增加请求体大小限制
