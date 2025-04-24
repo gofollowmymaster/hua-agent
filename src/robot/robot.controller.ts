@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { RobotService } from './robot.service';
 import {
+  FeishuMessageSenderDto,
   MessageFromRobotDto,
   SearchParamsDto,
   TableRecordId,
@@ -24,7 +25,7 @@ import {
 } from '@nestjs/swagger';
 import { records } from '@utils/actionTable/interface';
 import { AplusResponse } from '@src/type/global';
-@ApiTags('飞书多维表格')
+@ApiTags('飞书机器人快捷操作')
 @ApiHeaders([
   {
     name: 'appToken',
@@ -165,7 +166,7 @@ export class RobotController {
       );
     }
   }
-  //删除表格记录
+  //回复飞书消息
   @ApiOperation({
     summary: '回复飞书消息',
     description: '回复飞书消息',
@@ -182,6 +183,19 @@ export class RobotController {
       appToken,
       tableId,
     });
+    return res;
+  }
+
+  //通用发送飞书消息
+  @ApiOperation({
+    summary: '通用发送飞书消息',
+    description: '通用发送飞书消息到任何群',
+  })
+  @ApiBody({ type: FeishuMessageSenderDto })
+  @ApiOkResponse({ type: AplusResponse<records> })
+  @Post('sendFeishuMessage')
+  async sendFeishuMessage(@Body() MessageFromRobot: FeishuMessageSenderDto) {
+    const res = await this.robotService.sendFeishuMessage(MessageFromRobot);
     return res;
   }
 }

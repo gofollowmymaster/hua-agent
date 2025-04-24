@@ -1,4 +1,6 @@
 export default {
+  XiaoAAppId: process.env.FEISHU_APP_ID,
+  XiaoAAppSecret: process.env.FEISHU_APP_SECRET,
   AlertAppId: process.env.FEISHU_ALERT_APP_APPID || 'cli_a7c7e073b579500e',
   AlertAppSecret:
     process.env.FEISHU_ALERT_APP_APPSECRET ||

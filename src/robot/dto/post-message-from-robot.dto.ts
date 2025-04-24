@@ -1,5 +1,9 @@
 import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger';
 import type { records } from '../../utils/actionTable/interface';
+import {
+  FeishuMsgType,
+  ReceiveIdType,
+} from '@src/common/feishu/hepler/interface';
 /**
  * 
   参考一下数据帮我生成一个包含支持nestjs/swagger的类{
@@ -111,3 +115,31 @@ export type MessageFromRobotType = {
   //关键词前的内容 string
   preKeywordContent: string;
 };
+
+export class FeishuMessageSenderDto {
+  @ApiProperty({
+    type: String,
+    description: '消息类型',
+  })
+  receive_id: string;
+  @ApiProperty({
+    enum: FeishuMsgType,
+    description: '消息类型',
+  })
+  msg_type: FeishuMsgType;
+  @ApiProperty({
+    type: String,
+    description: '消息内容',
+  })
+  content: string;
+  @ApiPropertyOptional({
+    type: String,
+    description: 'uuid',
+  })
+  uuid?: string;
+  @ApiProperty({
+    enum: ReceiveIdType,
+    description: '接收对象类型',
+  })
+  receive_id_type: ReceiveIdType;
+}

@@ -2,22 +2,35 @@ import FeishuClient from '../clients/client';
 // import { ConfigService } from '@nestjs/config';
 import { FEISHU_CLIENT_ID } from './constants';
 import { Inject } from '@nestjs/common';
+import { CreateMessageType } from './interface';
+import { FeishuApiException } from '@src/common/exception/feishu-api-exception';
 
 class FeishuMessageHelper {
   constructor(
     // private readonly config: ConfigService,
     @Inject(FEISHU_CLIENT_ID) private readonly client: FeishuClient,
   ) {}
-  createInteractToGroup(content, feishuGroupId) {
-    return this.client.client.im.message.create({
-      data: {
-        receive_id: feishuGroupId,
-        msg_type: 'interactive',
-        content,
-      },
+  async create(msgParams: CreateMessageType) {
+    const { code, data } =
+      await this.client.client.im.message.create(msgParams);
+    if (code !== 0) {
+      throw new FeishuApiException();
+    }
+    return data;
+  }
+  async createToGroup(msgParams: CreateMessageType['data']) {
+    return await this.create({
+      data: msgParams,
       params: {
         receive_id_type: 'chat_id',
       },
+    });
+  }
+  async createInteractToGroup(content, feishuGroupId) {
+    return await this.createToGroup({
+      receive_id: feishuGroupId,
+      msg_type: 'interactive',
+      content,
     });
   }
   async reply(content: string, messageId: string) {

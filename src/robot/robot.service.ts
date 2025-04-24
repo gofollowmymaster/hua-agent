@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   SearchParamsDto,
   MessageFromRobotDto,
+  FeishuMessageSenderDto,
 } from './dto/post-message-from-robot.dto';
 import { listTableRecord } from '@utils/actionTable/listTableRecord';
 import { addTableRecord } from '@utils/actionTable/addTableRecord';
@@ -11,9 +12,14 @@ import { deleteTableRecord } from '@utils/actionTable/deleteTableRecord';
 import { feishuSenceService } from './logic/feishu.sence.service';
 import { removeAtXiaoA } from './logic';
 import { logger } from '../middleware/logger.middleware';
+import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import { ReceiveIdType } from '@src/common/feishu/hepler/interface';
 @Injectable()
 export class RobotService {
-  constructor(private readonly feishuSence: feishuSenceService) {}
+  constructor(
+    private readonly feishuSence: feishuSenceService,
+    private readonly messageHelper: FeishuMessageHelper,
+  ) {}
   async getList(headers: { appToken: string; tableId: string }) {
     const { appToken, tableId } = headers;
     const res = await listTableRecord(appToken, tableId);
@@ -89,5 +95,29 @@ export class RobotService {
       logger.info('res-------', res);
       return res;
     }
+  }
+
+  async sendFeishuMessage(params: FeishuMessageSenderDto) {
+    if (
+      params.receive_id_type &&
+      params.receive_id_type != ReceiveIdType.ChatId
+    ) {
+      return await this.messageHelper.create({
+        data: {
+          receive_id: params.receive_id,
+          msg_type: params.msg_type,
+          content: params.content,
+        },
+        params: {
+          receive_id_type: params.receive_id_type,
+        },
+      });
+    }
+
+    return await this.messageHelper.createToGroup({
+      receive_id: params.receive_id,
+      msg_type: params.msg_type,
+      content: params.content,
+    });
   }
 }

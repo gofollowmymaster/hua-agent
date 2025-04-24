@@ -1,9 +1,11 @@
 // import { nextTick } from 'process';
 import AlertClient from './alert-client';
+import XiaoAClient from './xiao-a-client';
 import { FeishuApp } from './enum';
 import { ConfigService } from '@nestjs/config';
 export const Clents = {
   AlertClient,
+  XiaoAClient,
 };
 /**
  * @description: 飞书客户端工厂类
