@@ -22,7 +22,7 @@ export class FeishuHelperModule {
             // 在这里可以使用 configService 实例
             // const configValue = configService.get<string>('YOUR_CONFIG_KEY');
             const client = await ClientFactory.create(clientName, config);
-
+            console.log('[ client ] >', clientName, client);
             return client;
           },
           inject: [ConfigService],

@@ -3,14 +3,14 @@ import FeishuClient from './client';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-class FeishuAlertClient extends FeishuClient {
+class XiaoAClient extends FeishuClient {
   // private readonly instance;
 
   constructor(config?: ConfigService) {
-    const AlertAppId = config.get('XiaoAAppId');
-    const AlertAppSecret = config.get('XiaoAAppSecret');
-    super(AlertAppId, AlertAppSecret);
+    const XiaoAAppId = config.get('XiaoAAppId');
+    const XiaoAAppSecret = config.get('XiaoAAppSecret');
+    super(XiaoAAppId, XiaoAAppSecret);
   }
 }
 
-export default FeishuAlertClient;
+export default XiaoAClient;

@@ -10,7 +10,8 @@ import { HttpAdapterHost } from '@nestjs/core';
 import { ClientFactory } from '@src/common/feishu/clients';
 import { FeishuApp } from '@src/common/feishu/clients/enum';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
-import { buildFeishuTemplateCardMsg } from '@utils/feishu-message';
+import { FeishuAlertCard } from '@src/common/feishu/card/alert-card';
+
 import dayjs from 'dayjs';
 
 @Catch()
@@ -52,7 +53,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
     };
 
     //构建消息内容
-    const content = buildFeishuTemplateCardMsg({
+    const content = FeishuAlertCard.buildCardMsg({
+      environment: process.env.NODE_ENV,
       title: 'Node Server异常报警',
       project: 'aplus-sql-server',
       color: 'red',

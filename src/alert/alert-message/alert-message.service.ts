@@ -178,7 +178,9 @@ export class AlertMsgService {
    */
   async sentryAlertHook(alertInfo: SentryRawDto) {
     const isApiAlert = alertInfo.culprit.includes('请求错误');
+    // try {
     this.sentryApiAlertAdapter = new SentryApiAlertAdapter(alertInfo);
+
     if (isApiAlert) {
       const record = this.sentryApiAlertAdapter.toApiAlertTableData();
       // console.log('[ record ] >', record);
@@ -191,6 +193,7 @@ export class AlertMsgService {
 
       await this.feishuFrontendTable.create(record);
     }
+    // } catch (err) {}
 
     const msgData = this.sentryApiAlertAdapter.toFeishuMessageData();
     // 异步发送飞书消息

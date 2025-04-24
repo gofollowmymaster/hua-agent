@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween'; // nodejs
 import { SentryAlertDto } from './dto/sentry-alert.dto';
-import { buildFeishuTemplateCardMsg } from '@utils/feishu-message';
+import { FeishuAlertCard } from '@src/common/feishu/card/alert-card';
 
 const { isWorkday } = require('chinese-workday');
 
@@ -62,7 +62,7 @@ export const buildAlertMsg = (alertInfo: SentryAlertDto, userId: string) => {
   const title = alertInfo.level == 'fatal' ? '高危报警' : '异常报警';
   const color = alertInfo.level == 'fatal' ? 'red' : 'orange';
 
-  return buildFeishuTemplateCardMsg({
+  return FeishuAlertCard.buildCardMsg({
     ...alertInfo,
     errorTime,
     userId,
