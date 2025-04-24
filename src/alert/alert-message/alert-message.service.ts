@@ -60,7 +60,7 @@ export class AlertMsgService {
     const groupMsgInfo = await this.sendFeishuMsg(alertInfo);
     // this.logger.error(JSON.stringify(groupMsgInfo));
 
-    const messageId = groupMsgInfo.data.message_id;
+    const messageId = groupMsgInfo.message_id;
 
     if (!messageId) {
       this.logger.error(JSON.stringify(groupMsgInfo));
