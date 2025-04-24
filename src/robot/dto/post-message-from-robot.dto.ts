@@ -119,7 +119,7 @@ export type MessageFromRobotType = {
 export class FeishuMessageSenderDto {
   @ApiProperty({
     type: String,
-    description: '消息类型',
+    description: '接受对象ID',
   })
   receive_id: string;
   @ApiProperty({
@@ -137,9 +137,10 @@ export class FeishuMessageSenderDto {
     description: 'uuid',
   })
   uuid?: string;
-  @ApiProperty({
+  @ApiPropertyOptional({
     enum: ReceiveIdType,
+    default: ReceiveIdType.ChatId,
     description: '接收对象类型',
   })
-  receive_id_type: ReceiveIdType;
+  receive_id_type?: ReceiveIdType;
 }
