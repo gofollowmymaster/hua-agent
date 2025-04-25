@@ -14,6 +14,8 @@ import { FeishuAlertCard } from '@src/common/feishu/card/alert-card';
 
 import dayjs from 'dayjs';
 
+type AplusError = Error & { [key: string]: any };
+
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private messagerHelper;
@@ -28,7 +30,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     );
   }
 
-  catch(exception: Error, host: ArgumentsHost): void {
+  catch(exception: AplusError, host: ArgumentsHost): void {
     // In certain situations `httpAdapter` might not be available in the
     // constructor method, thus we should resolve it here.
 
@@ -38,8 +40,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest();
     const path = httpAdapter.getRequestUrl(request);
     const hostName = httpAdapter.getRequestHostname(request);
-    const data = request.body;
+    const data = exception.response?.data || request.body;
 
+    // exception instanceof AxiosError
     const httpStatus =
       exception instanceof HttpException
         ? exception.getStatus()

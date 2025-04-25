@@ -32,10 +32,10 @@ export class AlertMsgController {
     description: '处理sentry报警消息通知',
   })
   @ApiBody({ type: SentryRawDto })
-  @Post('alert')
+  @Post('alertRaw')
   async sentryAlert(@Body() alertInfo: SentryRawDto) {
     // 添加到多维表格
-    await this.alertMsgService.sentryAlertHook(alertInfo);
+    return await this.alertMsgService.sentryAlertHook(alertInfo);
   }
 
   @ApiOperation({
