@@ -1,8 +1,9 @@
 import FeishuClient from '../clients/client';
 // import { ConfigService } from '@nestjs/config';
 import { FEISHU_CLIENT_ID } from './constants';
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
+@Injectable()
 class FeishuTableHelper {
   constructor(
     @Inject(FEISHU_CLIENT_ID) private readonly client: FeishuClient,

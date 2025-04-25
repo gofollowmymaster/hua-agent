@@ -4,8 +4,11 @@ import { FeishuHelperModule } from '../hepler/helper.module';
 import FeishuApiAlertTable from './api-alert-table';
 import FeishuFrontendAlertTable from './frontend-alert-table';
 import FeishuBusinessLineTable from './business-line-table';
+import { ClientFactory } from '../clients';
 @Module({
-  imports: [FeishuHelperModule.forRoot(FeishuApp.AlertClient)],
+  imports: [
+    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AlertClient)),
+  ],
   providers: [
     FeishuApiAlertTable,
     FeishuFrontendAlertTable,

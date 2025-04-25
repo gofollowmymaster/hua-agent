@@ -4,9 +4,13 @@ import { RobotService } from './robot.service';
 import { feishuSenceService } from './logic/feishu.sence.service';
 import { FeishuHelperModule } from '@src/common/feishu/hepler/helper.module';
 import { FeishuApp } from '@src/common/feishu/clients/enum';
+import { ClientFactory } from '@src/common/feishu/clients';
 
 @Module({
-  imports: [FeishuHelperModule.forRoot(FeishuApp.XiaoAClient)],
+  imports: [
+    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.XiaoAClient)),
+  ],
+
   controllers: [RobotController],
   providers: [RobotService, feishuSenceService],
   exports: [RobotService],

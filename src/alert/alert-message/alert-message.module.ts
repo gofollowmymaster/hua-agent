@@ -7,9 +7,10 @@ import { FeishuHelperModule } from '@src/common/feishu/hepler/helper.module';
 import { FeishuApp } from '@src/common/feishu/clients/enum';
 import { FeishuTableModule } from '@src/common/feishu/table/table.module';
 import SentryApiAlertAdapter from './adapter/sentry-alert-adapter';
+import { ClientFactory } from '@src/common/feishu/clients';
 @Module({
   imports: [
-    FeishuHelperModule.forRoot(FeishuApp.AlertClient),
+    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AlertClient)),
     FeishuTableModule,
   ],
   controllers: [AlertMsgController],

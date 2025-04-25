@@ -13,7 +13,7 @@ export const Clents = {
 export class ClientFactory {
   private static clientContainer = {};
 
-  static create(clientName: FeishuApp, config: ConfigService) {
+  static create(clientName: FeishuApp, config?: ConfigService) {
     // await nextTick();
     if (!this.clientContainer[clientName]) {
       this.clientContainer[clientName] = new Clents[clientName](config);
