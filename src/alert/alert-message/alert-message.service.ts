@@ -17,6 +17,7 @@ import FeishuApiAlertTable from '@src/common/feishu/table/api-alert-table';
 import FeishuFrontendAlertTable from '@src/common/feishu/table/frontend-alert-table';
 import SentryApiAlertAdapter from './adapter/sentry-alert-adapter';
 import FeishuBusinessLineTable from '@src/common/feishu/table/business-line-table';
+import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 @Injectable()
 export class AlertMsgService {
   // private messageHelper;
@@ -178,22 +179,24 @@ export class AlertMsgService {
    */
   async sentryAlertHook(alertInfo: SentryRawDto) {
     const isApiAlert = alertInfo.culprit.includes('请求错误');
-    // try {
-    this.sentryApiAlertAdapter = new SentryApiAlertAdapter(alertInfo);
+    try {
+      this.sentryApiAlertAdapter = new SentryApiAlertAdapter(alertInfo);
 
-    if (isApiAlert) {
-      const record = this.sentryApiAlertAdapter.toApiAlertTableData();
-      // console.log('[ record ] >', record);
-      // 异步记录到多维表格
-      await this.feishuApiTable.create(record);
-    } else {
-      // 异步记录到多维表格
-      const record = this.sentryApiAlertAdapter.toFrontendAlertTableData();
-      // console.log('[ record ] >', record);
+      if (isApiAlert) {
+        const record = this.sentryApiAlertAdapter.toApiAlertTableData();
+        console.log('[ record ] >', record);
+        // 异步记录到多维表格
+        await this.feishuApiTable.create(record);
+      } else {
+        // 异步记录到多维表格
+        const record = this.sentryApiAlertAdapter.toFrontendAlertTableData();
+        console.log('[ record ] >', record);
 
-      await this.feishuFrontendTable.create(record);
+        await this.feishuFrontendTable.create(record);
+      }
+    } catch (err) {
+      sendExceptionToFeishu(err, this.config);
     }
-    // } catch (err) {}
 
     const msgData = this.sentryApiAlertAdapter.toFeishuMessageData();
     // 异步发送飞书消息

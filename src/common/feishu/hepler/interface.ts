@@ -1,22 +1,3 @@
-// export type FeishuMsgType =
-//   | 'text'
-//   | 'post'
-//   | 'image'
-//   | 'file'
-//   | 'audio'
-//   | 'media'
-//   | 'sticker'
-//   | 'interactive'
-//   | 'share_chat'
-//   | 'share_user';
-
-// export type ReceiveIdType =
-//   | 'open_id'
-//   | 'user_id'
-//   | 'union_id'
-//   | 'email'
-//   | 'chat_id';
-
 export enum FeishuMsgType {
   Text = 'text',
   Post = 'post',

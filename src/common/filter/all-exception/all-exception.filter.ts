@@ -10,11 +10,9 @@ import { HttpAdapterHost } from '@nestjs/core';
 import { ClientFactory } from '@src/common/feishu/clients';
 import { FeishuApp } from '@src/common/feishu/clients/enum';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
-import { FeishuAlertCard } from '@src/common/feishu/card/alert-card';
 
-import dayjs from 'dayjs';
-
-type AplusError = Error & { [key: string]: any };
+import { sendExceptionToFeishu } from '@src/common/feishu/utils';
+import { AplusError } from '@src/common/exception/interface';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -31,9 +29,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
   }
 
   catch(exception: AplusError, host: ArgumentsHost): void {
-    // In certain situations `httpAdapter` might not be available in the
-    // constructor method, thus we should resolve it here.
-
     const { httpAdapter } = this.httpAdapterHost;
 
     const ctx = host.switchToHttp();
@@ -54,24 +49,17 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message,
       path,
     };
+    if (typeof exception == 'object') {
+      exception.culprit = culprit;
+    } else {
+      exception = {
+        name: 'Error',
+        message: exception,
+        culprit,
+      };
+    }
+    sendExceptionToFeishu(exception, this.config);
 
-    //构建消息内容
-    const content = FeishuAlertCard.buildCardMsg({
-      environment: process.env.NODE_ENV,
-      title: 'Node Server异常报警',
-      project: 'aplus-sql-server',
-      color: 'red',
-      culprit,
-      errorMessage: message,
-      errorTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-      url: 'https://sls.console.aliyun.com/lognext/project/k8s-log-c893ce02efe464e778e67c48016348406/logsearch/elnkpro-prod-log?encode%3Dbase64%26queryString%3DIF9jb250YWluZXJfbmFtZV86IGFwbHVzLXNxbC1zZXJ2aWNlLXByb2Q%3D%26filterInfo%3DeyJmamNvZGUiOiIoKSIsImZxIjoiIn0%3D%26queryTimeType%3D99%26startTime%3D1731892962%26endTime%3D1731896562',
-    });
-
-    // 发送群消息
-    this.messagerHelper.createInteractToGroup(
-      content,
-      this.config.get('DefaultAlertFeishuGroupId'),
-    );
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
   }
 }
