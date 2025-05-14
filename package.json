@@ -16,7 +16,7 @@
     "migrate:dev": "pnpm env:dev -- npx prisma migrate dev --create-only",
     "migrate:test": "pnpm env:test -- npx prisma migrate dev --create-only",
     "migrate:prod": "pnpm env:prod -- npx prisma migrate dev",
-    "start": "nest start",
+    "start": "pnpm env:dev --  nest start",
     "start:dev": "pnpm env:dev -- nest build --webpack --webpackPath webpack-hmr.config.js --watch",
     "start:test": "pnpm env:test -- nest build --webpack --webpackPath webpack-hmr.config.js --watch",
     "start:debug": "nest start --debug --watch",
