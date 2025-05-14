@@ -76,9 +76,7 @@ export class AlertMsgService {
       this.logger.info(alertInfo.timeStamp + '当前时间不需要加急通知');
       return;
     }
-    const { userId: feishuUserId } = this.getGroupAndUserByProject(
-      alertInfo.project,
-    );
+    const { userId: feishuUserId } = this.getGroupAndUserByProject(alertInfo);
     //不加await 使接口不需要等待加急消息发送
     this.messageAlert(groupMsgInfo, feishuUserId);
   }
