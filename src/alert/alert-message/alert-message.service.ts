@@ -40,7 +40,7 @@ export class AlertMsgService {
   async sendFeishuMsg(alertInfo: SentryAlertDto) {
     //获取飞书用户userid（todo）群Id -> 消息加急
     const { userId: feishuUserId, groupId: feishuGroupId } =
-      this.getGroupAndUserByProject(alertInfo.project);
+      this.getGroupAndUserByProject(alertInfo);
 
     //构建消息内容
     const content = buildAlertMsg({ ...alertInfo }, feishuUserId);
@@ -159,8 +159,13 @@ export class AlertMsgService {
     return !!message.userAlerted[0].reactionTime;
   }
 
-  getGroupAndUserByProject(projectName: string) {
-    if (process.env.NODE_ENV == 'dev') {
+  getGroupAndUserByProject(alertInfo: SentryAlertDto) {
+    const { project, environment } = alertInfo;
+    if (
+      process.env.NODE_ENV == 'dev' ||
+      environment == 'dev' ||
+      environment == 'development'
+    ) {
       return {
         groupId: this.config.getOrThrow('DefaultAlertFeishuGroupId'),
         userId: this.config.getOrThrow('DefaultAlertFeishuUserId'),
@@ -169,7 +174,7 @@ export class AlertMsgService {
     /**
      * 解码并处理有空格的情况
      */
-    projectName = decodeURIComponent(projectName).trim();
+    const projectName = decodeURIComponent(project).trim();
     return appUserMap[projectName];
   }
 

@@ -11,6 +11,7 @@ export enum Environment {
   UAT = 'uat',
   TEST = 'test',
   DEV = 'dev',
+  DEVELOPMENT = 'development',
 }
 export class SentryAlertDto {
   @ApiProperty({
