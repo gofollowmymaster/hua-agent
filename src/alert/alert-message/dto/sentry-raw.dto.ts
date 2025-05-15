@@ -99,7 +99,7 @@ interface Event {
   user: User;
   version: string;
   extra?: {
-    subAppName: subAppName;
+    subModuleName: subAppName;
     __serialized__: {
       code: number;
       payload: string;

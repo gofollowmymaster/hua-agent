@@ -12,7 +12,7 @@ export default class SentryApiAlertAdapter {
   toApiAlertTableData(): ApiAlertTableDto {
     const requestData = this.sentryData.event.extra?.__serialized__;
     const subAppName =
-      this.sentryData.event.extra?.subAppName || this.sentryData.project;
+      this.sentryData.event.extra?.subModuleName || this.sentryData.project;
     // const
     return {
       接口地址: requestData.url,
