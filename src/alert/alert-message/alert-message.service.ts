@@ -191,7 +191,7 @@ export class AlertMsgService {
         // 异步记录到多维表格
         await this.feishuApiTable.create(record);
 
-        if (this.ignoreCodeList.includes(record['http状态码'])) {
+        if (this.ignoreCodeList.includes(record['业务状态码'])) {
           return;
         }
       } else {
