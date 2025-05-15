@@ -31,7 +31,7 @@ export default class SentryApiAlertAdapter {
   toFrontendAlertTableData(): FrontendAlertTableDto {
     // const requestData = this.sentryData.event.extra.__serialized__;
     const subAppName =
-      this.sentryData.event.extra?.subAppName || this.sentryData.project;
+      this.sentryData.event.extra?.subModuleName || this.sentryData.project;
 
     // const
     return {
@@ -54,7 +54,7 @@ export default class SentryApiAlertAdapter {
   toFeishuMessageData(): SentryAlertDto {
     const sentryData = this.sentryData;
     const subAppName =
-      this.sentryData.event.extra?.subAppName || this.sentryData.project;
+      this.sentryData.event.extra?.subModuleName || this.sentryData.project;
 
     return {
       environment: sentryData.event.environment,
