@@ -24,6 +24,8 @@ export default class SentryApiAlertAdapter {
       业务线: [appUserMap[subAppName]?.bu],
       应用名: [subAppName + ''],
       发生时间: this.sentryData.event.timestamp * 1000,
+      环境: this.sentryData.event.environment,
+
       RawData: JSON.stringify(this.sentryData),
     };
   }

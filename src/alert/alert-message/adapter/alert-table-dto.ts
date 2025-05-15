@@ -8,6 +8,7 @@ export interface ApiAlertTableDto {
   业务线: [string];
   应用名: [string];
   发生时间: number;
+  环境: string;
   RawData: string;
 }
 
