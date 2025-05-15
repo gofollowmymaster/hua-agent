@@ -22,7 +22,7 @@ import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 export class AlertMsgService {
   // private messageHelper;
   private sentryApiAlertAdapter: SentryApiAlertAdapter;
-
+  private ignoreCodeList = ['401', '10002'];
   constructor(
     private prisma: PrismaService,
     private readonly logger: LoggerService,
@@ -190,6 +190,10 @@ export class AlertMsgService {
         console.log('[ record ] >', record);
         // 异步记录到多维表格
         await this.feishuApiTable.create(record);
+
+        if (this.ignoreCodeList.includes(record['http状态码'])) {
+          return;
+        }
       } else {
         // 异步记录到多维表格
         const record = this.sentryApiAlertAdapter.toFrontendAlertTableData();
