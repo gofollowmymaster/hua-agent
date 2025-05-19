@@ -1,19 +1,28 @@
 import { ApiAlertTableDto, FrontendAlertTableDto } from './alert-table-dto';
 import { SentryAlertDto } from '../dto/sentry-alert.dto';
 import { SentryRawDto } from '../dto/sentry-raw.dto';
-import { appUserMap } from '../app-user-map';
+import { appUserMap, apiModuleBuMap } from '../app-user-map';
 
 export default class SentryApiAlertAdapter {
   private sentryData: SentryRawDto;
   constructor(sentryData: SentryRawDto) {
     this.sentryData = sentryData;
   }
+  getModuleNameByUrl(url: string) {
+    url = url.replace('https://', '');
+    url = url.replace('/api/', '/');
+    const urlArr = url.split('/');
+    return urlArr[1];
+  }
 
   toApiAlertTableData(): ApiAlertTableDto {
     const requestData = this.sentryData.event.extra?.__serialized__;
     const subAppName =
       this.sentryData.event.extra?.subModuleName || this.sentryData.project;
-    // const
+    console.log(
+      '[ this.getModuleNameByUrl(requestData.url) ] >',
+      this.getModuleNameByUrl(requestData.url),
+    );
     return {
       接口地址: requestData.url,
       http状态码: '200',
@@ -21,7 +30,11 @@ export default class SentryApiAlertAdapter {
       请求参数: JSON.stringify(requestData.payload),
       响应数据: JSON.stringify(requestData.resData),
       错误信息: requestData.message,
-      业务线: [appUserMap[subAppName]?.bu],
+
+      业务线: [
+        apiModuleBuMap[this.getModuleNameByUrl(requestData.url)] ||
+          appUserMap[subAppName]?.bu,
+      ],
       应用名: subAppName + '',
       发生时间: this.sentryData.event.timestamp * 1000,
       环境: this.sentryData.event.environment,

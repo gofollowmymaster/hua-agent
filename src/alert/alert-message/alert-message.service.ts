@@ -187,7 +187,7 @@ export class AlertMsgService {
 
       if (isApiAlert) {
         const record = this.sentryApiAlertAdapter.toApiAlertTableData();
-        console.log('[ record ] >', record);
+        // console.log('[ record ] >', record);
         // 异步记录到多维表格
         await this.feishuApiTable.create(record);
 

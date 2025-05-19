@@ -68,3 +68,10 @@ export const appUserMap: Record<string, AppInfo> = {
     bu: 'recuwVEngyXUnD',
   },
 };
+
+export const apiModuleBuMap = {
+  im: 'recuwVEngyXUnD',
+  'download-center': 'recuwVEngyXUnD',
+  wms: 'recuwVEngy1rzk',
+  ad: 'recuwVEngyXbfv',
+};
