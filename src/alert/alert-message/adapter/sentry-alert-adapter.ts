@@ -8,7 +8,8 @@ export default class SentryApiAlertAdapter {
   constructor(sentryData: SentryRawDto) {
     this.sentryData = sentryData;
   }
-  getModuleNameByUrl(url: string) {
+  getModuleNameByUrl(url: string = '') {
+    if (!url) return;
     url = url.replace('https://', '');
     url = url.replace('/api/', '/');
     const urlArr = url.split('/');
@@ -19,10 +20,7 @@ export default class SentryApiAlertAdapter {
     const requestData = this.sentryData.event.extra?.__serialized__;
     const subAppName =
       this.sentryData.event.extra?.subModuleName || this.sentryData.project;
-    console.log(
-      '[ this.getModuleNameByUrl(requestData.url) ] >',
-      this.getModuleNameByUrl(requestData.url),
-    );
+    const moduleName = this.getModuleNameByUrl(requestData.url);
     return {
       接口地址: requestData.url,
       http状态码: '200',
@@ -30,11 +28,7 @@ export default class SentryApiAlertAdapter {
       请求参数: JSON.stringify(requestData.payload),
       响应数据: JSON.stringify(requestData.resData),
       错误信息: requestData.message,
-
-      业务线: [
-        apiModuleBuMap[this.getModuleNameByUrl(requestData.url)] ||
-          appUserMap[subAppName]?.bu,
-      ],
+      业务线: [apiModuleBuMap[moduleName] || appUserMap[subAppName]?.bu],
       应用名: subAppName + '',
       发生时间: this.sentryData.event.timestamp * 1000,
       环境: this.sentryData.event.environment,
@@ -71,13 +65,21 @@ export default class SentryApiAlertAdapter {
     const subAppName =
       this.sentryData.event.extra?.subModuleName || this.sentryData.project;
 
+    // const sentryData.url
+    const urlParsed = sentryData.url?.split('?');
+    const sentryUrl =
+      urlParsed[0] +
+      'events/' +
+      sentryData.event?.event_id +
+      '?' +
+      urlParsed[1];
     return {
       environment: sentryData.event.environment,
       rawData: JSON.stringify(sentryData),
       errorMessage: sentryData.message,
       userEmail: '',
       project: subAppName,
-      linkUrl: sentryData.url,
+      linkUrl: sentryUrl,
       level: sentryData.level,
       eventType: sentryData.event.type,
       culprit: sentryData.culprit,

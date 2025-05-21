@@ -20,6 +20,7 @@ export const sendExceptionToFeishu = (
   const messagerHelper = new FeishuMessageHelper(
     ClientFactory.create(FeishuApp.AlertClient, config),
   );
+  const errorTime = dayjs();
 
   //构建消息内容
   const content = FeishuAlertCard.buildCardMsg({
@@ -29,8 +30,8 @@ export const sendExceptionToFeishu = (
     color: 'red',
     culprit: exception.culprit || exception.name,
     errorMessage: exception.message,
-    errorTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-    url: 'https://sls.console.aliyun.com/lognext/project/k8s-log-c893ce02efe464e778e67c48016348406/logsearch/elnkpro-prod-log?encode%3Dbase64%26queryString%3DIF9jb250YWluZXJfbmFtZV86IGFwbHVzLXNxbC1zZXJ2aWNlLXByb2Q%3D%26filterInfo%3DeyJmamNvZGUiOiIoKSIsImZxIjoiIn0%3D%26queryTimeType%3D99%26startTime%3D1731892962%26endTime%3D1731896562',
+    errorTime: errorTime.format('YYYY-MM-DD HH:mm:ss'),
+    linkUrl: `https://sls.console.aliyun.com/lognext/project/k8s-log-c893ce02efe464e778e67c48016348406/logsearch/elnkpro-prod-log?encode%3Dbase64%26queryString%3DIF9jb250YWluZXJfbmFtZV86IGFwbHVzLXNxbC1zZXJ2aWNlLXByb2Q%3D%26filterInfo%3DeyJmamNvZGUiOiIoKSIsImZxIjoiIn0%3D%26queryTimeType%3D99%26startTime%3D${errorTime.subtract(60, 's').valueOf() / 1000}%26endTime%3D${errorTime.add(60, 's').valueOf() / 1000}`,
   });
   messagerHelper.createInteractToGroup(
     content,

@@ -4,7 +4,7 @@ export type AlertInfo = {
   project: string;
   level?: string;
   errorMessage: string;
-  url?: string;
+  linkUrl?: string;
   userId?: string;
   errorTime: string;
   title: string;
