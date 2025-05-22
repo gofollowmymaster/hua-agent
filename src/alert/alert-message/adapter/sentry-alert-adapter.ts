@@ -1,7 +1,7 @@
 import { ApiAlertTableDto, FrontendAlertTableDto } from './alert-table-dto';
 import { SentryAlertDto } from '../dto/sentry-alert.dto';
 import { SentryRawDto } from '../dto/sentry-raw.dto';
-import { appUserMap, apiModuleBuMap } from '../app-user-map';
+import { apiModuleBuMap, getSubAppInfo } from '../app-user-map';
 
 export default class SentryApiAlertAdapter {
   private sentryData: SentryRawDto;
@@ -20,6 +20,8 @@ export default class SentryApiAlertAdapter {
     const requestData = this.sentryData.event.extra?.__serialized__;
     const subAppName =
       this.sentryData.event.extra?.subModuleName || this.sentryData.project;
+    const appInfo = getSubAppInfo(subAppName);
+
     const moduleName = this.getModuleNameByUrl(requestData.url);
     return {
       接口地址: requestData.url,
@@ -28,7 +30,7 @@ export default class SentryApiAlertAdapter {
       请求参数: JSON.stringify(requestData.payload),
       响应数据: JSON.stringify(requestData.resData),
       错误信息: requestData.message,
-      业务线: [apiModuleBuMap[moduleName] || appUserMap[subAppName]?.bu],
+      业务线: [apiModuleBuMap[moduleName] || appInfo.bu],
       应用名: subAppName + '',
       发生时间: this.sentryData.event.timestamp * 1000,
       环境: this.sentryData.event.environment,
@@ -41,21 +43,21 @@ export default class SentryApiAlertAdapter {
     // const requestData = this.sentryData.event.extra.__serialized__;
     const subAppName =
       this.sentryData.event.extra?.subModuleName || this.sentryData.project;
-
+    const appInfo = getSubAppInfo(subAppName);
     // const
     return {
       标题: this.sentryData.message,
       链接信息: this.sentryData.url,
       是否解决: false,
       // 优先级: requestData.payload,
-      负责人: [{ id: appUserMap[subAppName]?.userId }],
+      负责人: [{ id: appInfo.userId }],
       错误原因: '',
       解决方案: '',
       来源: 'Sentry告警',
       报警级别: this.sentryData.level,
       描述信息: this.sentryData.culprit,
       应用名: [subAppName],
-      业务线: [appUserMap[subAppName]?.bu],
+      业务线: [appInfo.bu],
       环境: this.sentryData.event.environment,
       RawData: JSON.stringify(this.sentryData),
     };
