@@ -26,7 +26,7 @@ async function bootstrap() {
   const config = app.get(ConfigService);
   app.enableCors({
     origin: true, // 或设置为 true 允许所有
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Accept,Authorization',
     credentials: true, // 允许发送 cookies
   });
