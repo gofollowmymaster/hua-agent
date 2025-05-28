@@ -11,6 +11,7 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
 import { MockServerModule } from './mock-server/mock-server.module';
 import { AlertMsgModule } from '@src/alert/alert-message/alert-message.module';
 import { FeishuEventModule } from '@src/alert/event/event.module';
+import { AilyLogOperatorModule } from '@src/ai/log-operator/log-operator.module';
 import { LoggerModule } from './common/service/logger/logger.module';
 import configuration from './config';
 import { CacheModule } from '@nestjs/cache-manager';
@@ -44,6 +45,7 @@ const envFilePath = [
     AlertMsgModule,
     LoggerModule,
     FeishuEventModule,
+    AilyLogOperatorModule,
   ],
   providers: [PrismaService],
 })

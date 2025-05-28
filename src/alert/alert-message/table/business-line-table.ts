@@ -1,18 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import FeishuTable from './feishu-table';
 import { ConfigService } from '@nestjs/config';
-import FeishuTableHelper from '../hepler/table-helper';
+import FeishuTableHelper from '@src/common/feishu/hepler/table-helper';
+import FeishuTable from '@src/common/feishu/table/feishu-table';
 @Injectable()
-class FeishuFrontendAlertTable extends FeishuTable {
+class FeishuBusinessLineTable extends FeishuTable {
   // protected readonly tableHelper: FeishuTableHelper;
-
   constructor(
     readonly config: ConfigService,
     readonly tableHelper: FeishuTableHelper,
   ) {
     super();
     this.appToken = config.getOrThrow('AlertTableAppToken');
-    this.tableId = config.getOrThrow('AlertFrontendAppId');
+    this.tableId = 'tbl1aLjbTNgbgaT6';
   }
 }
-export default FeishuFrontendAlertTable;
+export default FeishuBusinessLineTable;

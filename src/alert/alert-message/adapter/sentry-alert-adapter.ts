@@ -75,9 +75,14 @@ export default class SentryApiAlertAdapter {
       sentryData.event?.event_id +
       '?' +
       urlParsed[1];
+    // let rawData = JSON.stringify(this.sentryData);
+
+    // if (rawData.length > 20000) {
+    //   rawData = '数据过大，已截断';
+    // }
     return {
       environment: sentryData.event.environment,
-      rawData: JSON.stringify(sentryData),
+      rawData: '',
       errorMessage: sentryData.message,
       userEmail: '',
       project: subAppName,

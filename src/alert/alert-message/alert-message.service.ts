@@ -13,11 +13,11 @@ import {
 import { ConfigService } from '@nestjs/config';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import { SentryRawDto } from './dto/sentry-raw.dto';
-import FeishuApiAlertTable from '@src/common/feishu/table/api-alert-table';
-import FeishuFrontendAlertTable from '@src/common/feishu/table/frontend-alert-table';
 import SentryApiAlertAdapter from './adapter/sentry-alert-adapter';
-import FeishuBusinessLineTable from '@src/common/feishu/table/business-line-table';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
+import FeishuApiAlertTable from './table/api-alert-table';
+import FeishuFrontendAlertTable from './table/frontend-alert-table';
+import FeishuBusinessLineTable from './table/business-line-table';
 @Injectable()
 export class AlertMsgService {
   // private messageHelper;
@@ -202,7 +202,7 @@ export class AlertMsgService {
         await this.feishuFrontendTable.create(record);
       }
     } catch (err) {
-      console.log('[ catch ] >', err, '----------');
+      console.log('[ ------------catch---------- ] >');
 
       sendExceptionToFeishu(err, this.config);
     }

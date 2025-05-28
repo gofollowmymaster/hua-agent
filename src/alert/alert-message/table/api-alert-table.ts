@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import FeishuTable from './feishu-table';
 import { ConfigService } from '@nestjs/config';
-import FeishuTableHelper from '../hepler/table-helper';
+import FeishuTableHelper from '@src/common/feishu/hepler/table-helper';
+import FeishuTable from '@src/common/feishu/table/feishu-table';
 @Injectable()
-class FeishuBusinessLineTable extends FeishuTable {
+class FeishuApiAlertTable extends FeishuTable {
   // protected readonly tableHelper: FeishuTableHelper;
   constructor(
     readonly config: ConfigService,
@@ -11,7 +11,7 @@ class FeishuBusinessLineTable extends FeishuTable {
   ) {
     super();
     this.appToken = config.getOrThrow('AlertTableAppToken');
-    this.tableId = 'tbl1aLjbTNgbgaT6';
+    this.tableId = config.getOrThrow('AlertApiTableId');
   }
 }
-export default FeishuBusinessLineTable;
+export default FeishuApiAlertTable;

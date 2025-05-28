@@ -23,7 +23,6 @@ export class FeishuAlertCard extends FeishuCard {
    */
   static buildCardMsg = (alertInfo: AlertInfo) => {
     const color = alertInfo.level == 'fatal' ? 'red' : 'orange';
-
     return super.build({ ...alertInfo, color });
   };
 

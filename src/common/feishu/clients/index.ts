@@ -1,14 +1,17 @@
 // import { nextTick } from 'process';
 import AlertClient from './alert-client';
 import XiaoAClient from './xiao-a-client';
+import AilyAplusClient from './aplus-aily-client';
 import { ConfigService } from '@nestjs/config';
 export const feishuAppClents = {
   AlertClient,
   XiaoAClient,
+  AilyAplusClient,
 };
 export enum FeishuApp {
   AlertClient = 'AlertClient',
   XiaoAClient = 'XiaoAClient',
+  AilyAplusClient = 'AilyAplusClient',
 }
 
 export type feishuAppClentsType = keyof typeof feishuAppClents;

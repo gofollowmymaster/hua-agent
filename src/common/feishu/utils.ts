@@ -24,11 +24,11 @@ export const sendExceptionToFeishu = (
   //构建消息内容
   const content = FeishuAlertCard.buildCardMsg({
     environment: process.env.NODE_ENV,
-    title: exception.title || 'Node Server异常报警',
+    title: exception.title?.slice(0, 1000) || 'Node Server异常报警',
     project: 'aplus-sql-server',
     color: 'red',
     culprit: exception.culprit || exception.name,
-    errorMessage: exception.message,
+    errorMessage: exception.message?.slice(0, 1000) || '未知错误',
     errorTime: errorTime.format('YYYY-MM-DD HH:mm:ss'),
     linkUrl: `https://sls.console.aliyun.com/lognext/project/k8s-log-c893ce02efe464e778e67c48016348406/logsearch/elnkpro-prod-log?encode%3Dbase64%26queryString%3DIF9jb250YWluZXJfbmFtZV86IGFwbHVzLXNxbC1zZXJ2aWNlLXByb2Q%3D%26filterInfo%3DeyJmamNvZGUiOiIoKSIsImZxIjoiIn0%3D%26queryTimeType%3D99%26startTime%3D${errorTime.subtract(60, 's').valueOf() / 1000}%26endTime%3D${errorTime.add(60, 's').valueOf() / 1000}`,
   });
