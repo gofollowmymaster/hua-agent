@@ -24,7 +24,12 @@ async function bootstrap() {
 
   const httpAdapter = app.get(HttpAdapterHost);
   const config = app.get(ConfigService);
-  app.enableCors();
+  app.enableCors({
+    origin: true, // 或设置为 true 允许所有
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Accept,Authorization',
+    credentials: true, // 允许发送 cookies
+  });
   app.useGlobalFilters(
     new AllExceptionsFilter(httpAdapter, config),
     new HttpExceptionFilter(),

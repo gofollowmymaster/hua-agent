@@ -1,10 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 
-class User {
-  id: string;
-  name: string;
-}
 export class LogOperatorDto {
   @IsNotEmpty()
   @ApiProperty({
@@ -12,11 +8,15 @@ export class LogOperatorDto {
     description: '消息ID',
   })
   messageId: string; // 消息ID
-  @IsNotEmpty()
   @ApiProperty({
-    type: User,
-    description: '用户信息',
+    type: String,
+    description: '用户名',
   })
-  user: User; // 操作用户
+  userName: string; // 操作用户
+  @ApiProperty({
+    type: String,
+    description: '供应商',
+  })
+  tenantName: string; // 供应商
   // remark?: string; // 备注，非必填项
 }

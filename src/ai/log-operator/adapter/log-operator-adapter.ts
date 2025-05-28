@@ -10,7 +10,8 @@ export default class SentryApiAlertAdapter {
   toTableData(): LogOperatorTableDto {
     return {
       ID: this.data.messageId,
-      操作用户: JSON.stringify(this.data.user),
+      操作用户: this.data.userName,
+      供应商: this.data.tenantName,
       // 备注?: string;
     };
   }
