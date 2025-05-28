@@ -7,8 +7,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost } from '@nestjs/core';
-import { ClientFactory } from '@src/common/feishu/clients';
-import { FeishuApp } from '@src/common/feishu/clients/enum';
+import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
@@ -44,6 +43,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         : HttpStatus.INTERNAL_SERVER_ERROR;
     const culprit = hostName + path + JSON.stringify(data);
     const message = exception.message || 'Internal Server Error';
+    console.log('[ exception ] >', exception);
     const responseBody = {
       code: httpStatus,
       message,

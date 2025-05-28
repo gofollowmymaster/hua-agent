@@ -1,6 +1,5 @@
 import { ConfigService } from '@nestjs/config';
-import { ClientFactory } from './clients';
-import { FeishuApp } from './clients/enum';
+import { ClientFactory, FeishuApp } from './clients';
 import FeishuMessageHelper from './hepler/message-helper';
 import { FeishuAlertCard } from './card/alert-card';
 import dayjs from 'dayjs';

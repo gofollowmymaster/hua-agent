@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
 
 export enum ErrorLevel {
   FATAL = 'fatal',
@@ -14,6 +15,7 @@ export enum Environment {
   DEVELOPMENT = 'development',
 }
 export class SentryAlertDto {
+  @IsNotEmpty()
   @ApiProperty({
     enum: Environment,
     description: '环境',

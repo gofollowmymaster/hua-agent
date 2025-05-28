@@ -1,5 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNotEmptyObject } from 'class-validator';
 export enum ErrorLevel {
   FATAL = 'fatal',
   ERROR = 'error',
@@ -23,10 +23,11 @@ export class SentryRawDto {
     type: Event,
     description: 'sentry事件信息',
   })
+  @IsNotEmptyObject()
   event: Event;
   @ApiProperty({
     type: String,
-    description: 'sentry事件ID',
+    description: 'sentryID',
   })
   id: string;
   @ApiProperty({
@@ -39,6 +40,7 @@ export class SentryRawDto {
     type: String,
     description: 'sentry事件文案消息',
   })
+  @IsNotEmpty()
   message: string;
   @ApiProperty({
     type: String,
@@ -56,6 +58,7 @@ export class SentryRawDto {
     type: String,
     description: 'sentry页面连接',
   })
+  @IsNotEmpty()
   readonly url: string;
 }
 

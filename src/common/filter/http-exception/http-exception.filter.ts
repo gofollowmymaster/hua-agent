@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
+import { isObject } from '@utils/is';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -15,8 +16,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
-    const resMsg = exception.getResponse();
-
+    let resMsg = exception.getResponse();
+    if (typeof resMsg != 'string' && isObject(resMsg) && 'message' in resMsg) {
+      resMsg = resMsg.message as object;
+    }
     console.log('返回错误', resMsg);
     response.status(status).json({
       code: status,

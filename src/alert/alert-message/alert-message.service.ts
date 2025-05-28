@@ -4,7 +4,7 @@ import { SentryAlertDto } from './dto/sentry-alert.dto';
 import { addRetryJob } from '@src/utils/job';
 import { PrismaService } from '@src/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
-import { appUserMap } from './app-user-map';
+import { getSubAppInfo } from './app-user-map';
 import {
   // buildAtUserMsg,
   buildAlertMsg,
@@ -173,7 +173,7 @@ export class AlertMsgService {
      * 解码并处理有空格的情况
      */
     const projectName = decodeURIComponent(project).trim();
-    return appUserMap[projectName];
+    return getSubAppInfo(projectName);
   }
 
   /**
@@ -181,7 +181,7 @@ export class AlertMsgService {
    * @param alertInfo
    */
   async sentryAlertHook(alertInfo: SentryRawDto) {
-    const isApiAlert = alertInfo.culprit.includes('请求错误');
+    const isApiAlert = alertInfo.culprit?.includes('请求错误');
     try {
       this.sentryApiAlertAdapter = new SentryApiAlertAdapter(alertInfo);
 
@@ -197,11 +197,13 @@ export class AlertMsgService {
       } else {
         // 异步记录到多维表格
         const record = this.sentryApiAlertAdapter.toFrontendAlertTableData();
-        console.log('[ record ] >', record);
+        // console.log('[ record ] >', '----------');
 
         await this.feishuFrontendTable.create(record);
       }
     } catch (err) {
+      console.log('[ catch ] >', err, '----------');
+
       sendExceptionToFeishu(err, this.config);
     }
 

@@ -15,7 +15,6 @@ import { LoggerModule } from './common/service/logger/logger.module';
 import configuration from './config';
 import { CacheModule } from '@nestjs/cache-manager';
 // import { FeishuHelperModule } from './common/feishu/hepler/helper.module';
-// import { FeishuApp } from './common/feishu/clients/enum';
 
 const envFilePath = [
   '.env',

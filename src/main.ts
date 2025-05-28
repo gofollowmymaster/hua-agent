@@ -12,6 +12,7 @@ import timezone from 'dayjs/plugin/timezone'; // nodejs
 import dayjs from 'dayjs';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import { ValidationPipe } from '@nestjs/common';
 
 declare const module: any;
 
@@ -30,6 +31,11 @@ async function bootstrap() {
     new UniqueConstraintExceptionFilter(),
   );
   app.useGlobalInterceptors(new TransformInterceptor());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      stopAtFirstError: true,
+    }),
+  );
   // 增加请求体大小限制
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
