@@ -20,7 +20,7 @@ export class LogOperatorController {
     description: 'success',
     type: String,
   })
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Post('add')
   async add(@Body() alertInfo: LogOperatorDto) {
     //发送消息

@@ -13,6 +13,7 @@ import dayjs from 'dayjs';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
+import { setGlobalConfig } from '@utils/app-config';
 
 declare const module: any;
 
@@ -21,6 +22,7 @@ dayjs.extend(timezone);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  setGlobalConfig(app);
 
   const httpAdapter = app.get(HttpAdapterHost);
   const config = app.get(ConfigService);
@@ -56,6 +58,7 @@ async function bootstrap() {
       jsonDocumentUrl: 'swagger/json',
     });
   }
+  // 设置全局配置
 
   await app.listen(3000);
 
