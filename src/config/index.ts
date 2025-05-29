@@ -1,4 +1,4 @@
 import feishu from './feishu';
-export default () => ({
+export default {
   ...feishu,
-});
+};

@@ -15,6 +15,8 @@ import { AilyLogOperatorModule } from '@src/ai/log-operator/log-operator.module'
 import { LoggerModule } from './common/service/logger/logger.module';
 import configuration from './config';
 import { CacheModule } from '@nestjs/cache-manager';
+import { AuthModule } from './aplus/auth/auth.module';
+import { DevtoolsModule } from '@nestjs/devtools-integration';
 // import { FeishuHelperModule } from './common/feishu/hepler/helper.module';
 
 const envFilePath = [
@@ -22,12 +24,13 @@ const envFilePath = [
   `.env.${process.env.NODE_ENV}`,
   `.env.${process.env.NODE_ENV}.local`,
 ];
+console.log('[ envFilePath ] >', envFilePath);
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: envFilePath,
       isGlobal: true,
-      load: [configuration],
+      load: [() => configuration],
     }),
     CacheModule.register({
       ttl: 60 * 60 * 24, // 24小时缓存
@@ -36,6 +39,9 @@ const envFilePath = [
     // 静态资源服务
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'mockServer'),
+    }),
+    DevtoolsModule.register({
+      http: process.env.NODE_ENV !== 'production',
     }),
     SubappModule,
     VersionModule,
@@ -46,6 +52,7 @@ const envFilePath = [
     LoggerModule,
     FeishuEventModule,
     AilyLogOperatorModule,
+    AuthModule,
   ],
   providers: [PrismaService],
 })

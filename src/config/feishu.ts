@@ -15,9 +15,7 @@ export default {
   AilyLogTableId: process.env.FEISHU_ALERT_API_TABLE_ID || 'tblNX1qbsmDuvbCu',
   //报警机器人相关
   AlertAppId: process.env.FEISHU_ALERT_APP_APPID || 'cli_a7c7e073b579500e',
-  AlertAppSecret:
-    process.env.FEISHU_ALERT_APP_APPSECRET ||
-    'M8jpmdjcb8wvAxjU2Wlk2cULx0Cobeap',
+  AlertAppSecret: process.env.FEISHU_ALERT_APP_APPSECRET,
   //报警表格相关
   AlertTableAppToken: process.env.FEISHU_ALERT_APP_TOKEN,
   AlertApiTableId: process.env.FEISHU_ALERT_API_TABLE_ID,
