@@ -7,9 +7,10 @@ class FeishuAlertClient extends FeishuClient {
   // private readonly instance;
 
   constructor(config?: ConfigService) {
-    const AlertAppId = config?.get('AlertAppId') || 'cli_a7c7e073b579500e';
+    const AlertAppId =
+      config?.get('AlertAppId') || process.env.FEISHU_ALERT_APP_APPID;
     const AlertAppSecret =
-      config?.get('AlertAppSecret') || 'M8jpmdjcb8wvAxjU2Wlk2cULx0Cobeap';
+      config?.get('AlertAppSecret') || process.env.FEISHU_ALERT_APP_APPSECRET;
     super(AlertAppId, AlertAppSecret);
   }
 }
