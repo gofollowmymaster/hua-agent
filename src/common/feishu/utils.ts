@@ -16,6 +16,7 @@ export const sendExceptionToFeishu = (
   exception: AplusError,
   config: ConfigService,
 ) => {
+  console.log('[ -----------config------------- ] >', config);
   const messagerHelper = new FeishuMessageHelper(
     ClientFactory.create(FeishuApp.AlertClient, config),
   );

@@ -13,8 +13,9 @@ class AilyLogOperatorTable extends FeishuTable {
     readonly tableHelper: FeishuTableHelper,
   ) {
     super();
-    this.appToken = config.getOrThrow('AilyLogTableAppToken');
-    this.tableId = config.getOrThrow('AilyLogOperatorTableId');
+    this.appToken =
+      config.get('AilyLogTableAppToken') || 'A6qfbapjtafVLYsn9xic6mYNnfT';
+    this.tableId = config.get('AilyLogOperatorTableId') || 'tblcE7q8e2vD9c48';
   }
 }
 export default AilyLogOperatorTable;

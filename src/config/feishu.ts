@@ -5,8 +5,8 @@ export default {
 
   //机器人Aplus智能体相关
 
-  AplusAilyAppId: process.env.FEISHU_APP_ID,
-  AplusAilyAppSecret: process.env.FEISHU_APP_SECRET,
+  AplusAilyAppId: process.env.FEISHU_AILY_APP_ID,
+  AplusAilyAppSecret: process.env.FEISHU_AILY_APP_SECRET,
   //Aplus智能体表格相关
   AilyLogTableAppToken:
     process.env.FEISHU_AILY_APLUS_APP_TOKEN || 'A6qfbapjtafVLYsn9xic6mYNnfT',
@@ -14,10 +14,8 @@ export default {
     process.env.FEISHU_AILY_APLUS_TABLE_ID || 'tblcE7q8e2vD9c48',
   AilyLogTableId: process.env.FEISHU_ALERT_API_TABLE_ID || 'tblNX1qbsmDuvbCu',
   //报警机器人相关
-  AlertAppId: process.env.FEISHU_ALERT_APP_APPID || 'cli_a7c7e073b579500e',
-  AlertAppSecret:
-    process.env.FEISHU_ALERT_APP_APPSECRET ||
-    'M8jpmdjcb8wvAxjU2Wlk2cULx0Cobeap',
+  AlertAppId: process.env.FEISHU_ALERT_APP_APPID,
+  AlertAppSecret: process.env.FEISHU_ALERT_APP_APPSECRET,
   //报警表格相关
   AlertTableAppToken: process.env.FEISHU_ALERT_APP_TOKEN,
   AlertApiTableId: process.env.FEISHU_ALERT_API_TABLE_ID,
