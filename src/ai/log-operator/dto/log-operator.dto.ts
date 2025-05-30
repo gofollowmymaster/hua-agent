@@ -1,6 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 
+export enum Environment {
+  PRODUCTION = 'production',
+  UAT = 'uat',
+  TEST = 'test',
+  DEV = 'dev',
+}
 export class LogOperatorDto {
   @IsNotEmpty()
   @ApiProperty({
@@ -18,5 +24,10 @@ export class LogOperatorDto {
     description: '供应商',
   })
   tenantName: string; // 供应商
+  @ApiPropertyOptional({
+    enum: Environment,
+    description: '环境',
+  })
+  env: Environment; // 环境
   // remark?: string; // 备注，非必填项
 }
