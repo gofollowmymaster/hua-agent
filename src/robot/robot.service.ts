@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import * as lark from '@larksuiteoapi/node-sdk';
 import {
   SearchParamsDto,
   MessageFromRobotDto,
   FeishuMessageSenderDto,
+  FeishuTicketDto,
 } from './dto/post-message-from-robot.dto';
 import { listTableRecord } from '@utils/actionTable/listTableRecord';
 import { addTableRecord } from '@utils/actionTable/addTableRecord';
@@ -14,11 +16,15 @@ import { removeAtXiaoA } from './logic';
 import { logger } from '../middleware/logger.middleware';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import { ReceiveIdType } from '@src/common/feishu/hepler/interface';
+import { ClientFactory } from '@src/common/feishu/clients';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 @Injectable()
 export class RobotService {
   constructor(
     private readonly feishuSence: feishuSenceService,
     private readonly messageHelper: FeishuMessageHelper,
+    private readonly httpService: HttpService,
   ) {}
   async getList(headers: { appToken: string; tableId: string }) {
     const { appToken, tableId } = headers;
@@ -119,5 +125,29 @@ export class RobotService {
       msg_type: params.msg_type,
       content: params.content,
     });
+  }
+  async getTicket(params: FeishuTicketDto) {
+    const client = ClientFactory.create(params.appName);
+    const appId = client.client.appId;
+    const appSecret = client.client.appSecret;
+    const res = await client.client.auth.v3.appAccessToken.internal(
+      {
+        data: {
+          app_id: appId,
+          app_secret: appSecret,
+        },
+      },
+      lark.withTenantToken(''),
+    );
+    const { data } = await firstValueFrom(
+      this.httpService.post(
+        'https://open.feishu.cn/open-apis/jssdk/ticket/get',
+        {},
+        {
+          headers: { Authorization: `Bearer ${res.app_access_token}` },
+        },
+      ),
+    );
+    return data;
   }
 }
