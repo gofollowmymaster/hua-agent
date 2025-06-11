@@ -139,7 +139,9 @@ export class RobotService {
       },
       lark.withTenantToken(''),
     );
-    const { data } = await firstValueFrom(
+    const {
+      data: { data },
+    } = await firstValueFrom(
       this.httpService.post(
         'https://open.feishu.cn/open-apis/jssdk/ticket/get',
         {},
