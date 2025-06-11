@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@larksuiteoapi/node-sdk": "^1.39.0",
+    "@nestjs/axios": "^4.0.0",
     "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.3",
@@ -45,6 +46,7 @@
     "@nestjs/serve-static": "^4.0.2",
     "@nestjs/swagger": "8.1.0",
     "@prisma/client": "5.16.1",
+    "axios": "^1.9.0",
     "body-parser": "^1.20.3",
     "cache-manager": "^6.4.2",
     "chinese-workday": "^1.10.0",

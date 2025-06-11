@@ -9,6 +9,7 @@ import {
 import { RobotService } from './robot.service';
 import {
   FeishuMessageSenderDto,
+  FeishuTicketDto,
   MessageFromRobotDto,
   SearchParamsDto,
   TableRecordId,
@@ -195,6 +196,19 @@ export class RobotController {
   @Post('sendFeishuMessage')
   async sendFeishuMessage(@Body() MessageFromRobot: FeishuMessageSenderDto) {
     const res = await this.robotService.sendFeishuMessage(MessageFromRobot);
+    return res;
+  }
+
+  // 通用机器人获取Ticket
+  @ApiOperation({
+    summary: '通用机器人获取Ticket',
+    description: '通用机器人获取Ticket',
+  })
+  @ApiBody({ type: FeishuTicketDto })
+  @ApiOkResponse({ type: AplusResponse<records> })
+  @Post('getTicket')
+  async getTicket(@Body() params: FeishuTicketDto) {
+    const res = await this.robotService.getTicket(params);
     return res;
   }
 }

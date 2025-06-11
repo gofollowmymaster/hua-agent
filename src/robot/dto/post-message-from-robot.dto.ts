@@ -4,6 +4,7 @@ import {
   FeishuMsgType,
   ReceiveIdType,
 } from '@src/common/feishu/hepler/interface';
+import { FeishuApp } from '@src/common/feishu/clients';
 /**
  * 
   参考一下数据帮我生成一个包含支持nestjs/swagger的类{
@@ -143,4 +144,12 @@ export class FeishuMessageSenderDto {
     description: '接收对象类型',
   })
   receive_id_type?: ReceiveIdType;
+}
+
+export class FeishuTicketDto {
+  @ApiProperty({
+    enum: FeishuApp,
+    description: '飞书应用名称',
+  })
+  appName: FeishuApp;
 }
