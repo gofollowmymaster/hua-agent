@@ -17,6 +17,7 @@ import configuration from './config';
 import { CacheModule } from '@nestjs/cache-manager';
 import { AuthModule } from './aplus/auth/auth.module';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
+import { ScheduleModule } from '@nestjs/schedule';
 // import { FeishuHelperModule } from './common/feishu/hepler/helper.module';
 
 const envFilePath = [
@@ -43,6 +44,7 @@ console.log('[ envFilePath ] >', envFilePath);
     DevtoolsModule.register({
       http: process.env.NODE_ENV !== 'production',
     }),
+    ScheduleModule.forRoot(),
     SubappModule,
     VersionModule,
     VerifyModule,
