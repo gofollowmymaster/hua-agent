@@ -20,6 +20,7 @@ import { DevtoolsModule } from '@nestjs/devtools-integration';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AilyWikiModule } from './wiki/wiki.module';
 // import { FeishuHelperModule } from './common/feishu/hepler/helper.module';
+import { DemoPluginModule } from './demo-plugin/demo-plugin.module';
 
 const envFilePath = [
   '.env',
@@ -57,6 +58,7 @@ console.log('[ envFilePath ] >', envFilePath);
     AilyLogOperatorModule,
     AuthModule,
     AilyWikiModule,
+    DemoPluginModule,
   ],
   providers: [PrismaService],
 })
