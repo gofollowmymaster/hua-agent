@@ -18,6 +18,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { AuthModule } from './aplus/auth/auth.module';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AilyWikiModule } from './wiki/wiki.module';
 // import { FeishuHelperModule } from './common/feishu/hepler/helper.module';
 import { DemoPluginModule } from './demo-plugin/demo-plugin.module';
 
@@ -56,6 +57,7 @@ console.log('[ envFilePath ] >', envFilePath);
     FeishuEventModule,
     AilyLogOperatorModule,
     AuthModule,
+    AilyWikiModule,
     DemoPluginModule,
   ],
   providers: [PrismaService],
