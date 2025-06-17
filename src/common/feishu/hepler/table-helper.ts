@@ -28,6 +28,17 @@ class FeishuTableHelper {
       },
     });
   }
+  async search(appToken, tableId, filter = {}) {
+    return await this.client.client.bitable.appTableRecord.search({
+      path: {
+        app_token: appToken,
+        table_id: tableId,
+      },
+      data: {
+        filter,
+      },
+    });
+  }
 }
 
 export default FeishuTableHelper;

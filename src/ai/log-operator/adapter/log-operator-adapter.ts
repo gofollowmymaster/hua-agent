@@ -1,7 +1,7 @@
 import { LogOperatorTableDto } from './log-operator-table.dto';
 import { Environment, LogOperatorDto } from '../dto/log-operator.dto';
 
-export default class SentryApiAlertAdapter {
+export default class LogOperatorAdapter {
   private data: LogOperatorDto;
   constructor(data: LogOperatorDto) {
     this.data = data;

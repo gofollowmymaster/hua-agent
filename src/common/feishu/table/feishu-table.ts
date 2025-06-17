@@ -44,5 +44,15 @@ abstract class FeishuTable {
     this.syncToCache();
     return res;
   }
+  async search(filter: Record<string, any>) {
+    const res = await this.tableHelper.search(
+      this.appToken,
+      this.tableId,
+      filter,
+    );
+    if (res.code !== 0) {
+      throw new Error(res.msg + '->' + JSON.stringify(res));
+    }
+  }
 }
 export default FeishuTable;

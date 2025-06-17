@@ -13,9 +13,6 @@ import AilyLogOperatorTable from './adapter/aily-log-operator-table';
 @Module({
   imports: [
     FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AilyAplusClient)),
-    // FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AlertClient)),
-
-    // FeishuTableModule,
   ],
   controllers: [LogOperatorController],
   providers: [
