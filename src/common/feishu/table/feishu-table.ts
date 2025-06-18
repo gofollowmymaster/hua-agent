@@ -1,7 +1,8 @@
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
-import { Cache } from 'cache-manager';
 import FeishuTableHelper from '../hepler/table-helper';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+
 // import { ConfigService } from '@nestjs/config';
 @Injectable()
 abstract class FeishuTable {

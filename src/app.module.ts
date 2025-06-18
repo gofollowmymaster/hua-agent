@@ -2,7 +2,6 @@ import { Module, MiddlewareConsumer } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PrismaService } from './prisma.service';
-import { ConfigModule } from '@nestjs/config';
 import { SubappModule } from './subapp/subapp.module';
 import { VersionModule } from './version/version.module';
 import { VerifyModule } from './verify/verify.module';
@@ -17,6 +16,9 @@ import configuration from './config';
 import { CacheModule } from '@nestjs/cache-manager';
 import { AuthModule } from './aplus/auth/auth.module';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import * as redisStore from 'cache-manager-redis-store';
+
 // import { ScheduleModule } from '@nestjs/schedule';
 import { AilyWikiModule } from './wiki/wiki.module';
 // import { FeishuHelperModule } from './common/feishu/hepler/helper.module';
@@ -35,9 +37,23 @@ console.log('[ envFilePath ] >', envFilePath);
       isGlobal: true,
       load: [() => configuration],
     }),
+    // CacheModule.register({
+    //   ttl: 60 * 60 * 24, // 24小时缓存
+    //   isGlobal: true,
+    // }),
     CacheModule.register({
-      ttl: 60 * 60 * 24, // 24小时缓存
       isGlobal: true,
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => {
+        return {
+          store: redisStore,
+          host: configService.get('REDIS_HOST'),
+          port: configService.get('REDIS_PORT'),
+          db: configService.get('REDIS_DB'), //目标库,
+          auth_pass: configService.get('REDIS_PASSPORT'), // 密码,没有可以不写
+        };
+      },
     }),
     // 静态资源服务
     ServeStaticModule.forRoot({
