@@ -23,7 +23,7 @@ abstract class FeishuTable {
     if (code !== 0) {
       throw new Error(msg + '->' + JSON.stringify(res));
     }
-    this.cacheManager.set(this.appToken + this.tableId, items);
+    this.cacheManager.set(this.appToken + this.tableId, items, 60 * 10);
     return items;
   }
   async list() {

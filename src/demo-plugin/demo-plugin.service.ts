@@ -54,12 +54,13 @@ export class DemoPluginService {
       if (records.length >= 1) {
         const { fields: info, record_id } = records[0];
         const current = dayjs().valueOf();
-        const createdTime = info['创建时间'] as number;
-        if (createdTime + EXPIRED_TIME > current) {
+
+        const applyTime = info['申请日期'] as number;
+        if (applyTime + EXPIRED_TIME > current) {
           //todo 即将过期提醒
           const userId = info['使用人']?.[0]?.id;
           console.log('[ userId ] >', userId);
-          if (current - createdTime < 1000 * 60 * 60 && userId) {
+          if (current - applyTime < 1000 * 60 * 60 && userId) {
             // this.messageHelper.createToUser({
             //   receive_id: userId,
             //   msg_type: 'text',
