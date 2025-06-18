@@ -8,7 +8,7 @@ class FeishuTableHelper {
   constructor(
     @Inject(FEISHU_CLIENT_ID) private readonly client: FeishuClient,
   ) {}
-  async create(appToken, tableId, records) {
+  async create(appToken: string, tableId: string, records) {
     return await this.client.client.bitable.appTableRecord.create({
       path: {
         app_token: appToken,
@@ -19,7 +19,7 @@ class FeishuTableHelper {
       },
     });
   }
-  async list(appToken, tableId, params = {}) {
+  async list(appToken: string, tableId: string, params = {}) {
     return await this.client.client.bitable.appTableRecord.list({
       params,
       path: {
@@ -28,7 +28,7 @@ class FeishuTableHelper {
       },
     });
   }
-  async search(appToken, tableId, filter = {}) {
+  async search(appToken: string, tableId: string, filter = {}) {
     return await this.client.client.bitable.appTableRecord.search({
       path: {
         app_token: appToken,
@@ -36,6 +36,23 @@ class FeishuTableHelper {
       },
       data: {
         filter,
+      },
+    });
+  }
+  async update(
+    appToken: string,
+    tableId: string,
+    recordId: string,
+    field = {},
+  ) {
+    return await this.client.client.bitable.appTableRecord.update({
+      path: {
+        app_token: appToken,
+        table_id: tableId,
+        record_id: recordId,
+      },
+      data: {
+        fields: field,
       },
     });
   }

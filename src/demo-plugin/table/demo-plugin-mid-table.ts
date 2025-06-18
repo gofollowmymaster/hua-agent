@@ -9,9 +9,8 @@ class DemoPluginMidTable extends FeishuTable {
     readonly tableHelper: FeishuTableHelper,
   ) {
     super();
-    this.appToken =
-      config.get('DemoPluginAppToken') || 'Q1G1w4fRki3q6mkRdsXctsa6nMg';
-    this.tableId = config.get('DemoPluginTableId') || 'tbl30cbfvxUQcczg';
+    this.appToken = 'T3vjbOUv4aZSYdsi6zKcUBr9nEd';
+    this.tableId = 'tblLnJI8E8aZJVM2';
   }
 }
 export default DemoPluginMidTable;

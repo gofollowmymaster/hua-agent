@@ -45,14 +45,27 @@ abstract class FeishuTable {
     return res;
   }
   async search(filter: Record<string, any>) {
-    const res = await this.tableHelper.search(
+    const { code, msg, data } = await this.tableHelper.search(
       this.appToken,
       this.tableId,
       filter,
     );
-    if (res.code !== 0) {
-      throw new Error(res.msg + '->' + JSON.stringify(res));
+    if (code !== 0) {
+      throw new Error(msg + '->' + JSON.stringify(data));
     }
+    return data.items;
+  }
+  async update(recordId, field: Record<string, any>) {
+    const { code, msg, data } = await this.tableHelper.update(
+      this.appToken,
+      this.tableId,
+      recordId,
+      field,
+    );
+    if (code !== 0) {
+      throw new Error(msg + '->' + JSON.stringify(data));
+    }
+    return data;
   }
 }
 export default FeishuTable;

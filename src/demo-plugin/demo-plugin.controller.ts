@@ -38,13 +38,11 @@ export class DemoPluginController {
   @Post('verify')
   async verifyMid(
     @Body()
-    body: VerifyMidDto,
+    params: VerifyMidDto,
     // @Res() response,
   ) {
-    const { MId } = body;
-
     // 查找是否存在 MId
-    const resData = await this.demoPluginService.verify(MId);
+    const resData = await this.demoPluginService.verify(params);
 
     return resData;
   }

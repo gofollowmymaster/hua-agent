@@ -19,6 +19,14 @@ class FeishuMessageHelper {
     }
     return data;
   }
+  async createToUser(msgParams: CreateMessageType['data']) {
+    return await this.create({
+      data: msgParams,
+      params: {
+        receive_id_type: 'user_id',
+      },
+    });
+  }
   async createToGroup(msgParams: CreateMessageType['data']) {
     return await this.create({
       data: msgParams,

@@ -3,9 +3,9 @@ for (let i = 0; i <= 15; i++) {
   hexList[i] = i.toString(16);
 }
 
-export function buildUUID(): string {
+export function buildUUID(length: number = 36): string {
   let uuid = '';
-  for (let i = 1; i <= 36; i++) {
+  for (let i = 1; i <= length; i++) {
     if (i === 9 || i === 14 || i === 19 || i === 24) {
       uuid += '-';
     } else if (i === 15) {
