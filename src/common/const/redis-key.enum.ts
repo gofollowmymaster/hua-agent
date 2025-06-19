@@ -1,3 +1,3 @@
 export enum RedisKeys {
-  WIKI_DIRECTORY = 'wiki:directory:{spaceId}',
+  WIKI_DIRECTORY = 'frontend:node:wiki:directory:{spaceId}',
 }

@@ -9,7 +9,7 @@ import { AuthGuard } from '@src/common/guard/auth';
 @ApiTags('ai问答日志操作器')
 @Controller('log-operator')
 export class LogOperatorController {
-  constructor(private readonly LogOperatorService: LogOperatorService) {}
+  constructor(private readonly logOperatorService: LogOperatorService) {}
 
   @ApiOperation({
     summary: '记录日志操作人',
@@ -20,10 +20,10 @@ export class LogOperatorController {
     description: 'success',
     type: String,
   })
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Post('add')
   async add(@Body() alertInfo: LogOperatorDto) {
     //发送消息
-    return await this.LogOperatorService.add(alertInfo);
+    return await this.logOperatorService.add(alertInfo);
   }
 }

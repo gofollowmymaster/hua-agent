@@ -24,22 +24,23 @@ export default class WikiDirectoryService {
     this.spaceId = this.config.getOrThrow('FeishuAplusWikiSpaceId');
   }
 
-  @Cron('0 0 8-22 * * *')
+  @Cron('0 * 8-22 * * *')
   async handleCron() {
     this.logger.debug(
       'WikiDirectoryService Called when the current is' +
         dayjs().format('YYYY-MM-DD HH:mm:ss'),
     );
 
+    this.loadWikiNodeTree();
+  }
+  async loadWikiNodeTree() {
     const rootNodes = await this.loadWikiNode();
 
     await this.loadDirectory(rootNodes);
 
     const key = RedisKeys.WIKI_DIRECTORY.replace('{spaceId}', this.spaceId);
-    console.log('[ sch key ] >', key, rootNodes);
     this.cache.set(key, rootNodes);
-    const data = await this.cache.get(key);
-    console.log('[ data ] >', data);
+    return rootNodes;
   }
   /**
    * 递归加载wiki节点tree

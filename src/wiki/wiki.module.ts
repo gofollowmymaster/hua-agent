@@ -19,4 +19,4 @@ import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
   providers: [WikiService, PrismaService, LoggerService],
   exports: [WikiService],
 })
-export class AilyWikiModule {}
+export class WikiModule {}

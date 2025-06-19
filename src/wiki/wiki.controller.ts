@@ -17,7 +17,7 @@ export class WikiController {
     description: 'success',
     type: String,
   })
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Post('/tree')
   async tree() {
     //发送消息

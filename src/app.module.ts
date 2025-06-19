@@ -1,4 +1,9 @@
-import { Module, MiddlewareConsumer } from '@nestjs/common';
+import {
+  Module,
+  MiddlewareConsumer,
+  OnModuleInit,
+  Inject,
+} from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PrismaService } from './prisma.service';
@@ -13,14 +18,15 @@ import { FeishuEventModule } from '@src/alert/event/event.module';
 import { AilyLogOperatorModule } from '@src/ai/log-operator/log-operator.module';
 import { LoggerModule } from './common/service/logger/logger.module';
 import configuration from './config';
-import { CacheModule } from '@nestjs/cache-manager';
+import { CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
 import { AuthModule } from './aplus/auth/auth.module';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import * as redisStore from 'cache-manager-redis-store';
+import { Cache } from 'cache-manager';
 
 // import { ScheduleModule } from '@nestjs/schedule';
-import { AilyWikiModule } from './wiki/wiki.module';
+import { WikiModule } from './wiki/wiki.module';
 // import { FeishuHelperModule } from './common/feishu/hepler/helper.module';
 import { DemoPluginModule } from './demo-plugin/demo-plugin.module';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -31,7 +37,6 @@ const envFilePath = [
   `.env.${process.env.NODE_ENV}`,
   `.env.${process.env.NODE_ENV}.local`,
 ];
-console.log('[ envFilePath ] >', envFilePath);
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -39,23 +44,14 @@ console.log('[ envFilePath ] >', envFilePath);
       isGlobal: true,
       load: [() => configuration],
     }),
-    // CacheModule.register({
-    //   ttl: 60 * 60 * 24, // 24小时缓存
-    //   isGlobal: true,
-    // }),
+
     CacheModule.register({
       isGlobal: true,
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => {
-        return {
-          store: redisStore,
-          host: configService.get('REDIS_HOST'),
-          port: configService.get('REDIS_PORT'),
-          db: configService.get('REDIS_DB'), //目标库,
-          auth_pass: configService.get('REDIS_PASSPORT'), // 密码,没有可以不写
-        };
-      },
+      store: redisStore,
+      host: configuration['DB_REDIS_HOST'],
+      port: configuration['DB_REDIS_PORT'],
+      db: configuration['DB_REDIS_DB'], //目标库,
+      auth_pass: configuration['DB_REDIS_PASSPORT'], // 密码,没有可以不写
     }),
     // 静态资源服务
     ServeStaticModule.forRoot({
@@ -75,15 +71,27 @@ console.log('[ envFilePath ] >', envFilePath);
     FeishuEventModule,
     AilyLogOperatorModule,
     AuthModule,
-    AilyWikiModule,
+    WikiModule,
     DemoPluginModule,
     ScheduleModule.forRoot(),
     SchedulTaskeModule,
   ],
   providers: [PrismaService],
 })
-export class AppModule {
+export class AppModule implements OnModuleInit {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*'); // 你可以指定特定的路由
+  }
+
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+
+  async onModuleInit() {
+    try {
+      await this.cacheManager.set('test_key', 'test_value', 60);
+      const value = await this.cacheManager.get('test_key');
+      console.log('Redis test value:', value); // 应输出 "test_value"
+    } catch (error) {
+      console.error('Redis connection error:', error);
+    }
   }
 }
