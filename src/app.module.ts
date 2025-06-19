@@ -1,9 +1,4 @@
-import {
-  Module,
-  MiddlewareConsumer,
-  OnModuleInit,
-  Inject,
-} from '@nestjs/common';
+import { Module, MiddlewareConsumer, Inject } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PrismaService } from './prisma.service';
@@ -22,12 +17,10 @@ import { CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
 import { AuthModule } from './aplus/auth/auth.module';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
 import { ConfigModule } from '@nestjs/config';
-import * as redisStore from 'cache-manager-redis-store';
 import { Cache } from 'cache-manager';
+import { createKeyv } from '@keyv/redis';
 
-// import { ScheduleModule } from '@nestjs/schedule';
 import { WikiModule } from './wiki/wiki.module';
-// import { FeishuHelperModule } from './common/feishu/hepler/helper.module';
 import { DemoPluginModule } from './demo-plugin/demo-plugin.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { SchedulTaskeModule } from './common/schedule-task/schedule-task.module';
@@ -47,11 +40,17 @@ const envFilePath = [
 
     CacheModule.register({
       isGlobal: true,
-      store: redisStore,
-      host: configuration['DB_REDIS_HOST'],
-      port: configuration['DB_REDIS_PORT'],
-      db: configuration['DB_REDIS_DB'], //目标库,
-      auth_pass: configuration['DB_REDIS_PASSPORT'], // 密码,没有可以不写
+      // store: redisStore,
+      stores: [
+        createKeyv({
+          socket: {
+            host: configuration['DB_REDIS_HOST'],
+            port: parseInt(configuration['DB_REDIS_PORT']),
+          },
+          database: 6, //目标库,
+          password: configuration['DB_REDIS_PASSWORD'],
+        }),
+      ],
     }),
     // 静态资源服务
     ServeStaticModule.forRoot({
@@ -78,20 +77,10 @@ const envFilePath = [
   ],
   providers: [PrismaService],
 })
-export class AppModule implements OnModuleInit {
+export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*'); // 你可以指定特定的路由
   }
 
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
-
-  async onModuleInit() {
-    try {
-      await this.cacheManager.set('test_key', 'test_value', 60);
-      const value = await this.cacheManager.get('test_key');
-      console.log('Redis test value:', value); // 应输出 "test_value"
-    } catch (error) {
-      console.error('Redis connection error:', error);
-    }
-  }
 }
