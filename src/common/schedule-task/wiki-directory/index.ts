@@ -24,7 +24,7 @@ export default class WikiDirectoryService {
     this.spaceId = this.config.getOrThrow('FeishuAplusWikiSpaceId');
   }
 
-  @Cron('0 * 8-22 * * *')
+  @Cron('0 0 8-22 * * *')
   async handleCron() {
     this.logger.debug(
       'WikiDirectoryService Called when the current is' +
