@@ -16,12 +16,7 @@ export class WikiService {
 
   async tree(params: WikiDto) {
     const xiaoAclient = ClientFactory.create(FeishuApp.XiaoAClient);
-    const appId = xiaoAclient.client.appId;
-    const appSecret = xiaoAclient.client.appSecret;
-    const client = new lark.Client({
-      appId: appId,
-      appSecret: appSecret,
-    });
+    const client = xiaoAclient.client;
 
     const nodeApi = async (nodeToken?: string) => {
       const node = await client.wiki.v2.spaceNode.list({
