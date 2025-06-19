@@ -3,6 +3,7 @@ import AlertClient from './alert-client';
 import XiaoAClient from './xiao-a-client';
 import AilyAplusClient from './aplus-aily-client';
 import { ConfigService } from '@nestjs/config';
+import FeishuClient from './client';
 export const feishuAppClents = {
   AlertClient,
   XiaoAClient,
@@ -15,12 +16,13 @@ export enum FeishuApp {
 }
 
 export type feishuAppClentsType = keyof typeof feishuAppClents;
+type ClientContainer = Record<feishuAppClentsType, FeishuClient>;
 
 /**
  * @description: 飞书客户端工厂类
  */
 export class ClientFactory {
-  private static clientContainer = {};
+  private static clientContainer: Partial<ClientContainer> = {};
 
   static create(clientName: feishuAppClentsType, config?: ConfigService) {
     // await nextTick();
