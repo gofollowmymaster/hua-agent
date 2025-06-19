@@ -23,6 +23,8 @@ import * as redisStore from 'cache-manager-redis-store';
 import { AilyWikiModule } from './wiki/wiki.module';
 // import { FeishuHelperModule } from './common/feishu/hepler/helper.module';
 import { DemoPluginModule } from './demo-plugin/demo-plugin.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { SchedulTaskeModule } from './common/schedule-task/schedule-task.module';
 
 const envFilePath = [
   '.env',
@@ -75,6 +77,8 @@ console.log('[ envFilePath ] >', envFilePath);
     AuthModule,
     AilyWikiModule,
     DemoPluginModule,
+    ScheduleModule.forRoot(),
+    SchedulTaskeModule,
   ],
   providers: [PrismaService],
 })
