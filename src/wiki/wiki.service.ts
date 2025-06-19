@@ -1,11 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { WikiDto } from './dto/wiki.dto';
-import * as lark from '@larksuiteoapi/node-sdk';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 
 import { ConfigService } from '@nestjs/config';
-import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import { Cache } from 'cache-manager';
+
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import WikiDirectoryService from '@src/common/schedule-task/wiki-directory';

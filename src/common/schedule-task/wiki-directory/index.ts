@@ -7,6 +7,7 @@ import * as lark from '@larksuiteoapi/node-sdk';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
+
 // import
 
 @Injectable()
@@ -39,7 +40,7 @@ export default class WikiDirectoryService {
     await this.loadDirectory(rootNodes);
 
     const key = RedisKeys.WIKI_DIRECTORY.replace('{spaceId}', this.spaceId);
-    this.cache.set(key, rootNodes);
+    this.cache.set(key, rootNodes, 0);
     return rootNodes;
   }
   /**
