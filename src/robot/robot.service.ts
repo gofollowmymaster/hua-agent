@@ -139,6 +139,14 @@ export class RobotService {
       },
       lark.withTenantToken(''),
     );
+    let app_access_token;
+
+    if (res && 'app_access_token' in res) {
+      app_access_token = res.app_access_token;
+      // 使用 app_access_token
+    } else {
+      throw new Error('Failed to get app_access_token');
+    }
     const {
       data: { data },
     } = await firstValueFrom(
@@ -146,7 +154,7 @@ export class RobotService {
         'https://open.feishu.cn/open-apis/jssdk/ticket/get',
         {},
         {
-          headers: { Authorization: `Bearer ${res.app_access_token}` },
+          headers: { Authorization: `Bearer ${app_access_token}` },
         },
       ),
     );
