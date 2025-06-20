@@ -1,9 +1,8 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { DemoPluginService } from './demo-plugin.service';
 
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GenerateMidDto, VerifyMidDto } from './dto/generate-mid.dto';
-import { AuthGuard } from '@src/common/guard/auth';
 
 @ApiTags('演示插件')
 @Controller('demo-plugin')
@@ -37,7 +36,7 @@ export class DemoPluginController {
     type: String,
   })
   @Post('verify')
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   async verifyMid(
     @Body()
     params: VerifyMidDto,
