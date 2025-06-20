@@ -1,8 +1,9 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { DemoPluginService } from './demo-plugin.service';
 
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GenerateMidDto, VerifyMidDto } from './dto/generate-mid.dto';
+import { AuthGuard } from '@src/common/guard/auth';
 
 @ApiTags('演示插件')
 @Controller('demo-plugin')
@@ -36,14 +37,17 @@ export class DemoPluginController {
     type: String,
   })
   @Post('verify')
+  @UseGuards(AuthGuard)
   async verifyMid(
     @Body()
     params: VerifyMidDto,
     // @Res() response,
   ) {
     // 查找是否存在 MId
-    const resData = await this.demoPluginService.verify(params);
+    const isValid = await this.demoPluginService.verify(params);
 
-    return resData;
+    return {
+      isValid,
+    };
   }
 }

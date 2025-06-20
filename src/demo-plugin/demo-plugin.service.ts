@@ -54,8 +54,19 @@ export class DemoPluginService {
       if (records.length >= 1) {
         const { fields: info, record_id } = records[0];
         const current = dayjs().valueOf();
+        // 未启用状态为第一次使用，则启用返回有效
+        console.log('[ rechdIziTu ] >', data.MId, info['状态']);
+        if (info['状态'] == '未启用') {
+          await this.demoPluginMidTable.update(record_id, {
+            申请日期: current,
+            状态: '使用中',
+          });
+          isValid = true;
+          return isValid;
+        }
 
         const applyTime = info['申请日期'] as number;
+        // 没有过期，返回有效
         if (applyTime + EXPIRED_TIME > current) {
           //todo 即将过期提醒
           const userId = info['使用人']?.[0]?.id;
@@ -71,25 +82,20 @@ export class DemoPluginService {
             // });
           }
           isValid = true;
-        } else if (info['状态'] !== '已失效') {
+          return isValid;
+        }
+        //已过期 且状态非已失效，则更新状态为已失效
+        if (info['状态'] !== '已失效') {
           await this.demoPluginMidTable.update(record_id, {
             状态: '已失效',
           });
         }
-        if (info['状态'] == '未启用') {
-          await this.demoPluginMidTable.update(record_id, {
-            申请日期: current,
-            状态: '使用中',
-          });
-        }
       }
     } catch (error) {
-      // console.log('[ error ] >', error);
+      console.log('[ error ] >', error);
       sendExceptionToFeishu(error, this.config);
     }
-
-    return {
-      isValid,
-    };
+    console.log('[ info  fin ] >');
+    return isValid;
   }
 }

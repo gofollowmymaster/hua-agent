@@ -4,6 +4,7 @@ import FeishuTableHelper from '@src/common/feishu/hepler/table-helper';
 import FeishuTable from '@src/common/feishu/table/feishu-table';
 @Injectable()
 class DemoPluginMidTable extends FeishuTable {
+  protected useCache: boolean = false;
   constructor(
     readonly config: ConfigService,
     readonly tableHelper: FeishuTableHelper,

@@ -7,11 +7,10 @@ import { RedisKeys } from '@src/common/const/redis-key.enum';
 @Injectable()
 abstract class FeishuTable {
   protected readonly tableHelper: FeishuTableHelper;
-  // protected readonly config: ConfigService;
   @Inject(CACHE_MANAGER) protected cacheManager: Cache;
   protected appToken = '';
   protected tableId = '';
-  protected useCache = true;
+  protected useCache = false;
   protected ttl = 1000 * 60;
   buildCacheKey(key: string) {
     const cacheKey = RedisKeys.FEISHU_MTABLE.replace(
