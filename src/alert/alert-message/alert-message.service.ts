@@ -159,16 +159,21 @@ export class AlertMsgService {
 
   getGroupAndUserByProject(alertInfo: SentryAlertDto) {
     const { project, environment } = alertInfo;
-    if (
-      process.env.NODE_ENV == 'dev' ||
-      environment == 'dev' ||
-      environment == 'development'
-    ) {
+    if (environment == 'dev' || environment == 'development') {
       return {
         groupId: this.config.getOrThrow('DefaultAlertFeishuGroupId'),
         userId: this.config.getOrThrow('DefaultAlertFeishuUserId'),
       };
     }
+
+    if (environment == 'uat' || environment == 'test') {
+      // uat、test 环境使用的飞书群组
+      return {
+        groupId: 'oc_b69c0e3bf64478075363125e4fd32507',
+        userId: this.config.getOrThrow('DefaultAlertFeishuUserId'),
+      };
+    }
+
     /**
      * 解码并处理有空格的情况
      */
