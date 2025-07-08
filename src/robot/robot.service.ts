@@ -147,6 +147,7 @@ export class RobotService {
     } else {
       throw new Error('Failed to get app_access_token');
     }
+    console.log('[ app_access_token ] >', app_access_token);
     const {
       data: { data },
     } = await firstValueFrom(
