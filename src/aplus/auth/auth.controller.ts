@@ -1,7 +1,8 @@
 import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBody, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
-import { UserLoginDto } from './dto/user-login';
+import { FeishuTokenDto, UserLoginDto } from './dto/user-login';
+import { AplusResponse } from '@src/type/global';
 
 @Controller('auth')
 export class AuthController {
@@ -20,5 +21,16 @@ export class AuthController {
   })
   signIn(@Body() signInDto: Record<string, any>) {
     return this.authService.signIn(signInDto.username, signInDto.password);
+  }
+  @Post('getToken')
+  @ApiOperation({
+    summary: '获取飞书accessToken',
+    description: '获取飞书accessToken',
+  })
+  // @ApiBody({ type: FeishuTokenDto })
+  @ApiOkResponse({ type: AplusResponse<Record<string, any>> })
+  async getToken() {
+    // console.log('getToken params', params);
+    return this.authService.getToken();
   }
 }

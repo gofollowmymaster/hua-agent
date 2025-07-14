@@ -31,7 +31,6 @@ export default class WikiDirectoryService {
       'WikiDirectoryService Called when the current is' +
         dayjs().format('YYYY-MM-DD HH:mm:ss'),
     );
-
     this.loadWikiNodeTree();
   }
   async loadWikiNodeTree() {

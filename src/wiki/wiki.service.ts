@@ -27,7 +27,6 @@ export class WikiService {
   async tree() {
     const spaceId = this.config.getOrThrow('FeishuAplusWikiSpaceId');
     const key = RedisKeys.WIKI_DIRECTORY.replace('{spaceId}', spaceId);
-    console.log('[ key ] >', key);
     let tree = await this.cache.get(key);
     if (!tree) {
       tree = await this.wikiDirectoryServer.loadWikiNodeTree();

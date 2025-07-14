@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
+import { FeishuApp } from '@src/common/feishu/clients';
 
 export class UserLoginDto {
   @IsNotEmpty()
@@ -18,4 +19,13 @@ export class UserLoginDto {
     description: '平台',
   })
   platform: string; // 平台
+}
+
+export class FeishuTokenDto {
+  // @IsNotEmpty()
+  @ApiProperty({
+    enum: FeishuApp,
+    description: 'AppName',
+  })
+  appName: FeishuApp; // 飞书应用ID
 }

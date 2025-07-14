@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { jwtConstants } from './constants';
       global: true,
       secret: jwtConstants.secret,
     }),
+    HttpModule,
   ],
   providers: [AuthService],
   controllers: [AuthController],

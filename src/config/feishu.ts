@@ -1,12 +1,14 @@
 export default {
+  //机器人Aplus鉴权应用
+  AplusAuthAppId: process.env.FEISHU_AUTH_APP_ID,
+  AplusAuthAppSecret: process.env.FEISHU_AUTH_APP_SECRET,
   //机器人小A相关
   XiaoAAppId: process.env.FEISHU_APP_ID,
   XiaoAAppSecret: process.env.FEISHU_APP_SECRET,
-
   //机器人Aplus智能体相关
-
   AplusAilyAppId: process.env.FEISHU_AILY_APP_ID,
   AplusAilyAppSecret: process.env.FEISHU_AILY_APP_SECRET,
+
   //Aplus智能体表格相关
   AilyLogTableAppToken:
     process.env.FEISHU_AILY_APLUS_APP_TOKEN || 'A6qfbapjtafVLYsn9xic6mYNnfT',
