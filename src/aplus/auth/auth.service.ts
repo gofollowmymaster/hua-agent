@@ -1,6 +1,4 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
-import { FeishuApiException } from '@src/common/exception/feishu-api-exception';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
