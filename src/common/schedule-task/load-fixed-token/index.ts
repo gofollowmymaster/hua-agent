@@ -16,11 +16,11 @@ export type FeishuAuthType = Awaited<
 // import
 const tokenInfo: Record<string, FeishuAuthType> = {
   production: {
-    access_token: 'u-5IaCOFT6ZcHUc_cqVw6ReR45kZCQhkaVpq200kk0yFZo',
+    access_token: 'u-64LkVNpat0hEDAvbCqkHkyll7VkQhkEPM20000Awaaqv',
     avatar_big:
       'https://s3-imfile.feishucdn.com/static-resource/v1/v3_009h_96cf49af-d754-4cde-bad1-e25a589f946g~?image_size=640x640&cut_type=&quality=&format=image&sticker_format=.webp',
     avatar_middle:
-      'https://s3-imfile.feishucdn.com/static-resource/v1/v3_009h_96cf49af-d754-4cde-bad1-e25a589f946g~?image_size=240x240&cut_type=&quality=&format=image&sticker_format=.webp',
+      'https://s1-imfile.feishucdn.com/static-resource/v1/v3_009h_96cf49af-d754-4cde-bad1-e25a589f946g~?image_size=240x240&cut_type=&quality=&format=image&sticker_format=.webp',
     avatar_thumb:
       'https://s1-imfile.feishucdn.com/static-resource/v1/v3_009h_96cf49af-d754-4cde-bad1-e25a589f946g~?image_size=72x72&cut_type=&quality=&format=image&sticker_format=.webp',
     avatar_url:
@@ -30,7 +30,7 @@ const tokenInfo: Record<string, FeishuAuthType> = {
     name: 'Ahua',
     open_id: 'ou_10579d464bd8555ab8be1fec0b6f06f7',
     refresh_expires_in: 2591700,
-    refresh_token: 'ur-6j3LFjkWBfW9Ybm0f8BX_S45knAQhkEpoG201400yIUc',
+    refresh_token: 'ur-5qRAkoP5l07EAMjOCyIU6gll5jQkhkypMi00ggAwabeb',
     sid: 'AAAAAAAAAABobHakR4AAEw==',
     tenant_key: '1694e7f6f01d9758',
     token_type: 'Bearer',

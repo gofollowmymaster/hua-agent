@@ -31,6 +31,6 @@ export class AuthController {
   @ApiOkResponse({ type: AplusResponse<Record<string, any>> })
   async getToken() {
     // console.log('getToken params', params);
-    return this.authService.getToken();
+    return this.authService.getTokenByCpde();
   }
 }
