@@ -15,7 +15,7 @@ export type FeishuAuthType = Awaited<
 // type AuthType = ReturnType<lark.Client.authen.refreshAccessToken.create>;
 // import
 const tokenInfo: Record<string, FeishuAuthType> = {
-  prod: {
+  production: {
     access_token: 'u-5IaCOFT6ZcHUc_cqVw6ReR45kZCQhkaVpq200kk0yFZo',
     avatar_big:
       'https://s3-imfile.feishucdn.com/static-resource/v1/v3_009h_96cf49af-d754-4cde-bad1-e25a589f946g~?image_size=640x640&cut_type=&quality=&format=image&sticker_format=.webp',
