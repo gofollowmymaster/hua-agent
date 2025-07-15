@@ -38,9 +38,9 @@ const tokenInfo: Record<string, FeishuAuthType> = {
     user_id: '762a5468',
   },
   dev: {
-    access_token: 'u-5Zpl8GQ.F7M9cZ1WnlXrLk0114sQhkahVW204lE82AeJ',
+    access_token: 'u-4niMzJvGd3OryUL.ifWhDQ513G9QhkGNNE00l0K02Ddq',
     avatar_big:
-      'https://s1-imfile.feishucdn.com/static-resource/v1/v3_009h_96cf49af-d754-4cde-bad1-e25a589f946g~?image_size=640x640&cut_type=&quality=&format=image&sticker_format=.webp',
+      'https://s3-imfile.feishucdn.com/static-resource/v1/v3_009h_96cf49af-d754-4cde-bad1-e25a589f946g~?image_size=640x640&cut_type=&quality=&format=image&sticker_format=.webp',
     avatar_middle:
       'https://s3-imfile.feishucdn.com/static-resource/v1/v3_009h_96cf49af-d754-4cde-bad1-e25a589f946g~?image_size=240x240&cut_type=&quality=&format=image&sticker_format=.webp',
     avatar_thumb:
@@ -52,7 +52,7 @@ const tokenInfo: Record<string, FeishuAuthType> = {
     name: 'Ahua',
     open_id: 'ou_ce7559a98c7d9ed006fb37747851870f',
     refresh_expires_in: 2591700,
-    refresh_token: 'ur-7rqsSMpz9cxVsKH5wQH60b011cuQhkaVNq2015U82BeV',
+    refresh_token: 'ur-40T08GPRR6na5UxOMTA2Hs511GFkhkajqE00lk.02zoe',
     sid: 'AAAAAAAAAABobHakR4AAEw==',
     tenant_key: '1694e7f6f01d9758',
     token_type: 'Bearer',

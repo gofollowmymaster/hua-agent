@@ -35,7 +35,7 @@ export class AuthService {
     const res = await client.client.authen.accessToken.create({
       data: {
         grant_type: 'authorization_code',
-        code: 'ayyrDbbebxyz4y3AHcwAIKedBwB6y7yw',
+        code: '9CKgCe8a1GxI4z9KEK511fCb0CdHady9',
       },
     });
     console.log('[ res ] >', res);
