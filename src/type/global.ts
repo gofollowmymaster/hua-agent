@@ -2,15 +2,18 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class AplusResponse<T> {
   @ApiProperty({
-    type: 'string',
+    type: Number,
     description: '返回码',
   })
   code: number;
   @ApiProperty({
-    type: 'string',
+    type: String,
     description: '返回信息',
   })
   message: string;
-
-  data: T;
+  @ApiProperty({
+    type: Object,
+    description: '返回数据',
+  })
+  body: T;
 }

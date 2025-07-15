@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { ApiBody, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { FeishuTokenDto, UserLoginDto } from './dto/user-login';
 import { AplusResponse } from '@src/type/global';
+import { FeishuAuthType } from '@src/common/schedule-task/load-fixed-token';
 
 @Controller('auth')
 export class AuthController {
@@ -27,10 +28,21 @@ export class AuthController {
     summary: '获取飞书accessToken',
     description: '获取飞书accessToken',
   })
-  // @ApiBody({ type: FeishuTokenDto })
-  @ApiOkResponse({ type: AplusResponse<Record<string, any>> })
+  @ApiOkResponse({ type: AplusResponse<FeishuAuthType> })
   async getToken() {
     // console.log('getToken params', params);
     return this.authService.getToken();
+  }
+  @Post('getTokenByCpde')
+  @ApiOperation({
+    summary: '手动更新token',
+    description: '通过授权code获取飞书accessToken，用于定期手动更新token',
+  })
+  @ApiBody({ type: FeishuTokenDto })
+  @ApiOkResponse({ type: AplusResponse<FeishuAuthType> })
+  @ApiOkResponse({ type: AplusResponse<FeishuAuthType> })
+  async getTokenByCpde(@Body() params: FeishuTokenDto) {
+    // console.log('getToken params', params);
+    return this.authService.getTokenByCpde(params.code);
   }
 }

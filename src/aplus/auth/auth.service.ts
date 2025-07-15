@@ -30,12 +30,12 @@ export class AuthService {
 
     return cachedinfo;
   }
-  async getTokenByCpde(): Promise<string> {
+  async getTokenByCpde(code: string): Promise<FeishuAuthType> {
     const client = ClientFactory.create(FeishuApp.AilyAplusClient);
     const res = await client.client.authen.accessToken.create({
       data: {
         grant_type: 'authorization_code',
-        code: '9CKgCe8a1GxI4z9KEK511fCb0CdHady9',
+        code: code,
       },
     });
     console.log('[ res ] >', res);
@@ -44,7 +44,7 @@ export class AuthService {
       throw new FeishuApiException();
     }
 
-    // this.cache.set(RedisKeys.FEISHU_FIXED_ACCESS_TOKEN, res.data);
-    return '4KClx8a29zAF4H23Gxc95Aw0adDBa6w6';
+    this.cache.set(RedisKeys.FEISHU_FIXED_ACCESS_TOKEN, res.data);
+    return res.data;
   }
 }

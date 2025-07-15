@@ -71,3 +71,5 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
+
+https://accounts.feishu.cn/open-apis/authen/v1/authorize?app_id=cli_a8c53168e1b2100c&redirect_uri=https://auth.aplnk.com/admin.html&scope=aily:session:read%20aily:session:write%20aily:message:read%20aily:message:write%20aily:run:read%20aily:run:write%20aily:file:read%20aily:file:write%20aily:skill:read%20aily:skill:write
