@@ -24,6 +24,7 @@ import { DemoPluginModule } from './demo-plugin/demo-plugin.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { SchedulTaskeModule } from './common/schedule-task/schedule-task.module';
 import { AiModule } from './ai/ai.module';
+import { JwtModule } from '@nestjs/jwt';
 
 const envFilePath = [
   '.env',
@@ -58,6 +59,10 @@ const envFilePath = [
     }),
     DevtoolsModule.register({
       http: process.env.NODE_ENV !== 'production',
+    }),
+    JwtModule.register({
+      global: true,
+      secret: configuration['jwtSecret'],
     }),
     // ScheduleModule.forRoot(),
     SubappModule,
