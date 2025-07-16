@@ -189,7 +189,8 @@ export class RobotController {
   //通用发送飞书消息
   @ApiOperation({
     summary: '通用发送飞书消息',
-    description: '通用发送飞书消息到任何群',
+    description:
+      '通用发送飞书消息到任何群,消息体需遵循飞书结构，具体参见文档:https://open.feishu.cn/document/server-docs/im-v1/message-content-description/create_json',
   })
   @ApiBody({ type: FeishuMessageSenderDto })
   @ApiOkResponse({ type: AplusResponse<records> })

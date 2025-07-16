@@ -7,8 +7,8 @@ import * as lark from '@larksuiteoapi/node-sdk';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
-import { FeishuApiException } from '@src/common/exception/feishu-api-exception';
-import { CronException } from '@src/common/exception/cron-exception';
+import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import { FeishuAlertCard } from '@src/common/feishu/card/alert-card';
 
 export type FeishuAuthType = Awaited<
   ReturnType<lark.Client['authen']['refreshAccessToken']['create']>
@@ -18,17 +18,20 @@ export type FeishuAuthType = Awaited<
 export default class FixedTokenService {
   private readonly client: lark.Client;
   private readonly logger = new Logger(FixedTokenService.name);
-
+  private readonly messagerHelper: FeishuMessageHelper;
   constructor(
     private readonly config: ConfigService,
     @Inject(CACHE_MANAGER) protected cache: Cache,
   ) {
     const authClient = ClientFactory.create(FeishuApp.AilyAplusClient);
     this.client = authClient.client;
+    this.messagerHelper = new FeishuMessageHelper(
+      ClientFactory.create(FeishuApp.AlertClient, config),
+    );
   }
 
   //每30分钟运行一次
-  @Cron('0 */5 * * * *')
+  @Cron('0 * * * * *')
   async handleCron() {
     this.logger.debug(
       'FixedTokenService Called when the current is' +
@@ -42,7 +45,8 @@ export default class FixedTokenService {
     );
     console.log('[ cachedinfo ] >', tokenInCached);
     if (!tokenInCached) {
-      throw new CronException('token is null');
+      this.sendAlertMsg('token in cache is null');
+      return;
     }
 
     const res = await this.client.authen.refreshAccessToken.create({
@@ -51,12 +55,35 @@ export default class FixedTokenService {
         refresh_token: tokenInCached.refresh_token,
       },
     });
-    if (res.code !== 0) {
-      throw new FeishuApiException(res.msg);
-    }
-
     console.log('[ refreshAccessToken ] >', res);
 
-    await this.cache.set(RedisKeys.FEISHU_FIXED_ACCESS_TOKEN, res.data);
+    if (res.code !== 0) {
+      this.sendAlertMsg(res.msg);
+      return;
+    }
+
+    await this.cache.set(
+      RedisKeys.FEISHU_FIXED_ACCESS_TOKEN,
+      res.data,
+      1000 * 60 * 60,
+    );
+  }
+  sendAlertMsg(errorMessage: string) {
+    const errorTime = dayjs();
+
+    //构建消息内容
+    const content = FeishuAlertCard.buildCardMsg({
+      environment: process.env.NODE_ENV,
+      title: '定时刷新Token异常报警',
+      project: 'aplus-sql-server',
+      color: 'red',
+      errorMessage: `刷新Token异常；${errorMessage}`,
+      errorTime: errorTime.format('YYYY-MM-DD HH:mm:ss'),
+      linkUrl: `https://sls.console.aliyun.com/lognext/project/k8s-log-c893ce02efe464e778e67c48016348406/logsearch/elnkpro-prod-log?encode%3Dbase64%26queryString%3DIF9jb250YWluZXJfbmFtZV86IGFwbHVzLXNxbC1zZXJ2aWNlLXByb2Q%3D%26filterInfo%3DeyJmamNvZGUiOiIoKSIsImZxIjoiIn0%3D%26queryTimeType%3D99%26startTime%3D${errorTime.subtract(60, 's').valueOf() / 1000}%26endTime%3D${errorTime.add(60, 's').valueOf() / 1000}`,
+    });
+    this.messagerHelper.createInteractToGroup(
+      content,
+      this.config.get('DefaultAlertFeishuGroupId'),
+    );
   }
 }

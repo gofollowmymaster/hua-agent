@@ -15,7 +15,7 @@ import { AplusError } from '@src/common/exception/interface';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
-  private messagerHelper;
+  private messagerHelper: FeishuMessageHelper;
   constructor(
     private readonly httpAdapterHost: HttpAdapterHost,
     // private readonly alertInfo: Record<string, any>,
