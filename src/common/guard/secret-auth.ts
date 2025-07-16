@@ -46,7 +46,7 @@ export class SecretAuthGuard implements CanActivate {
 
     // Compare the generated signature with the provided signature
     if (generatedSignature !== signature) {
-      throw new UnauthorizedException('Invalid data');
+      throw new UnauthorizedException();
     }
     return true;
   }
