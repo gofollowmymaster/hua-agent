@@ -24,6 +24,7 @@ import { DemoPluginModule } from './demo-plugin/demo-plugin.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { SchedulTaskeModule } from './common/schedule-task/schedule-task.module';
 import { AiModule } from './ai/ai.module';
+import { AdminModule } from './admin/admin.module';
 import { JwtModule } from '@nestjs/jwt';
 
 const envFilePath = [
@@ -74,6 +75,7 @@ const envFilePath = [
     LoggerModule,
     FeishuEventModule,
     AiModule,
+    AdminModule,
     AuthModule,
     WikiModule,
     DemoPluginModule,

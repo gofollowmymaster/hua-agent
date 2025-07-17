@@ -26,6 +26,9 @@ export class TransformInterceptor<T>
         if (controllerName === 'FeishuEventController') {
           return data;
         }
+        if (data?.code && data?.message) {
+          return data;
+        }
         return { code: 200, body: data, message: '请求成功' };
       }),
     );

@@ -15,6 +15,10 @@ export default {
   AilyLogOperatorTableId:
     process.env.FEISHU_AILY_APLUS_TABLE_ID || 'tblcE7q8e2vD9c48',
   AilyLogTableId: process.env.FEISHU_ALERT_API_TABLE_ID || 'tblNX1qbsmDuvbCu',
+  //Aplus Node-Server 管理表格
+  AplusNodeAdminAppToken: process.env.FEISHU_APLUS_NODE_ADMIN_APP_TOKEN,
+  AplusNodeAdminMtableTableId:
+    process.env.FEISHU_APLUS_NODE_ADMIN_Mtable_TABLE_ID,
   //报警机器人相关
   AlertAppId: process.env.FEISHU_ALERT_APP_APPID,
   AlertAppSecret: process.env.FEISHU_ALERT_APP_APPSECRET,

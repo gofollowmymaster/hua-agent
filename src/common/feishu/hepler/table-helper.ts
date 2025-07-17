@@ -38,6 +38,16 @@ class FeishuTableHelper {
       },
     });
   }
+  async get(appToken: string, tableId: string, record_id: string) {
+    return await this.client.client.bitable.appTableRecord.get({
+      path: {
+        app_token: appToken,
+        table_id: tableId,
+        record_id,
+      },
+    });
+  }
+
   async create(appToken: string, tableId: string, records: BitTableFields) {
     return await this.client.client.bitable.appTableRecord.create({
       path: {

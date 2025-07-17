@@ -16,5 +16,21 @@ class FeishuBusinessLineTable extends FeishuTable {
     this.appToken = config.getOrThrow('AlertTableAppToken');
     this.tableId = 'tbl1aLjbTNgbgaT6';
   }
+
+  getBusinessLineBySubapp(projectName: string) {
+    return this.search(
+      {
+        conjunction: 'and',
+        conditions: [
+          {
+            field_name: '责任项目',
+            operator: 'contains',
+            value: [projectName],
+          },
+        ],
+      },
+      true,
+    );
+  }
 }
 export default FeishuBusinessLineTable;

@@ -40,7 +40,7 @@ export class AlertMsgService {
   async sendFeishuMsg(alertInfo: SentryAlertDto) {
     //获取飞书用户userid（todo）群Id -> 消息加急
     const { userId: feishuUserId, groupId: feishuGroupId } =
-      this.getGroupAndUserByProject(alertInfo);
+      await this.getGroupAndUserByProject(alertInfo);
 
     //构建消息内容
     const content = buildAlertMsg({ ...alertInfo }, feishuUserId);
@@ -76,7 +76,8 @@ export class AlertMsgService {
       this.logger.info(alertInfo.timeStamp + '当前时间不需要加急通知');
       return;
     }
-    const { userId: feishuUserId } = this.getGroupAndUserByProject(alertInfo);
+    const { userId: feishuUserId } =
+      await this.getGroupAndUserByProject(alertInfo);
     //不加await 使接口不需要等待加急消息发送
     this.messageAlert(groupMsgInfo, feishuUserId);
   }
@@ -178,7 +179,7 @@ export class AlertMsgService {
      * 解码并处理有空格的情况
      */
     const projectName = decodeURIComponent(project).trim();
-    return await this.feishuBusinessLineTable.search({
+    const res = await this.feishuBusinessLineTable.search({
       conjunction: 'and',
       conditions: [
         {
@@ -188,6 +189,10 @@ export class AlertMsgService {
         },
       ],
     });
+    return {
+      userId: res.data.items[0].fields['负责人'],
+      groupId: res.data.items[0].fields['默认分组'],
+    };
   }
 
   /**

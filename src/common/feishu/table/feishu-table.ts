@@ -4,7 +4,6 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { BitTableFields, BitTableFilter } from '../type/bitable';
-// import { ConfigService } from '@nestjs/config';
 @Injectable()
 abstract class FeishuTable {
   protected readonly tableHelper: FeishuTableHelper;
@@ -22,11 +21,10 @@ abstract class FeishuTable {
   }
 
   async readWrapper(key: string, handler: () => Promise<any>, useCache = true) {
-    if (this.useCache && useCache) {
+    if (this.useCache || useCache) {
       const cachaeKey = this.buildCacheKey(key);
 
       let res = await this.cacheManager.get(cachaeKey);
-      console.log('[ useCache ] >', this.useCache, cachaeKey, res);
 
       if (res) return res;
 
@@ -36,22 +34,21 @@ abstract class FeishuTable {
     }
     return await handler();
   }
+  requestWrapper(handler: () => Promise<any>) {
+    return async () => {
+      const { code, msg, data } = await handler();
+      if (code !== 0) {
+        throw new Error(msg + '->' + JSON.stringify(data));
+      }
+      return data;
+    };
+  }
   async list(useCache = false) {
     return await this.readWrapper(
       '',
-      async () => {
-        const res = await this.tableHelper.list(this.appToken, this.tableId);
-
-        const {
-          msg,
-          code,
-          data: { items },
-        } = res;
-        if (code !== 0) {
-          throw new Error(msg + '->' + JSON.stringify(res));
-        }
-        return items;
-      },
+      this.requestWrapper(async () => {
+        return await this.tableHelper.list(this.appToken, this.tableId);
+      }),
       useCache,
     );
   }
@@ -59,43 +56,50 @@ abstract class FeishuTable {
   async search(filter: BitTableFilter, useCache = true) {
     return await this.readWrapper(
       filter.toString(),
-      async () => {
-        const { code, msg, data } = await this.tableHelper.search(
+      this.requestWrapper(async () => {
+        return await this.tableHelper.search(
           this.appToken,
           this.tableId,
           filter,
         );
-        if (code !== 0) {
-          throw new Error(msg + '->' + JSON.stringify(data));
-        }
-        return data.items;
-      },
+      }),
+      useCache,
+    );
+  }
+
+  async get(recordId: string, useCache = true) {
+    return await this.readWrapper(
+      recordId,
+      this.requestWrapper(async () => {
+        return await this.tableHelper.get(
+          this.appToken,
+          this.tableId,
+          recordId,
+        );
+      }),
       useCache,
     );
   }
   async update(recordId, field: BitTableFields) {
-    const { code, msg, data } = await this.tableHelper.update(
-      this.appToken,
-      this.tableId,
-      recordId,
-      field,
-    );
-    if (code !== 0) {
-      throw new Error(msg + '->' + JSON.stringify(data));
-    }
+    const data = this.requestWrapper(
+      async () =>
+        await this.tableHelper.update(
+          this.appToken,
+          this.tableId,
+          recordId,
+          field,
+        ),
+    )();
+
     return data;
   }
 
   async create(record: BitTableFields) {
-    const res = await this.tableHelper.create(
-      this.appToken,
-      this.tableId,
-      record,
-    );
-    if (res.code !== 0) {
-      throw new Error(res.msg + '->' + JSON.stringify(res));
-    }
-    return res.data;
+    const data = this.requestWrapper(
+      async () =>
+        await this.tableHelper.create(this.appToken, this.tableId, record),
+    )();
+    return data;
   }
 }
 export default FeishuTable;

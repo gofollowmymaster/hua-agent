@@ -1,5 +1,7 @@
+export const RedisPrefix = 'frontend-node:';
+export const RedisPrefixMtable = 'frontend-node:mtable:';
 export enum RedisKeys {
-  WIKI_DIRECTORY = 'frontend-node:wiki:directory:{spaceId}',
-  FEISHU_MTABLE = 'frontend-node:mtable:{appToken}:{tableId}',
-  FEISHU_FIXED_ACCESS_TOKEN = 'frontend-node:fixed-access-token',
+  WIKI_DIRECTORY = RedisPrefix + 'wiki:directory:{spaceId}',
+  FEISHU_MTABLE = RedisPrefixMtable + '{appToken}:{tableId}',
+  FEISHU_FIXED_ACCESS_TOKEN = RedisPrefix + 'fixed-access-token',
 }
