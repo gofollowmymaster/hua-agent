@@ -44,7 +44,7 @@ export default class FixedTokenService {
       RedisKeys.FEISHU_FIXED_ACCESS_TOKEN,
     );
     console.log('[ cachedinfo ] >', tokenInCached);
-    if (!tokenInCached) {
+    if (!tokenInCached?.refresh_token) {
       this.sendAlertMsg('token in cache is null');
       return;
     }

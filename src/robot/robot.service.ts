@@ -15,7 +15,7 @@ import { feishuSenceService } from './logic/feishu.sence.service';
 import { removeAtXiaoA } from './logic';
 import { logger } from '../middleware/logger.middleware';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
-import { ReceiveIdType } from '@src/common/feishu/hepler/interface';
+import { ReceiveIdType } from '@src/common/feishu/type/im';
 import { ClientFactory } from '@src/common/feishu/clients';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';

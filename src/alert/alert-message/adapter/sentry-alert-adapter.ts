@@ -34,22 +34,18 @@ export default class SentryApiAlertAdapter {
       应用名: subAppName + '',
       发生时间: this.sentryData.event.timestamp * 1000,
       环境: this.sentryData.event.environment,
-
       RawData: JSON.stringify(this.sentryData),
     };
   }
 
   toFrontendAlertTableData(): FrontendAlertTableDto {
-    // const requestData = this.sentryData.event.extra.__serialized__;
     const subAppName =
       this.sentryData.event.extra?.subModuleName || this.sentryData.project;
     const appInfo = getSubAppInfo(subAppName);
-    // const
     return {
       标题: this.sentryData.message,
       链接信息: this.sentryData.url,
       是否解决: false,
-      // 优先级: requestData.payload,
       负责人: [{ id: appInfo.userId }],
       错误原因: '',
       解决方案: '',
@@ -75,11 +71,7 @@ export default class SentryApiAlertAdapter {
       sentryData.event?.event_id +
       '?' +
       urlParsed[1];
-    // let rawData = JSON.stringify(this.sentryData);
 
-    // if (rawData.length > 20000) {
-    //   rawData = '数据过大，已截断';
-    // }
     return {
       environment: sentryData.event.environment,
       rawData: '',

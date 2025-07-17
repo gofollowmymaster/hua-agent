@@ -157,7 +157,7 @@ export class AlertMsgService {
     return !!message.userAlerted[0].reactionTime;
   }
 
-  getGroupAndUserByProject(alertInfo: SentryAlertDto) {
+  async getGroupAndUserByProject(alertInfo: SentryAlertDto) {
     const { project, environment } = alertInfo;
     if (environment == 'dev' || environment == 'development') {
       return {
@@ -178,7 +178,16 @@ export class AlertMsgService {
      * 解码并处理有空格的情况
      */
     const projectName = decodeURIComponent(project).trim();
-    return getSubAppInfo(projectName);
+    return await this.feishuBusinessLineTable.search({
+      conjunction: 'and',
+      conditions: [
+        {
+          field_name: '默认项目',
+          operator: 'contains',
+          value: [projectName],
+        },
+      ],
+    });
   }
 
   /**

@@ -1,4 +1,9 @@
 import FeishuClient from '../clients/client';
+import {
+  BitTableFields,
+  BitTableFilter,
+  BitTableSearchPayloadParams,
+} from '../type/bitable';
 // import { ConfigService } from '@nestjs/config';
 import { FEISHU_CLIENT_ID } from './constants';
 import { Inject, Injectable } from '@nestjs/common';
@@ -8,18 +13,12 @@ class FeishuTableHelper {
   constructor(
     @Inject(FEISHU_CLIENT_ID) private readonly client: FeishuClient,
   ) {}
-  async create(appToken: string, tableId: string, records) {
-    return await this.client.client.bitable.appTableRecord.create({
-      path: {
-        app_token: appToken,
-        table_id: tableId,
-      },
-      data: {
-        fields: records,
-      },
-    });
-  }
-  async list(appToken: string, tableId: string, params = {}) {
+
+  async list(
+    appToken: string,
+    tableId: string,
+    params: BitTableSearchPayloadParams = {},
+  ) {
     return await this.client.client.bitable.appTableRecord.list({
       params,
       path: {
@@ -28,7 +27,7 @@ class FeishuTableHelper {
       },
     });
   }
-  async search(appToken: string, tableId: string, filter = {}) {
+  async search(appToken: string, tableId: string, filter: BitTableFilter = {}) {
     return await this.client.client.bitable.appTableRecord.search({
       path: {
         app_token: appToken,
@@ -39,11 +38,22 @@ class FeishuTableHelper {
       },
     });
   }
+  async create(appToken: string, tableId: string, records: BitTableFields) {
+    return await this.client.client.bitable.appTableRecord.create({
+      path: {
+        app_token: appToken,
+        table_id: tableId,
+      },
+      data: {
+        fields: records,
+      },
+    });
+  }
   async update(
     appToken: string,
     tableId: string,
     recordId: string,
-    field = {},
+    field: BitTableFields = {},
   ) {
     return await this.client.client.bitable.appTableRecord.update({
       path: {
@@ -53,6 +63,16 @@ class FeishuTableHelper {
       },
       data: {
         fields: field,
+      },
+    });
+  }
+
+  async delete(appToken: string, tableId: string, recordId: string) {
+    return await this.client.client.bitable.appTableRecord.delete({
+      path: {
+        app_token: appToken,
+        table_id: tableId,
+        record_id: recordId,
       },
     });
   }

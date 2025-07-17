@@ -5,6 +5,9 @@ import FeishuTable from '@src/common/feishu/table/feishu-table';
 @Injectable()
 class FeishuBusinessLineTable extends FeishuTable {
   // protected readonly tableHelper: FeishuTableHelper;
+  protected readonly useCache = true;
+  protected readonly ttl = 1000 * 60 * 60 * 24;
+
   constructor(
     readonly config: ConfigService,
     readonly tableHelper: FeishuTableHelper,

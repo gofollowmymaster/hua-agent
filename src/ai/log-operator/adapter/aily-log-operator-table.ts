@@ -13,8 +13,7 @@ class AilyLogOperatorTable extends FeishuTable {
     readonly tableHelper: FeishuTableHelper,
   ) {
     super();
-    console.log('[  |----------| ] >', config.get('AilyLogTableAppToken'));
-    console.log('[  |----------| ] >', config.get('AilyLogOperatorTableId'));
+
     this.appToken = config.get('AilyLogTableAppToken');
     this.tableId = config.get('AilyLogOperatorTableId');
   }

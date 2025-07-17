@@ -1,4 +1,4 @@
-export interface ApiAlertTableDto {
+export type ApiAlertTableDto = {
   接口地址: string;
   http状态码: string;
   业务状态码: string;
@@ -12,9 +12,9 @@ export interface ApiAlertTableDto {
   发生时间: number;
   环境: string;
   RawData: string;
-}
+};
 
-export interface FrontendAlertTableDto {
+export type FrontendAlertTableDto = {
   标题: string;
   链接信息: string;
   是否解决: boolean;
@@ -29,7 +29,7 @@ export interface FrontendAlertTableDto {
   业务线: [string];
   环境: string;
   RawData: string;
-}
+};
 // interface FeishuUser {
 //   id: string;
 // }

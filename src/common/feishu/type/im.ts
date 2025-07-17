@@ -1,3 +1,9 @@
+import * as lark from '@larksuiteoapi/node-sdk';
+
+export type FeishuMessageCreateParams = Parameters<
+  lark.Client['im']['message']['create']
+>;
+
 export enum FeishuMsgType {
   Text = 'text',
   Post = 'post',
@@ -19,14 +25,6 @@ export enum ReceiveIdType {
   ChatId = 'chat_id',
 }
 
-export type CreateMessageType = {
-  data: {
-    receive_id: string;
-    msg_type: `${FeishuMsgType}`;
-    content: string;
-    uuid?: string;
-  };
-  params: {
-    receive_id_type: `${ReceiveIdType}`;
-  };
-};
+export type CreateMessageType = FeishuMessageCreateParams[0];
+
+//im.message.create

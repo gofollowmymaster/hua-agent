@@ -2,7 +2,7 @@ import FeishuClient from '../clients/client';
 // import { ConfigService } from '@nestjs/config';
 import { FEISHU_CLIENT_ID } from './constants';
 import { Inject, Injectable, Scope } from '@nestjs/common';
-import { CreateMessageType } from './interface';
+import { CreateMessageType } from '../type/im';
 import { FeishuApiException } from '@src/common/exception/feishu-api-exception';
 
 @Injectable({ scope: Scope.TRANSIENT })
@@ -35,7 +35,7 @@ class FeishuMessageHelper {
       },
     });
   }
-  async createInteractToGroup(content, feishuGroupId) {
+  async createInteractToGroup(content: string, feishuGroupId) {
     return await this.createToGroup({
       receive_id: feishuGroupId,
       msg_type: 'interactive',

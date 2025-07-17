@@ -1,9 +1,6 @@
 import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger';
 import type { records } from '../../utils/actionTable/interface';
-import {
-  FeishuMsgType,
-  ReceiveIdType,
-} from '@src/common/feishu/hepler/interface';
+import { FeishuMsgType, ReceiveIdType } from '@src/common/feishu/type/im';
 import { FeishuApp } from '@src/common/feishu/clients';
 /**
  * 
