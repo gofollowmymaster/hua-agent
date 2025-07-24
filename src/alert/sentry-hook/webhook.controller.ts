@@ -4,12 +4,13 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { SentryWebhookService } from './webhook.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 
 @ApiTags('Sentry WebHook')
 @Controller('sentry-hook')
 export class SentryWebhookController {
   constructor(
-    private readonly feishuEventService: SentryWebhookService,
+    private readonly sentryWebhookService: SentryWebhookService,
     private readonly logger: LoggerService,
   ) {}
 
@@ -20,9 +21,9 @@ export class SentryWebhookController {
   // @ApiBody({ type: FeishuEventCallbackDto })
   @Post('webhook')
   // 接收已表情回复webhook
-  async webhook(@Body() callbackInfo: any) {
+  async webhook(@Body() params: any) {
     // 验证
-    console.log('[ callbackInfo ] >', callbackInfo);
+    await this.sentryWebhookService.handle(params);
     return;
   }
 }
