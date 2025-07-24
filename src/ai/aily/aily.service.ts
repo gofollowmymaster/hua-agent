@@ -33,7 +33,7 @@ export class AilyService {
     this.cache.set(
       RedisKeys.FEISHU_FIXED_ACCESS_TOKEN,
       res.data,
-      1000 * 60 * 60,
+      1000 * 60 * 60 * 24,
     );
     return res.data;
   }

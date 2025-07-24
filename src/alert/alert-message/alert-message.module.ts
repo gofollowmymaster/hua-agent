@@ -10,7 +10,7 @@ import SentryApiAlertAdapter from './adapter/sentry-alert-adapter';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import FeishuApiAlertTable from './table/api-alert-table';
 import FeishuFrontendAlertTable from './table/frontend-alert-table';
-import FeishuBusinessLineTable from './table/business-line-table';
+import FeishuBusinessLineTable from '../../common/table/business-line-table';
 @Module({
   imports: [
     FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AlertClient)),

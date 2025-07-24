@@ -65,7 +65,7 @@ export default class FixedTokenService {
     await this.cache.set(
       RedisKeys.FEISHU_FIXED_ACCESS_TOKEN,
       res.data,
-      1000 * 60 * 60,
+      1000 * 60 * 60 * 24,
     );
   }
   sendAlertMsg(errorMessage: string) {

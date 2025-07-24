@@ -1,8 +1,8 @@
 import { createHash } from 'crypto';
 const secretKey = 'w1JHRBTylvbXFKNP'; // Replace with your actual secret key
 const restData = {
-  createTime: '111111',
-  clientId: '211111',
+  code: 'aBIoB9b96JyLAycEGcC0dLyyx0FC9w8w',
+  clientId: 'recuRy2RxDT28R',
 };
 // Sort keys and construct the string
 const sortedKeys = Object.keys(restData).sort();

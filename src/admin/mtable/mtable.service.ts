@@ -12,7 +12,16 @@ export class MtableService extends BaseService {
   async list() {
     // this.LogOperatorAdapter = new LogOperatorAdapter(params);
     // const record = this.LogOperatorAdapter.toTableData();
-
     return await this.adminMtableTable.list();
+    return await this.adminMtableTable.search({
+      conjunction: 'and',
+      conditions: [
+        {
+          field_name: '环境',
+          operator: 'contains',
+          value: ['dev'],
+        },
+      ],
+    });
   }
 }

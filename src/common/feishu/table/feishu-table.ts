@@ -3,7 +3,11 @@ import FeishuTableHelper from '../hepler/table-helper';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
-import { BitTableFields, BitTableFilter } from '../type/bitable';
+import {
+  BitTableFields,
+  BitTableFilter,
+  BitTablePagination,
+} from '../type/bitable';
 @Injectable()
 abstract class FeishuTable {
   protected readonly tableHelper: FeishuTableHelper;
@@ -43,7 +47,7 @@ abstract class FeishuTable {
       return data;
     };
   }
-  async list(useCache = false) {
+  async list(useCache = false): Promise<BitTablePagination> {
     return await this.readWrapper(
       '',
       this.requestWrapper(async () => {
@@ -53,7 +57,10 @@ abstract class FeishuTable {
     );
   }
 
-  async search(filter: BitTableFilter, useCache = true) {
+  async search(
+    filter: BitTableFilter,
+    useCache = true,
+  ): Promise<BitTablePagination> {
     return await this.readWrapper(
       filter.toString(),
       this.requestWrapper(async () => {

@@ -13,6 +13,8 @@ export type BitTableSearchPayloadParams = BitTableSearchPayload['params'];
 export type BitTableSearchReturn = Awaited<
   ReturnType<lark.Client['bitable']['appTableRecord']['search']>
 >;
+export type BitTablePagination = BitTableSearchReturn['data'];
+export type BitTableDataList = BitTablePagination['items'];
 
 //将类型BitTableSearchReturn['data']['items']的fields字段类型转换为泛型T
 export type BitTableRecord<T = Record<string, any>> = {

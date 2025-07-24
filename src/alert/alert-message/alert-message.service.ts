@@ -4,7 +4,6 @@ import { SentryAlertDto } from './dto/sentry-alert.dto';
 import { addRetryJob } from '@src/utils/job';
 import { PrismaService } from '@src/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
-import { getSubAppInfo } from './app-user-map';
 import {
   // buildAtUserMsg,
   buildAlertMsg,
@@ -17,7 +16,7 @@ import SentryApiAlertAdapter from './adapter/sentry-alert-adapter';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import FeishuApiAlertTable from './table/api-alert-table';
 import FeishuFrontendAlertTable from './table/frontend-alert-table';
-import FeishuBusinessLineTable from './table/business-line-table';
+import FeishuBusinessLineTable from '../../common/table/business-line-table';
 @Injectable()
 export class AlertMsgService {
   // private messageHelper;
@@ -190,8 +189,8 @@ export class AlertMsgService {
       ],
     });
     return {
-      userId: res.data.items[0].fields['负责人'],
-      groupId: res.data.items[0].fields['默认分组'],
+      userId: res.items[0].fields['负责人'],
+      groupId: res.items[0].fields['默认分组'],
     };
   }
 
@@ -221,7 +220,7 @@ export class AlertMsgService {
         await this.feishuFrontendTable.create(record);
       }
     } catch (err) {
-      console.log('[ ------------catch---------- ] >');
+      console.log('[ ------------catch---------- ] >', err);
 
       sendExceptionToFeishu(err, this.config);
     }
@@ -229,11 +228,5 @@ export class AlertMsgService {
     const msgData = this.sentryApiAlertAdapter.toFeishuMessageData();
     // 异步发送飞书消息
     this.sendFsAlertMsg(msgData);
-  }
-
-  async loadFeishuAplusBussnessList() {
-    const list = await this.feishuBusinessLineTable.list();
-
-    return list;
   }
 }

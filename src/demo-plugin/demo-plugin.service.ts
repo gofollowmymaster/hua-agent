@@ -48,7 +48,7 @@ export class DemoPluginService {
         ],
       };
 
-      const records = await this.demoPluginMidTable.search(filter);
+      const { items: records } = await this.demoPluginMidTable.search(filter);
       if (records.length > 1) {
         sendExceptionToFeishu(new Error('MId 重复:' + data.MId), this.config);
       }

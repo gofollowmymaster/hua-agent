@@ -4,12 +4,21 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { createHash } from 'crypto';
+import ClientSecretTable from '../table/client-secret-table';
+import { ConfigService } from '@nestjs/config';
+import FeishuTableHelper from '../feishu/hepler/table-helper';
+import { ClientFactory, FeishuApp } from '../feishu/clients';
 
 @Injectable()
 export class SecretAuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  private clientSecretTable: ClientSecretTable;
+  constructor(private config: ConfigService) {
+    this.clientSecretTable = new ClientSecretTable(
+      this.config,
+      new FeishuTableHelper(ClientFactory.create(FeishuApp.AilyAplusClient)),
+    );
+  }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -23,12 +32,19 @@ export class SecretAuthGuard implements CanActivate {
     return true;
   }
 
-  private verify(data: Record<string, string>) {
-    const secretKey = 'w1JHRBTylvbXFKNP'; // Replace with your actual secret key
-    const { signature, ...restData } = data;
+  private async verify(data: Record<string, string>) {
+    const { signature, appId, ...restData } = data;
+
     if (!signature) {
       throw new UnauthorizedException('has no signature');
     }
+    if (!appId) {
+      throw new UnauthorizedException('has no appId');
+    }
+    console.log('[ this.clientSecretTable ] >', this.clientSecretTable);
+    const appInfo = await this.clientSecretTable.get(appId);
+
+    const secretKey = appInfo.AppSecret; // Replace with your actual secret key
 
     // Sort keys and construct the string
     const sortedKeys = Object.keys(restData).sort();

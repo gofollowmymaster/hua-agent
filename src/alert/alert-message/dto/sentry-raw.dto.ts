@@ -379,3 +379,5 @@ export class SentryRawDto {
   @IsNotEmpty()
   readonly url: string;
 }
+
+export class updateIssueDto {}

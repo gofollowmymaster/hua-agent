@@ -4,7 +4,7 @@ import { ApiBody, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { FeishuGenerateTokenDto, FeishuTokenDto } from './dto/aily';
 import { AplusResponse } from '@src/type/global';
 import { FeishuAuthType } from '@src/common/schedule-task/load-fixed-token';
-import { SecretAuthGuard } from '@src/common/guard/secret-auth';
+import { SecretAuthGuard } from '@src/common/guard/sign-auth';
 
 @Controller('aily')
 export class AilyController {
@@ -19,7 +19,12 @@ export class AilyController {
   @ApiOkResponse({ type: AplusResponse<FeishuAuthType> })
   @UseGuards(SecretAuthGuard)
   async getToken() {
-    return this.authService.getToken();
+    const feishuUser = await this.authService.getToken();
+    if (!feishuUser) {
+      throw new Error('获取飞书用户信息失败');
+    }
+    console.log('[ feishuUser ] >', feishuUser);
+    return feishuUser;
   }
   @Post('getTokenByCode')
   @ApiOperation({

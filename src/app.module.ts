@@ -26,6 +26,7 @@ import { SchedulTaskeModule } from './common/schedule-task/schedule-task.module'
 import { AiModule } from './ai/ai.module';
 import { AdminModule } from './admin/admin.module';
 import { JwtModule } from '@nestjs/jwt';
+import { SentryWebhookModule } from './alert/sentry-hook/webhook.module';
 
 const envFilePath = [
   '.env',
@@ -81,6 +82,7 @@ const envFilePath = [
     DemoPluginModule,
     ScheduleModule.forRoot(),
     SchedulTaskeModule,
+    SentryWebhookModule,
   ],
   providers: [PrismaService],
 })
