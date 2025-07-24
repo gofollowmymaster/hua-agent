@@ -8,7 +8,7 @@ import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 
 @Module({
   imports: [
-    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.XiaoAClient)),
+    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AilyAplusClient)),
   ],
   controllers: [DemoPluginController],
   providers: [DemoPluginService, PrismaService, DemoPluginMidTable],
