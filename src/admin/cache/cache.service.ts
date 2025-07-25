@@ -16,7 +16,7 @@ export class CacheService extends BaseService {
     super();
   }
 
-  async clearCache(params: CacheClearDto) {
+  async delCache(params: CacheClearDto) {
     const fullKey =
       params.type == KeyType.多维表格
         ? RedisPrefixMtable + params.key

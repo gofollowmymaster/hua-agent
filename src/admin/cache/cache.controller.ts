@@ -22,10 +22,10 @@ export class CacheController {
   @ApiBody({
     type: CacheClearDto,
   })
-  @Post('clearCache')
-  async clearCache(@Body() params: CacheClearDto) {
+  @Post('delCache')
+  async delCache(@Body() params: CacheClearDto) {
     //发送消息
-    return await this.cacheService.clearCache(params);
+    return await this.cacheService.delCache(params);
   }
   @ApiOperation({
     summary: '获取缓存信息',

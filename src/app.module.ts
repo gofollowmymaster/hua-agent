@@ -27,6 +27,7 @@ import { AiModule } from './ai/ai.module';
 import { AdminModule } from './admin/admin.module';
 import { JwtModule } from '@nestjs/jwt';
 import { SentryWebhookModule } from './alert/sentry-hook/webhook.module';
+// import { BaseTableModule } from './common/table/base-table.module';
 
 const envFilePath = [
   '.env',
@@ -66,6 +67,7 @@ const envFilePath = [
       global: true,
       secret: configuration['jwtSecret'],
     }),
+    // BaseTableModule,
     // ScheduleModule.forRoot(),
     SubappModule,
     VersionModule,

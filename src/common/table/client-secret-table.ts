@@ -16,21 +16,5 @@ class ClientSecretTable extends FeishuTable {
     this.appToken = config.getOrThrow('AplusNodeAdminAppToken');
     this.tableId = 'tblM4JUNtLKnrewV';
   }
-
-  getBusinessLineByAppId(appId: string) {
-    return this.search(
-      {
-        conjunction: 'and',
-        conditions: [
-          {
-            field_name: 'AppId',
-            operator: 'is',
-            value: [appId],
-          },
-        ],
-      },
-      true,
-    );
-  }
 }
 export default ClientSecretTable;

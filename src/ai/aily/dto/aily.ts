@@ -7,7 +7,7 @@ export class FeishuTokenDto {
     type: String,
     description: '客户端ID',
   })
-  clientId: string;
+  appId: string;
   @IsNotEmpty()
   @ApiProperty({
     type: String,
@@ -29,7 +29,7 @@ export class FeishuGenerateTokenDto {
     type: String,
     description: '调用端身份ID',
   })
-  clientId: string;
+  appId: string;
   @IsNotEmpty()
   @ApiProperty({
     type: String,

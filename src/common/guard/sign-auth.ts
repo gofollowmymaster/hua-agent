@@ -33,32 +33,38 @@ export class SecretAuthGuard implements CanActivate {
   }
 
   private async verify(data: Record<string, string>) {
-    const { signature, appId, ...restData } = data;
+    const { signature, ...restData } = data;
 
     if (!signature) {
       throw new UnauthorizedException('has no signature');
     }
-    if (!appId) {
+    if (!restData.appId) {
       throw new UnauthorizedException('has no appId');
     }
-    console.log('[ this.clientSecretTable ] >', this.clientSecretTable);
-    const appInfo = await this.clientSecretTable.get(appId);
+    let generatedSignature;
+    try {
+      const {
+        record: { fields: appInfo },
+      } = await this.clientSecretTable.get(restData.appId);
+      // return true;
+      const secretKey = appInfo?.AppSecret; // Replace with your actual secret key
+      // Sort keys and construct the string
+      const sortedKeys = Object.keys(restData).sort();
+      const concatenatedString = sortedKeys
+        .map((key) => `${key}=${restData[key]}`)
+        .join('&');
 
-    const secretKey = appInfo.AppSecret; // Replace with your actual secret key
+      // Append the secret key
+      const stringToHash = concatenatedString + secretKey;
+      console.log('[ signature ] >', stringToHash);
 
-    // Sort keys and construct the string
-    const sortedKeys = Object.keys(restData).sort();
-    const concatenatedString = sortedKeys
-      .map((key) => `${key}=${restData[key]}`)
-      .join('&');
-
-    // Append the secret key
-    const stringToHash = concatenatedString + secretKey;
-
-    // Generate MD5 hash
-    const generatedSignature = createHash('md5')
-      .update(stringToHash)
-      .digest('hex');
+      // Generate MD5 hash
+      generatedSignature = createHash('md5').update(stringToHash).digest('hex');
+    } catch (error) {
+      console.log('[ error ] >', error);
+      throw new UnauthorizedException();
+    }
+    console.log('[ signature ] >', signature, generatedSignature);
 
     // Compare the generated signature with the provided signature
     if (generatedSignature !== signature) {

@@ -2,10 +2,12 @@ import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 let globalConfig: ConfigService;
+let appInstance: INestApplication<any>;
 
 export function setGlobalConfig(app: INestApplication) {
   console.log('Setting global config');
   globalConfig = app.get(ConfigService);
+  appInstance = app;
 }
 
 /**
@@ -20,9 +22,16 @@ export function getGlobalConfig(key: string) {
 /**
  * 在其他地方使用全局配置
  * 使用时机：应用启动后，不能在模块加载时使用
- * @param key
- * @returns
+ * @returns ConfigService
  */
 export function getGlobalConfigInstance() {
   return globalConfig;
+}
+
+/**
+ * 在其他地方使用app实例
+ * @returns
+ */
+export function getGlobalAppInstance(className: any) {
+  return appInstance.get(className);
 }

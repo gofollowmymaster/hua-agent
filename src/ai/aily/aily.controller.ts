@@ -34,7 +34,7 @@ export class AilyController {
   @ApiBody({ type: FeishuGenerateTokenDto })
   @ApiOkResponse({ type: AplusResponse<FeishuAuthType> })
   @UseGuards(SecretAuthGuard)
-  async getTokenByCpde(@Body() params: FeishuGenerateTokenDto) {
+  async getTokenByCode(@Body() params: FeishuGenerateTokenDto) {
     return this.authService.getTokenByCode(params.code);
   }
 }

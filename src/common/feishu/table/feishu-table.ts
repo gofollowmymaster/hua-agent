@@ -8,6 +8,7 @@ import {
   BitTableFilter,
   BitTablePagination,
 } from '../type/bitable';
+import { getGlobalAppInstance } from '@utils/app-config';
 @Injectable()
 abstract class FeishuTable {
   protected readonly tableHelper: FeishuTableHelper;
@@ -25,10 +26,13 @@ abstract class FeishuTable {
   }
 
   async readWrapper(key: string, handler: () => Promise<any>, useCache = true) {
+    if (!this.cacheManager) {
+      this.cacheManager = getGlobalAppInstance(CACHE_MANAGER);
+    }
     if (this.useCache || useCache) {
       const cachaeKey = this.buildCacheKey(key);
 
-      let res = await this.cacheManager.get(cachaeKey);
+      let res = await this.cacheManager?.get(cachaeKey);
 
       if (res) return res;
 
