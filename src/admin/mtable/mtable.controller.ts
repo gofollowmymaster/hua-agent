@@ -1,7 +1,7 @@
 import { Controller, Post, UseGuards } from '@nestjs/common';
 
 import { MtableService } from './mtable.service';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@src/common/guard/auth';
 
 @ApiTags('多维表格管理中心')
@@ -22,5 +22,15 @@ export class MtableController {
   async list() {
     //发送消息
     return await this.mtableService.list();
+  }
+
+  @ApiOperation({
+    summary: '业务线列表',
+    description: '飞书业务线列表信息',
+  })
+  @Post('business-line')
+  async aplusBussnessList() {
+    // 添加到多维表格
+    return await this.mtableService.aplusBussnessList();
   }
 }

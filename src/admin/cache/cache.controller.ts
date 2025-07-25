@@ -12,7 +12,7 @@ export class CacheController {
 
   @ApiOperation({
     summary: '清理缓存',
-    description: '清理缓存指定缓存信息',
+    description: '根据指定key清理缓存指定缓存信息',
   })
   @ApiOkResponse({
     description: 'success',
@@ -26,5 +26,22 @@ export class CacheController {
   async clearCache(@Body() params: CacheClearDto) {
     //发送消息
     return await this.cacheService.clearCache(params);
+  }
+  @ApiOperation({
+    summary: '获取缓存信息',
+    description: '根据指定key获取缓存信息',
+  })
+  @ApiOkResponse({
+    description: 'success',
+    type: String,
+  })
+  @UseGuards(AuthGuard)
+  @ApiBody({
+    type: CacheClearDto,
+  })
+  @Post('getCache')
+  async getCache(@Body() params: CacheClearDto) {
+    //发送消息
+    return await this.cacheService.getCache(params.key);
   }
 }

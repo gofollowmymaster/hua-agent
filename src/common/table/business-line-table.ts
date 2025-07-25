@@ -13,8 +13,8 @@ class FeishuBusinessLineTable extends FeishuTable {
     readonly tableHelper: FeishuTableHelper,
   ) {
     super();
-    this.appToken = config.getOrThrow('AlertTableAppToken');
-    this.tableId = 'tbl1aLjbTNgbgaT6';
+    this.appToken = config.getOrThrow('AplusNodeAdminAppToken');
+    this.tableId = 'tblbjBv6z2RXX5Qp';
   }
 
   getBusinessLineBySubapp(projectName: string) {

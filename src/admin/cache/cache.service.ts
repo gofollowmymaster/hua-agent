@@ -36,4 +36,8 @@ export class CacheService extends BaseService {
       code,
     };
   }
+
+  async getCache(fullKey) {
+    return await this.cache.get(fullKey);
+  }
 }

@@ -9,6 +9,7 @@ import AdminMtableTable from './mtable/table/mtable-table';
 import { MtableService } from './mtable/mtable.service';
 import { CacheController } from './cache/cache.controller';
 import { CacheService } from './cache/cache.service';
+import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { CacheService } from './cache/cache.service';
     PrismaService,
     LoggerService,
     AdminMtableTable,
+    FeishuBusinessLineTable,
   ],
   controllers: [MtableController, CacheController],
 })
