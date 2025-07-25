@@ -182,15 +182,22 @@ export class AlertMsgService {
       conjunction: 'and',
       conditions: [
         {
-          field_name: '默认项目',
+          field_name: '责任项目',
           operator: 'contains',
           value: [projectName],
         },
       ],
     });
+    console.log(
+      '[ getGroupAndUserByProject ] >',
+      res.items[0].fields['前端leader'],
+      projectName,
+    );
+    const userId = res.items[0].fields['前端leader'][0].id;
+    const groupId = res.items[0].fields['前端监控群'][0].id;
     return {
-      userId: res.items[0].fields['负责人'],
-      groupId: res.items[0].fields['默认分组'],
+      userId,
+      groupId,
     };
   }
 

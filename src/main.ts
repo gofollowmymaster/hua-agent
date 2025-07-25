@@ -13,7 +13,8 @@ import dayjs from 'dayjs';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
-import { setGlobalConfig } from '@utils/app-config';
+import { getGlobalConfigInstance, setGlobalConfig } from '@utils/app-config';
+import { sendExceptionToFeishu } from './common/feishu/utils';
 
 declare const module: any;
 
@@ -68,3 +69,24 @@ async function bootstrap() {
   }
 }
 bootstrap();
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('-------Unhandled Rejection at:', reason);
+
+  const config = getGlobalConfigInstance();
+  console.log('[ config ] >', config);
+  if (!config) return;
+  promise.then().catch((error) => {
+    sendExceptionToFeishu(error, config);
+  });
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:---------', error);
+
+  const config = getGlobalConfigInstance();
+  if (!config) return;
+  sendExceptionToFeishu(error, config);
+  // 可能需要优雅地关闭应用
+  process.exit(1);
+});

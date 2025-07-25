@@ -25,12 +25,4 @@ export class FeishuAlertCard extends FeishuCard {
     const color = alertInfo.level == 'fatal' ? 'red' : 'orange';
     return super.build({ ...alertInfo, color });
   };
-
-  //   buildAtUserMsg = (data: Record<string, any>, userId: string) => {
-  //     const AtUser = userId ? `<at user_id="${userId}"></at>` : '';
-  //     const content = {
-  //       text: `${AtUser}`,
-  //     };
-  //     return JSON.stringify(content);
-  //   };
 }

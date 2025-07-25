@@ -15,7 +15,14 @@ export function setGlobalConfig(app: INestApplication) {
  * @returns
  */
 export function getGlobalConfig(key: string) {
-  console.log('Getting global config', key);
-
   return globalConfig.get(key);
+}
+/**
+ * 在其他地方使用全局配置
+ * 使用时机：应用启动后，不能在模块加载时使用
+ * @param key
+ * @returns
+ */
+export function getGlobalConfigInstance() {
+  return globalConfig;
 }
