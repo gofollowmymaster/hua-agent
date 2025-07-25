@@ -65,8 +65,9 @@ abstract class FeishuTable {
     filter: BitTableFilter,
     useCache = true,
   ): Promise<BitTablePagination> {
+    console.log('[  filter.toString() ] >', filter.toString());
     return await this.readWrapper(
-      filter.toString(),
+      JSON.stringify(filter),
       this.requestWrapper(async () => {
         return await this.tableHelper.search(
           this.appToken,
