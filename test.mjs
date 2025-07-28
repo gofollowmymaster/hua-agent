@@ -2,6 +2,7 @@ import { createHash } from 'crypto';
 const secretKey = 'w1JHRBTylvbXFKNP'; // Replace with your actual secret key
 const restData = {
   appId: 'recuRy2RxDT28R',
+  code: '2wxuFc8fyc754JF2EB8FEK8e9I6JII1x',
 };
 // Sort keys and construct the string
 const sortedKeys = Object.keys(restData).sort();

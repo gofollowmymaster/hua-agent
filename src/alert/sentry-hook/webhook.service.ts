@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { FeishuEventCallbackDto } from './dto/feishu-event.dto';
+import { FeishuEventCallbackDto } from './dto/sentry-hook';
 import { PrismaService } from '@src/prisma.service';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { ConfigService } from '@nestjs/config';
