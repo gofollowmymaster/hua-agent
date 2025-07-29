@@ -9,6 +9,7 @@ import {
   BitTablePagination,
 } from '../type/bitable';
 import { getGlobalAppInstance } from '@utils/app-config';
+import { FeishuApiException } from '@src/common/exception/feishu-api-exception';
 @Injectable()
 abstract class FeishuTable {
   protected readonly tableHelper: FeishuTableHelper;
@@ -44,9 +45,13 @@ abstract class FeishuTable {
   }
   requestWrapper(handler: () => Promise<any>) {
     return async () => {
-      const { code, msg, data } = await handler();
+      const res = await handler();
+      const { code, data } = res;
       if (code !== 0) {
-        throw new Error(msg + '->' + JSON.stringify(data));
+        throw new FeishuApiException(
+          `【${code}】   ->  ${JSON.stringify(res)}`,
+          code,
+        );
       }
       return data;
     };
@@ -65,9 +70,9 @@ abstract class FeishuTable {
     filter: BitTableFilter,
     useCache = true,
   ): Promise<BitTablePagination> {
-    console.log('[  filter.toString() ] >', filter.toString());
+    const cacheKey = JSON.stringify(filter).replaceAll(':', '');
     return await this.readWrapper(
-      JSON.stringify(filter),
+      cacheKey,
       this.requestWrapper(async () => {
         return await this.tableHelper.search(
           this.appToken,

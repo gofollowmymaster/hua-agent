@@ -25,6 +25,7 @@ import { AiModule } from './ai/ai.module';
 import { AdminModule } from './admin/admin.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AlertModule } from './alert/alert.module';
+import { RedisModule } from './common/service/redis/redis.module';
 // import { BaseTableModule } from './common/table/base-table.module';
 
 const envFilePath = [
@@ -47,9 +48,9 @@ const envFilePath = [
         createKeyv({
           socket: {
             host: configuration['DB_REDIS_HOST'],
-            port: parseInt(configuration['DB_REDIS_PORT']),
+            port: configuration['DB_REDIS_PORT'],
           },
-          database: 6, //目标库,
+          database: configuration['DB_REDIS_DB'], //目标库,
           password: configuration['DB_REDIS_PASSWORD'],
         }),
       ],
@@ -65,9 +66,15 @@ const envFilePath = [
       global: true,
       secret: configuration['jwtSecret'],
     }),
+    RedisModule,
     // BaseTableModule,
     // ScheduleModule.forRoot(),
-
+    // RedisModule.register({
+    //   host: configuration['DB_REDIS_HOST'],
+    //   port: parseInt(configuration['DB_REDIS_PORT']),
+    //   password: configuration['DB_REDIS_PASSWORD'],
+    //   db: configuration['DB_REDIS_DB'],
+    // }),
     SubappModule,
     VersionModule,
     VerifyModule,

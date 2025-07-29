@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AlertMsgController } from './alert-message/alert-message.controller';
 import { AlertMsgService } from './alert-message/alert-message.service';
 import { PrismaService } from '@src/prisma.service';
-import { LoggerService } from '@src/common/service/logger/logger.service';
 import { FeishuHelperModule } from '@src/common/feishu/hepler/helper.module';
 
 // import { FeishuTableModule } from '@src/common/feishu/table/table.module';
@@ -10,6 +9,7 @@ import SentryApiAlertAdapter from './alert-message/adapter/sentry-alert-adapter'
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import FeishuApiAlertTable from './alert-message/table/api-alert-table';
 import FeishuFrontendAlertTable from './alert-message/table/frontend-alert-table';
+import FeishuFrontendAlertIssueTable from './alert-message/table/frontend-alert-issue-table';
 import FeishuBusinessLineTable from '../common/table/business-line-table';
 
 import { FeishuEventController } from './event/event.controller';
@@ -17,6 +17,7 @@ import { FeishuEventService } from './event/event.service';
 
 import { SentryWebhookController } from './sentry-integrations/webhook.controller';
 import { SentryWebhookService } from './sentry-integrations/webhook.service';
+import FeishuApiAlertIssueTable from './alert-message/table/api-alert-issue-table';
 
 @Module({
   imports: [
@@ -30,11 +31,12 @@ import { SentryWebhookService } from './sentry-integrations/webhook.service';
   ],
   providers: [
     FeishuApiAlertTable,
+    FeishuApiAlertIssueTable,
     FeishuFrontendAlertTable,
+    FeishuFrontendAlertIssueTable,
     FeishuBusinessLineTable,
     AlertMsgService,
     PrismaService,
-    LoggerService,
     SentryApiAlertAdapter,
     FeishuEventService,
     SentryWebhookService,

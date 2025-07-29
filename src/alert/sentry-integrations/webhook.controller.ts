@@ -53,7 +53,7 @@ export class SentryWebhookController {
   })
   @ApiBody({ type: SentryHookDto })
   @Post('webhook')
-  // 接收已表情回复webhook
+  // sentry webhook入口
   async webhook(
     @Headers() headers: SentryWebHookHeader,
     @Body() params: SentryHookDto,

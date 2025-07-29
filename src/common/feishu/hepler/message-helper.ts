@@ -66,6 +66,19 @@ class FeishuMessageHelper {
       },
     });
   }
+  async urgentApp(userId: string[], messageId: string) {
+    return await this.client.client.im.message.urgentApp({
+      data: {
+        user_id_list: [...userId],
+      },
+      params: {
+        user_id_type: 'user_id',
+      },
+      path: {
+        message_id: messageId,
+      },
+    });
+  }
 }
 
 export default FeishuMessageHelper;

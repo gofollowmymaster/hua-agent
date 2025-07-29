@@ -74,7 +74,6 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error('-------Unhandled Rejection at:', reason);
 
   const config = getGlobalConfigInstance();
-  console.log('[ config ] >', config);
   if (!config) return;
   promise.then().catch((error) => {
     sendExceptionToFeishu(error, config);

@@ -14,11 +14,10 @@ export default {
     process.env.FEISHU_AILY_APLUS_APP_TOKEN || 'A6qfbapjtafVLYsn9xic6mYNnfT',
   AilyLogOperatorTableId:
     process.env.FEISHU_AILY_APLUS_TABLE_ID || 'tblcE7q8e2vD9c48',
-  AilyLogTableId: process.env.FEISHU_ALERT_API_TABLE_ID || 'tblNX1qbsmDuvbCu',
   //Aplus Node-Server 管理表格
   AplusNodeAdminAppToken: process.env.FEISHU_APLUS_NODE_ADMIN_APP_TOKEN,
   AplusNodeAdminMtableTableId:
-    process.env.FEISHU_APLUS_NODE_ADMIN_Mtable_TABLE_ID,
+    process.env.FEISHU_APLUS_NODE_ADMIN_MTABLE_TABLE_ID,
   //报警机器人相关
   AlertAppId: process.env.FEISHU_ALERT_APP_APPID,
   AlertAppSecret: process.env.FEISHU_ALERT_APP_APPSECRET,
@@ -26,6 +25,9 @@ export default {
   AlertTableAppToken: process.env.FEISHU_ALERT_APP_TOKEN,
   AlertApiTableId: process.env.FEISHU_ALERT_API_TABLE_ID,
   AlertFrontendAppId: process.env.FEISHU_ALERT_FRONTEND_TABLE_ID,
+  AlertFrontendIssueTableAppId:
+    process.env.FEISHU_ALERT_FRONTEND_ISUUE_TABLE_ID,
+  AlertApiIssueTableId: process.env.FEISHU_ALERT_API_ISSUE_TABLE_ID,
   //默认报警群
   DefaultAlertFeishuGroupId:
     process.env.DEFAULT_ALERT_GROUPID || 'oc_b030f5155cad2838eeacadc977f403b0',
