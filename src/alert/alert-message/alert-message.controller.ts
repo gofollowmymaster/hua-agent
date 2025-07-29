@@ -27,8 +27,20 @@ export class AlertMsgController {
   @ApiBody({ type: SentryRawDto })
   @Post('alertRaw')
   async sentryAlert(@Body() alertInfo: SentryRawDto) {
-    // 添加到多维表格
-    return await this.alertMsgService.sentryAlertHook(alertInfo);
+    const event = alertInfo.event;
+    const urlParsed = alertInfo.url?.split('?');
+    const eventUrl =
+      urlParsed[0] + 'events/' + event?.event_id + '?' + urlParsed[1];
+
+    const eventData = {
+      ...alertInfo.event,
+      title: alertInfo.message,
+      issue_url: alertInfo.url,
+      event_url: eventUrl,
+      issue_id: alertInfo.id,
+    };
+
+    return await this.alertMsgService.sentryAlertHook(eventData);
   }
   // @ApiOperation({
   //   summary: '修改Issue状态',

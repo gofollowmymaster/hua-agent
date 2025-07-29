@@ -8,6 +8,7 @@ import ClientSecretTable from '../table/client-secret-table';
 import { ConfigService } from '@nestjs/config';
 import FeishuTableHelper from '../feishu/hepler/table-helper';
 import { ClientFactory, FeishuApp } from '../feishu/clients';
+import { Request } from 'express';
 
 @Injectable()
 export class SecretAuthGuard implements CanActivate {

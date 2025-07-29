@@ -8,8 +8,6 @@ import { VerifyModule } from './verify/verify.module';
 import { RobotModule } from './robot/robot.module';
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { MockServerModule } from './mock-server/mock-server.module';
-import { AlertMsgModule } from '@src/alert/alert-message/alert-message.module';
-import { FeishuEventModule } from '@src/alert/event/event.module';
 import { LoggerModule } from './common/service/logger/logger.module';
 import configuration from './config';
 import { CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
@@ -26,7 +24,7 @@ import { SchedulTaskeModule } from './common/schedule-task/schedule-task.module'
 import { AiModule } from './ai/ai.module';
 import { AdminModule } from './admin/admin.module';
 import { JwtModule } from '@nestjs/jwt';
-import { SentryWebhookModule } from './alert/sentry-hook/webhook.module';
+import { AlertModule } from './alert/alert.module';
 // import { BaseTableModule } from './common/table/base-table.module';
 
 const envFilePath = [
@@ -69,14 +67,13 @@ const envFilePath = [
     }),
     // BaseTableModule,
     // ScheduleModule.forRoot(),
+
     SubappModule,
     VersionModule,
     VerifyModule,
     RobotModule,
     MockServerModule,
-    AlertMsgModule,
     LoggerModule,
-    FeishuEventModule,
     AiModule,
     AdminModule,
     AuthModule,
@@ -84,7 +81,7 @@ const envFilePath = [
     DemoPluginModule,
     ScheduleModule.forRoot(),
     SchedulTaskeModule,
-    SentryWebhookModule,
+    AlertModule,
   ],
   providers: [PrismaService],
 })

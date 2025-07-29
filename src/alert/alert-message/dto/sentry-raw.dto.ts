@@ -13,7 +13,7 @@ export enum Environment {
   DEV = 'dev',
 }
 
-class Event {
+export class SentryEvent {
   _dsc: Dsc;
   _meta: Meta;
   _metrics: Metrics;
@@ -32,7 +32,7 @@ class Event {
   hashes: string[];
   id: string;
   key_id: string;
-  level: string;
+  level: ErrorLevel;
   location: string;
   logentry: Logentry;
   logger: string;
@@ -52,6 +52,9 @@ class Event {
   readonly type: string;
   user: User;
   version: string;
+  web_url: string;
+  issue_url: string;
+  issue_id: string;
   extra?: {
     subModuleName: subAppName;
     __serialized__: {
@@ -338,11 +341,11 @@ export class SentryRawDto {
   })
   culprit: string;
   @ApiProperty({
-    type: Event,
+    type: SentryEvent,
     description: 'sentry事件信息',
   })
   @IsNotEmptyObject()
-  event: Event;
+  event: SentryEvent;
   @ApiProperty({
     type: String,
     description: 'sentryID',

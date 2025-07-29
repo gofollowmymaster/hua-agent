@@ -10,7 +10,11 @@ import {
 import { SentryWebhookService } from './webhook.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { ApiBody, ApiHeaders, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { SentryHookType, SentryWebHookHeader } from './dto/sentry-hook';
+import {
+  SentryHookDto,
+  SentryHookType,
+  SentryWebHookHeader,
+} from './dto/sentry-hook';
 import { verifySignature } from './util';
 @ApiTags('Sentry WebHook')
 @Controller('sentry-hook')
@@ -47,16 +51,39 @@ export class SentryWebhookController {
     summary: 'Sentry WebHook入口',
     description: 'Sentry WebHook统一入口',
   })
-  @ApiBody({ type:  })
+  @ApiBody({ type: SentryHookDto })
   @Post('webhook')
   // 接收已表情回复webhook
-  async webhook(@Headers() headers: SentryWebHookHeader, @Body() params: any) {
+  async webhook(
+    @Headers() headers: SentryWebHookHeader,
+    @Body() params: SentryHookDto,
+  ) {
     // 验证
-    if (!verifySignature(params, headers)) {
+    // if ( !verifySignature(params, headers)) {
+    //sentry-hook签名验证存在问题，等待解决  https://github.com/getsentry/sentry/issues/71025
+    if (!headers['sentry-hook-signature']) {
       throw new UnauthorizedException('Sentry Hook签名验证失败');
     }
-    //处理
-    this.sentryWebhookService.handle(params);
+    const resource = headers['sentry-hook-resource'];
+    switch (resource) {
+      case SentryHookType.Error:
+        await this.sentryWebhookService.error(params);
+
+        break;
+      case SentryHookType.Issue:
+        this.sentryWebhookService.issue(params);
+
+        break;
+      case SentryHookType.Comment:
+        this.sentryWebhookService.comment(params);
+
+        break;
+      case SentryHookType.EventAlert:
+      case SentryHookType.MetricAlert:
+        this.sentryWebhookService.alert(params);
+      case SentryHookType.Installation:
+        this.sentryWebhookService.installation(params);
+    }
     return true;
   }
 }

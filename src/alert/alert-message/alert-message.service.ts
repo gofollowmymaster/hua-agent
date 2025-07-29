@@ -11,7 +11,7 @@ import {
 } from './utils';
 import { ConfigService } from '@nestjs/config';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
-import { SentryRawDto } from './dto/sentry-raw.dto';
+import { SentryEvent } from './dto/sentry-raw.dto';
 import SentryApiAlertAdapter from './adapter/sentry-alert-adapter';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import FeishuApiAlertTable from './table/api-alert-table';
@@ -205,11 +205,10 @@ export class AlertMsgService {
    * sentry webhook处理
    * @param alertInfo
    */
-  async sentryAlertHook(alertInfo: SentryRawDto) {
+  async sentryAlertHook(alertInfo: SentryEvent) {
     const isApiAlert = alertInfo.culprit?.includes('请求错误');
     try {
       this.sentryApiAlertAdapter = new SentryApiAlertAdapter(alertInfo);
-
       if (isApiAlert) {
         const record = this.sentryApiAlertAdapter.toApiAlertTableData();
         // console.log('[ record ] >', record);

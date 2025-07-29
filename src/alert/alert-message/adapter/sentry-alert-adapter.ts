@@ -1,12 +1,12 @@
 import { ApiAlertTableDto, FrontendAlertTableDto } from './alert-table-dto';
 import { SentryAlertDto } from '../dto/sentry-alert.dto';
-import { SentryRawDto } from '../dto/sentry-raw.dto';
+import { SentryEvent } from '../dto/sentry-raw.dto';
 import { apiModuleBuMap, getSubAppInfo } from '../app-user-map';
 
 export default class SentryApiAlertAdapter {
-  private sentryData: SentryRawDto;
-  constructor(sentryData: SentryRawDto) {
-    this.sentryData = sentryData;
+  private sentryEvent: SentryEvent;
+  constructor(sentryEvent: SentryEvent) {
+    this.sentryEvent = sentryEvent;
   }
   getModuleNameByUrl(url: string = '') {
     if (!url) return;
@@ -17,12 +17,12 @@ export default class SentryApiAlertAdapter {
   }
 
   toApiAlertTableData(): ApiAlertTableDto {
-    const requestData = this.sentryData.event.extra?.__serialized__;
-    const subAppName =
-      this.sentryData.event.extra?.subModuleName || this.sentryData.project;
+    const requestData = this.sentryEvent.extra?.__serialized__;
+    const subAppName = this.sentryEvent.extra?.subModuleName;
     const appInfo = getSubAppInfo(subAppName);
 
     const moduleName = this.getModuleNameByUrl(requestData.url);
+    console.log('[ requestData ] >', requestData);
     return {
       接口地址: requestData.url,
       http状态码: '200',
@@ -32,57 +32,48 @@ export default class SentryApiAlertAdapter {
       错误信息: requestData.message,
       业务线: [apiModuleBuMap[moduleName] || appInfo.bu],
       应用名: subAppName + '',
-      发生时间: this.sentryData.event.timestamp * 1000,
-      环境: this.sentryData.event.environment,
-      RawData: JSON.stringify(this.sentryData),
+      发生时间: this.sentryEvent.timestamp * 1000,
+      环境: this.sentryEvent.environment,
+      RawData: JSON.stringify(this.sentryEvent),
     };
   }
 
   toFrontendAlertTableData(): FrontendAlertTableDto {
-    const subAppName =
-      this.sentryData.event.extra?.subModuleName || this.sentryData.project;
+    const subAppName = this.sentryEvent.extra?.subModuleName;
     const appInfo = getSubAppInfo(subAppName);
     return {
-      标题: this.sentryData.message,
-      链接信息: this.sentryData.url,
+      标题: this.sentryEvent.title,
+      链接信息: this.sentryEvent.web_url,
       是否解决: false,
       负责人: [{ id: appInfo.userId }],
       错误原因: '',
       解决方案: '',
       来源: 'Sentry告警',
-      报警级别: this.sentryData.level,
-      描述信息: this.sentryData.culprit,
+      报警级别: this.sentryEvent.level,
+      描述信息: this.sentryEvent.culprit,
       应用名: [subAppName],
       业务线: [appInfo.bu],
-      环境: this.sentryData.event.environment,
-      RawData: JSON.stringify(this.sentryData),
+      环境: this.sentryEvent.environment,
+      RawData: JSON.stringify(this.sentryEvent),
     };
   }
   toFeishuMessageData(): SentryAlertDto {
-    const sentryData = this.sentryData;
-    const subAppName =
-      this.sentryData.event.extra?.subModuleName || this.sentryData.project;
+    const sentryEvent = this.sentryEvent;
+    const subAppName = this.sentryEvent.extra?.subModuleName;
 
-    // const sentryData.url
-    const urlParsed = sentryData.url?.split('?');
-    const sentryUrl =
-      urlParsed[0] +
-      'events/' +
-      sentryData.event?.event_id +
-      '?' +
-      urlParsed[1];
+    // const sentryEvent.url
 
     return {
-      environment: sentryData.event.environment,
+      environment: sentryEvent.environment,
       rawData: '',
-      errorMessage: sentryData.message,
+      errorMessage: sentryEvent.title,
       userEmail: '',
       project: subAppName,
-      linkUrl: sentryUrl,
-      level: sentryData.level,
-      eventType: sentryData.event.type,
-      culprit: sentryData.culprit,
-      timeStamp: sentryData.event.timestamp,
+      linkUrl: sentryEvent.web_url,
+      level: sentryEvent.level,
+      eventType: sentryEvent.type,
+      culprit: sentryEvent.culprit,
+      timeStamp: sentryEvent.timestamp,
     };
   }
 }

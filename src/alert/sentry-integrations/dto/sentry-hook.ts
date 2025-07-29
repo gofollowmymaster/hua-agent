@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { SentryEvent } from '@src/alert/alert-message/dto/sentry-raw.dto';
 import { IsNotEmpty } from 'class-validator';
+import { extend } from 'dayjs';
 
 export enum SentryHookType {
   Issue = 'issue',
@@ -21,11 +23,11 @@ export enum SentryIssueAlertAction {
 }
 
 export type SentryWebHookHeader = {
-  'Sentry-Hook-Resource': SentryHookType;
-  'Sentry-Hook-Signature': string;
-  'Sentry-Hook-Timestamp': string;
-  'Request-ID': string;
-  'Content-Type': string;
+  'sentry-hook-resource': SentryHookType;
+  'sentry-hook-signature': string;
+  'sentry-hook-timestamp': string;
+  'request-id': string;
+  'content-type': string;
 };
 
 enum SentryHookActorType {
@@ -53,14 +55,23 @@ export class SentryHookActor {
   'name': string;
 }
 
-export class SentryHookData {
+export class SentryInstallationData {
   @IsNotEmpty()
   @ApiProperty({
-    description: 'Data type',
-    enum: SentryHookDataType,
+    description: 'Installation id',
+    type: String,
   })
-  
+  'uuid': string;
 }
+
+// export class SentryHookErrorData {
+//   @IsNotEmpty()
+//   @ApiProperty({
+//     description: 'Data type',
+//     enum: SentryHookDataType,
+//   })
+
+// }
 
 export class SentryHookDto {
   @IsNotEmpty()
@@ -72,11 +83,23 @@ export class SentryHookDto {
   @ApiProperty({
     description: 'Sentry Hook数据',
   })
-  data: SentryHookData;
+  data: any;
   @IsNotEmpty()
   @ApiProperty({
     type: SentryHookActor,
     description: 'Sentry Hook 操作者',
   })
   actor: SentryHookActor;
+  @IsNotEmpty()
+  @ApiProperty({
+    type: SentryInstallationData,
+    description: 'Sentry 集成信息',
+  })
+  installation: SentryInstallationData;
+}
+
+export class SentryHookErrorDto extends SentryHookDto {
+  data: {
+    error: SentryEvent;
+  };
 }
