@@ -50,7 +50,7 @@ export class DemoPluginService {
 
       const { items: records } = await this.demoPluginMidTable.search(filter);
       if (records.length > 1) {
-        sendExceptionToFeishu(new Error('MId 重复:' + data.MId), this.config);
+        sendExceptionToFeishu(new Error('MId 重复:' + data.MId));
       }
       if (records.length >= 1) {
         const { fields: info, record_id } = records[0];
@@ -94,7 +94,7 @@ export class DemoPluginService {
       }
     } catch (error) {
       console.log('[ error ] >', error);
-      sendExceptionToFeishu(error, this.config);
+      sendExceptionToFeishu(error);
     }
     console.log('[ info  fin ] >');
     return isValid;

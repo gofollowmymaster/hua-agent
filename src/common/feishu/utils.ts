@@ -3,7 +3,7 @@ import { ClientFactory, FeishuApp } from './clients';
 import FeishuMessageHelper from './hepler/message-helper';
 import { FeishuAlertCard } from './card/alert-card';
 import dayjs from 'dayjs';
-import { AplusError } from '../exception/interface';
+import { getGlobalAppInstance } from '@utils/app-config';
 
 /**
  * 使用预配置的 Feishu 客户端向 Feishu 群组发送异常通知。
@@ -13,9 +13,10 @@ import { AplusError } from '../exception/interface';
  * 警报卡片中包含一个指向阿里云日志服务的链接，以便进一步调查。
  */
 export const sendExceptionToFeishu = (
-  exception: AplusError,
-  config: ConfigService,
+  exception: Error,
+  reqContext: string = '',
 ) => {
+  const config = getGlobalAppInstance(ConfigService);
   const messagerHelper = new FeishuMessageHelper(
     ClientFactory.create(FeishuApp.AlertClient, config),
   );
@@ -24,14 +25,16 @@ export const sendExceptionToFeishu = (
   //构建消息内容
   const content = FeishuAlertCard.buildCardMsg({
     environment: process.env.NODE_ENV,
-    title: exception.title?.slice(0, 1000) || 'Node Server异常报警',
+    title: `Node Server异常报警【${exception.name}】`,
     project: 'aplus-sql-server',
     color: 'red',
-    culprit: exception.culprit || exception.name,
+    culprit: reqContext || '内部错误',
     errorMessage: exception.message?.slice(0, 1000) || '未知错误',
     errorTime: errorTime.format('YYYY-MM-DD HH:mm:ss'),
     linkUrl: `https://sls.console.aliyun.com/lognext/project/k8s-log-c893ce02efe464e778e67c48016348406/logsearch/elnkpro-prod-log?encode%3Dbase64%26queryString%3DIF9jb250YWluZXJfbmFtZV86IGFwbHVzLXNxbC1zZXJ2aWNlLXByb2Q%3D%26filterInfo%3DeyJmamNvZGUiOiIoKSIsImZxIjoiIn0%3D%26queryTimeType%3D99%26startTime%3D${errorTime.subtract(60, 's').valueOf() / 1000}%26endTime%3D${errorTime.add(60, 's').valueOf() / 1000}`,
   });
+  console.log('[ exception ] >', exception);
+
   messagerHelper.createInteractToGroup(
     content,
     config.get('DefaultAlertFeishuGroupId'),

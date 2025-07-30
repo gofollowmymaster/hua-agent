@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { SentryEvent } from '@src/alert/alert-message/dto/sentry-raw.dto';
+import { SentryEvent } from '@src/alert/type/sentry';
 import { IsNotEmpty } from 'class-validator';
-import { extend } from 'dayjs';
 
 export enum SentryHookType {
   Issue = 'issue',

@@ -69,10 +69,6 @@ export const appUserMap: Record<string, AppInfo> = {
   },
 };
 
-export const getSubAppInfo = (moduleName: string) => {
-  return appUserMap[moduleName] || appUserMap['aplus-user'];
-};
-
 export const apiModuleBuMap = {
   im: 'recuwVEngyXUnD',
   'download-center': 'recuwVEngyXUnD',

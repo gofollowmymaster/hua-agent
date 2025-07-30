@@ -5,13 +5,13 @@ import {
   UniqueConstraintExceptionFilter,
 } from './common/filter/http-exception/http-exception.filter';
 import { AllExceptionsFilter } from './common/filter/all-exception/all-exception.filter';
+import { AplusExceptionsFilter } from './common/filter/aplus-exception/aplus-exception.filter';
 import { TransformInterceptor } from './common/interceptor/transform/transform.interceptor';
 import * as bodyParser from 'body-parser';
 import utc from 'dayjs/plugin/utc'; // nodejs
 import timezone from 'dayjs/plugin/timezone'; // nodejs
 import dayjs from 'dayjs';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { getGlobalConfigInstance, setGlobalConfig } from '@utils/app-config';
 import { sendExceptionToFeishu } from './common/feishu/utils';
@@ -26,7 +26,6 @@ async function bootstrap() {
   setGlobalConfig(app);
 
   const httpAdapter = app.get(HttpAdapterHost);
-  const config = app.get(ConfigService);
   app.enableCors({
     origin: true, // 或设置为 true 允许所有
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -34,7 +33,8 @@ async function bootstrap() {
     credentials: true, // 允许发送 cookies
   });
   app.useGlobalFilters(
-    new AllExceptionsFilter(httpAdapter, config),
+    new AllExceptionsFilter(httpAdapter),
+    new AplusExceptionsFilter(httpAdapter),
     new HttpExceptionFilter(),
     new UniqueConstraintExceptionFilter(),
   );
@@ -76,7 +76,7 @@ process.on('unhandledRejection', (reason, promise) => {
   const config = getGlobalConfigInstance();
   if (!config) return;
   promise.then().catch((error) => {
-    sendExceptionToFeishu(error, config);
+    sendExceptionToFeishu(error);
   });
 });
 
@@ -85,7 +85,7 @@ process.on('uncaughtException', (error) => {
 
   const config = getGlobalConfigInstance();
   if (!config) return;
-  sendExceptionToFeishu(error, config);
+  sendExceptionToFeishu(error);
   // 可能需要优雅地关闭应用
   process.exit(1);
 });

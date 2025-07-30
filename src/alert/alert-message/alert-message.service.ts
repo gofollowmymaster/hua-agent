@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ErrorLevel, SentryAlertDto } from './dto/sentry-alert.dto';
+import { SentryAlertDto } from './dto/sentry-alert.dto';
 // import feishuClient from '@src/common/feishu-robot/alert-client';
 import { addRetryJob } from '@src/utils/job';
 import { PrismaService } from '@src/prisma.service';
@@ -9,22 +9,26 @@ import {
   isNeedSendAlertMsg,
 } from './utils';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
-import { SentryEvent } from './dto/sentry-raw.dto';
-import SentryApiAlertAdapter from './adapter/sentry-alert-adapter';
+
+import SentryAlertAdapter from './adapter/sentry-alert-adapter';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
-import FeishuApiAlertTable from './table/api-alert-table';
-import FeishuFrontendAlertTable from './table/frontend-alert-table';
+import FeishuApiAlertTable from '../table/api-alert-table';
+import FeishuFrontendAlertTable from '../table/frontend-alert-table';
 import FeishuBusinessLineTable from '../../common/table/business-line-table';
-import FeishuFrontendAlertIssueTable from './table/frontend-alert-issue-table';
-import FeishuApiAlertIssueTable from './table/api-alert-issue-table';
+import FeishuFrontendAlertIssueTable from '../table/frontend-alert-issue-table';
+import FeishuApiAlertIssueTable from '../table/api-alert-issue-table';
 import { BaseService } from '@src/common/base/BaseService';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { ConfigService } from '@nestjs/config';
+import dayjs from 'dayjs';
+import { ErrorEndpoint, ErrorLevel, SentryEvent } from '../type/sentry';
+import { ActionLimitException } from '@src/common/exception/action-limit-exception';
+
 @Injectable()
 export class AlertMsgService extends BaseService {
   // private messageHelper;
-  private sentryApiAlertAdapter: SentryApiAlertAdapter;
+
   private ignoreCodeList = ['401', '10002'];
   constructor(
     private prisma: PrismaService,
@@ -37,6 +41,7 @@ export class AlertMsgService extends BaseService {
     private readonly feishuFrontendIssueTable: FeishuFrontendAlertIssueTable,
     private readonly feishuBusinessLineTable: FeishuBusinessLineTable,
     private readonly redisService: RedisService,
+    private readonly sentryApiAlertAdapter: SentryAlertAdapter,
   ) {
     super();
   }
@@ -187,10 +192,6 @@ export class AlertMsgService extends BaseService {
   async getGroupAndUserByProject(alertInfo: SentryAlertDto) {
     const { project, environment } = alertInfo;
     if (environment == 'dev' || environment == 'development') {
-      console.log(
-        '[ this.config.getOrThrow ] >',
-        this.config.getOrThrow('DefaultAlertFeishuUserId'),
-      );
       return {
         groupId: this.config.getOrThrow('DefaultAlertFeishuGroupId'),
         userId: this.config.getOrThrow('DefaultAlertFeishuUserId'),
@@ -209,19 +210,9 @@ export class AlertMsgService extends BaseService {
      * 解码并处理有空格的情况
      */
     const projectName = decodeURIComponent(project).trim();
-    const res = await this.feishuBusinessLineTable.search({
-      conjunction: 'and',
-      conditions: [
-        {
-          field_name: '责任项目',
-          operator: 'contains',
-          value: [projectName],
-        },
-      ],
-    });
+    const { frontendAlertGroupId: groupId, frontendLeaderId: userId } =
+      await this.feishuBusinessLineTable.getBusinessLineBySubapp(projectName);
 
-    const userId = res.items[0].fields['前端leader'][0].id;
-    const groupId = res.items[0].fields['前端监控群'][0].id;
     return {
       userId,
       groupId,
@@ -232,7 +223,7 @@ export class AlertMsgService extends BaseService {
     const isApiAlert = alertInfo.culprit?.includes('请求错误');
     try {
       if (isApiAlert) {
-        const record = this.sentryApiAlertAdapter.toApiAlertTableData();
+        const record = await this.sentryApiAlertAdapter.toApiAlertTableData();
         // 异步记录到多维表格
         await this.feishuApiTable.create(record);
 
@@ -250,7 +241,8 @@ export class AlertMsgService extends BaseService {
           false,
         );
         if (issueRes.total == 0) {
-          const issue = this.sentryApiAlertAdapter.toApiAlertIssueTableData();
+          const issue =
+            await this.sentryApiAlertAdapter.toApiAlertIssueTableData();
           await this.feishuApiIssueTable.create(issue);
         } else {
           const record = issueRes.items[0];
@@ -264,7 +256,8 @@ export class AlertMsgService extends BaseService {
         }
       } else {
         // 异步记录到多维表格
-        const record = this.sentryApiAlertAdapter.toFrontendAlertTableData();
+        const record =
+          await this.sentryApiAlertAdapter.toFrontendAlertTableData();
 
         this.feishuFrontendTable.create(record);
         const issueRes = await this.feishuFrontendIssueTable.search(
@@ -282,7 +275,7 @@ export class AlertMsgService extends BaseService {
         );
         if (issueRes.total == 0) {
           const issue =
-            this.sentryApiAlertAdapter.toFrontendAlertIssueTableData();
+            await this.sentryApiAlertAdapter.toFrontendAlertIssueTableData();
           await this.feishuFrontendIssueTable.create(issue);
         } else {
           const record = issueRes.items[0];
@@ -293,7 +286,7 @@ export class AlertMsgService extends BaseService {
         }
       }
     } catch (err) {
-      sendExceptionToFeishu(err, this.config);
+      sendExceptionToFeishu(err);
     }
   }
 
@@ -302,7 +295,7 @@ export class AlertMsgService extends BaseService {
    * @param alertInfo
    */
   async sentryAlertHook(errorEvent: SentryEvent) {
-    this.sentryApiAlertAdapter = new SentryApiAlertAdapter(errorEvent);
+    await this.sentryApiAlertAdapter.setEventryEvent(errorEvent);
 
     this.writeToTable(errorEvent);
 
@@ -311,7 +304,7 @@ export class AlertMsgService extends BaseService {
       1,
       60 * 5,
     ); // 限制每5分钟最多处理一次
-    if (isLimited) return;
+    if (isLimited) throw new ActionLimitException('已记录日志，但没有发送消息');
     const msgData = this.sentryApiAlertAdapter.toFeishuMessageData();
 
     // 异步发送飞书消息
@@ -319,14 +312,29 @@ export class AlertMsgService extends BaseService {
   }
 
   /**
-   * 高危报警
+   * 高频错误报警
    * @param alertInfo
    */
-  async fatalErrorAlertMsg(errorEvent: SentryEvent) {
-    this.sentryApiAlertAdapter = new SentryApiAlertAdapter(errorEvent);
+  async highFrequencyAlertMsg(errorEvent: SentryEvent) {
+    await this.sentryApiAlertAdapter.setEventryEvent(errorEvent);
 
-    const msgData = this.sentryApiAlertAdapter.toFeishuMessageData();
-    msgData.level = ErrorLevel.FATAL;
+    let project;
+    if (errorEvent.extra?.errorEndpoint === ErrorEndpoint.Server) {
+      project = '';
+    }
+    const msgData = {
+      environment: errorEvent.environment,
+      rawData: '',
+      errorMessage: '高频报错提醒',
+      userEmail: '',
+      project,
+      linkUrl:
+        'https://cloud.elnkpro.com:9000/organizations/aplus-frontend-team/issues/?query=is%3Aunresolved%20issue.priority%3A%5Bhigh%2C%20medium%5D%20event.timestamp%3A-1h&referrer=issue-list&statsPeriod=14d',
+      level: ErrorLevel.FATAL,
+      eventType: 'HighFrequencyError',
+      culprit: '最近3分钟内报错数超过10个,请及时处理',
+      timeStamp: dayjs().valueOf(),
+    };
     // 异步发送飞书消息
     this.sendFsAlertMsg(msgData);
   }

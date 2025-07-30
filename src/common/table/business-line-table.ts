@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import FeishuTableHelper from '@src/common/feishu/hepler/table-helper';
 import FeishuTable from '@src/common/feishu/table/feishu-table';
+import { FeishuApiException } from '../exception/feishu-api-exception';
 @Injectable()
 class FeishuBusinessLineTable extends FeishuTable {
   // protected readonly tableHelper: FeishuTableHelper;
@@ -17,8 +18,8 @@ class FeishuBusinessLineTable extends FeishuTable {
     this.tableId = 'tblbjBv6z2RXX5Qp';
   }
 
-  getBusinessLineBySubapp(projectName: string) {
-    return this.search(
+  async getBusinessLineBySubapp(projectName: string) {
+    const res = await this.search(
       {
         conjunction: 'and',
         conditions: [
@@ -29,8 +30,28 @@ class FeishuBusinessLineTable extends FeishuTable {
           },
         ],
       },
-      true,
+      false,
     );
+    if (res.items.length === 0) {
+      throw new FeishuApiException(`未找到对应的业务线: ${projectName}`, 501);
+    }
+    const frontendLeaderId = res.items[0].fields['前端leader'][0].id;
+    const frontendAlertGroupId = res.items[0].fields['前端监控群'][0].id;
+    const frontendGroupId = res.items[0].fields['前端组织群'][0].id;
+    const backendLeaderId = res.items[0].fields['前端leader'][0].id;
+    const backendAlertGroupId = res.items[0].fields['接口告警群']?.[0]?.id;
+    const feishuProjectUrl = res.items[0].fields['飞书项目地址'];
+    const bu = res.items[0].record_id;
+
+    return {
+      frontendLeaderId,
+      frontendAlertGroupId,
+      frontendGroupId,
+      backendLeaderId,
+      backendAlertGroupId,
+      feishuProjectUrl,
+      bu,
+    };
   }
 }
 export default FeishuBusinessLineTable;

@@ -8,6 +8,7 @@ import {
 import { Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
 import { isObject } from '@utils/is';
+import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -20,7 +21,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (typeof resMsg != 'string' && isObject(resMsg) && 'message' in resMsg) {
       resMsg = resMsg.message as object;
     }
-    console.log('返回错误', resMsg);
+    if (status >= 300) {
+      sendExceptionToFeishu(exception, request.url);
+    }
     response.status(status).json({
       code: status,
       message: resMsg,

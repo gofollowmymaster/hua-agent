@@ -67,23 +67,19 @@ export class SentryWebhookController {
     const resource = headers['sentry-hook-resource'];
     switch (resource) {
       case SentryHookType.Error:
-        await this.sentryWebhookService.error(params);
+        return await this.sentryWebhookService.error(params);
 
-        break;
       case SentryHookType.Issue:
-        this.sentryWebhookService.issue(params);
+        return await this.sentryWebhookService.issue(params);
 
-        break;
       case SentryHookType.Comment:
-        this.sentryWebhookService.comment(params);
+        return await this.sentryWebhookService.comment(params);
 
-        break;
       case SentryHookType.EventAlert:
       case SentryHookType.MetricAlert:
-        this.sentryWebhookService.alert(params);
+        return await this.sentryWebhookService.alert(params);
       case SentryHookType.Installation:
-        this.sentryWebhookService.installation(params);
+        return await this.sentryWebhookService.installation(params);
     }
-    return true;
   }
 }

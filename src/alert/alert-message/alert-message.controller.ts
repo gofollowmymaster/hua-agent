@@ -3,7 +3,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { SentryAlertDto } from './dto/sentry-alert.dto';
 import { AlertMsgService } from './alert-message.service';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { SentryRawDto, updateIssueDto } from './dto/sentry-raw.dto';
+import { SentryRawDto } from './dto/sentry-raw.dto';
 
 @ApiTags('飞书消息报警')
 @Controller('alert-message')
