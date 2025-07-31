@@ -15,7 +15,7 @@ import {
   SentryHookType,
   SentryWebHookHeader,
 } from './dto/sentry-hook';
-import { verifySignature } from './util';
+// import { verifySignature } from './util';
 @ApiTags('Sentry WebHook')
 @Controller('sentry-hook')
 @ApiHeaders([

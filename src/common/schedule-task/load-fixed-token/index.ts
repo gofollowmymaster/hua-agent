@@ -8,7 +8,7 @@ import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
-import { FeishuAlertCard } from '@src/common/feishu/card/alert-card';
+import { CommonAlertCard } from '@src/common/feishu/card/alert-card';
 
 export type FeishuAuthType = Awaited<
   ReturnType<lark.Client['authen']['refreshAccessToken']['create']>
@@ -72,7 +72,7 @@ export default class FixedTokenService {
     const errorTime = dayjs();
 
     //构建消息内容
-    const content = FeishuAlertCard.buildCardMsg({
+    const content = CommonAlertCard.buildCardMsg({
       environment: process.env.NODE_ENV,
       title: '定时刷新Token异常报警',
       project: 'aplus-sql-server',

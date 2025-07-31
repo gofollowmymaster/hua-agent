@@ -2,7 +2,7 @@ import FeishuClient from '../clients/client';
 // import { ConfigService } from '@nestjs/config';
 import { FEISHU_CLIENT_ID } from './constants';
 import { Inject, Injectable, Scope } from '@nestjs/common';
-import { CreateMessageType } from '../type/im';
+import { CreateMessageType, FeishuMsgType } from '../type/im';
 import { FeishuApiException } from '@src/common/exception/feishu-api-exception';
 
 @Injectable({ scope: Scope.TRANSIENT })
@@ -42,11 +42,33 @@ class FeishuMessageHelper {
       content,
     });
   }
-  async reply(content: string, messageId: string) {
+
+  async reply(
+    content: string,
+    messageId: string,
+    msgType: FeishuMsgType = FeishuMsgType.Text,
+  ) {
     return await this.client.client.im.message.reply({
       data: {
-        msg_type: 'text',
+        msg_type: msgType,
         content,
+        reply_in_thread: true,
+      },
+      path: {
+        message_id: messageId,
+      },
+    });
+  }
+  async replyInThread(
+    content: string,
+    messageId: string,
+    msgType: FeishuMsgType = FeishuMsgType.Text,
+  ) {
+    return await this.client.client.im.message.reply({
+      data: {
+        msg_type: msgType,
+        content,
+        reply_in_thread: true,
       },
       path: {
         message_id: messageId,

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { SentryEvent } from '@src/alert/type/sentry';
+import { SentryEvent } from '@src/alert/common/type/sentry';
 import { IsNotEmpty } from 'class-validator';
 
 export enum SentryHookType {

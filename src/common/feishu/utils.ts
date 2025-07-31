@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { ClientFactory, FeishuApp } from './clients';
 import FeishuMessageHelper from './hepler/message-helper';
-import { FeishuAlertCard } from './card/alert-card';
+import { CommonAlertCard } from './card/alert-card';
 import dayjs from 'dayjs';
 import { getGlobalAppInstance } from '@utils/app-config';
 
@@ -23,7 +23,7 @@ export const sendExceptionToFeishu = (
   const errorTime = dayjs();
 
   //构建消息内容
-  const content = FeishuAlertCard.buildCardMsg({
+  const content = CommonAlertCard.buildCardMsg({
     environment: process.env.NODE_ENV,
     title: `Node Server异常报警【${exception.name}】`,
     project: 'aplus-sql-server',

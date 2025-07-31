@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Environment, ErrorLevel } from '@src/alert/type/sentry';
+import { Environment, ErrorLevel } from '@src/alert/common/type/alert';
 import { IsNotEmpty } from 'class-validator';
 
 export class SentryAlertDto {

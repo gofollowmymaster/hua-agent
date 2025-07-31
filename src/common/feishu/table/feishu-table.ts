@@ -50,7 +50,7 @@ abstract class FeishuTable {
       if (code !== 0) {
         throw new FeishuApiException(
           `【${code}】   ->  ${JSON.stringify(res)}`,
-          code,
+          500,
         );
       }
       return data;

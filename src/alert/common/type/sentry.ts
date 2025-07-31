@@ -1,21 +1,30 @@
-export enum ErrorLevel {
-  FATAL = 'fatal',
-  ERROR = 'error',
-  WARING = 'waring',
-  INFO = 'info',
-}
-export enum Environment {
-  PROD = 'production',
-  UAT = 'uat',
-  TEST = 'test',
-  DEV = 'dev',
-  DEVELOPMENT = 'development',
-}
-export enum ErrorEndpoint {
-  Page = 'page',
-  Server = 'server',
-}
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  Environment,
+  ErrorEndpoint,
+  ErrorLevel,
+  PageModuleName,
+  RequestData,
+} from './alert';
 
+class SentryEventExtra {
+  @ApiPropertyOptional({
+    type: Object,
+    description: '接口请求数据',
+  })
+  __serialized__?: RequestData;
+  @ApiProperty({
+    enum: PageModuleName,
+    description: '错误页面模块名称',
+  })
+  subModuleName: PageModuleName;
+  @ApiProperty({
+    enum: ErrorEndpoint,
+    description: '错误端点类型',
+  })
+  errorEndpoint: ErrorEndpoint;
+  [key: string]: any;
+}
 export class SentryEvent {
   _dsc: Dsc;
   _meta: Meta;
@@ -58,27 +67,11 @@ export class SentryEvent {
   web_url: string;
   issue_url: string;
   issue_id: string;
-  extra?: {
-    subModuleName: SubAppName;
-    errorEndpoint: ErrorEndpoint;
-    __serialized__: {
-      code: number;
-      payload: string;
-      resData: {
-        path: string;
-        requestId: string;
-        status: number;
-        timestamp: '2025-04-11 13:50:09';
-        error: string;
-        message: null;
-      };
-      traceId: string;
-      url: string;
-      message: string;
-      method: 'get' | 'post' | 'put' | 'delete';
-      transactionMessage: string;
-    };
-  };
+  @ApiPropertyOptional({
+    type: Object,
+    description: '附加的sentry事件数据',
+  })
+  extra?: SentryEventExtra;
 }
 
 interface User {
@@ -277,16 +270,6 @@ interface Argument {
   vcAccount: string;
 }
 
-export type SubAppName =
-  | 'aplus-admin-bms'
-  | 'aplus-user-bms'
-  | 'aplus-admin-mos'
-  | 'aplus-user-mos'
-  | 'aplus-admin-wms'
-  | 'aplus-user-wms'
-  | 'aplus-admin-main'
-  | 'aplus-user-main'
-  | 'aplus-login-center';
 interface Metrics {
   'bytes.ingested.event': number;
   'bytes.stored.event': number;

@@ -1,14 +1,14 @@
 import MsgReadHandler from './msg-read-handler';
 import MsgReactionHandler from './msg-reaction-handler';
 import { EventHandles } from '@larksuiteoapi/node-sdk';
-import { SentryWebhookService } from '../webhook.service';
+import { FeishuEventService } from '../callback.service';
 
 type EventHandlerParameters<T extends keyof EventHandles> = Parameters<
   EventHandles[T]
 >[0];
 export type CustomEventHandleType<T extends keyof EventHandles> = (
   event: EventHandlerParameters<T>,
-  service: SentryWebhookService,
+  service: FeishuEventService,
 ) => ReturnType<EventHandles[T]>;
 
 const EventHandler = {

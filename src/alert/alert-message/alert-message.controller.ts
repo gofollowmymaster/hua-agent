@@ -1,25 +1,21 @@
 import { Body, Controller, Post } from '@nestjs/common';
 
-import { SentryAlertDto } from './dto/sentry-alert.dto';
 import { AlertMsgService } from './alert-message.service';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SentryRawDto } from './dto/sentry-raw.dto';
+import {
+  AlertEvent,
+  ErrorEndpoint,
+  PageModuleName,
+} from '../common/type/alert';
+import { getModuleNameByUrl } from '../common/utils';
+import { SentryAlertDto } from './dto/sentry-alert.dto';
 
 @ApiTags('飞书消息报警')
 @Controller('alert-message')
 export class AlertMsgController {
   constructor(private readonly alertMsgService: AlertMsgService) {}
 
-  @ApiOperation({
-    summary: '飞书sentry连接器发送报警消息',
-    description: '发送飞书报警消息，非节假日指定时段会电话通知',
-  })
-  @ApiBody({ type: SentryAlertDto })
-  @Post('send')
-  async sendMsg(@Body() alertInfo: SentryAlertDto) {
-    //发送消息
-    return await this.alertMsgService.sendFsAlertMsg(alertInfo);
-  }
   @ApiOperation({
     summary: 'sentry直连报警消息通知',
     description: '处理sentry报警消息通知',
@@ -32,24 +28,22 @@ export class AlertMsgController {
     const eventUrl =
       urlParsed[0] + 'events/' + event?.event_id + '?' + urlParsed[1];
 
-    const eventData = {
+    const requestData = alertInfo.event.extra?.__serialized__;
+    const serverModuleName = getModuleNameByUrl(requestData?.url);
+
+    const eventData: AlertEvent = {
       ...alertInfo.event,
       title: alertInfo.message,
-      issue_url: alertInfo.url,
-      event_url: eventUrl,
+      // issue_url: alertInfo.url,
+      web_url: eventUrl,
       issue_id: alertInfo.id,
+      requestData,
+      pageModuleName:
+        alertInfo.event.extra?.subModuleName || PageModuleName.APLUS_OTHER,
+      serverModuleName,
+      errorEndpoint: alertInfo.event.extra?.errorEndpoint || ErrorEndpoint.Page,
     };
 
     return await this.alertMsgService.sentryAlertHook(eventData);
   }
-  // @ApiOperation({
-  //   summary: '修改Issue状态',
-  //   description: '修改Issue状态',
-  // })
-  // @ApiBody({ type: updateIssueDto })
-  // @Post('updateIssue')
-  // async updateIssue(@Body() alertInfo: updateIssueDto) {
-  //   // 添加到多维表格
-  //   return await this.alertMsgService.updateIssue(alertInfo);
-  // }
 }

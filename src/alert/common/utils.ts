@@ -1,9 +1,14 @@
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween'; // nodejs
-import { SentryAlertDto } from './dto/sentry-alert.dto';
-import { FeishuAlertCard } from '@src/common/feishu/card/alert-card';
-
 const { isWorkday } = require('chinese-workday');
+
+export function getModuleNameByUrl(url: string = '') {
+  if (!url) return;
+  url = url.replace('https://', '');
+  url = url.replace('/api/', '/');
+  const urlArr = url.split('/');
+  return urlArr[1];
+}
 
 const isHoliday = (day: number = dayjs().valueOf()) => {
   console.log(
@@ -52,23 +57,3 @@ export const isNeedSendAlertMsg = (time: number = dayjs().valueOf()) => {
   }
   return false;
 };
-
-export const buildAlertMsg = (alertInfo: SentryAlertDto, userId: string) => {
-  // const AtUser = userId ? `<at user_id="${userId}"></at>` : '';
-
-  const errorTime = dayjs(alertInfo.timeStamp * 1000).format(
-    'YYYY-MM-DD HH:mm:ss',
-  );
-  const title = alertInfo.level == 'fatal' ? '高危报警' : '异常报警';
-  const color = alertInfo.level == 'fatal' ? 'red' : 'orange';
-
-  return FeishuAlertCard.buildCardMsg({
-    ...alertInfo,
-    errorTime,
-    userId,
-    title,
-    color,
-  });
-};
-
-// <at user_id="ou_xxxxxxx">用户名（可不填）</at>

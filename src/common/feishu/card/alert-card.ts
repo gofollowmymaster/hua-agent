@@ -1,18 +1,19 @@
+import dayjs from 'dayjs';
 import { FeishuCard } from './feishu-card';
 
-export type AlertInfo = {
+export type CommonCardData = {
   project: string;
   level?: string;
   errorMessage: string;
   linkUrl?: string;
   userId?: string;
-  errorTime: string;
-  title: string;
-  color: string;
+  timestamp?: number;
+  title?: string;
+  color?: string;
   culprit?: string;
   [key: string]: any;
 };
-export class FeishuAlertCard extends FeishuCard {
+export class CommonAlertCard extends FeishuCard {
   protected static AlertTemplateId = 'AAqSyNBCovM2j';
   protected static AlertTemplateVersion = '1.0.9';
 
@@ -21,8 +22,15 @@ export class FeishuAlertCard extends FeishuCard {
    * @param alertInfo
    * @returns
    */
-  static buildCardMsg = (alertInfo: AlertInfo) => {
-    const color = alertInfo.level == 'fatal' ? 'red' : 'orange';
-    return super.build({ ...alertInfo, color });
+  static buildCardMsg = (alertInfo: CommonCardData) => {
+    const color =
+      alertInfo.color || (alertInfo.level == 'fatal' ? 'red' : 'orange');
+    const title = alertInfo.level == 'fatal' ? '高危报警' : '异常报警';
+    const errorTime = dayjs(alertInfo.timestamp * 1000).format(
+      'YYYY-MM-DD HH:mm:ss',
+    );
+    return super.build({ ...alertInfo, color, title, errorTime });
   };
 }
+
+export default CommonAlertCard;
