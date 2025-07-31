@@ -1,14 +1,14 @@
 import MsgReadHandler from './msg-read-handler';
 import MsgReactionHandler from './msg-reaction-handler';
 import { EventHandles } from '@larksuiteoapi/node-sdk';
-import { FeishuEventService } from '../callback.service';
+import { FeishuCallbackService } from '../callback.service';
 
 type EventHandlerParameters<T extends keyof EventHandles> = Parameters<
   EventHandles[T]
 >[0];
 export type CustomEventHandleType<T extends keyof EventHandles> = (
   event: EventHandlerParameters<T>,
-  service: FeishuEventService,
+  service: FeishuCallbackService,
 ) => ReturnType<EventHandles[T]>;
 
 const EventHandler = {
