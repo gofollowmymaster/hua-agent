@@ -23,7 +23,11 @@ export class TransformInterceptor<T>
     return next.handle().pipe(
       map((data) => {
         // 判断是否是飞书事件回调
-        if (controllerName === 'FeishuEventController') {
+        if (
+          ['FeishuEventController', 'FeishuCallbackController'].includes(
+            controllerName,
+          )
+        ) {
           return data;
         }
         if (data?.code && data?.message) {

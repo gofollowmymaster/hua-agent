@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { EventHandles } from '@larksuiteoapi/node-sdk';
+import { EventHandles, generateChallenge } from '@larksuiteoapi/node-sdk';
 type EventType = keyof EventHandles;
 export class FeishuCallbackHeader {
   @ApiProperty({
@@ -43,6 +43,14 @@ class CallbackContext {
   'open_message_id': string; //触发链接预览的消息ID
   'open_chat_id': string; //触发链接预览的群ID
 }
+
+class CallbackActionDto {
+  @ApiProperty({
+    type: Object,
+    description: '回调的触发者',
+  })
+  value: CallbackOperator;
+}
 export class CallbackEventDto {
   @ApiProperty({
     type: Object,
@@ -59,6 +67,22 @@ export class CallbackEventDto {
     description: '场景下具体的上下文参数',
   })
   context: CallbackContext;
+  @ApiProperty({
+    type: String,
+    description: '新卡片用的凭证，有效期为 30 分钟，最多可更新 2 次',
+  })
+  token: string;
+  @ApiPropertyOptional({
+    type: String,
+    description:
+      '卡片分发类型，固定取值为 url_preview，表示链接预览卡片仅链接预览卡片有此字段',
+  })
+  delivery_type?: string;
+  @ApiPropertyOptional({
+    type: String,
+    description: '用户操作交互组件回传的数据',
+  })
+  action?: CallbackActionDto;
 }
 
 export class FeishuCallbackDto {

@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpException, Post } from '@nestjs/common';
 
 import { FeishuCallbackDto } from './dto/feishu-callback.dto';
 import { FeishuCallbackService } from './callback.service';
