@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 
-import { FeishuEventCallbackDto } from './dto/feishu-event.dto';
+import { FeishuCallbackDto } from './dto/feishu-callback.dto';
 import { FeishuCallbackService } from './callback.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -17,10 +17,10 @@ export class FeishuCallbackController {
     summary: '回调统一接口',
     description: '报警机器人飞书回调全局统一接口',
   })
-  @ApiBody({ type: FeishuEventCallbackDto })
+  @ApiBody({ type: FeishuCallbackDto })
   @Post('handler')
   // 接收已表情回复webhook
-  async handle(@Body() callbackInfo: FeishuEventCallbackDto) {
+  async handle(@Body() callbackInfo: FeishuCallbackDto) {
     // 验证
     if (callbackInfo.type === 'url_verification') {
       return { challenge: callbackInfo.challenge };

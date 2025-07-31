@@ -98,7 +98,6 @@ export class SentryWebhookService extends AlertBaseService {
   }
 
   async sentryErrorHook(errorEvent: AlertEvent) {
-    return;
     await this.alertFeishuAdapter.setEvent(errorEvent);
     this.writeToTable(errorEvent);
 

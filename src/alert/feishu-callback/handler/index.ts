@@ -1,19 +1,18 @@
-import MsgReadHandler from './msg-read-handler';
+import MsgCardHandler from './msg-read-handler';
 import MsgReactionHandler from './msg-reaction-handler';
 import { EventHandles } from '@larksuiteoapi/node-sdk';
 import { FeishuCallbackService } from '../callback.service';
 
-type EventHandlerParameters<T extends keyof EventHandles> = Parameters<
+type CallbackHandlerParameters<T extends keyof EventHandles> = Parameters<
   EventHandles[T]
 >[0];
-export type CustomEventHandleType<T extends keyof EventHandles> = (
-  event: EventHandlerParameters<T>,
+export type CustomCallbackHandleType<T extends keyof EventHandles> = (
+  event: CallbackHandlerParameters<T>,
   service: FeishuCallbackService,
 ) => ReturnType<EventHandles[T]>;
 
 const EventHandler = {
-  'im.message.message_read_v1': MsgReadHandler,
-  'im.message.receive_v1': async () => {},
+  'card.action.trigger': MsgCardHandler,
   'im.message.reaction.created_v1': MsgReactionHandler,
 };
 export default EventHandler;

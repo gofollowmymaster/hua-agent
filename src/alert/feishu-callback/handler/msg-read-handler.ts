@@ -1,6 +1,6 @@
-import { CustomEventHandleType } from '.';
+import { CustomCallbackHandleType } from '.';
 
-const MsgReadHandler: CustomEventHandleType<
+const MsgReadHandler: CustomCallbackHandleType<
   'im.message.message_read_v1'
 > = async (event, service) => {
   const { reader, message_id_list } = event;

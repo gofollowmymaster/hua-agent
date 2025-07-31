@@ -1,6 +1,6 @@
-import { CustomEventHandleType } from '.';
+import { CustomCallbackHandleType } from '.';
 
-const MsgReactionHandler: CustomEventHandleType<
+const MsgReactionHandler: CustomCallbackHandleType<
   'im.message.reaction.created_v1'
 > = async (event, service) => {
   const { message_id: messageId, reaction_type, user_id } = event;

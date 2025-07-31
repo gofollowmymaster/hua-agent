@@ -13,7 +13,9 @@ import FeishuFrontendAlertIssueTable from './common/table/frontend-alert-issue-t
 import FeishuBusinessLineTable from '../common/table/business-line-table';
 
 import { FeishuEventController } from './event/event.controller';
+import { FeishuCallbackController } from './feishu-callback/callback.controller';
 import { FeishuEventService } from './event/event.service';
+import { FeishuCallbackService } from './feishu-callback/callback.service';
 
 import { SentryWebhookController } from './sentry-integrations/webhook.controller';
 import { SentryWebhookService } from './sentry-integrations/webhook.service';
@@ -28,6 +30,7 @@ import AlertFeishuAdapter from './common/adapter/alert-feishu-adapter';
   controllers: [
     AlertMsgController,
     FeishuEventController,
+    FeishuCallbackController,
     SentryWebhookController,
   ],
   providers: [
@@ -40,6 +43,7 @@ import AlertFeishuAdapter from './common/adapter/alert-feishu-adapter';
     PrismaService,
     SentryApiAlertAdapter,
     FeishuEventService,
+    FeishuCallbackService,
     SentryWebhookService,
     AlertFeishuAdapter,
   ],

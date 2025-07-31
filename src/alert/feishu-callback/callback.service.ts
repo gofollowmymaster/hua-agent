@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { FeishuEventCallbackDto } from './dto/feishu-event.dto';
+import { FeishuCallbackDto } from './dto/feishu-callback.dto';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import EventHandler from './handler';
 import { PrismaService } from '@src/prisma.service';
@@ -11,7 +11,7 @@ export class FeishuCallbackService {
     readonly prisma: PrismaService,
   ) {}
 
-  async handle(callbackInfo: FeishuEventCallbackDto) {
+  async handle(callbackInfo: FeishuCallbackDto) {
     const { header, event } = callbackInfo;
 
     const handler = EventHandler[header.event_type];
