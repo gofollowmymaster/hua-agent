@@ -25,8 +25,8 @@ const issueStatusMap = {
   ignoreCount1000: '已忽略',
 };
 export default class ErrorUnresolvedCard extends FeishuCard {
-  protected static AlertTemplateId = 'AAqz6VqUmrfDw';
-  protected static AlertTemplateVersion = '1.0.2';
+  static readonly templateId = 'AAqz6VqUmrfDw';
+  static readonly templateVersion = '1.0.3';
 
   /**
    * 构建飞书报警卡片消息

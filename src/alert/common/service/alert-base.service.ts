@@ -210,13 +210,7 @@ export class AlertBaseService extends BaseService {
     switch (errorEvent.errorEndpoint) {
       case ErrorEndpoint.Server:
         await this.writeToBackEndTable(errorEvent);
-        if (!errorEvent.requestData?.code) {
-          sendExceptionToFeishu(new Error('请求报警信息缺少code字段'));
-        } else if (
-          this.ignoreCodeList.includes(errorEvent.requestData.code + '')
-        ) {
-          return;
-        }
+
         break;
       case ErrorEndpoint.Page:
         await this.writeToFrontendTable(errorEvent);

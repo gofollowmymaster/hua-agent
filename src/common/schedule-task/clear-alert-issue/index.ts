@@ -18,7 +18,7 @@ export default class ClearAlertIssueInService {
   }
 
   //每30分钟运行一次
-  @Cron('0 * * * * *')
+  @Cron('0 0 0 * * *')
   async handleCron() {
     this.logger.debug('Clear Alert Issue Info Called ');
 

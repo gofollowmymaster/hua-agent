@@ -1,6 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { EventHandles, generateChallenge } from '@larksuiteoapi/node-sdk';
-type EventType = keyof EventHandles;
+
 export class FeishuCallbackHeader {
   @ApiProperty({
     type: String,
@@ -12,7 +11,7 @@ export class FeishuCallbackHeader {
     type: String,
     description: '回调类型',
   })
-  event_type: EventType;
+  event_type: string;
   @ApiProperty({
     type: String,
     description: '回调发送的时间戳，近似于回调触发的时间',
@@ -37,20 +36,36 @@ class CallbackOperator {
 }
 
 type CallbackHost = 'im_message' | 'im_top_notice';
-class CallbackContext {
-  'url': string; //匹配URL规则的原链接
-  'preview_token': string; //用于标识链接预览的凭证，在返回链接预览数据时要用
-  'open_message_id': string; //触发链接预览的消息ID
-  'open_chat_id': string; //触发链接预览的群ID
-}
 
+class CallbackValueDto {
+  @ApiProperty({
+    type: String,
+  })
+  'action': string;
+  @ApiProperty({
+    type: String,
+  })
+  'issueId': string;
+}
 class CallbackActionDto {
   @ApiProperty({
-    type: Object,
-    description: '回调的触发者',
+    type: CallbackValueDto,
+    description: '回调的触发动作信息',
   })
-  value: CallbackOperator;
+  value: CallbackValueDto;
+
+  @ApiProperty({
+    type: String,
+    description: '回调的触发标签',
+  })
+  tag: string;
+  @ApiProperty({
+    type: String,
+    description: '回调的选项值',
+  })
+  option: string;
 }
+class CallbackContext {}
 export class CallbackEventDto {
   @ApiProperty({
     type: Object,
@@ -107,4 +122,5 @@ export class FeishuCallbackDto {
   })
   event: CallbackEventDto;
   type?: string;
+  [key: string]: any;
 }

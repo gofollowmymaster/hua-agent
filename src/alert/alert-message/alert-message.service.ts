@@ -14,7 +14,6 @@ import { LoggerService } from '@src/common/service/logger/logger.service';
 import { ConfigService } from '@nestjs/config';
 import { AlertBaseService } from '../common/service/alert-base.service';
 import { AlertEvent } from '../common/type/alert';
-import dayjs from 'dayjs';
 import CommonAlertCard from '@src/common/feishu/card/alert-card';
 
 @Injectable()

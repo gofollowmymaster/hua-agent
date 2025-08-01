@@ -1,4 +1,4 @@
-import { Body, Controller, HttpException, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 
 import { FeishuCallbackDto } from './dto/feishu-callback.dto';
 import { FeishuCallbackService } from './callback.service';
@@ -27,6 +27,5 @@ export class FeishuCallbackController {
     }
     const res = await this.feishucallbackService.handle(callbackInfo);
     this.logger.info('res:', res);
-    return { challenge: callbackInfo.challenge, data: res, code: 200 };
   }
 }

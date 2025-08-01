@@ -74,7 +74,6 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error('-------Unhandled Rejection at:', reason);
 
   promise.then().catch((error: Error) => {
-    console.log('[ error ] >', error.stack, error.message);
     sendExceptionToFeishu(error);
   });
 });

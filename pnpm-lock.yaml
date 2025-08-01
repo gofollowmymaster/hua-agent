@@ -12,8 +12,8 @@ importers:
         specifier: ^4.4.0
         version: 4.4.0(keyv@5.3.2)
       '@larksuiteoapi/node-sdk':
-        specifier: ^1.53.0
-        version: 1.53.0
+        specifier: ^1.54.0
+        version: 1.54.0
       '@nestjs/axios':
         specifier: ^4.0.0
         version: 4.0.0(@nestjs/common@10.3.10(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.9.0)(rxjs@7.8.1)
@@ -553,8 +553,8 @@ packages:
   '@keyv/serialize@1.0.3':
     resolution: {integrity: sha512-qnEovoOp5Np2JDGonIDL6Ayihw0RhnRh6vxPuHo4RDn1UOzwEo4AeIfpL6UGIrsceWrCMiVPgwRjbHu4vYFc3g==}
 
-  '@larksuiteoapi/node-sdk@1.53.0':
-    resolution: {integrity: sha512-wfnzw/PBmwEpnhwdq0yONX/YKpNeOIyLhyeUfrU4qfynmwP8ZLHYbDum1YJAB32cX1i+vwl1GXsLHMpx1gMgOQ==}
+  '@larksuiteoapi/node-sdk@1.54.0':
+    resolution: {integrity: sha512-Z4dwEBMaZcxNmk3ww8c21loTKIFTQvU4O2ltoRpb/1muv1npOIDaPze2ps/MwF1Zl7MyyK186IUOqcjXiqBwvg==}
 
   '@ljharb/through@2.3.13':
     resolution: {integrity: sha512-/gKJun8NNiWGZJkGzI/Ragc53cOdcLNdzjLaIa+GEjguQs0ulsurx8WN0jijdK9yPqDvziX995sMRLyLt1uZMQ==}
@@ -4248,7 +4248,7 @@ snapshots:
     dependencies:
       buffer: 6.0.3
 
-  '@larksuiteoapi/node-sdk@1.53.0':
+  '@larksuiteoapi/node-sdk@1.54.0':
     dependencies:
       axios: 0.27.2
       lodash.identity: 3.0.0
@@ -4501,7 +4501,7 @@ snapshots:
 
   '@pm2/pm2-version-check@1.0.4':
     dependencies:
-      debug: 4.4.1
+      debug: 4.3.5
     transitivePeerDependencies:
       - supports-color
 
@@ -4954,7 +4954,7 @@ snapshots:
 
   agent-base@7.1.1:
     dependencies:
-      debug: 4.4.1
+      debug: 4.3.5
     transitivePeerDependencies:
       - supports-color
 
@@ -5943,7 +5943,7 @@ snapshots:
     dependencies:
       basic-ftp: 5.0.5
       data-uri-to-buffer: 6.0.2
-      debug: 4.4.1
+      debug: 4.3.5
       fs-extra: 11.2.0
     transitivePeerDependencies:
       - supports-color
@@ -6040,14 +6040,14 @@ snapshots:
   http-proxy-agent@7.0.2:
     dependencies:
       agent-base: 7.1.1
-      debug: 4.4.1
+      debug: 4.3.5
     transitivePeerDependencies:
       - supports-color
 
   https-proxy-agent@7.0.5:
     dependencies:
       agent-base: 7.1.1
-      debug: 4.4.1
+      debug: 4.3.5
     transitivePeerDependencies:
       - supports-color
 
@@ -6912,7 +6912,7 @@ snapshots:
     dependencies:
       '@tootallnate/quickjs-emscripten': 0.23.0
       agent-base: 7.1.1
-      debug: 4.4.1
+      debug: 4.3.5
       get-uri: 6.0.3
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.5
@@ -7116,7 +7116,7 @@ snapshots:
   proxy-agent@6.3.1:
     dependencies:
       agent-base: 7.1.1
-      debug: 4.4.1
+      debug: 4.3.5
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.5
       lru-cache: 7.18.3
@@ -7218,7 +7218,7 @@ snapshots:
 
   require-in-the-middle@5.2.0:
     dependencies:
-      debug: 4.4.1
+      debug: 4.3.5
       module-details-from-path: 1.0.3
       resolve: 1.22.8
     transitivePeerDependencies:
@@ -7365,7 +7365,7 @@ snapshots:
   socks-proxy-agent@8.0.4:
     dependencies:
       agent-base: 7.1.1
-      debug: 4.4.1
+      debug: 4.3.5
       socks: 2.8.3
     transitivePeerDependencies:
       - supports-color

@@ -11,13 +11,24 @@ class FeishuMessageHelper {
     // private readonly config: ConfigService,
     @Inject(FEISHU_CLIENT_ID) private readonly client: FeishuClient,
   ) {}
-  async create(msgParams: CreateMessageType) {
-    const { code, data } =
-      await this.client.client.im.message.create(msgParams);
+
+  async requestWrapper(handler: () => Promise<any>) {
+    const res = await handler();
+    const { code, data } = res;
     if (code !== 0) {
-      throw new FeishuApiException();
+      console.log('[ FeishuMessageHelper ] >', res);
+      return;
+      throw new FeishuApiException(
+        `【${code}】   ->  ${JSON.stringify(res)}`,
+        500,
+      );
     }
     return data;
+  }
+  async create(msgParams: CreateMessageType) {
+    return await this.requestWrapper(async () => {
+      return await this.client.client.im.message.create(msgParams);
+    });
   }
   async createToUser(msgParams: CreateMessageType['data']) {
     return await this.create({
@@ -47,16 +58,19 @@ class FeishuMessageHelper {
     content: string,
     messageId: string,
     msgType: FeishuMsgType = FeishuMsgType.Text,
+    replyInThread = false,
   ) {
-    return await this.client.client.im.message.reply({
-      data: {
-        msg_type: msgType,
-        content,
-        reply_in_thread: true,
-      },
-      path: {
-        message_id: messageId,
-      },
+    return this.requestWrapper(async () => {
+      return await this.client.client.im.message.reply({
+        data: {
+          msg_type: msgType,
+          content,
+          reply_in_thread: replyInThread,
+        },
+        path: {
+          message_id: messageId,
+        },
+      });
     });
   }
   async replyInThread(
@@ -64,41 +78,69 @@ class FeishuMessageHelper {
     messageId: string,
     msgType: FeishuMsgType = FeishuMsgType.Text,
   ) {
-    return await this.client.client.im.message.reply({
-      data: {
-        msg_type: msgType,
-        content,
-        reply_in_thread: true,
-      },
-      path: {
-        message_id: messageId,
-      },
-    });
+    return await this.reply(content, messageId, msgType, true);
   }
   async urgentPhone(userId: string[], messageId: string) {
-    return await this.client.client.im.message.urgentPhone({
-      data: {
-        user_id_list: [...userId],
-      },
-      params: {
-        user_id_type: 'user_id',
-      },
-      path: {
-        message_id: messageId,
-      },
+    return this.requestWrapper(async () => {
+      return await this.client.client.im.message.urgentPhone({
+        data: {
+          user_id_list: [...userId],
+        },
+        params: {
+          user_id_type: 'user_id',
+        },
+        path: {
+          message_id: messageId,
+        },
+      });
     });
   }
   async urgentApp(userId: string[], messageId: string) {
-    return await this.client.client.im.message.urgentApp({
-      data: {
-        user_id_list: [...userId],
-      },
-      params: {
-        user_id_type: 'user_id',
-      },
-      path: {
-        message_id: messageId,
-      },
+    return this.requestWrapper(async () => {
+      return await this.client.client.im.message.urgentApp({
+        data: {
+          user_id_list: [...userId],
+        },
+        params: {
+          user_id_type: 'user_id',
+        },
+        path: {
+          message_id: messageId,
+        },
+      });
+    });
+  }
+
+  async updateByCard(
+    messageId: string,
+    templateId: string,
+    templateVersion: string,
+    variables: Record<string, any>,
+  ) {
+    return this.requestWrapper(async () => {
+      console.log('[ updateByCard ] >', {
+        data: {
+          template_id: templateId,
+          template_variable: variables,
+        },
+
+        path: {
+          message_id: messageId,
+        },
+      });
+      // return;
+      return await this.client.client.im.message.updateByCard({
+        data: {
+          template_id: templateId,
+          // template_version_name: templateVersion,
+          template_variable: variables,
+          // msg_type: 'interactive',
+        },
+
+        path: {
+          message_id: messageId,
+        },
+      });
     });
   }
 }

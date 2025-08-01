@@ -1,18 +1,19 @@
-import MsgCardHandler from './msg-read-handler';
-import MsgReactionHandler from './msg-reaction-handler';
-import { EventHandles } from '@larksuiteoapi/node-sdk';
+import assignToHandler from './assign-to-handler';
+// import MsgReactionHandler from './msg-reaction-handler';
+// import { EventHandles } from '@larksuiteoapi/node-sdk';
 import { FeishuCallbackService } from '../callback.service';
+import { CallbackEventDto } from '../dto/feishu-callback.dto';
 
-type CallbackHandlerParameters<T extends keyof EventHandles> = Parameters<
-  EventHandles[T]
->[0];
-export type CustomCallbackHandleType<T extends keyof EventHandles> = (
-  event: CallbackHandlerParameters<T>,
+// type CallbackHandlerParameters<T extends keyof EventHandles> = Parameters<
+//   EventHandles[T]
+// >[0];
+export type CustomCallbackHandleType = (
+  event: CallbackEventDto,
   service: FeishuCallbackService,
-) => ReturnType<EventHandles[T]>;
+) => any;
 
 const EventHandler = {
-  'card.action.trigger': MsgCardHandler,
-  'im.message.reaction.created_v1': MsgReactionHandler,
+  assignTo: assignToHandler,
+  // 'im.message.reaction.created_v1': MsgReactionHandler,
 };
 export default EventHandler;

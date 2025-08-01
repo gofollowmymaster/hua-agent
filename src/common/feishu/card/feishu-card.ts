@@ -1,6 +1,6 @@
 export abstract class FeishuCard {
-  protected static AlertTemplateId = '';
-  protected static AlertTemplateVersion = '';
+  protected static templateId = '';
+  protected static templateVersion = '';
 
   /**
    * 构建飞卡片消息
@@ -14,8 +14,8 @@ export abstract class FeishuCard {
     const content = {
       type: 'template',
       data: {
-        template_id: this.AlertTemplateId,
-        template_version_name: this.AlertTemplateVersion,
+        template_id: this.templateId,
+        template_version_name: this.templateVersion,
         template_variable: { ...alertInfo },
       },
     };

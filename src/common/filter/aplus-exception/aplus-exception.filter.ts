@@ -34,6 +34,7 @@ export class AplusExceptionsFilter implements ExceptionFilter {
       message,
       path,
     };
+    console.log('[ httpStatus ] >', httpStatus);
 
     sendExceptionToFeishu(exception, reqContext);
 

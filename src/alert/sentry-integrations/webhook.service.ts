@@ -11,7 +11,6 @@ import FeishuApiAlertTable from '../common/table/api-alert-table';
 import FeishuApiAlertIssueTable from '../common/table/api-alert-issue-table';
 import FeishuFrontendAlertTable from '../common/table/frontend-alert-table';
 import FeishuFrontendAlertIssueTable from '../common/table/frontend-alert-issue-table';
-import { ActionLimitException } from '@src/common/exception/action-limit-exception';
 import Redis from 'ioredis';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import {
@@ -23,7 +22,6 @@ import {
 import { getModuleNameByUrl } from '../common/utils';
 import { AlertBaseService } from '../common/service/alert-base.service';
 import dayjs from 'dayjs';
-import { count } from 'console';
 import CommonAlertCard from '@src/common/feishu/card/alert-card';
 import ErrorUnresolvedCard from '@src/common/feishu/card/error-unresolve-card';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
@@ -105,25 +103,37 @@ export class SentryWebhookService extends AlertBaseService {
     await this.alertFeishuAdapter.setEvent(errorEvent);
     this.writeToTable(errorEvent);
 
+    //接口错误时，部分错误代码不需要发送消息
+    if (
+      errorEvent.errorEndpoint == ErrorEndpoint.Server &&
+      !errorEvent.requestData?.code
+    ) {
+      sendExceptionToFeishu(new Error('请求报警信息缺少code字段'));
+    } else if (this.ignoreCodeList.includes(errorEvent.requestData.code + '')) {
+      return;
+    }
+
     const key = RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace(
       '{issueId}',
       errorEvent.issue_id,
     );
     const issueInfo = await this.redis.hgetall(key);
+    //新issue 发送卡片消息
     if (!issueInfo.issueId) {
       const cardData = this.alertFeishuAdapter.toUnresolvedCardeData();
-      console.log('[ cardData ] >', cardData);
       const content = ErrorUnresolvedCard.buildCardMsg(cardData);
       const groupMsgInfo = await this.sendFsAlertMsg(errorEvent, content);
       const issueInfo = {
         issueId: errorEvent.issue_id,
         count: 1,
         messageId: groupMsgInfo.message_id,
+        cardData: JSON.stringify(cardData),
+        errorEndpoint: errorEvent.errorEndpoint,
       };
       this.redis.hset(key, issueInfo);
       return;
     }
-    // 如果issueInfo存在，修改数量并回复之前的错误
+    // 如果issue在，修改数量并回复之前的错误
     await this.redis.hset(key, {
       count: parseInt(issueInfo?.count || '0') + 1,
     });
