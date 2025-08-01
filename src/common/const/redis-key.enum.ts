@@ -2,6 +2,7 @@ export const RedisPrefix = 'frontend-node:';
 export const RedisPrefixMtable = 'frontend-node:mtable:';
 export const RedisPrefixLimiter = 'frontend-node:limiter:';
 export const SentryAlertPrefix = 'frontend-node:alert:sentry-integration:';
+
 export enum RedisKeys {
   WIKI_DIRECTORY = RedisPrefix + 'wiki:directory:{spaceId}',
   FEISHU_MTABLE = RedisPrefixMtable + '{appToken}:{tableId}',
@@ -9,6 +10,5 @@ export enum RedisKeys {
   RATE_LIMITER = RedisPrefixLimiter + '{key}',
   SENTRY_ALERT_COUNT_ISSUE = SentryAlertPrefix + 'issue-error-count:{issueId}',
   SENTRY_ALERT_COUNT_FREQUENCY = SentryAlertPrefix + 'issue-error-frequency',
-
   // SENTRY_ALERT_COUNT_TOTAL = SentryAlertPrefix,
 }

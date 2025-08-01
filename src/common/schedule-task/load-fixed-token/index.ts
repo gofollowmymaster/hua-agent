@@ -9,6 +9,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import { CommonAlertCard } from '@src/common/feishu/card/alert-card';
+import { sendCommonCardToFeishu } from '@src/common/feishu/utils';
 
 export type FeishuAuthType = Awaited<
   ReturnType<lark.Client['authen']['refreshAccessToken']['create']>
@@ -33,17 +34,15 @@ export default class FixedTokenService {
   //每30分钟运行一次
   @Cron('0 */30 * * * *')
   async handleCron() {
-    this.logger.debug(
-      'FixedTokenService Called when the current is' +
-        dayjs().format('YYYY-MM-DD HH:mm:ss'),
-    );
+    this.logger.debug('FixedTokenService Called ');
     this.loadToken();
   }
   async loadToken() {
     const tokenInCached: FeishuAuthType = await this.cache.get(
       RedisKeys.FEISHU_FIXED_ACCESS_TOKEN,
     );
-    console.log('[ cachedinfo ] >', tokenInCached);
+    this.logger.log('[ cachedinfo ] >' + JSON.stringify(tokenInCached));
+
     if (!tokenInCached?.refresh_token) {
       this.sendAlertMsg('token in cache is null');
       return;
@@ -55,7 +54,8 @@ export default class FixedTokenService {
         refresh_token: tokenInCached.refresh_token,
       },
     });
-    console.log('[ refreshAccessToken ] >', res);
+
+    this.logger.log('[ refreshAccessToken ] >' + JSON.stringify(res));
 
     if (res.code !== 0) {
       this.sendAlertMsg(res.msg);
@@ -68,22 +68,14 @@ export default class FixedTokenService {
       1000 * 60 * 60 * 24,
     );
   }
-  sendAlertMsg(errorMessage: string) {
-    const errorTime = dayjs();
 
-    //构建消息内容
-    const content = CommonAlertCard.buildCardMsg({
-      environment: process.env.NODE_ENV,
+  sendAlertMsg(errorMessage: string) {
+    sendCommonCardToFeishu({
       title: '定时刷新Token异常报警',
       project: 'aplus-sql-server',
       color: 'red',
-      errorMessage: `刷新Token异常；${errorMessage}`,
-      errorTime: errorTime.format('YYYY-MM-DD HH:mm:ss'),
-      linkUrl: `https://sls.console.aliyun.com/lognext/project/k8s-log-c893ce02efe464e778e67c48016348406/logsearch/elnkpro-prod-log?encode%3Dbase64%26queryString%3DIF9jb250YWluZXJfbmFtZV86IGFwbHVzLXNxbC1zZXJ2aWNlLXByb2Q%3D%26filterInfo%3DeyJmamNvZGUiOiIoKSIsImZxIjoiIn0%3D%26queryTimeType%3D99%26startTime%3D${errorTime.subtract(60, 's').valueOf() / 1000}%26endTime%3D${errorTime.add(60, 's').valueOf() / 1000}`,
+      errorType: `刷新飞书Token异常`,
+      content: errorMessage,
     });
-    this.messagerHelper.createInteractToGroup(
-      content,
-      this.config.get('DefaultAlertFeishuGroupId'),
-    );
   }
 }

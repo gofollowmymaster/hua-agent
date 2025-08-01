@@ -4,7 +4,6 @@ import {
   FrontendAlertIssueTableDto,
   FrontendAlertTableDto,
 } from '../type/alert-table';
-import { SentryAlertDto } from '../../alert-message/dto/sentry-alert.dto';
 import { apiModuleBuMap } from '../../alert-message/app-user-map';
 import { RequestData } from '@src/alert/common/type/alert';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
@@ -105,22 +104,19 @@ export default class AlertFeishuAdapter {
     return {
       environment: this.event.environment,
       rawData: '',
-      errorMessage: this.event.title,
       userEmail: '',
       project: this.event.pageModuleName,
       linkUrl: this.event.web_url,
       level: this.event.level,
-      eventType: this.event.type,
-      culprit: this.event.culprit,
+      errorType: this.event.type,
+      content: this.event.culprit,
       timestamp: this.event.timestamp,
     };
   }
   toUnresolvedCardeData(): UnresolvedCardData {
     return {
-      userId: this.appInfo.userId,
+      userId: this.appInfo.frontendLeaderId,
       title: this.event.title,
-      // color?: string;
-
       environment: this.event.environment,
       rawData: '',
       errorType: this.event.type,

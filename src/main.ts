@@ -73,18 +73,15 @@ bootstrap();
 process.on('unhandledRejection', (reason, promise) => {
   console.error('-------Unhandled Rejection at:', reason);
 
-  const config = getGlobalConfigInstance();
-  if (!config) return;
-  promise.then().catch((error) => {
+  promise.then().catch((error: Error) => {
+    console.log('[ error ] >', error.stack, error.message);
     sendExceptionToFeishu(error);
   });
 });
 
-process.on('uncaughtException', (error) => {
+process.on('uncaughtException', (error: Error) => {
   console.error('Uncaught Exception:---------', error);
 
-  const config = getGlobalConfigInstance();
-  if (!config) return;
   sendExceptionToFeishu(error);
   // 可能需要优雅地关闭应用
   process.exit(1);

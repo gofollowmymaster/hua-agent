@@ -26,7 +26,7 @@ const issueStatusMap = {
 };
 export default class ErrorUnresolvedCard extends FeishuCard {
   protected static AlertTemplateId = 'AAqz6VqUmrfDw';
-  protected static AlertTemplateVersion = '1.0.1';
+  protected static AlertTemplateVersion = '1.0.2';
 
   /**
    * 构建飞书报警卡片消息

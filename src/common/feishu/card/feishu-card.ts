@@ -8,6 +8,9 @@ export abstract class FeishuCard {
    * @returns
    */
   protected static build(alertInfo: Record<string, any>) {
+    alertInfo.content = alertInfo.content
+      ? alertInfo.content.slice(0, 500)
+      : '--';
     const content = {
       type: 'template',
       data: {

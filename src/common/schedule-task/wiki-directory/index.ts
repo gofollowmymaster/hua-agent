@@ -27,10 +27,7 @@ export default class WikiDirectoryService {
 
   @Cron('0 0 8-22 * * *')
   async handleCron() {
-    this.logger.debug(
-      'WikiDirectoryService Called when the current is' +
-        dayjs().format('YYYY-MM-DD HH:mm:ss'),
-    );
+    this.logger.debug('WikiDirectoryService Called ');
     this.loadWikiNodeTree();
   }
   async loadWikiNodeTree() {
