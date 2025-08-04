@@ -67,6 +67,7 @@ export class SentryWebhookController {
     const resource = headers['sentry-hook-resource'];
     switch (resource) {
       case SentryHookType.Error:
+        return;
         return await this.sentryWebhookService.error(params);
 
       case SentryHookType.Issue:
