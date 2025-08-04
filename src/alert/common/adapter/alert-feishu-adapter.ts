@@ -118,10 +118,10 @@ export default class AlertFeishuAdapter {
       userId: this.appInfo.frontendLeaderId,
       title: this.event.title,
       environment: this.event.environment,
-      rawData: '',
+
       errorType: this.event.type,
       errorMessage: this.event.title,
-      userEmail: '',
+      userName: this.appInfo.frontendLeaderName,
       project: this.event.pageModuleName,
       linkUrl: this.event.web_url,
       level: this.event.level,

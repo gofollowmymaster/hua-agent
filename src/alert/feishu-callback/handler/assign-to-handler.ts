@@ -18,18 +18,10 @@ const AssignToHandler: CustomCallbackHandleType = async (event, service) => {
     RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),
   );
 
-  /**
-   * 1. 发送回复消息
-   * 2. 修改消息界面
-   * 3. 修改多为表格
-   * 4. 修改sentry
-   */
-
   if (!issueInfo.issueId) {
     //跨天问题
     return;
   }
-  console.log('[ issueInfo ] >', issueInfo);
 
   if (issueInfo.messageId) {
     service.messageHelper.replyInThread(
@@ -57,32 +49,30 @@ const AssignToHandler: CustomCallbackHandleType = async (event, service) => {
       FeishuMsgType.Post,
     );
   }
-  service.feishuUserHelper
-    .getUserInfo({
-      userId: assignToUserId,
-      userIdType: 'open_id',
-    })
-    .then((res) => {
-      const {
-        user: { user_id, enterprise_email, open_id },
-      } = res;
-      console.log('[ user_id ] >', assignToUserId, open_id, res);
-      console.log('[ user_id ] >', user_id);
-      service.updateTable(
-        issueInfo.issueId,
-        issueInfo.errorEndpoint as ErrorEndpoint,
-        {
-          负责人: [{ id: open_id }],
-        },
-      );
+  const userInfo = await service.feishuUserHelper.getUserInfo({
+    userId: assignToUserId,
+    userIdType: 'open_id',
+  });
 
-      service.sentryService.updateIssue(
-        {
-          assignedTo: enterprise_email,
-        },
-        issueId,
-      );
-    });
+  const {
+    user: { user_id, name, enterprise_email },
+  } = userInfo;
+  console.log('[ user_id ] >', assignToUserId, open_id, userInfo);
+  console.log('[ user_id ] >', user_id);
+  service.updateTable(
+    issueInfo.issueId,
+    issueInfo.errorEndpoint as ErrorEndpoint,
+    {
+      负责人: [{ id: assignToUserId }],
+    },
+  );
+
+  service.sentryService.updateIssue(
+    {
+      assignedTo: enterprise_email,
+    },
+    issueId,
+  );
 
   if (issueInfo.cardData) {
     const cardData = JSON.parse(issueInfo.cardData);
@@ -104,6 +94,7 @@ const AssignToHandler: CustomCallbackHandleType = async (event, service) => {
           template_variable: {
             ...cardData,
             userId: assignToUserId,
+            userName: name,
           },
         },
       },

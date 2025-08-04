@@ -6,6 +6,7 @@ import ErrorUnresolvedCard, {
   issueStatusMap,
 } from '@src/common/feishu/card/error-unresolve-card';
 import ErrorResolvedCard from '@src/common/feishu/card/error-resolved-card';
+import { ErrorEndpoint } from '@src/alert/common/type/alert';
 
 const ModifyStatusHandler: CustomCallbackHandleType = async (
   event,
@@ -65,14 +66,6 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
     );
   }
 
-  // service.updateTable(
-  //   issueInfo.issueId,
-  //   issueInfo.errorEndpoint as ErrorEndpoint,
-  //   {
-  //     负责人: [assignToUserId],
-  //   },
-  // );
-
   if (issueInfo.cardData) {
     const cardData = JSON.parse(issueInfo.cardData);
     let cardReturn = {
@@ -82,7 +75,7 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
         template_version_name: ErrorUnresolvedCard.templateVersion,
         template_variable: {
           ...cardData,
-          status: issueStatus,
+          status: issueStatusMap[issueStatus],
         },
       },
     };
@@ -99,6 +92,13 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
         },
         issueInfo.issueId,
       );
+      service.updateTable(
+        issueInfo.issueId,
+        issueInfo.errorEndpoint as ErrorEndpoint,
+        {
+          是否解决: true,
+        },
+      );
 
       cardReturn = {
         type: 'template',
@@ -107,7 +107,7 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
           template_version_name: ErrorResolvedCard.templateVersion,
           template_variable: {
             ...cardData,
-            status: issueStatus,
+            status: issueStatusMap[issueStatus],
           },
         },
       };

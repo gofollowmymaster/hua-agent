@@ -38,16 +38,18 @@ class FeishuBusinessLineTable extends FeishuTable {
     const frontendLeaderId = res.items[0].fields['前端leader'][0].id;
     const frontendAlertGroupId = res.items[0].fields['前端监控群'][0].id;
     const frontendGroupId = res.items[0].fields['前端组织群'][0].id;
-    const backendLeaderId = res.items[0].fields['前端leader'][0].id;
+    const backendLeaderId = res.items[0].fields['后端leader'][0].id;
     const backendAlertGroupId = res.items[0].fields['接口告警群']?.[0]?.id;
     const feishuProjectUrl = res.items[0].fields['飞书项目地址'];
     const bu = res.items[0].record_id;
 
     return {
       frontendLeaderId,
+      frontendLeaderName: res.items[0].fields['前端leader'][0].name,
       frontendAlertGroupId,
       frontendGroupId,
       backendLeaderId,
+      backendLeaderName: res.items[0].fields['后端leader'][0].name,
       backendAlertGroupId,
       feishuProjectUrl,
       bu,

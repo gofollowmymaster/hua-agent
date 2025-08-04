@@ -25,6 +25,7 @@ import dayjs from 'dayjs';
 import CommonAlertCard from '@src/common/feishu/card/alert-card';
 import ErrorUnresolvedCard from '@src/common/feishu/card/error-unresolve-card';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 
 @Injectable()
 export class SentryWebhookService extends AlertBaseService {
@@ -40,6 +41,7 @@ export class SentryWebhookService extends AlertBaseService {
     protected readonly feishuFrontendTable: FeishuFrontendAlertTable,
     protected readonly feishuFrontendIssueTable: FeishuFrontendAlertIssueTable,
     protected readonly alertFeishuAdapter: AlertFeishuAdapter,
+    protected readonly feishuBusinessLineTable: FeishuBusinessLineTable,
   ) {
     super();
     this.redis = redisService.getClient();
