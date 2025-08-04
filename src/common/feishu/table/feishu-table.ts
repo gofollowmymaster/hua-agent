@@ -4,6 +4,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import {
+  BitTableApiOption,
   BitTableFields,
   BitTableFilter,
   BitTablePagination,
@@ -97,7 +98,7 @@ abstract class FeishuTable {
       useCache,
     );
   }
-  async update(recordId, field: BitTableFields) {
+  async update(recordId, field: BitTableFields, params?: BitTableApiOption) {
     const data = this.requestWrapper(
       async () =>
         await this.tableHelper.update(
@@ -105,6 +106,7 @@ abstract class FeishuTable {
           this.tableId,
           recordId,
           field,
+          params,
         ),
     )();
 

@@ -3,28 +3,17 @@ import FeishuClient from '../clients/client';
 import { FEISHU_CLIENT_ID } from './constants';
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { CreateMessageType, FeishuMsgType } from '../type/im';
-import { FeishuApiException } from '@src/common/exception/feishu-api-exception';
+import FeishuApiHelper from './feishu-api-helper';
 
 @Injectable({ scope: Scope.TRANSIENT })
-class FeishuMessageHelper {
+class FeishuMessageHelper extends FeishuApiHelper {
   constructor(
     // private readonly config: ConfigService,
     @Inject(FEISHU_CLIENT_ID) private readonly client: FeishuClient,
-  ) {}
-
-  async requestWrapper(handler: () => Promise<any>) {
-    const res = await handler();
-    const { code, data } = res;
-    if (code !== 0) {
-      console.log('[ FeishuMessageHelper ] >', res);
-      return;
-      throw new FeishuApiException(
-        `【${code}】   ->  ${JSON.stringify(res)}`,
-        500,
-      );
-    }
-    return data;
+  ) {
+    super();
   }
+
   async create(msgParams: CreateMessageType) {
     return await this.requestWrapper(async () => {
       return await this.client.client.im.message.create(msgParams);

@@ -1,5 +1,6 @@
 import FeishuClient from '../clients/client';
 import {
+  BitTableApiOption,
   BitTableFields,
   BitTableFilter,
   BitTableSearchPayloadParams,
@@ -64,6 +65,7 @@ class FeishuTableHelper {
     tableId: string,
     recordId: string,
     field: BitTableFields = {},
+    params?: BitTableApiOption,
   ) {
     return await this.client.client.bitable.appTableRecord.update({
       path: {
@@ -74,6 +76,7 @@ class FeishuTableHelper {
       data: {
         fields: field,
       },
+      params,
     });
   }
 

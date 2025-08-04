@@ -2,6 +2,7 @@ import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { CustomCallbackHandleType } from '.';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import ErrorUnresolvedCard from '@src/common/feishu/card/error-unresolve-card';
+import { ErrorEndpoint } from '@src/alert/common/type/alert';
 
 const AssignToHandler: CustomCallbackHandleType = async (event, service) => {
   const {
@@ -56,14 +57,32 @@ const AssignToHandler: CustomCallbackHandleType = async (event, service) => {
       FeishuMsgType.Post,
     );
   }
+  service.feishuUserHelper
+    .getUserInfo({
+      userId: assignToUserId,
+      userIdType: 'open_id',
+    })
+    .then((res) => {
+      const {
+        user: { user_id, enterprise_email, open_id },
+      } = res;
+      console.log('[ user_id ] >', assignToUserId, open_id, res);
+      console.log('[ user_id ] >', user_id);
+      service.updateTable(
+        issueInfo.issueId,
+        issueInfo.errorEndpoint as ErrorEndpoint,
+        {
+          负责人: [{ id: open_id }],
+        },
+      );
 
-  // service.updateTable(
-  //   issueInfo.issueId,
-  //   issueInfo.errorEndpoint as ErrorEndpoint,
-  //   {
-  //     负责人: [assignToUserId],
-  //   },
-  // );
+      service.sentryService.updateIssue(
+        {
+          assignedTo: enterprise_email,
+        },
+        issueId,
+      );
+    });
 
   if (issueInfo.cardData) {
     const cardData = JSON.parse(issueInfo.cardData);

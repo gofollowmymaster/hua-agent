@@ -29,3 +29,5 @@ export type BitTableCreateParams = Parameters<
 >;
 
 export type BitTableFields = BitTableCreateParams[0]['data']['fields'];
+
+export type BitTableApiOption = BitTableCreateParams[0]['params'];

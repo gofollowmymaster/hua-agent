@@ -1,6 +1,7 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import FeishuMessageHelper from './message-helper';
 import FeishuTableHelper from './table-helper';
+import FeishuUserHelper from './feishu-user-helper';
 import { FEISHU_CLIENT_ID } from './constants';
 import FeishuClient from '../clients/client';
 
@@ -23,8 +24,12 @@ export class FeishuHelperModule {
           provide: FeishuTableHelper,
           useClass: FeishuTableHelper,
         },
+        {
+          provide: FeishuUserHelper,
+          useClass: FeishuUserHelper,
+        },
       ],
-      exports: [FeishuMessageHelper, FeishuTableHelper],
+      exports: [FeishuMessageHelper, FeishuTableHelper, FeishuUserHelper],
     };
   }
 }
