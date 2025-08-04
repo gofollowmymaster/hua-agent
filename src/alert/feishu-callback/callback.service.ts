@@ -12,6 +12,7 @@ import FeishuFrontendAlertIssueTable from '../common/table/frontend-alert-issue-
 import AlertFeishuAdapter from '../common/adapter/alert-feishu-adapter';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { ErrorEndpoint } from '../common/type/alert';
+import { SentryApiService } from '../common/service/sentry-api-service';
 
 @Injectable()
 export class FeishuCallbackService {
@@ -27,6 +28,7 @@ export class FeishuCallbackService {
     // protected readonly feishuFrontendTable: FeishuFrontendAlertTable,
     protected readonly feishuFrontendIssueTable: FeishuFrontendAlertIssueTable,
     protected readonly alertFeishuAdapter: AlertFeishuAdapter,
+    readonly sentryService: SentryApiService,
   ) {
     this.redis = redisService.getClient();
   }

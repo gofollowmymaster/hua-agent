@@ -21,11 +21,13 @@ import { SentryWebhookController } from './sentry-integrations/webhook.controlle
 import { SentryWebhookService } from './sentry-integrations/webhook.service';
 import FeishuApiAlertIssueTable from './common/table/api-alert-issue-table';
 import AlertFeishuAdapter from './common/adapter/alert-feishu-adapter';
+import { SentryApiService } from './common/service/sentry-api-service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
     FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AlertClient)),
-    // FeishuTableModule,
+    HttpModule,
   ],
   controllers: [
     AlertMsgController,
@@ -46,6 +48,7 @@ import AlertFeishuAdapter from './common/adapter/alert-feishu-adapter';
     FeishuCallbackService,
     SentryWebhookService,
     AlertFeishuAdapter,
+    SentryApiService,
   ],
   exports: [AlertMsgService, FeishuEventService, SentryWebhookService],
 })

@@ -1,4 +1,5 @@
-import assignToHandler from './assign-to-handler';
+import AssignToHandler from './assign-to-handler';
+import ModifyStatusHandler from './modify-status-handler';
 // import MsgReactionHandler from './msg-reaction-handler';
 // import { EventHandles } from '@larksuiteoapi/node-sdk';
 import { FeishuCallbackService } from '../callback.service';
@@ -13,7 +14,8 @@ export type CustomCallbackHandleType = (
 ) => any;
 
 const EventHandler = {
-  assignTo: assignToHandler,
+  assignTo: AssignToHandler,
+  modifyStatus: ModifyStatusHandler,
   // 'im.message.reaction.created_v1': MsgReactionHandler,
 };
 export default EventHandler;

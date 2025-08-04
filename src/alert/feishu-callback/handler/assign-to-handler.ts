@@ -2,9 +2,8 @@ import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { CustomCallbackHandleType } from '.';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import ErrorUnresolvedCard from '@src/common/feishu/card/error-unresolve-card';
-import { ErrorEndpoint } from '@src/alert/common/type/alert';
 
-const MsgReadHandler: CustomCallbackHandleType = async (event, service) => {
+const AssignToHandler: CustomCallbackHandleType = async (event, service) => {
   const {
     operator: { open_id },
     action: {
@@ -92,4 +91,4 @@ const MsgReadHandler: CustomCallbackHandleType = async (event, service) => {
     };
   }
 };
-export default MsgReadHandler;
+export default AssignToHandler;
