@@ -35,20 +35,11 @@ export default class ErrorResolvedCard extends FeishuCard {
    * @returns
    */
   static buildCardMsg = (alertInfo: ResolvedCardData) => {
-    const color = alertInfo.level == 'fatal' ? 'red' : 'orange';
-    const title = alertInfo.level == 'fatal' ? '高危报警' : '异常报警';
+    // const color = alertInfo.level == 'fatal' ? 'red' : 'orange';
+    // const title = alertInfo.level == 'fatal' ? '高危报警' : '异常报警';
 
-    const status = issueStatusMap[alertInfo.status] || '未解决';
-    const errorTime = dayjs(alertInfo.timestamp * 1000).format(
-      'YYYY-MM-DD HH:mm:ss',
-    );
     return super.build({
       ...alertInfo,
-      title,
-      errorTime,
-      color,
-      status,
-      count: 1,
     });
   };
 }

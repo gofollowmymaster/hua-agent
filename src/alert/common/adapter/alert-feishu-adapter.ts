@@ -10,7 +10,11 @@ import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { Injectable } from '@nestjs/common';
 import { AlertEvent } from '@src/alert/common/type/alert';
 import { CommonCardData } from '@src/common/feishu/card/alert-card';
-import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolve-card';
+import {
+  issueStatusMap,
+  UnresolvedCardData,
+} from '@src/common/feishu/card/error-unresolve-card';
+import dayjs from 'dayjs';
 
 @Injectable()
 export default class AlertFeishuAdapter {
@@ -116,9 +120,8 @@ export default class AlertFeishuAdapter {
   toUnresolvedCardeData(): UnresolvedCardData {
     return {
       userId: this.appInfo.frontendLeaderId,
-      title: this.event.title,
+      title: this.event.level == 'fatal' ? '高危报警' : '异常报警',
       environment: this.event.environment,
-
       errorType: this.event.type,
       errorMessage: this.event.title,
       userName: this.appInfo.frontendLeaderName,
@@ -126,11 +129,15 @@ export default class AlertFeishuAdapter {
       linkUrl: this.event.web_url,
       level: this.event.level,
       eventType: this.event.type,
-      content: this.event.culprit,
+      content: this.event.culprit + '\n' + this.event.title,
       count: 1,
-      status: 'unresolved',
+      status: issueStatusMap['unresolved'],
+
       issueId: this.event.issue_id,
-      timestamp: this.event.timestamp,
+      errorTime: dayjs(this.event.timestamp * 1000).format(
+        'YYYY-MM-DD HH:mm:ss',
+      ),
+      color: this.event.level == 'fatal' ? 'red' : 'orange',
     };
   }
 }
