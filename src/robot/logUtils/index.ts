@@ -1,5 +1,5 @@
+import { logger } from '@src/common/middleware/logger.middleware';
 import type { MessageFromRobotType } from '../dto/post-message-from-robot.dto';
-import { logger } from '../../middleware/logger.middleware';
 export function FromFeishuLogger() {
   return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value;

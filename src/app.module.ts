@@ -6,7 +6,7 @@ import { SubappModule } from './subapp/subapp.module';
 import { VersionModule } from './version/version.module';
 import { VerifyModule } from './verify/verify.module';
 import { RobotModule } from './robot/robot.module';
-import { LoggerMiddleware } from './middleware/logger.middleware';
+import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { MockServerModule } from './mock-server/mock-server.module';
 import { LoggerModule } from './common/service/logger/logger.module';
 import configuration from './config';

@@ -13,7 +13,7 @@ import timezone from 'dayjs/plugin/timezone'; // nodejs
 import dayjs from 'dayjs';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import { getGlobalConfigInstance, setGlobalConfig } from '@utils/app-config';
+import { setGlobalConfig } from '@utils/app-config';
 import { sendExceptionToFeishu } from './common/feishu/utils';
 
 declare const module: any;

@@ -14,7 +14,7 @@ import { addTableRecord } from '../../utils/actionTable/addTableRecord';
 import { listTableField } from '../../utils/actionTable/listTableField';
 import { updateTableRecord } from '../../utils/actionTable/updateTableRecord';
 import { ErrorMessages, ErrorMessagesCode } from './errEnum';
-import { logger } from '../../middleware/logger.middleware';
+import { logger } from '@src/common/middleware/logger.middleware';
 const dayjs = require('dayjs');
 
 @Injectable()

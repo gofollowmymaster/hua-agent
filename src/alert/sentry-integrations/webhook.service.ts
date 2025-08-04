@@ -109,7 +109,9 @@ export class SentryWebhookService extends AlertBaseService {
       !errorEvent.requestData?.code
     ) {
       sendExceptionToFeishu(new Error('请求报警信息缺少code字段'));
-    } else if (this.ignoreCodeList.includes(errorEvent.requestData.code + '')) {
+    } else if (
+      this.ignoreCodeList.includes(errorEvent.requestData?.code + '')
+    ) {
       return;
     }
 

@@ -64,6 +64,7 @@ export class SentryWebhookController {
     if (!headers['sentry-hook-signature']) {
       throw new UnauthorizedException('Sentry Hook签名验证失败');
     }
+    return;
     const resource = headers['sentry-hook-resource'];
     switch (resource) {
       case SentryHookType.Error:

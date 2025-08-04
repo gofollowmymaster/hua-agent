@@ -58,13 +58,13 @@ const MsgReadHandler: CustomCallbackHandleType = async (event, service) => {
     );
   }
 
-  service.updateTable(
-    issueInfo.issueId,
-    issueInfo.errorEndpoint as ErrorEndpoint,
-    {
-      负责人: [assignToUserId],
-    },
-  );
+  // service.updateTable(
+  //   issueInfo.issueId,
+  //   issueInfo.errorEndpoint as ErrorEndpoint,
+  //   {
+  //     负责人: [assignToUserId],
+  //   },
+  // );
 
   if (issueInfo.cardData) {
     const cardData = JSON.parse(issueInfo.cardData);

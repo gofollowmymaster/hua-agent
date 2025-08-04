@@ -25,7 +25,6 @@ export class FeishuCallbackController {
     if (callbackInfo.type === 'url_verification') {
       return { challenge: callbackInfo.challenge };
     }
-    const res = await this.feishucallbackService.handle(callbackInfo);
-    this.logger.info('res:', res);
+    return await this.feishucallbackService.handle(callbackInfo);
   }
 }

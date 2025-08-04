@@ -38,7 +38,7 @@ export class FeishuCallbackService {
     const { action } = eventInfo.action.value;
 
     if (header?.event_type && header.event_type !== 'card.action.trigger') {
-      throw new HttpException('不支持的回调时间类型类型', 500);
+      throw new HttpException('不支持的回调事件类型', 500);
     }
 
     const handler = EventHandler[action];
