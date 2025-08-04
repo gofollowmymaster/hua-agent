@@ -181,7 +181,7 @@ export class AlertBaseService extends BaseService {
     const { pageModuleName, environment } = alertInfo;
     if (environment == 'dev' || environment == 'development') {
       return {
-        groupId: this.config.getOrThrow('DefaultAlertFeishuGroupId'),
+        groupId: this.config.getOrThrow('FeishuMsgDebugGroupId'),
         userId: this.config.getOrThrow('DefaultAlertFeishuUserId'),
       };
     }

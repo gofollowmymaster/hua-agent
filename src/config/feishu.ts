@@ -28,9 +28,11 @@ export default {
   AlertFrontendIssueTableAppId:
     process.env.FEISHU_ALERT_FRONTEND_ISUUE_TABLE_ID,
   AlertApiIssueTableId: process.env.FEISHU_ALERT_API_ISSUE_TABLE_ID,
-  //默认报警群
+  //node-server报警群
   DefaultAlertFeishuGroupId:
     process.env.DEFAULT_ALERT_GROUPID || 'oc_b030f5155cad2838eeacadc977f403b0',
+  //dev调试报警群
+  FeishuMsgDebugGroupId: 'oc_504fc5a30c33892570ffb5163b6bec93',
   //默认报警人 Ahua
   DefaultAlertFeishuUserId: process.env.DEFAULT_ALERT_USERID || '762a5468',
 

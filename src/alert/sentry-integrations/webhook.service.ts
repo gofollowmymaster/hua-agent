@@ -130,7 +130,8 @@ export class SentryWebhookService extends AlertBaseService {
         cardData: JSON.stringify(cardData),
         errorEndpoint: errorEvent.errorEndpoint,
       };
-      this.redis.hset(key, issueInfo);
+      await this.redis.hset(key, issueInfo);
+      this.redis.expire(key, 60 * 60 * 24);
       return;
     }
     // 如果issue在，修改数量并回复之前的错误

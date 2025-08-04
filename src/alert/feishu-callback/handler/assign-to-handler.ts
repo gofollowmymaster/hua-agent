@@ -8,11 +8,11 @@ const MsgReadHandler: CustomCallbackHandleType = async (event, service) => {
   const {
     operator: { open_id },
     action: {
-      value: { issueId, action },
+      value: { issueId },
       option: assignToUserId,
     },
-    token,
-    context: { open_message_id, open_chat_id },
+    // token,
+    // context: { open_message_id, open_chat_id },
   } = event;
   const issueInfo = await service.redis.hgetall(
     RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),
@@ -35,7 +35,6 @@ const MsgReadHandler: CustomCallbackHandleType = async (event, service) => {
     service.messageHelper.replyInThread(
       JSON.stringify({
         zh_cn: {
-          // content: `1111`,
           content: [
             [
               {

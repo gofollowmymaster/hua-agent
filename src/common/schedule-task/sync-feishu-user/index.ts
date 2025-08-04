@@ -20,11 +20,34 @@ export default class SyncFeishuUser {
     this.client = ClientFactory.create(FeishuApp.AlertClient);
   }
 
-  @Cron('0 * * * * *')
+  @Cron('0 0 * * * *')
   async handleCron() {
     this.logger.debug('Sync User List Info Called ');
+    return;
 
-    const list = await this.client.client.contact.user.list();
+    const list = await this.client.client.directory.v1.employee.filter({
+      data: {
+        filter: {
+          conditions: [
+            {
+              field: 'base_info.departments.department_id',
+              operator: 'eq',
+              value: 'od-a8298cd6d4bf757187107da078bb167e',
+            },
+          ],
+        },
+        required_fields: ['base_info.*'],
+        page_request: {
+          page_size: 1000,
+          page_token: '',
+        },
+      },
+      params: {
+        employee_id_type: 'open_id',
+        department_id_type: 'department_id',
+        // department_id: 'od-a8298cd6d4bf757187107da078bb167e',
+      },
+    });
     console.log('[ list ] >', JSON.stringify(list));
   }
 }
