@@ -2,20 +2,24 @@ import FeishuClient from '../clients/client';
 // import { ConfigService } from '@nestjs/config';
 import { FEISHU_CLIENT_ID } from './constants';
 import { Inject, Injectable, Scope } from '@nestjs/common';
-import FeishuApiHelper from './feishu-api-helper';
 import {
   ContactUserGetReturnType,
   DepartmentIdType,
   UserIdType,
 } from '../type/contact';
+import { RedisService } from '@src/common/service/redis/redis.service';
+import FeishuDataApiHelper from './feishu-data-api-helper';
 
 @Injectable({ scope: Scope.TRANSIENT })
-class FeishuUserHelper extends FeishuApiHelper {
+class FeishuUserHelper extends FeishuDataApiHelper {
+  protected readonly useCache = true;
+  protected readonly ttl = 60 * 60 * 24;
   constructor(
     // private readonly config: ConfigService,
     @Inject(FEISHU_CLIENT_ID) private readonly client: FeishuClient,
+    protected redisService: RedisService,
   ) {
-    super();
+    super(redisService);
   }
   async getUserInfo({
     userId,
@@ -26,7 +30,8 @@ class FeishuUserHelper extends FeishuApiHelper {
     userIdType: UserIdType;
     departmentIdType?: DepartmentIdType;
   }): Promise<ContactUserGetReturnType> {
-    return await this.requestWrapper(
+    return await this.readWrapper(
+      'getUserInfo',
       async () =>
         await this.client.client.contact.user.get({
           params: {
@@ -35,6 +40,32 @@ class FeishuUserHelper extends FeishuApiHelper {
           },
           path: {
             user_id: userId,
+          },
+        }),
+    );
+  }
+  async getUserIdByEmailOrPhone({
+    emails,
+    mobiles,
+    includeResigned,
+    userIdType,
+  }: {
+    emails?: string[];
+    mobiles?: string[];
+    includeResigned?: false;
+    userIdType: UserIdType;
+  }): Promise<ContactUserGetReturnType> {
+    return await this.readWrapper(
+      'getUserInfo',
+      async () =>
+        await this.client.client.contact.user.batchGetId({
+          data: {
+            emails,
+            mobiles,
+            include_resigned: includeResigned,
+          },
+          params: {
+            user_id_type: userIdType,
           },
         }),
     );

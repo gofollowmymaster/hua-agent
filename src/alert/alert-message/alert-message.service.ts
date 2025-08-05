@@ -34,7 +34,7 @@ export class AlertMsgService extends AlertBaseService {
     protected readonly redisService: RedisService,
     protected readonly alertFeishuAdapter: AlertFeishuAdapter,
   ) {
-    super();
+    super(redisService);
   }
 
   /**

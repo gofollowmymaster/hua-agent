@@ -1,5 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { SentryEvent } from '@src/alert/common/type/sentry';
+import {
+  SentryComment,
+  SentryEvent,
+  SentryIssue,
+} from '@src/alert/common/type/sentry';
 import { IsNotEmpty } from 'class-validator';
 
 export enum SentryHookType {
@@ -9,16 +13,6 @@ export enum SentryHookType {
   MetricAlert = 'metric_alert',
   EventAlert = 'event_alert',
   Installation = 'installation',
-}
-export enum SentryIssueAction {
-  Created = 'created',
-  Resolved = 'resolved',
-  Assigned = 'assigned',
-  Archived = 'archived',
-  Unresolved = 'unresolved',
-}
-export enum SentryIssueAlertAction {
-  Triggered = 'triggered',
 }
 
 export type SentryWebHookHeader = {
@@ -62,22 +56,24 @@ export class SentryInstallationData {
   })
   'uuid': string;
 }
-
-// export class SentryHookErrorData {
-//   @IsNotEmpty()
-//   @ApiProperty({
-//     description: 'Data type',
-//     enum: SentryHookDataType,
-//   })
-
-// }
-
+enum SentryEventAction {
+  Created = 'created',
+  Resolved = 'resolved',
+  Ignored = 'ignored',
+  Assigned = 'assigned',
+  Updated = 'updated',
+  Deleted = 'deleted',
+  Triggered = 'triggered',
+  Critical = 'critical',
+  Warning = 'warning',
+}
 export class SentryHookDto {
   @IsNotEmpty()
   @ApiProperty({
+    enum: SentryEventAction,
     description: 'Sentry Hook动作',
   })
-  action: string;
+  action: SentryEventAction;
   @IsNotEmpty()
   @ApiProperty({
     description: 'Sentry Hook数据',
@@ -101,4 +97,12 @@ export class SentryHookErrorDto extends SentryHookDto {
   data: {
     error: SentryEvent;
   };
+}
+
+export class SentryHookCommentDto extends SentryHookDto {
+  data: SentryComment;
+}
+
+export class SentryHookIssueDto extends SentryHookDto {
+  data: SentryIssue;
 }

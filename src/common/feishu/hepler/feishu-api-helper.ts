@@ -5,8 +5,6 @@ import { FeishuApiException } from '@src/common/exception/feishu-api-exception';
 
 @Injectable({ scope: Scope.TRANSIENT })
 abstract class FeishuApiHelper {
-  // private readonly client: FeishuClient;
-
   async requestWrapper(handler: () => Promise<any>) {
     const res = await handler();
     const { code, data } = res;

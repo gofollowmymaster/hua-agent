@@ -14,41 +14,13 @@ const AssignToHandler: CustomCallbackHandleType = async (event, service) => {
     // token,
     // context: { open_message_id, open_chat_id },
   } = event;
-  const issueInfo = await service.redis.hgetall(
-    RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),
-  );
 
-  if (!issueInfo.issueId) {
-    //跨天问题
-    return;
-  }
+  service.assignToHandler({
+    issueId,
+    operator: open_id,
+    assignTo: assignToUserId,
+  });
 
-  if (issueInfo.messageId) {
-    service.messageHelper.replyInThread(
-      JSON.stringify({
-        zh_cn: {
-          content: [
-            [
-              {
-                tag: 'at',
-                user_id: open_id,
-              },
-              {
-                tag: 'text',
-                text: `将问题指派给`,
-              },
-              {
-                tag: 'at',
-                user_id: assignToUserId,
-              },
-            ],
-          ],
-        },
-      }),
-      issueInfo.messageId,
-      FeishuMsgType.Post,
-    );
-  }
   const userInfo = await service.feishuUserHelper.getUserInfo({
     userId: assignToUserId,
     userIdType: 'open_id',
@@ -59,13 +31,6 @@ const AssignToHandler: CustomCallbackHandleType = async (event, service) => {
   } = userInfo;
   console.log('[ user_id ] >', assignToUserId, open_id, userInfo);
   console.log('[ user_id ] >', user_id);
-  service.updateTable(
-    issueInfo.issueId,
-    issueInfo.errorEndpoint as ErrorEndpoint,
-    {
-      负责人: [{ id: assignToUserId }],
-    },
-  );
 
   service.sentryService.updateIssue(
     {
@@ -73,7 +38,7 @@ const AssignToHandler: CustomCallbackHandleType = async (event, service) => {
     },
     issueId,
   );
-
+  const issueInfo = await service.checkIssueInCache(issueId);
   if (issueInfo.cardData) {
     const cardData = JSON.parse(issueInfo.cardData);
 

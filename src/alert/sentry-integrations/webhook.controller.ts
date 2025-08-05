@@ -11,10 +11,19 @@ import { SentryWebhookService } from './webhook.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { ApiBody, ApiHeaders, ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
+  SentryHookCommentDto,
   SentryHookDto,
+  SentryHookIssueDto,
   SentryHookType,
   SentryWebHookHeader,
 } from './dto/sentry-hook';
+import { getModuleNameByUrl } from '../common/utils';
+import {
+  AlertEvent,
+  ErrorEndpoint,
+  IssueAction,
+  PageModuleName,
+} from '../common/type/alert';
 // import { verifySignature } from './util';
 @ApiTags('Sentry WebHook')
 @Controller('sentry-hook')
@@ -65,16 +74,16 @@ export class SentryWebhookController {
       throw new UnauthorizedException('Sentry Hook签名验证失败');
     }
     const resource = headers['sentry-hook-resource'];
+    console.log('[ resource ] >', resource);
     switch (resource) {
       case SentryHookType.Error:
-        return;
-        return await this.sentryWebhookService.error(params);
+        return await this.error(params);
 
       case SentryHookType.Issue:
-        return await this.sentryWebhookService.issue(params);
+        return await this.issue(params);
 
       case SentryHookType.Comment:
-        return await this.sentryWebhookService.comment(params);
+        return await this.comment(params);
 
       case SentryHookType.EventAlert:
       case SentryHookType.MetricAlert:
@@ -82,5 +91,49 @@ export class SentryWebhookController {
       case SentryHookType.Installation:
         return await this.sentryWebhookService.installation(params);
     }
+  }
+  async issue(params: SentryHookIssueDto) {
+    const issueInfo = {
+      action: params.action as unknown as IssueAction,
+      issueId: params.data.issue.id,
+      substatus: params.data.issue.substatus,
+      status: params.data.issue.status,
+      statusDetails: params.data.issue.statusDetails,
+      culprit: params.data.issue.culprit,
+      assignedTo: params.data.issue.assignedTo,
+      issueType: params.data.issue.issueType,
+      level: params.data.issue.level,
+      type: params.data.issue.type,
+      operator: params.data.assignee,
+    };
+    console.log('[ issueInfo ] >', issueInfo);
+    return await this.sentryWebhookService.issue(issueInfo);
+  }
+  async comment(params: SentryHookCommentDto) {
+    const operator = params.actor.name;
+    const issueId = params.data.issue_id + '';
+    const comment = params.data.comment;
+    this.sentryWebhookService.comment({
+      operator,
+      issueId,
+      comment,
+    });
+  }
+  async error(params: SentryHookDto) {
+    const alertError = params.data.error;
+
+    const requestData = alertError.extra?.__serialized__;
+    const serverModuleName = getModuleNameByUrl(requestData?.url);
+    const pageModuleName =
+      alertError.extra?.subModuleName || PageModuleName.APLUS_OTHER;
+    const eventData: AlertEvent = {
+      ...alertError,
+      title: alertError.title,
+      requestData,
+      pageModuleName,
+      serverModuleName,
+      errorEndpoint: alertError.extra?.errorEndpoint || ErrorEndpoint.Page,
+    };
+    return await this.sentryWebhookService.error(eventData);
   }
 }

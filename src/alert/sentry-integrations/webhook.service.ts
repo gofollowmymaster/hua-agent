@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@src/prisma.service';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
-import { SentryHookDto, SentryHookErrorDto } from './dto/sentry-hook';
+import { SentryHookDto } from './dto/sentry-hook';
 
 import { RedisService } from '@src/common/service/redis/redis.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
@@ -15,21 +15,24 @@ import Redis from 'ioredis';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import {
   AlertEvent,
+  CommentEvent,
   ErrorEndpoint,
   ErrorLevel,
-  PageModuleName,
+  IssueAction,
+  IssueEvent,
 } from '../common/type/alert';
-import { getModuleNameByUrl } from '../common/utils';
 import { AlertBaseService } from '../common/service/alert-base.service';
 import dayjs from 'dayjs';
 import CommonAlertCard from '@src/common/feishu/card/alert-card';
 import ErrorUnresolvedCard from '@src/common/feishu/card/error-unresolve-card';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
+import { FeishuMsgType } from '@src/common/feishu/type/im';
+import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
 
 @Injectable()
 export class SentryWebhookService extends AlertBaseService {
-  private readonly redis: Redis;
+  protected readonly redis: Redis;
   constructor(
     protected readonly prisma: PrismaService,
     protected readonly redisService: RedisService,
@@ -42,9 +45,10 @@ export class SentryWebhookService extends AlertBaseService {
     protected readonly feishuFrontendIssueTable: FeishuFrontendAlertIssueTable,
     protected readonly alertFeishuAdapter: AlertFeishuAdapter,
     protected readonly feishuBusinessLineTable: FeishuBusinessLineTable,
+    protected readonly feishuUserHelper: FeishuUserHelper,
   ) {
-    super();
-    this.redis = redisService.getClient();
+    super(redisService);
+    // this.redis = redisService.getClient();
   }
 
   /**
@@ -52,30 +56,43 @@ export class SentryWebhookService extends AlertBaseService {
    * @param params
    * @returns
    */
-  async issue(params: SentryHookDto) {
-    return;
-    sendExceptionToFeishu(new Error(JSON.stringify(params)));
-  }
-  async error(params: SentryHookErrorDto) {
-    const alertError = params.data.error;
+  async issue(eventData: IssueEvent) {
+    switch (eventData.action) {
+      case IssueAction.Created:
+        return;
 
-    const requestData = alertError.extra?.__serialized__;
-    const serverModuleName = getModuleNameByUrl(requestData?.url);
-    const pageModuleName =
-      alertError.extra?.subModuleName || PageModuleName.APLUS_OTHER;
-    const eventData: AlertEvent = {
-      ...alertError,
-      title: alertError.title,
-      requestData,
-      pageModuleName,
-      serverModuleName,
-      errorEndpoint: alertError.extra?.errorEndpoint || ErrorEndpoint.Page,
-    };
-    const res = await this.sentryErrorHook(eventData);
+      case IssueAction.Assigned:
+        await this.assignTo(eventData);
+        return;
+      case IssueAction.Resolved:
+
+      case IssueAction.Unresolved:
+        this.modifyStatus(eventData);
+        return;
+    }
+  }
+  async modifyStatus(eventData: IssueEvent) {}
+
+  async assignTo(eventData: IssueEvent) {
+    // const
+    const userInfo = await this.feishuUserHelper.getUserIdByEmailOrPhone({
+      emails: [eventData.assignedTo.email, eventData.operator.email],
+      userIdType: 'open_id',
+    });
+
+    console.log('[ userInfo ] >', userInfo);
+    // this.assignToHandler({
+    //   issueId: eventData.issueId,
+    //   // operator: eventData.operator,
+    //   // assignTo: eventData.assignedTo,
+    // });
+  }
+  async error(eventData: AlertEvent) {
+    const res = await this.errorHookHandler(eventData);
 
     //3min 内超过20次告警，发送额外致命错误
     const isTooManyWarning = await this.redisService.limiter(
-      pageModuleName,
+      eventData.pageModuleName,
       10,
       60 * 3,
     );
@@ -85,8 +102,32 @@ export class SentryWebhookService extends AlertBaseService {
     }
     return res;
   }
-  async comment(params: SentryHookDto) {
-    sendExceptionToFeishu(new Error(JSON.stringify(params)));
+  async comment(eventInfo: CommentEvent) {
+    const issueInfo = await this.checkIssueInCache(eventInfo.issueId);
+    await this.messageHelper.replyInThread(
+      JSON.stringify({
+        zh_cn: {
+          content: [
+            [
+              // {
+              //   tag: 'at',
+              //   user_id: open_id,
+              // },
+              {
+                tag: 'text',
+                text: `@${eventInfo.operator}在sentry中回复:${eventInfo.comment}`,
+              },
+              // {
+              //   tag: 'at',
+              //   user_id: assignToUserId,
+              // },
+            ],
+          ],
+        },
+      }),
+      issueInfo.messageId,
+      FeishuMsgType.Post,
+    );
   }
   /**
    * 报警暂时通过报错事件处理
@@ -101,7 +142,7 @@ export class SentryWebhookService extends AlertBaseService {
     sendExceptionToFeishu(new Error(JSON.stringify(params)));
   }
 
-  async sentryErrorHook(errorEvent: AlertEvent) {
+  async errorHookHandler(errorEvent: AlertEvent) {
     await this.alertFeishuAdapter.setEvent(errorEvent);
     this.writeToTable(errorEvent);
 

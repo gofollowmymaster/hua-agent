@@ -4,6 +4,7 @@ import { FEISHU_CLIENT_ID } from './constants';
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { CreateMessageType, FeishuMsgType } from '../type/im';
 import FeishuApiHelper from './feishu-api-helper';
+import { RedisService } from '@src/common/service/redis/redis.service';
 
 @Injectable({ scope: Scope.TRANSIENT })
 class FeishuMessageHelper extends FeishuApiHelper {

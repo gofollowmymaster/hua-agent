@@ -41,8 +41,8 @@ class FeishuBusinessLineTable extends FeishuTable {
     const backendLeaderId = res.items[0].fields['后端leader'][0].id;
     const backendAlertGroupId = res.items[0].fields['接口告警群']?.[0]?.id;
     const feishuProjectUrl = res.items[0].fields['飞书项目地址'];
-    const bu = res.items[0].record_id;
-
+    const bu = res.items[0].fields['业务线']?.[0]?.text;
+    // console.log('[ ---bu--- ] >', projectName, bu);
     return {
       frontendLeaderId,
       frontendLeaderName: res.items[0].fields['前端leader'][0].name,

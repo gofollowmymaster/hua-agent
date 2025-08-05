@@ -311,3 +311,72 @@ interface Dsc {
   trace_id: string;
   transaction: string;
 }
+
+export type SentryComment = {
+  comment_id: number;
+
+  issue_id: number;
+  project_slug: string;
+  timestamp: string;
+  comment: string;
+};
+
+export type SentryUser = {
+  email: string;
+  type: 'user';
+  id: string;
+  name: string;
+  openId: string;
+};
+
+export type SentryIssue = {
+  resolution_type?: 'in_next_release' | 'in_release';
+  assignee?: SentryUser;
+  issue: {
+    id: string;
+    shareId: null;
+    shortId: 'APLUS-USER-ZA';
+    title: string;
+    culprit: string;
+    permalink: null;
+    logger: null;
+    level: ErrorLevel;
+    status: 'ignored';
+    statusDetails: {};
+    substatus: string;
+    isPublic: false;
+    platform: 'javascript';
+    project: {
+      id: '25';
+      name: 'aplus-user';
+      slug: 'aplus-user';
+      platform: 'javascript-vue';
+    };
+    type: 'error';
+    metadata: {
+      value: string;
+      sdk: {
+        name: 'sentry.javascript.vue';
+        name_normalized: 'sentry.javascript.vue';
+      };
+      initial_priority: number;
+      title: string | null;
+    };
+    numComments: number;
+    assignedTo: SentryUser;
+    isBookmarked: boolean;
+    isSubscribed: boolean;
+    subscriptionDetails: null;
+    hasSeen: boolean;
+    annotations: [];
+    issueType: 'error';
+    issueCategory: 'error';
+    priority: 'high';
+    priorityLockedAt: null;
+    isUnhandled: boolean;
+    count: string;
+    userCount: number;
+    firstSeen: string;
+    lastSeen: string;
+  };
+};

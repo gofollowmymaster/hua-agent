@@ -10,16 +10,15 @@ import Redis from 'ioredis';
 import FeishuApiAlertIssueTable from '../common/table/api-alert-issue-table';
 import FeishuFrontendAlertIssueTable from '../common/table/frontend-alert-issue-table';
 import AlertFeishuAdapter from '../common/adapter/alert-feishu-adapter';
-import { sendExceptionToFeishu } from '@src/common/feishu/utils';
-import { ErrorEndpoint } from '../common/type/alert';
 import { SentryApiService } from '../common/service/sentry-api-service';
 import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
+import { AlertBaseService } from '../common/service/alert-base.service';
 
 @Injectable()
-export class FeishuCallbackService {
+export class FeishuCallbackService extends AlertBaseService {
   readonly redis: Redis;
   constructor(
-    private readonly logger: LoggerService,
+    // private readonly logger: LoggerService,
     readonly prisma: PrismaService,
     protected readonly redisService: RedisService,
     protected readonly config: ConfigService,
@@ -32,7 +31,8 @@ export class FeishuCallbackService {
     readonly sentryService: SentryApiService,
     readonly feishuUserHelper: FeishuUserHelper,
   ) {
-    this.redis = redisService.getClient();
+    super(redisService);
+    // this.redis = redisService.getClient();
   }
 
   async handle(callbackInfo: FeishuCallbackDto) {
@@ -51,36 +51,5 @@ export class FeishuCallbackService {
       return res;
     }
     throw new Error('未知事件类型');
-  }
-
-  async updateTable(
-    issue_id: string,
-    errorEndpoint: ErrorEndpoint,
-    recordNew: Record<string, any>,
-  ) {
-    const table =
-      errorEndpoint === ErrorEndpoint.Server
-        ? this.feishuApiIssueTable
-        : this.feishuFrontendIssueTable;
-    const issueRes = await table.search(
-      {
-        conjunction: 'and',
-        conditions: [
-          {
-            field_name: 'IssueId',
-            operator: 'is',
-            value: [issue_id],
-          },
-        ],
-      },
-      false,
-    );
-    if (issueRes.total == 0) {
-      sendExceptionToFeishu(new Error('修改卡片消息是未找到issue:' + issue_id));
-    } else {
-      const record = issueRes.items[0];
-      const { record_id: recordId } = record;
-      await table.update(recordId, recordNew);
-    }
   }
 }

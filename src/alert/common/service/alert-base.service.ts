@@ -17,12 +17,24 @@ import { BaseService } from '@src/common/base/BaseService';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { ConfigService } from '@nestjs/config';
-import { AlertEvent, ErrorEndpoint } from '../type/alert';
+import {
+  AlertEvent,
+  AssignEvent,
+  Environment,
+  ErrorEndpoint,
+  ModifyStatusEvent,
+  PageModuleName,
+} from '../type/alert';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
+import { RedisKeys } from '@src/common/const/redis-key.enum';
+import Redis from 'ioredis';
+import { FeishuMsgType } from '@src/common/feishu/type/im';
+import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
+import { issueStatusMap } from '@src/common/feishu/card/error-unresolve-card';
 
 @Injectable()
 export class AlertBaseService extends BaseService {
-  // private messageHelper;
+  protected readonly redis: Redis;
   protected prisma: PrismaService;
   protected readonly logger: LoggerService;
   protected readonly config: ConfigService;
@@ -34,9 +46,11 @@ export class AlertBaseService extends BaseService {
   protected readonly feishuBusinessLineTable: FeishuBusinessLineTable;
   protected readonly redisService: RedisService;
   protected readonly alertFeishuAdapter: AlertFeishuAdapter;
+  protected readonly feishuUserHelper: FeishuUserHelper;
   protected ignoreCodeList = ['401', '10002'];
-  constructor() {
+  constructor(redisService) {
     super();
+    this.redis = redisService.getClient();
   }
 
   /**
@@ -45,8 +59,10 @@ export class AlertBaseService extends BaseService {
    */
   async sendFeishuMsg(alertInfo: AlertEvent, message: string) {
     //获取飞书用户userid（todo）群Id -> 消息加急
-    const { groupId: feishuGroupId } =
-      await this.getGroupAndUserByProject(alertInfo);
+    const { groupId: feishuGroupId } = await this.getGroupAndUserByProject(
+      alertInfo.pageModuleName,
+      alertInfo.environment,
+    );
 
     // 发送群消息
     const groupMsgInfo = await this.messageHelper.createInteractToGroup(
@@ -88,8 +104,10 @@ export class AlertBaseService extends BaseService {
     const urgentType = isNeedSendAlertMsg(alertInfo.timestamp)
       ? 'Phone'
       : 'App';
-    const { userId: feishuUserId } =
-      await this.getGroupAndUserByProject(alertInfo);
+    const { userId: feishuUserId } = await this.getGroupAndUserByProject(
+      alertInfo.pageModuleName,
+      alertInfo.environment,
+    );
     let res = await this.sendFsAlertMsgToUser(
       groupMsgInfo,
       feishuUserId,
@@ -177,8 +195,11 @@ export class AlertBaseService extends BaseService {
     return !!message.userAlerted[0].reactionTime;
   }
 
-  async getGroupAndUserByProject(alertInfo: AlertEvent) {
-    const { pageModuleName, environment } = alertInfo;
+  async getGroupAndUserByProject(
+    pageModuleName: PageModuleName,
+    environment: Environment,
+  ) {
+    // const { pageModuleName, environment } = alertInfo;
     if (environment == 'dev' || environment == 'development') {
       return {
         groupId: this.config.getOrThrow('FeishuMsgDebugGroupId'),
@@ -249,6 +270,7 @@ export class AlertBaseService extends BaseService {
         const { record_id: recordId, fields } = record;
         await this.feishuFrontendIssueTable.update(recordId, {
           错误次数: (fields['错误次数'] as number) + 1,
+          是否解决: false,
         });
       }
     } catch (err) {
@@ -283,10 +305,139 @@ export class AlertBaseService extends BaseService {
         const { record_id: recordId, fields } = record;
         await this.feishuApiIssueTable.update(recordId, {
           错误次数: (fields['错误次数'] as number) + 1,
+          是否解决: false,
         });
       }
     } catch (err) {
       sendExceptionToFeishu(err);
+    }
+  }
+
+  async checkIssueInCache(issueId: string) {
+    const issueInfo = await this.redis.hgetall(
+      RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),
+    );
+
+    if (!issueInfo.issueId) {
+      //跨天问题
+      throw new Error(`Issue:${issueId}已失效`);
+    }
+    return issueInfo;
+  }
+  async assignToHandler(eventData: AssignEvent) {
+    const issueInfo = await this.checkIssueInCache(eventData.issueId);
+
+    if (issueInfo.messageId) {
+      this.messageHelper.replyInThread(
+        JSON.stringify({
+          zh_cn: {
+            content: [
+              [
+                {
+                  tag: 'at',
+                  user_id: eventData.operator,
+                },
+                {
+                  tag: 'text',
+                  text: `将问题指派给`,
+                },
+                {
+                  tag: 'at',
+                  user_id: eventData.assignTo,
+                },
+              ],
+            ],
+          },
+        }),
+        issueInfo.messageId,
+        FeishuMsgType.Post,
+      );
+    }
+
+    this.updateTable(
+      issueInfo.issueId,
+      issueInfo.errorEndpoint as ErrorEndpoint,
+      {
+        负责人: [{ id: eventData.assignTo }],
+      },
+    );
+  }
+
+  async modifyStatusHandler(eventData: ModifyStatusEvent) {
+    const issueInfo = await this.checkIssueInCache(eventData.issueId);
+    if (issueInfo.messageId) {
+      this.messageHelper.replyInThread(
+        JSON.stringify({
+          zh_cn: {
+            content: [
+              [
+                {
+                  tag: 'at',
+                  user_id: eventData.operator,
+                },
+                {
+                  tag: 'text',
+                  text: `将将问题状态修改为`,
+                },
+                {
+                  tag: 'text',
+                  text:
+                    issueStatusMap[eventData.issueStatus] ||
+                    eventData.issueStatus,
+                  style: ['bold'],
+                },
+              ],
+            ],
+          },
+        }),
+        issueInfo.messageId,
+        FeishuMsgType.Post,
+      );
+    }
+    if (
+      !['resolved', 'ignoreCount100', 'ignoreCount1000'].includes(
+        eventData.issueStatus,
+      )
+    ) {
+      return;
+    }
+    this.updateTable(
+      issueInfo.issueId,
+      issueInfo.errorEndpoint as ErrorEndpoint,
+      {
+        是否解决: true,
+      },
+    );
+  }
+
+  async updateTable(
+    issue_id: string,
+    errorEndpoint: ErrorEndpoint,
+    recordNew: Record<string, any>,
+  ) {
+    const table =
+      errorEndpoint === ErrorEndpoint.Server
+        ? this.feishuApiIssueTable
+        : this.feishuFrontendIssueTable;
+    const issueRes = await table.search(
+      {
+        conjunction: 'and',
+        conditions: [
+          {
+            field_name: 'IssueId',
+            operator: 'is',
+            value: [issue_id],
+          },
+        ],
+      },
+      false,
+    );
+    if (issueRes.total == 0) {
+      sendExceptionToFeishu(new Error('修改卡片消息是未找到issue:' + issue_id));
+    } else {
+      const record = issueRes.items[0];
+      const { record_id: recordId } = record;
+      await table.update(recordId, recordNew);
     }
   }
 }
