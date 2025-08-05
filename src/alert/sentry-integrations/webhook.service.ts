@@ -71,7 +71,14 @@ export class SentryWebhookService extends AlertBaseService {
         return;
     }
   }
-  async modifyStatus(eventData: IssueEvent) {}
+  async modifyStatus(eventData: IssueEvent) {
+    return;
+    //   this.modifyStatusHandler({
+    //     operator:
+    // issueId: string;
+    // issueStatus: 'resolved' | 'unresolved' | 'ignored';
+    //   });
+  }
 
   async assignTo(eventData: IssueEvent) {
     // const
