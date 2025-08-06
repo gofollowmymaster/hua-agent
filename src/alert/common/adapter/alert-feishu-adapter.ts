@@ -5,7 +5,7 @@ import {
   FrontendAlertTableDto,
 } from '../type/alert-table';
 import { apiModuleBuMap } from '../../alert-message/app-user-map';
-import { RequestData } from '@src/alert/common/type/alert';
+import { ErrorEndpoint, RequestData } from '@src/alert/common/type/alert';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { Injectable } from '@nestjs/common';
 import { AlertEvent } from '@src/alert/common/type/alert';
@@ -119,7 +119,10 @@ export default class AlertFeishuAdapter {
   }
   toUnresolvedCardeData(): UnresolvedCardData {
     return {
-      userId: this.appInfo.frontendLeaderId,
+      userId:
+        this.event.errorEndpoint == ErrorEndpoint.Server
+          ? this.appInfo.backendLeaderId
+          : this.appInfo.frontendLeaderId,
       title: this.event.level == 'fatal' ? '高危报警' : '异常报警',
       environment: this.event.environment,
       errorType: this.event.type,

@@ -18,7 +18,7 @@ export type ResolvedCardData = {
   [key: string]: any;
 };
 
-export default class ErrorResolvedCard extends FeishuCard {
+export default class ErrorClosedCard extends FeishuCard {
   static readonly templateId = 'AAqz0I0RCKyBk';
   static readonly templateVersion = '1.0.0';
 

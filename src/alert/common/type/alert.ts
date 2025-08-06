@@ -115,3 +115,10 @@ export type ModifyStatusEvent = {
   issueId: string;
   issueStatus: 'resolved' | 'unresolved' | 'ignored';
 };
+
+export type CloseIssueEvent = {
+  operator: string;
+  issueId: string;
+  reason: string;
+  solution: string;
+};

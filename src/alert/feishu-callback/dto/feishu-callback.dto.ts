@@ -63,7 +63,12 @@ class CallbackActionDto {
     type: String,
     description: '回调的选项值',
   })
-  option: string;
+  option?: string;
+  @ApiProperty({
+    type: Object,
+    description: '回调的表单值',
+  })
+  form_value?: Record<string, any>;
 }
 class CallbackContext {}
 export class CallbackEventDto {

@@ -20,6 +20,7 @@ import { ConfigService } from '@nestjs/config';
 import {
   AlertEvent,
   AssignEvent,
+  CloseIssueEvent,
   Environment,
   ErrorEndpoint,
   ModifyStatusEvent,
@@ -326,7 +327,15 @@ export class AlertBaseService extends BaseService {
   }
   async assignToHandler(eventData: AssignEvent) {
     const issueInfo = await this.checkIssueInCache(eventData.issueId);
-
+    this.redis.hset(
+      RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace(
+        '{issueId}',
+        eventData.issueId,
+      ),
+      {
+        userId: eventData.assignTo,
+      },
+    );
     if (issueInfo.messageId) {
       this.messageHelper.replyInThread(
         JSON.stringify({
@@ -366,6 +375,15 @@ export class AlertBaseService extends BaseService {
   async modifyStatusHandler(eventData: ModifyStatusEvent) {
     const issueInfo = await this.checkIssueInCache(eventData.issueId);
     if (issueInfo.messageId) {
+      this.redis.hset(
+        RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace(
+          '{issueId}',
+          eventData.issueId,
+        ),
+        {
+          status: issueStatusMap[eventData.issueStatus],
+        },
+      );
       this.messageHelper.replyInThread(
         JSON.stringify({
           zh_cn: {
@@ -377,7 +395,7 @@ export class AlertBaseService extends BaseService {
                 },
                 {
                   tag: 'text',
-                  text: `将将问题状态修改为`,
+                  text: `将问题状态修改为`,
                 },
                 {
                   tag: 'text',
@@ -406,6 +424,51 @@ export class AlertBaseService extends BaseService {
       issueInfo.errorEndpoint as ErrorEndpoint,
       {
         是否解决: true,
+      },
+    );
+  }
+
+  async closeIssueHandler(eventData: CloseIssueEvent) {
+    const issueInfo = await this.checkIssueInCache(eventData.issueId);
+    if (issueInfo.messageId) {
+      this.redis.hset(
+        RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace(
+          '{issueId}',
+          eventData.issueId,
+        ),
+        {
+          reason: eventData.reason,
+          solution: eventData.solution,
+        },
+      );
+      this.messageHelper.replyInThread(
+        JSON.stringify({
+          zh_cn: {
+            content: [
+              [
+                {
+                  tag: 'at',
+                  user_id: eventData.operator,
+                },
+                {
+                  tag: 'text',
+                  text: `🎉将本问题关闭🎉\n【问题原因】${eventData.reason}\n【处理方法】${eventData.solution}`,
+                },
+              ],
+            ],
+          },
+        }),
+        issueInfo.messageId,
+        FeishuMsgType.Post,
+      );
+    }
+
+    this.updateTable(
+      issueInfo.issueId,
+      issueInfo.errorEndpoint as ErrorEndpoint,
+      {
+        错误原因: eventData.reason,
+        解决方案: eventData.solution,
       },
     );
   }

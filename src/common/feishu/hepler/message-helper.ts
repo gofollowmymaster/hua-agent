@@ -5,6 +5,7 @@ import { Inject, Injectable, Scope } from '@nestjs/common';
 import { CreateMessageType, FeishuMsgType } from '../type/im';
 import FeishuApiHelper from './feishu-api-helper';
 import { RedisService } from '@src/common/service/redis/redis.service';
+import { UserIdType } from '../type/contact';
 
 @Injectable({ scope: Scope.TRANSIENT })
 class FeishuMessageHelper extends FeishuApiHelper {
@@ -85,14 +86,18 @@ class FeishuMessageHelper extends FeishuApiHelper {
       });
     });
   }
-  async urgentApp(userId: string[], messageId: string) {
+  async urgentApp(
+    userId: string[],
+    messageId: string,
+    userIdType: UserIdType = 'user_id',
+  ) {
     return this.requestWrapper(async () => {
       return await this.client.client.im.message.urgentApp({
         data: {
           user_id_list: [...userId],
         },
         params: {
-          user_id_type: 'user_id',
+          user_id_type: userIdType,
         },
         path: {
           message_id: messageId,

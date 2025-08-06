@@ -1,5 +1,4 @@
 import { CustomCallbackHandleType } from '.';
-import ErrorUnresolvedCard from '@src/common/feishu/card/error-unresolve-card';
 
 const AssignToHandler: CustomCallbackHandleType = async (event, service) => {
   const {
@@ -35,9 +34,6 @@ const AssignToHandler: CustomCallbackHandleType = async (event, service) => {
     },
     issueId,
   );
-  // const issueInfo = await service.checkIssueInCache(issueId);
-  // if (issueInfo.cardData) {
-  // const cardData = JSON.parse(issueInfo.cardData);
 
   return {
     toast: {
@@ -48,19 +44,6 @@ const AssignToHandler: CustomCallbackHandleType = async (event, service) => {
         en_us: 'card action success',
       },
     },
-    // card: {
-    //   type: 'template',
-    //   data: {
-    //     template_id: ErrorUnresolvedCard.templateId,
-    //     template_version_name: ErrorUnresolvedCard.templateVersion,
-    //     template_variable: {
-    //       ...cardData,
-    //       userId: assignToUserId,
-    //       userName: name,
-    //     },
-    //   },
-    // },
-    // };
   };
 };
 export default AssignToHandler;
