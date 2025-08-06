@@ -21,7 +21,7 @@ export type ResolvedCardData = {
 
 export default class ErrorResolvedCard extends FeishuCard {
   static readonly templateId = 'AAqzwZgGpWfzJ';
-  static readonly templateVersion = '1.0.6';
+  static readonly templateVersion = '1.0.7';
 
   /**
    * 构建飞书报警卡片消息

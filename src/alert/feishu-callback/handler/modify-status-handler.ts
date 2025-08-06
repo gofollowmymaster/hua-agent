@@ -37,6 +37,7 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
         template_version_name: ErrorUnresolvedCard.templateVersion,
         template_variable: {
           ...cardData,
+          color: ErrorUnresolvedCard.getColor(statusLabel),
           status: statusLabel,
           statusOptions: ErrorUnresolvedCard.statusOptions(statusLabel),
         },
