@@ -1,10 +1,5 @@
 import { CustomCallbackHandleType } from '.';
-import ErrorUnresolvedCard, {
-  IssueStatus,
-  issueStatusMap,
-} from '@src/common/feishu/card/error-unresolve-card';
-import ErrorResolvedCard from '@src/common/feishu/card/error-resolved-card';
-import { ModifyStatusEvent } from '@src/alert/common/type/alert';
+
 import ErrorClosedCard from '@src/common/feishu/card/error-closed-card';
 
 const CloseHandler: CustomCallbackHandleType = async (event, service) => {
@@ -35,6 +30,8 @@ const CloseHandler: CustomCallbackHandleType = async (event, service) => {
         template_variable: {
           ...cardData,
           status: statusLabel,
+          reason,
+          solution,
         },
       },
     };
