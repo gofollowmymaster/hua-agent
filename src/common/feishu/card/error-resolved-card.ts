@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { FeishuCard } from './feishu-card';
+import { IssueStatus } from './error-unresolve-card';
 
 export type ResolvedCardData = {
   project: string;
@@ -17,17 +18,10 @@ export type ResolvedCardData = {
   environment: string;
   [key: string]: any;
 };
-export type IssueStatus = keyof typeof issueStatusMap;
-const issueStatusMap = {
-  unresolved: '待处理',
-  resolved: '已解决',
-  ignoreCount100: '暂时忽略',
-  ignoreCount1000: '已忽略',
-  progressing: '处理中',
-};
+
 export default class ErrorResolvedCard extends FeishuCard {
   static readonly templateId = 'AAqzwZgGpWfzJ';
-  static readonly templateVersion = '1.0.3';
+  static readonly templateVersion = '1.0.6';
 
   /**
    * 构建飞书报警卡片消息

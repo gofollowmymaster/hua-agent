@@ -129,15 +129,14 @@ export default class AlertFeishuAdapter {
       linkUrl: this.event.web_url,
       level: this.event.level,
       eventType: this.event.type,
-      content: this.event.culprit + '\n' + this.event.title,
+      abstract: this.event.culprit,
+      content: this.event.title,
       count: 1,
       status: issueStatusMap['unresolved'],
-
       issueId: this.event.issue_id,
       errorTime: dayjs(this.event.timestamp * 1000).format(
         'YYYY-MM-DD HH:mm:ss',
       ),
-      color: this.event.level == 'fatal' ? 'red' : 'orange',
     };
   }
 }

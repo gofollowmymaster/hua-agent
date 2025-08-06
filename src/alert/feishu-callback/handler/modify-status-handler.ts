@@ -1,12 +1,10 @@
-import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { CustomCallbackHandleType } from '.';
-import { FeishuMsgType } from '@src/common/feishu/type/im';
 import ErrorUnresolvedCard, {
   IssueStatus,
   issueStatusMap,
 } from '@src/common/feishu/card/error-unresolve-card';
 import ErrorResolvedCard from '@src/common/feishu/card/error-resolved-card';
-import { ErrorEndpoint, ModifyStatusEvent } from '@src/alert/common/type/alert';
+import { ModifyStatusEvent } from '@src/alert/common/type/alert';
 
 const ModifyStatusHandler: CustomCallbackHandleType = async (
   event,
@@ -23,15 +21,15 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
   } = event;
   const issueInfo = await service.checkIssueInCache(issueId);
   console.log('[ issueInfo ] >', issueInfo);
-  const status = issueStatus.startsWith('ignore') ? 'ignored' : issueStatus;
   service.modifyStatusHandler({
     issueId,
     operator: open_id,
-    issueStatus: status,
+    issueStatus,
   } as ModifyStatusEvent);
 
   if (issueInfo.cardData) {
     const cardData = JSON.parse(issueInfo.cardData);
+    const statusLabel = issueStatusMap[issueStatus];
     let cardReturn = {
       type: 'template',
       data: {
@@ -39,7 +37,8 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
         template_version_name: ErrorUnresolvedCard.templateVersion,
         template_variable: {
           ...cardData,
-          status: issueStatusMap[issueStatus],
+          status: statusLabel,
+          statusOptions: ErrorUnresolvedCard.statusOptions(statusLabel),
         },
       },
     };
@@ -49,6 +48,7 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
       )
     ) {
       //修改sentry
+
       service.sentryService.updateIssue(
         {
           status: issueStatus as IssueStatus,

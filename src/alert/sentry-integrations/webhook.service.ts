@@ -97,7 +97,7 @@ export class SentryWebhookService extends AlertBaseService {
   async error(eventData: AlertEvent) {
     const res = await this.errorHookHandler(eventData);
 
-    //3min 内超过20次告警，发送额外致命错误
+    //按前端业务模块3min 内超过10次告警，发送额外致命错误
     const isTooManyWarning = await this.redisService.limiter(
       eventData.pageModuleName,
       10,
@@ -196,6 +196,7 @@ export class SentryWebhookService extends AlertBaseService {
       }),
       issueInfo.messageId,
     );
+    //todo 更新卡片信息  激活
 
     console.log('[ res ] >', res);
   }

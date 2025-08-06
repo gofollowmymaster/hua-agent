@@ -329,6 +329,10 @@ export type SentryUser = {
   openId: string;
 };
 
+export type SentryStatus = 'ignored' | 'resolved' | 'unresolved';
+// | 'ignored_in_release'
+// | 'ignored_in_next_release';
+
 export type SentryIssue = {
   resolution_type?: 'in_next_release' | 'in_release';
   assignee?: SentryUser;
@@ -341,7 +345,7 @@ export type SentryIssue = {
     permalink: null;
     logger: null;
     level: ErrorLevel;
-    status: 'ignored';
+    status: SentryStatus;
     statusDetails: {};
     substatus: string;
     isPublic: false;
