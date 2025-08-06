@@ -4,7 +4,7 @@ import FeishuMessageHelper from './hepler/message-helper';
 import { CommonAlertCard, CommonCardData } from './card/alert-card';
 import dayjs from 'dayjs';
 import { getGlobalAppInstance } from '@utils/app-config';
-
+import { throttle } from 'lodash-es';
 /**
  * 使用预配置的 Feishu 客户端向 Feishu 群组发送异常通知。
  *
@@ -13,7 +13,7 @@ import { getGlobalAppInstance } from '@utils/app-config';
  * 警报卡片中包含一个指向阿里云日志服务的链接，以便进一步调查。
  */
 
-export const sendExceptionToFeishu = (
+export const sendExceptionToFeishuOrigin = (
   exception: Error,
   reqContext: string = '',
 ) => {
@@ -53,3 +53,11 @@ export const sendCommonCardToFeishu = (options: CommonCardData) => {
     config.get('DefaultAlertFeishuGroupId'),
   );
 };
+
+export const sendExceptionToFeishu: (
+  exception: Error,
+  reqContext?: string,
+) => void = throttle(sendExceptionToFeishuOrigin, 200, {
+  leading: true,
+  trailing: false,
+});
