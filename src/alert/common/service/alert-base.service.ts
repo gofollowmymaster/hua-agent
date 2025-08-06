@@ -221,7 +221,7 @@ export class AlertBaseService extends BaseService {
     const projectName = decodeURIComponent(pageModuleName).trim();
     const { frontendAlertGroupId: groupId, frontendLeaderId: userId } =
       await this.feishuBusinessLineTable.getBusinessLineBySubapp(projectName);
-
+    console.log('[ projectName ] >', projectName, userId);
     return {
       userId,
       groupId,

@@ -25,7 +25,7 @@ export const sendExceptionToFeishu = (
     errorType: exception.message || '内部错误',
     content: reqContext || exception.stack,
   };
-  console.log('[   exception ] >', exception);
+  console.log('[   exception ] >', exception.message);
   sendCommonCardToFeishu(options);
 };
 

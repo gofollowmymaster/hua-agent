@@ -71,7 +71,7 @@ async function bootstrap() {
 bootstrap();
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('-------Unhandled Rejection at:', reason);
+  // console.error('-------Unhandled Rejection at:', reason);
 
   promise.then().catch((error: Error) => {
     sendExceptionToFeishu(error);

@@ -1,8 +1,5 @@
-import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { CustomCallbackHandleType } from '.';
-import { FeishuMsgType } from '@src/common/feishu/type/im';
 import ErrorUnresolvedCard from '@src/common/feishu/card/error-unresolve-card';
-import { ErrorEndpoint } from '@src/alert/common/type/alert';
 
 const AssignToHandler: CustomCallbackHandleType = async (event, service) => {
   const {
@@ -27,7 +24,7 @@ const AssignToHandler: CustomCallbackHandleType = async (event, service) => {
   });
 
   const {
-    user: { user_id, name, enterprise_email },
+    user: { user_id, enterprise_email },
   } = userInfo;
   console.log('[ user_id ] >', assignToUserId, open_id, userInfo);
   console.log('[ user_id ] >', user_id);
@@ -38,32 +35,32 @@ const AssignToHandler: CustomCallbackHandleType = async (event, service) => {
     },
     issueId,
   );
-  const issueInfo = await service.checkIssueInCache(issueId);
-  if (issueInfo.cardData) {
-    const cardData = JSON.parse(issueInfo.cardData);
+  // const issueInfo = await service.checkIssueInCache(issueId);
+  // if (issueInfo.cardData) {
+  // const cardData = JSON.parse(issueInfo.cardData);
 
-    return {
-      toast: {
-        type: 'info',
-        content: '指派成功',
-        i18n: {
-          zh_cn: '指派成功',
-          en_us: 'card action success',
-        },
+  return {
+    toast: {
+      type: 'info',
+      content: '指派成功',
+      i18n: {
+        zh_cn: '指派成功',
+        en_us: 'card action success',
       },
-      card: {
-        type: 'template',
-        data: {
-          template_id: ErrorUnresolvedCard.templateId,
-          template_version_name: ErrorUnresolvedCard.templateVersion,
-          template_variable: {
-            ...cardData,
-            userId: assignToUserId,
-            userName: name,
-          },
-        },
-      },
-    };
-  }
+    },
+    // card: {
+    //   type: 'template',
+    //   data: {
+    //     template_id: ErrorUnresolvedCard.templateId,
+    //     template_version_name: ErrorUnresolvedCard.templateVersion,
+    //     template_variable: {
+    //       ...cardData,
+    //       userId: assignToUserId,
+    //       userName: name,
+    //     },
+    //   },
+    // },
+    // };
+  };
 };
 export default AssignToHandler;
