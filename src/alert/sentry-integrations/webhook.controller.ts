@@ -76,6 +76,8 @@ export class SentryWebhookController {
     if (!headers['developer']) {
       return;
     }
+    console.log('[ ----params--- ] >', params);
+
     const resource = headers['sentry-hook-resource'];
     switch (resource) {
       case SentryHookType.Error:
@@ -106,9 +108,13 @@ export class SentryWebhookController {
       issueType: params.data.issue.issueType,
       level: params.data.issue.level,
       type: params.data.issue.type,
-      operator: params.data.assignee,
+      operator: params.data.assignee ||
+        params.data.issue.statusDetails?.actor || {
+          email: '管理员',
+          name: '管理员',
+        },
     };
-    console.log('[ issueInfo ] >', issueInfo);
+    console.log('[ ----issueInfo--- ] >', issueInfo);
     return await this.sentryWebhookService.issue(issueInfo);
   }
   async comment(params: SentryHookCommentDto) {

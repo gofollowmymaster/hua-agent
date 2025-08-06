@@ -65,19 +65,19 @@ export class SentryWebhookService extends AlertBaseService {
         await this.assignTo(eventData);
         return;
       case IssueAction.Resolved:
-
       case IssueAction.Unresolved:
+        console.log('[ resolved ] >', eventData);
         this.modifyStatus(eventData);
         return;
     }
   }
   async modifyStatus(eventData: IssueEvent) {
-    return;
-    //   this.modifyStatusHandler({
-    //     operator:
-    // issueId: string;
-    // issueStatus: 'resolved' | 'unresolved' | 'ignored';
-    //   });
+    // return;
+    this.modifyStatusHandler({
+      operator: eventData.operator?.email,
+      issueId: eventData.issueId,
+      issueStatus: eventData.status,
+    });
   }
 
   async assignTo(eventData: IssueEvent) {
@@ -88,11 +88,11 @@ export class SentryWebhookService extends AlertBaseService {
     });
 
     console.log('[ userInfo ] >', userInfo);
-    // this.assignToHandler({
-    //   issueId: eventData.issueId,
-    //   // operator: eventData.operator,
-    //   // assignTo: eventData.assignedTo,
-    // });
+    this.assignToHandler({
+      issueId: eventData.issueId,
+      operator: eventData.operator.email,
+      assignTo: eventData.assignedTo.email,
+    });
   }
   async error(eventData: AlertEvent) {
     const res = await this.errorHookHandler(eventData);

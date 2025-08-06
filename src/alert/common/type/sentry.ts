@@ -323,16 +323,46 @@ export type SentryComment = {
 
 export type SentryUser = {
   email: string;
-  type: 'user';
-  id: string;
+  type?: 'user';
+  id?: string;
   name: string;
-  openId: string;
+  openId?: string;
 };
 
 export type SentryStatus = 'ignored' | 'resolved' | 'unresolved';
 // | 'ignored_in_release'
 // | 'ignored_in_next_release';
-
+export type StatusDetails = {
+  inRelease?: string;
+  actor?: {
+    id: '10';
+    name: string;
+    username: string;
+    email: string;
+    avatarUrl: 'https://gravatar.com/avatar/e940675142eb0c500c9c237c5831a583c5b6cf38a324ff1a5d39efeb1add6766?s=32&d=mm';
+    isActive: true;
+    hasPasswordAuth: true;
+    isManaged: false;
+    dateJoined: '2024-11-07T13:01:12.499186Z';
+    lastLogin: '2025-08-02T04:27:54.872960Z';
+    has2fa: false;
+    lastActive: '2025-08-05T07:34:55.021633Z';
+    isSuperuser: false;
+    isStaff: false;
+    emails: [
+      {
+        id: '10';
+        email: string;
+        is_verified: true;
+      },
+    ];
+    avatar: {
+      avatarType: 'letter_avatar';
+      avatarUuid: null;
+      avatarUrl: null;
+    };
+  };
+};
 export type SentryIssue = {
   resolution_type?: 'in_next_release' | 'in_release';
   assignee?: SentryUser;
@@ -346,7 +376,7 @@ export type SentryIssue = {
     logger: null;
     level: ErrorLevel;
     status: SentryStatus;
-    statusDetails: {};
+    statusDetails: StatusDetails;
     substatus: string;
     isPublic: false;
     platform: 'javascript';
