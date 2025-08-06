@@ -21,7 +21,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (typeof resMsg != 'string' && isObject(resMsg) && 'message' in resMsg) {
       resMsg = resMsg.message as object;
     }
-    if (status >= 300) {
+    if (status >= 300 && status !== 401) {
       sendExceptionToFeishu(exception, request.url);
     }
     response.status(status).json({

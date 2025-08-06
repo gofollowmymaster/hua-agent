@@ -4,7 +4,7 @@ import FeishuMessageHelper from './hepler/message-helper';
 import { CommonAlertCard, CommonCardData } from './card/alert-card';
 import dayjs from 'dayjs';
 import { getGlobalAppInstance } from '@utils/app-config';
-import { throttle } from 'lodash-es';
+import { throttle } from 'lodash';
 /**
  * 使用预配置的 Feishu 客户端向 Feishu 群组发送异常通知。
  *
