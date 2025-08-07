@@ -2,8 +2,8 @@ import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 
 import { CacheService } from './cache.service';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@src/common/guard/auth';
 import { CacheClearDto } from './dto/cache-clear.dto';
+import { SecretAuthGuard } from '@src/common/guard/secret-auth';
 
 @ApiTags('缓存管理')
 @Controller('admin/cache')
@@ -18,7 +18,7 @@ export class CacheController {
     description: 'success',
     type: String,
   })
-  @UseGuards(AuthGuard)
+  @UseGuards(SecretAuthGuard)
   @ApiBody({
     type: CacheClearDto,
   })
@@ -35,7 +35,7 @@ export class CacheController {
     description: 'success',
     type: String,
   })
-  @UseGuards(AuthGuard)
+  @UseGuards(SecretAuthGuard)
   @ApiBody({
     type: CacheClearDto,
   })

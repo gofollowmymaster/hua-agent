@@ -12,7 +12,7 @@ import { ClientFactory, FeishuApp } from '../feishu/clients';
 import { RedisService } from '../service/redis/redis.service';
 
 @Injectable()
-export class SecretAuthGuard implements CanActivate {
+export class SignAuthGuard implements CanActivate {
   private clientSecretTable: ClientSecretTable;
   constructor(
     private config: ConfigService,

@@ -21,7 +21,7 @@ export class SecretAuthGuard implements CanActivate {
     this.clientSecretTable = new ClientSecretTable(
       this.config,
       new FeishuTableHelper(
-        ClientFactory.create(FeishuApp.AilyAplusClient),
+        ClientFactory.create(FeishuApp.AlertClient),
         redisService,
       ),
     );

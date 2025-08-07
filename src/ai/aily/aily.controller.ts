@@ -4,7 +4,7 @@ import { ApiBody, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { FeishuGenerateTokenDto, FeishuTokenDto } from './dto/aily';
 import { AplusResponse } from '@src/type/global';
 import { FeishuAuthType } from '@src/common/schedule-task/load-fixed-token';
-import { SecretAuthGuard } from '@src/common/guard/sign-auth';
+import { SignAuthGuard } from '@src/common/guard/sign-auth';
 
 @Controller('aily')
 export class AilyController {
@@ -17,7 +17,7 @@ export class AilyController {
   })
   @ApiBody({ type: FeishuTokenDto })
   @ApiOkResponse({ type: AplusResponse<FeishuAuthType> })
-  @UseGuards(SecretAuthGuard)
+  @UseGuards(SignAuthGuard)
   async getToken() {
     const feishuUser = await this.authService.getToken();
     if (!feishuUser) {
@@ -33,7 +33,7 @@ export class AilyController {
   })
   @ApiBody({ type: FeishuGenerateTokenDto })
   @ApiOkResponse({ type: AplusResponse<FeishuAuthType> })
-  @UseGuards(SecretAuthGuard)
+  @UseGuards(SignAuthGuard)
   async getTokenByCode(@Body() params: FeishuGenerateTokenDto) {
     return this.authService.getTokenByCode(params.code);
   }
