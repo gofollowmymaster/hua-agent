@@ -1,12 +1,1 @@
-import crypto from 'crypto';
-function verifySignature(
-  data,
-  signature,
-  secret = 'eb470d9237d66d515fabbd87160152fd0c7c5b808c3089c90c8d82c6569cd26a',
-) {
-  const hmac = crypto.createHmac('sha256', secret);
-  hmac.update(JSON.stringify(data), 'utf8');
-  const digest = hmac.digest('hex');
-  return digest === signature;
-}
-console.log('[ generatedSignature ] >', verifySignature());
+{\"data\":{\"template_id\":\"AAqz6VqUmrfDw\",\"template_variable\":{\"userId\":\"ou_a1259cb97cd9853f842537d9c8966f43\",\"title\":\"异常报警\",\"environment\":\"dev\",\"errorType\":\"error\",\"errorMessage\":\"UnhandledRejection: Non-Error promise rejection captured with value: View loading\",\"userName\":\"Jackie\",\"project\":\"subapp-user-mos\",\"outerLink\":\"https://q1njej8cpab.feishu.cn/record/ZSo1rS5doehMV6cXobfcPtSqnGc\",\"linkUrl\":\"https://q1njej8cpab.feishu.cn/record/ZSo1rS5doehMV6cXobfcPtSqnGc\",\"level\":\"warning\",\"eventType\":\"error\",\"abstract\":\"【普通警告】【subapp-user-mos】页面路径/subapp-user-mos/ad/business/ad-mix-list/ad-mix-detail\",\"content\":\"UnhandledRejection: Non-Error promise rejection captured with value: View loading\",\"count\":1,\"status\":\"待处理\",\"issueId\":\"217211000\",\"errorTime\":\"2025-08-06 17:34:03\"}},\"type\":\"template\"}

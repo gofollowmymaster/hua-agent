@@ -30,4 +30,10 @@ export type BitTableCreateParams = Parameters<
 
 export type BitTableFields = BitTableCreateParams[0]['data']['fields'];
 
-export type BitTableApiOption = BitTableCreateParams[0]['params'];
+export type BitTableCreateOption = BitTableCreateParams[0]['params'];
+
+export type BitTableGetParams = Parameters<
+  lark.Client['bitable']['appTableRecord']['get']
+>;
+
+export type BitTableGetOption = BitTableGetParams[0]['params'];

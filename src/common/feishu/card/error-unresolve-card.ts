@@ -28,6 +28,7 @@ export const issueStatusMap = {
   ignoreCount100: '暂时忽略',
   ignoreCount1000: '已忽略',
   progressing: '处理中',
+  reopened: '重新打开',
 } as const;
 export default class ErrorUnresolvedCard extends FeishuCard {
   static readonly templateId = 'AAqz6VqUmrfDw';

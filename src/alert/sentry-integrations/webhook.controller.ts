@@ -13,6 +13,7 @@ import { ApiBody, ApiHeaders, ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
   SentryHookCommentDto,
   SentryHookDto,
+  SentryHookErrorDto,
   SentryHookIssueDto,
   SentryHookType,
   SentryWebHookHeader,
@@ -62,7 +63,11 @@ export class SentryWebhookController {
   })
   @ApiBody({ type: SentryHookDto })
   @Post('webhook')
-  // sentry webhook入口
+  /**
+   *  sentry webhook入口
+   * 所有操作异步进行
+   * 当前错误时会丢弃，无补偿措施
+   *  */
   async webhook(
     @Headers() headers: SentryWebHookHeader,
     @Body() params: SentryHookDto,
@@ -76,24 +81,28 @@ export class SentryWebhookController {
     if (!headers['developer']) {
       return;
     }
-    console.log('[ ----params--- ] >', params);
 
     const resource = headers['sentry-hook-resource'];
     switch (resource) {
       case SentryHookType.Error:
-        return await this.error(params);
+        this.error(params);
+        break;
 
       case SentryHookType.Issue:
-        return await this.issue(params);
+        this.issue(params);
+        break;
 
       case SentryHookType.Comment:
-        return await this.comment(params);
+        this.comment(params);
+        break;
 
       case SentryHookType.EventAlert:
       case SentryHookType.MetricAlert:
-        return await this.sentryWebhookService.alert(params);
+        this.sentryWebhookService.alert(params);
+        break;
       case SentryHookType.Installation:
-        return await this.sentryWebhookService.installation(params);
+        this.sentryWebhookService.installation(params);
+        break;
     }
   }
   async issue(params: SentryHookIssueDto) {
@@ -114,7 +123,6 @@ export class SentryWebhookController {
           name: '管理员',
         },
     };
-    console.log('[ ----issueInfo--- ] >', issueInfo);
     return await this.sentryWebhookService.issue(issueInfo);
   }
   async comment(params: SentryHookCommentDto) {
@@ -127,7 +135,7 @@ export class SentryWebhookController {
       comment,
     });
   }
-  async error(params: SentryHookDto) {
+  async error(params: SentryHookErrorDto) {
     const alertError = params.data.error;
 
     const requestData = alertError.extra?.__serialized__;
@@ -137,7 +145,8 @@ export class SentryWebhookController {
     const eventData: AlertEvent = {
       ...alertError,
       title: alertError.title,
-      requestData,
+      issueId: alertError.issue_id,
+      webUrl: alertError.web_url,
       pageModuleName,
       serverModuleName,
       errorEndpoint: alertError.extra?.errorEndpoint || ErrorEndpoint.Page,

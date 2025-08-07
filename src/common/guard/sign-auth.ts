@@ -9,14 +9,21 @@ import ClientSecretTable from '../table/client-secret-table';
 import { ConfigService } from '@nestjs/config';
 import FeishuTableHelper from '../feishu/hepler/table-helper';
 import { ClientFactory, FeishuApp } from '../feishu/clients';
+import { RedisService } from '../service/redis/redis.service';
 
 @Injectable()
 export class SecretAuthGuard implements CanActivate {
   private clientSecretTable: ClientSecretTable;
-  constructor(private config: ConfigService) {
+  constructor(
+    private config: ConfigService,
+    private redisService: RedisService,
+  ) {
     this.clientSecretTable = new ClientSecretTable(
       this.config,
-      new FeishuTableHelper(ClientFactory.create(FeishuApp.AilyAplusClient)),
+      new FeishuTableHelper(
+        ClientFactory.create(FeishuApp.AilyAplusClient),
+        redisService,
+      ),
     );
   }
 

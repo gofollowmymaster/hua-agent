@@ -5,6 +5,7 @@ import { Inject, Injectable, Scope } from '@nestjs/common';
 import { CreateMessageType, FeishuMsgType } from '../type/im';
 import FeishuApiHelper from './feishu-api-helper';
 import { UserIdType } from '../type/contact';
+// import { HttpService } from '@nestjs/axios';
 
 @Injectable({ scope: Scope.TRANSIENT })
 class FeishuMessageHelper extends FeishuApiHelper {
@@ -109,29 +110,21 @@ class FeishuMessageHelper extends FeishuApiHelper {
     variables: Record<string, any>,
   ) {
     return this.requestWrapper(async () => {
-      console.log('[ updateByCard ] >', {
-        data: {
-          template_id: templateId,
-          template_variable: variables,
-        },
-
-        path: {
-          message_id: messageId,
-        },
-      });
       // return;
-      return await this.client.client.im.message.updateByCard({
-        data: {
-          template_id: templateId,
-          // template_version_name: templateVersion,
-          template_variable: variables,
-          // msg_type: 'interactive',
-        },
+      console.log(
+        '-=-------',
 
-        path: {
-          message_id: messageId,
-        },
-      });
+        JSON.stringify({
+          data: {
+            template_id: templateId,
+            template_version_name: templateVersion,
+            template_variable: variables,
+          },
+
+          type: 'template',
+        }),
+      );
+      return this.httpService.patch('');
     });
   }
 }

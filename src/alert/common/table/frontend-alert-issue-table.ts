@@ -13,6 +13,12 @@ class FeishuFrontendAlertIssueTable extends FeishuTable {
     super();
     this.appToken = config.getOrThrow('AlertTableAppToken');
     this.tableId = config.getOrThrow('AlertFrontendIssueTableAppId');
+    this.tableHelper.setTableOption({
+      appToken: this.appToken,
+      tableId: this.tableId,
+      useCache: this.useCache,
+      ttl: this.ttl,
+    });
   }
 }
 export default FeishuFrontendAlertIssueTable;

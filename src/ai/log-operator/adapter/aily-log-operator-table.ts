@@ -16,6 +16,12 @@ class AilyLogOperatorTable extends FeishuTable {
 
     this.appToken = config.get('AilyLogTableAppToken');
     this.tableId = config.get('AilyLogOperatorTableId');
+    this.tableHelper.setTableOption({
+      appToken: this.appToken,
+      tableId: this.tableId,
+      useCache: this.useCache,
+      ttl: this.ttl,
+    });
   }
 }
 export default AilyLogOperatorTable;

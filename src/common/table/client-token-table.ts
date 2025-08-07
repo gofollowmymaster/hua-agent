@@ -15,6 +15,12 @@ class ClientTokenTable extends FeishuTable {
     super();
     this.appToken = config.getOrThrow('AplusNodeAdminAppToken');
     this.tableId = 'tblNF8bpfSvc4ZK0';
+    this.tableHelper.setTableOption({
+      appToken: this.appToken,
+      tableId: this.tableId,
+      useCache: this.useCache,
+      ttl: this.ttl,
+    });
   }
 }
 export default ClientTokenTable;

@@ -24,11 +24,14 @@ import {
 import { AlertBaseService } from '../common/service/alert-base.service';
 import dayjs from 'dayjs';
 import CommonAlertCard from '@src/common/feishu/card/alert-card';
-import ErrorUnresolvedCard from '@src/common/feishu/card/error-unresolve-card';
+import ErrorUnresolvedCard, {
+  UnresolvedCardData,
+} from '@src/common/feishu/card/error-unresolve-card';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class SentryWebhookService extends AlertBaseService {
@@ -46,6 +49,7 @@ export class SentryWebhookService extends AlertBaseService {
     protected readonly alertFeishuAdapter: AlertFeishuAdapter,
     protected readonly feishuBusinessLineTable: FeishuBusinessLineTable,
     protected readonly feishuUserHelper: FeishuUserHelper,
+    protected readonly httpService: HttpService,
   ) {
     super(redisService);
     // this.redis = redisService.getClient();
@@ -116,18 +120,10 @@ export class SentryWebhookService extends AlertBaseService {
         zh_cn: {
           content: [
             [
-              // {
-              //   tag: 'at',
-              //   user_id: open_id,
-              // },
               {
-                tag: 'text',
+                tag: 'markdown',
                 text: `@${eventInfo.operator}在sentry中回复:${eventInfo.comment}`,
               },
-              // {
-              //   tag: 'at',
-              //   user_id: assignToUserId,
-              // },
             ],
           ],
         },
@@ -151,13 +147,7 @@ export class SentryWebhookService extends AlertBaseService {
 
   async errorHookHandler(errorEvent: AlertEvent) {
     await this.alertFeishuAdapter.setEvent(errorEvent);
-    this.writeToTable(errorEvent).then(({ issueRecord }) => {
-      console.log('[ issueRecord ] >', issueRecord);
-      //todo  生成分享链接
-      this.updateIssueCardDataInCache(errorEvent.issueId, {
-        recordId: issueRecord.record_id,
-      });
-    });
+    const eventRecord = await this.writeToTable(errorEvent);
 
     //接口错误时，部分错误代码不需要发送消息
     if (
@@ -179,6 +169,7 @@ export class SentryWebhookService extends AlertBaseService {
     //新issue 发送卡片消息
     if (!issueInfo.issueId) {
       const cardData = this.alertFeishuAdapter.toAplusAlertCardeData();
+      cardData.linkUrl = eventRecord.recordUrl;
       const content = ErrorUnresolvedCard.buildCardMsg(cardData);
       const groupMsgInfo = await this.sendFsAlertMsg(errorEvent, content);
       const issueInfo = {
@@ -196,17 +187,45 @@ export class SentryWebhookService extends AlertBaseService {
     await this.redis.hset(key, {
       count: parseInt(issueInfo?.count || '0') + 1,
     });
-    const res = await this.messageHelper.replyInThread(
+    const cardData: UnresolvedCardData = JSON.parse(issueInfo.cardData);
+    let messageText = `错误再次被触发，本周累计发生**${issueInfo.count}**次,[查看详情](${eventRecord.recordUrl}) `;
+    if (['已解决', '暂时忽略'].includes(cardData.status)) {
+      messageText = `<at user_id="${cardData.userId}"></at>错误被重新打开,请及时排查,[查看详情](${eventRecord.recordUrl}) `;
+      //更新卡片信息  激活
+      this.updateByCard(issueInfo.messageId, {
+        content: JSON.stringify({
+          type: 'template',
+          data: {
+            template_id: ErrorUnresolvedCard.templateId,
+            template_version_name: ErrorUnresolvedCard.templateVersion,
+            template_variable: {
+              ...JSON.parse(issueInfo.cardData),
+              status: '重新打开',
+              color: 'red',
+              statusOptions: ErrorUnresolvedCard.statusOptions('待处理'),
+            },
+          },
+        }),
+      });
+    }
+    await this.messageHelper.replyInThread(
       JSON.stringify({
-        text: '错误再次被触发，今日累计发生次数：' + issueInfo.count,
+        zh_cn: {
+          content: [
+            [
+              {
+                tag: 'md',
+                text: messageText,
+              },
+            ],
+          ],
+        },
       }),
       issueInfo.messageId,
+      FeishuMsgType.Post,
     );
-    //todo 更新卡片信息  激活
 
-    // this.messageHelper.updateByCard();
-
-    console.log('[ res ] >', res);
+    // console.log('[ res ] >', res);
   }
 
   /**

@@ -31,7 +31,6 @@ class FeishuUserHelper extends FeishuDataApiHelper {
     departmentIdType?: DepartmentIdType;
   }): Promise<ContactUserGetReturnType> {
     return await this.readWrapper(
-      'getUserInfo',
       async () =>
         await this.client.client.contact.user.get({
           params: {
@@ -42,6 +41,8 @@ class FeishuUserHelper extends FeishuDataApiHelper {
             user_id: userId,
           },
         }),
+      true,
+      'getUserInfo',
     );
   }
   async getUserIdByEmailOrPhone({
@@ -56,7 +57,6 @@ class FeishuUserHelper extends FeishuDataApiHelper {
     userIdType: UserIdType;
   }): Promise<ContactUserGetReturnType> {
     return await this.readWrapper(
-      'getUserInfo',
       async () =>
         await this.client.client.contact.user.batchGetId({
           data: {
@@ -68,6 +68,8 @@ class FeishuUserHelper extends FeishuDataApiHelper {
             user_id_type: userIdType,
           },
         }),
+      true,
+      'getUserInfo',
     );
   }
 }

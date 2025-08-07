@@ -35,6 +35,10 @@ import {
   issueStatusMap,
   UnresolvedCardData,
 } from '@src/common/feishu/card/error-unresolve-card';
+import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
+import { firstValueFrom } from 'rxjs';
+import * as lark from '@larksuiteoapi/node-sdk';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class AlertBaseService extends BaseService {
@@ -51,6 +55,8 @@ export class AlertBaseService extends BaseService {
   protected readonly redisService: RedisService;
   protected readonly alertFeishuAdapter: AlertFeishuAdapter;
   protected readonly feishuUserHelper: FeishuUserHelper;
+  protected readonly httpService: HttpService;
+
   protected ignoreCodeList = ['401', '10002'];
   constructor(redisService) {
     super();
@@ -234,57 +240,81 @@ export class AlertBaseService extends BaseService {
   async writeToTable(errorEvent: AlertEvent) {
     switch (errorEvent.errorEndpoint) {
       case ErrorEndpoint.Server:
-        return await this.writeToBackEndTable(errorEvent);
+        this.writeToBackEndIssueTable(errorEvent);
+        const backEndFields = this.alertFeishuAdapter.toApiAlertTableData();
+        // 异步记录事件到多维表格
+        const { record: backEventRecord } =
+          await this.feishuApiTable.create(backEndFields);
+        const {
+          record: { record_url },
+        } = await this.feishuFrontendTable.get(backEventRecord.record_id, {
+          with_shared_url: true,
+        });
 
+        return {
+          ...backEventRecord,
+          recordUrl: record_url,
+        };
       case ErrorEndpoint.Page:
-        return await this.writeToFrontendTable(errorEvent);
+        this.writeToFrontendIssueTable(errorEvent);
+        // 异步记录事件到多维表格
+        const frontEndFields =
+          this.alertFeishuAdapter.toFrontendAlertTableData();
+
+        const { record: frontEventRecord } =
+          await this.feishuFrontendTable.create(frontEndFields);
+        const {
+          record: { record_url: recordUrl },
+        } = await this.feishuFrontendTable.get(frontEventRecord.record_id, {
+          with_shared_url: true,
+        });
+
+        return {
+          ...frontEventRecord,
+          recordUrl,
+        };
       default:
         sendExceptionToFeishu(new Error('未知错误端点类型'));
         break;
     }
   }
 
-  async writeToFrontendTable(alertInfo: AlertEvent) {
+  async writeToFrontendIssueTable(alertInfo: AlertEvent) {
     let issueRecord;
     try {
-      const issueRes = await this.feishuFrontendIssueTable.search(
-        {
-          conjunction: 'and',
-          conditions: [
-            {
-              field_name: 'IssueId',
-              operator: 'is',
-              value: [alertInfo.issueId],
-            },
-          ],
-        },
-        false,
-      );
-      if (issueRes.total == 0) {
+      const { total, items: records } =
+        await this.feishuFrontendIssueTable.search(
+          {
+            conjunction: 'and',
+            conditions: [
+              {
+                field_name: 'IssueId',
+                operator: 'is',
+                value: [alertInfo.issueId],
+              },
+            ],
+          },
+          false,
+        );
+      if (total == 0) {
         const issue = this.alertFeishuAdapter.toFrontendAlertIssueTableData();
         issueRecord = await this.feishuFrontendIssueTable.create(issue);
       } else {
-        const record = issueRes.items[0];
-        const { record_id: recordId, fields } = record;
+        const { record_id: recordId, fields } = records[0];
         issueRecord = await this.feishuFrontendIssueTable.update(recordId, {
           错误次数: (fields['错误次数'] as number) + 1,
           是否解决: false,
         });
       }
 
-      // 异步记录到多维表格
-      const record = this.alertFeishuAdapter.toFrontendAlertTableData();
-
-      this.feishuFrontendTable.create(record);
+      // issueRecord.record.record_url =record
     } catch (err) {
       sendExceptionToFeishu(err);
     }
 
-    return issueRecord;
+    return issueRecord.record;
   }
-  async writeToBackEndTable(alertInfo: AlertEvent) {
-    let issueRecord;
-
+  async writeToBackEndIssueTable(alertInfo: AlertEvent) {
     try {
       //查询issue
       const issueRes = await this.feishuApiIssueTable.search(
@@ -302,23 +332,18 @@ export class AlertBaseService extends BaseService {
       );
       if (issueRes.total == 0) {
         const issue = this.alertFeishuAdapter.toApiAlertIssueTableData();
-        issueRecord = await this.feishuApiIssueTable.create(issue);
+        await this.feishuApiIssueTable.create(issue);
       } else {
         const record = issueRes.items[0];
         const { record_id: recordId, fields } = record;
-        issueRecord = await this.feishuApiIssueTable.update(recordId, {
+        await this.feishuApiIssueTable.update(recordId, {
           错误次数: (fields['错误次数'] as number) + 1,
           是否解决: false,
         });
       }
-
-      const record = this.alertFeishuAdapter.toApiAlertTableData();
-      // 异步记录事件到多维表格
-      this.feishuApiTable.create(record);
     } catch (err) {
       sendExceptionToFeishu(err);
     }
-    return issueRecord;
   }
 
   async checkIssueInCache(issueId: string) {
@@ -510,5 +535,39 @@ export class AlertBaseService extends BaseService {
       const { record_id: recordId } = record;
       await table.update(recordId, recordNew);
     }
+  }
+
+  async updateByCard(message_id: string, data) {
+    const client = ClientFactory.create(FeishuApp.AlertClient);
+    const appId = client.client.appId;
+    const appSecret = client.client.appSecret;
+    const res = await client.client.auth.v3.appAccessToken.internal(
+      {
+        data: {
+          app_id: appId,
+          app_secret: appSecret,
+        },
+      },
+      lark.withTenantToken(''),
+    );
+    let app_access_token;
+
+    if (res && 'app_access_token' in res) {
+      app_access_token = res.app_access_token;
+      // 使用 app_access_token
+    } else {
+      throw new Error('Failed to get app_access_token');
+    }
+    console.log('[ app_access_token ] >', app_access_token);
+    const resData = await firstValueFrom(
+      this.httpService.patch(
+        'https://open.feishu.cn/open-apis/im/v1/messages/' + message_id,
+        data,
+        {
+          headers: { Authorization: `Bearer ${app_access_token}` },
+        },
+      ),
+    );
+    console.log('[ resData ] >', resData);
   }
 }

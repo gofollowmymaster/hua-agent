@@ -18,8 +18,8 @@ export enum FeishuApp {
   AuthClient = 'AuthClient',
 }
 
-export type feishuAppClentsType = keyof typeof feishuAppClents;
-type ClientContainer = Record<feishuAppClentsType, FeishuClient>;
+export type FeishuAppClentsType = keyof typeof feishuAppClents;
+type ClientContainer = Record<FeishuAppClentsType, FeishuClient>;
 
 /**
  * @description: 飞书客户端工厂类
@@ -27,7 +27,7 @@ type ClientContainer = Record<feishuAppClentsType, FeishuClient>;
 export class ClientFactory {
   private static clientContainer: Partial<ClientContainer> = {};
 
-  static create(clientName: feishuAppClentsType, config?: ConfigService) {
+  static create(clientName: FeishuAppClentsType, config?: ConfigService) {
     // await nextTick();
     if (!this.clientContainer[clientName]) {
       this.clientContainer[clientName] = new feishuAppClents[clientName](

@@ -17,6 +17,12 @@ class AdminMtableTable extends FeishuTable {
 
     this.appToken = config.get('AplusNodeAdminAppToken');
     this.tableId = config.get('AplusNodeAdminMtableTableId');
+    this.tableHelper.setTableOption({
+      appToken: this.appToken,
+      tableId: this.tableId,
+      useCache: this.useCache,
+      ttl: this.ttl,
+    });
   }
 }
 export default AdminMtableTable;

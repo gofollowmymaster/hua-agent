@@ -15,6 +15,12 @@ class ClientSecretTable extends FeishuTable {
     super();
     this.appToken = config.getOrThrow('AplusNodeAdminAppToken');
     this.tableId = 'tblM4JUNtLKnrewV';
+    this.tableHelper.setTableOption({
+      appToken: this.appToken,
+      tableId: this.tableId,
+      useCache: this.useCache,
+      ttl: this.ttl,
+    });
   }
 }
 export default ClientSecretTable;

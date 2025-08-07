@@ -1,6 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { FeishuCallbackDto } from './dto/feishu-callback.dto';
-import { LoggerService } from '@src/common/service/logger/logger.service';
 import EventHandler from './handler';
 import { PrismaService } from '@src/prisma.service';
 import { RedisService } from '@src/common/service/redis/redis.service';
@@ -18,21 +17,17 @@ import { AlertBaseService } from '../common/service/alert-base.service';
 export class FeishuCallbackService extends AlertBaseService {
   readonly redis: Redis;
   constructor(
-    // private readonly logger: LoggerService,
     readonly prisma: PrismaService,
     protected readonly redisService: RedisService,
     protected readonly config: ConfigService,
     readonly messageHelper: FeishuMessageHelper,
-    // protected readonly feishuApiTable: FeishuApiAlertTable,
     protected readonly feishuApiIssueTable: FeishuApiAlertIssueTable,
-    // protected readonly feishuFrontendTable: FeishuFrontendAlertTable,
     protected readonly feishuFrontendIssueTable: FeishuFrontendAlertIssueTable,
     protected readonly alertFeishuAdapter: AlertFeishuAdapter,
     readonly sentryService: SentryApiService,
     readonly feishuUserHelper: FeishuUserHelper,
   ) {
     super(redisService);
-    // this.redis = redisService.getClient();
   }
 
   async handle(callbackInfo: FeishuCallbackDto) {
