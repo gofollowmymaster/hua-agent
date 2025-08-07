@@ -247,7 +247,7 @@ export class AlertBaseService extends BaseService {
           await this.feishuApiTable.create(backEndFields);
         const {
           record: { record_url },
-        } = await this.feishuFrontendTable.get(backEventRecord.record_id, {
+        } = await this.feishuApiTable.get(backEventRecord.record_id, {
           with_shared_url: true,
         });
 
