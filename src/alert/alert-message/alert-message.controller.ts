@@ -9,7 +9,6 @@ import {
   PageModuleName,
 } from '../common/type/alert';
 import { getModuleNameByUrl } from '../common/utils';
-import { SentryAlertDto } from './dto/sentry-alert.dto';
 
 @ApiTags('飞书消息报警')
 @Controller('alert-message')
@@ -35,8 +34,8 @@ export class AlertMsgController {
       ...alertInfo.event,
       title: alertInfo.message,
       // issue_url: alertInfo.url,
-      web_url: eventUrl,
-      issue_id: alertInfo.id,
+      webUrl: eventUrl,
+      issueId: alertInfo.id,
       requestData,
       pageModuleName:
         alertInfo.event.extra?.subModuleName || PageModuleName.APLUS_OTHER,

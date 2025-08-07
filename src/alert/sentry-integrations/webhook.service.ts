@@ -151,7 +151,13 @@ export class SentryWebhookService extends AlertBaseService {
 
   async errorHookHandler(errorEvent: AlertEvent) {
     await this.alertFeishuAdapter.setEvent(errorEvent);
-    this.writeToTable(errorEvent);
+    this.writeToTable(errorEvent).then(({ issueRecord }) => {
+      console.log('[ issueRecord ] >', issueRecord);
+      //todo  生成分享链接
+      this.updateIssueCardDataInCache(errorEvent.issueId, {
+        recordId: issueRecord.record_id,
+      });
+    });
 
     //接口错误时，部分错误代码不需要发送消息
     if (
@@ -167,16 +173,16 @@ export class SentryWebhookService extends AlertBaseService {
 
     const key = RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace(
       '{issueId}',
-      errorEvent.issue_id,
+      errorEvent.issueId,
     );
     const issueInfo = await this.redis.hgetall(key);
     //新issue 发送卡片消息
     if (!issueInfo.issueId) {
-      const cardData = this.alertFeishuAdapter.toUnresolvedCardeData();
+      const cardData = this.alertFeishuAdapter.toAplusAlertCardeData();
       const content = ErrorUnresolvedCard.buildCardMsg(cardData);
       const groupMsgInfo = await this.sendFsAlertMsg(errorEvent, content);
       const issueInfo = {
-        issueId: errorEvent.issue_id,
+        issueId: errorEvent.issueId,
         count: 1,
         messageId: groupMsgInfo.message_id,
         cardData: JSON.stringify(cardData),
@@ -197,6 +203,8 @@ export class SentryWebhookService extends AlertBaseService {
       issueInfo.messageId,
     );
     //todo 更新卡片信息  激活
+
+    // this.messageHelper.updateByCard();
 
     console.log('[ res ] >', res);
   }

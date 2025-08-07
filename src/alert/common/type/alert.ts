@@ -6,13 +6,14 @@ export type AlertEvent = {
   serverModuleName?: string;
   timestamp: number;
   environment: Environment;
-  issue_id: string;
+  issueId: string;
   title: string;
   level: ErrorLevel;
-  web_url: string;
+  webUrl: string;
   culprit: string;
   type: string;
   errorEndpoint: ErrorEndpoint;
+  feishuUrl?: string;
 };
 
 export enum PageModuleName {

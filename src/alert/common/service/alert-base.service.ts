@@ -31,7 +31,10 @@ import { RedisKeys } from '@src/common/const/redis-key.enum';
 import Redis from 'ioredis';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
-import { issueStatusMap } from '@src/common/feishu/card/error-unresolve-card';
+import {
+  issueStatusMap,
+  UnresolvedCardData,
+} from '@src/common/feishu/card/error-unresolve-card';
 
 @Injectable()
 export class AlertBaseService extends BaseService {
@@ -231,12 +234,10 @@ export class AlertBaseService extends BaseService {
   async writeToTable(errorEvent: AlertEvent) {
     switch (errorEvent.errorEndpoint) {
       case ErrorEndpoint.Server:
-        await this.writeToBackEndTable(errorEvent);
+        return await this.writeToBackEndTable(errorEvent);
 
-        break;
       case ErrorEndpoint.Page:
-        await this.writeToFrontendTable(errorEvent);
-        break;
+        return await this.writeToFrontendTable(errorEvent);
       default:
         sendExceptionToFeishu(new Error('未知错误端点类型'));
         break;
@@ -244,11 +245,8 @@ export class AlertBaseService extends BaseService {
   }
 
   async writeToFrontendTable(alertInfo: AlertEvent) {
+    let issueRecord;
     try {
-      // 异步记录到多维表格
-      const record = await this.alertFeishuAdapter.toFrontendAlertTableData();
-
-      this.feishuFrontendTable.create(record);
       const issueRes = await this.feishuFrontendIssueTable.search(
         {
           conjunction: 'and',
@@ -256,35 +254,39 @@ export class AlertBaseService extends BaseService {
             {
               field_name: 'IssueId',
               operator: 'is',
-              value: [alertInfo.issue_id],
+              value: [alertInfo.issueId],
             },
           ],
         },
         false,
       );
       if (issueRes.total == 0) {
-        const issue =
-          await this.alertFeishuAdapter.toFrontendAlertIssueTableData();
-        await this.feishuFrontendIssueTable.create(issue);
+        const issue = this.alertFeishuAdapter.toFrontendAlertIssueTableData();
+        issueRecord = await this.feishuFrontendIssueTable.create(issue);
       } else {
         const record = issueRes.items[0];
         const { record_id: recordId, fields } = record;
-        await this.feishuFrontendIssueTable.update(recordId, {
+        issueRecord = await this.feishuFrontendIssueTable.update(recordId, {
           错误次数: (fields['错误次数'] as number) + 1,
           是否解决: false,
         });
       }
+
+      // 异步记录到多维表格
+      const record = this.alertFeishuAdapter.toFrontendAlertTableData();
+
+      this.feishuFrontendTable.create(record);
     } catch (err) {
       sendExceptionToFeishu(err);
     }
+
+    return issueRecord;
   }
   async writeToBackEndTable(alertInfo: AlertEvent) {
-    // const isApiAlert = alertInfo.culprit?.includes('请求错误');
-    try {
-      const record = await this.alertFeishuAdapter.toApiAlertTableData();
-      // 异步记录到多维表格
-      await this.feishuApiTable.create(record);
+    let issueRecord;
 
+    try {
+      //查询issue
       const issueRes = await this.feishuApiIssueTable.search(
         {
           conjunction: 'and',
@@ -292,26 +294,31 @@ export class AlertBaseService extends BaseService {
             {
               field_name: 'IssueId',
               operator: 'is',
-              value: [alertInfo.issue_id],
+              value: [alertInfo.issueId],
             },
           ],
         },
         false,
       );
       if (issueRes.total == 0) {
-        const issue = await this.alertFeishuAdapter.toApiAlertIssueTableData();
-        await this.feishuApiIssueTable.create(issue);
+        const issue = this.alertFeishuAdapter.toApiAlertIssueTableData();
+        issueRecord = await this.feishuApiIssueTable.create(issue);
       } else {
         const record = issueRes.items[0];
         const { record_id: recordId, fields } = record;
-        await this.feishuApiIssueTable.update(recordId, {
+        issueRecord = await this.feishuApiIssueTable.update(recordId, {
           错误次数: (fields['错误次数'] as number) + 1,
           是否解决: false,
         });
       }
+
+      const record = this.alertFeishuAdapter.toApiAlertTableData();
+      // 异步记录事件到多维表格
+      this.feishuApiTable.create(record);
     } catch (err) {
       sendExceptionToFeishu(err);
     }
+    return issueRecord;
   }
 
   async checkIssueInCache(issueId: string) {
@@ -326,17 +333,25 @@ export class AlertBaseService extends BaseService {
     return issueInfo;
   }
 
-  async updateIssueInCache(issueId: string, issueInfo: Record<string, any>) {
+  async updateIssueCardDataInCache(
+    issueId: string,
+    issueInfo: Record<string, any>,
+  ) {
+    const cardDataStr = await this.redis.hget(
+      RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),
+      'cardData',
+    );
+    const cardData = JSON.parse(cardDataStr) as UnresolvedCardData;
     await this.redis.hset(
       RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),
-      issueInfo,
+      { cardData: { ...cardData, ...issueInfo } },
     );
   }
 
   async assignToHandler(eventData: AssignEvent) {
     const issueInfo = await this.checkIssueInCache(eventData.issueId);
 
-    this.updateIssueInCache(eventData.issueId, {
+    this.updateIssueCardDataInCache(eventData.issueId, {
       userId: eventData.assignTo,
     });
     if (issueInfo.messageId) {
@@ -378,7 +393,7 @@ export class AlertBaseService extends BaseService {
   async modifyStatusHandler(eventData: ModifyStatusEvent) {
     const issueInfo = await this.checkIssueInCache(eventData.issueId);
     if (issueInfo.messageId) {
-      this.updateIssueInCache(eventData.issueId, {
+      this.updateIssueCardDataInCache(eventData.issueId, {
         status: issueStatusMap[eventData.issueStatus],
       });
 
@@ -429,7 +444,7 @@ export class AlertBaseService extends BaseService {
   async closeIssueHandler(eventData: CloseIssueEvent) {
     const issueInfo = await this.checkIssueInCache(eventData.issueId);
     if (issueInfo.messageId) {
-      this.updateIssueInCache(eventData.issueId, {
+      this.updateIssueCardDataInCache(eventData.issueId, {
         reason: eventData.reason,
         solution: eventData.solution,
       });

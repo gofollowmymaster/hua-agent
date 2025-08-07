@@ -26,6 +26,7 @@ import { AdminModule } from './admin/admin.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AlertModule } from './alert/alert.module';
 import { RedisModule } from './common/service/redis/redis.module';
+import { GlobalExceptionHandlerModule } from './common/service/global-exception-hander/global-exception.module';
 // import { BaseTableModule } from './common/table/base-table.module';
 
 const envFilePath = [
@@ -43,7 +44,6 @@ const envFilePath = [
 
     CacheModule.register({
       isGlobal: true,
-      // store: redisStore,
       stores: [
         createKeyv({
           socket: {
@@ -68,13 +68,7 @@ const envFilePath = [
     }),
     RedisModule,
     // BaseTableModule,
-    // ScheduleModule.forRoot(),
-    // RedisModule.register({
-    //   host: configuration['DB_REDIS_HOST'],
-    //   port: parseInt(configuration['DB_REDIS_PORT']),
-    //   password: configuration['DB_REDIS_PASSWORD'],
-    //   db: configuration['DB_REDIS_DB'],
-    // }),
+    GlobalExceptionHandlerModule,
     SubappModule,
     VersionModule,
     VerifyModule,

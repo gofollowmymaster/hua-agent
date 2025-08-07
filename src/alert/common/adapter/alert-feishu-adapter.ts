@@ -33,7 +33,7 @@ export default class AlertFeishuAdapter {
     this.event = event;
   }
 
-  async toApiAlertTableData(): Promise<ApiAlertTableDto> {
+  toApiAlertTableData(): ApiAlertTableDto {
     const bu = apiModuleBuMap[this.event.serverModuleName] || this.appInfo.bu;
     return {
       接口地址: this.requestData.url,
@@ -49,7 +49,7 @@ export default class AlertFeishuAdapter {
     };
   }
 
-  async toApiAlertIssueTableData(): Promise<ApiAlertIssueTableDto> {
+  toApiAlertIssueTableData(): ApiAlertIssueTableDto {
     const bu = apiModuleBuMap[this.event.pageModuleName] || this.appInfo.bu;
     return {
       接口地址: this.requestData.url,
@@ -64,15 +64,15 @@ export default class AlertFeishuAdapter {
       解决方案: '',
       负责人: [{ id: this.appInfo.backendLeaderId }],
       错误次数: 1,
-      IssueId: this.event.issue_id,
+      IssueId: this.event.issueId,
       是否解决: false,
     };
   }
 
-  async toFrontendAlertTableData(): Promise<FrontendAlertTableDto> {
+  toFrontendAlertTableData(): FrontendAlertTableDto {
     return {
       标题: this.event.title,
-      链接信息: this.event.web_url,
+      链接信息: this.event.webUrl,
       是否解决: false,
       // 负责人: [{ id: appInfo.userId }],
       错误原因: '',
@@ -86,10 +86,10 @@ export default class AlertFeishuAdapter {
       RawData: JSON.stringify(this.event),
     };
   }
-  async toFrontendAlertIssueTableData(): Promise<FrontendAlertIssueTableDto> {
+  toFrontendAlertIssueTableData(): FrontendAlertIssueTableDto {
     return {
       标题: this.event.title,
-      链接信息: this.event.web_url,
+      链接信息: this.event.webUrl,
       是否解决: false,
       负责人: [{ id: this.appInfo.frontendLeaderId }],
       错误原因: '',
@@ -101,7 +101,7 @@ export default class AlertFeishuAdapter {
       业务线: this.appInfo.bu,
       环境: this.event.environment,
       错误次数: 1,
-      IssueId: this.event.issue_id,
+      IssueId: this.event.issueId,
     };
   }
   toCommonCardeData(): CommonCardData {
@@ -110,14 +110,14 @@ export default class AlertFeishuAdapter {
       rawData: '',
       userEmail: '',
       project: this.event.pageModuleName,
-      linkUrl: this.event.web_url,
+      linkUrl: this.event.webUrl,
       level: this.event.level,
       errorType: this.event.type,
       content: this.event.culprit,
       timestamp: this.event.timestamp,
     };
   }
-  toUnresolvedCardeData(): UnresolvedCardData {
+  toAplusAlertCardeData(): UnresolvedCardData {
     return {
       userId:
         this.event.errorEndpoint == ErrorEndpoint.Server
@@ -129,14 +129,15 @@ export default class AlertFeishuAdapter {
       errorMessage: this.event.title,
       userName: this.appInfo.frontendLeaderName,
       project: this.event.pageModuleName,
-      linkUrl: this.event.web_url,
+      outerLink: this.event.webUrl,
+      linkUrl: this.event.feishuUrl,
       level: this.event.level,
       eventType: this.event.type,
       abstract: this.event.culprit,
       content: this.event.title,
       count: 1,
       status: issueStatusMap['unresolved'],
-      issueId: this.event.issue_id,
+      issueId: this.event.issueId,
       errorTime: dayjs(this.event.timestamp * 1000).format(
         'YYYY-MM-DD HH:mm:ss',
       ),

@@ -4,15 +4,11 @@ import { FEISHU_CLIENT_ID } from './constants';
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { CreateMessageType, FeishuMsgType } from '../type/im';
 import FeishuApiHelper from './feishu-api-helper';
-import { RedisService } from '@src/common/service/redis/redis.service';
 import { UserIdType } from '../type/contact';
 
 @Injectable({ scope: Scope.TRANSIENT })
 class FeishuMessageHelper extends FeishuApiHelper {
-  constructor(
-    // private readonly config: ConfigService,
-    @Inject(FEISHU_CLIENT_ID) private readonly client: FeishuClient,
-  ) {
+  constructor(@Inject(FEISHU_CLIENT_ID) private readonly client: FeishuClient) {
     super();
   }
 

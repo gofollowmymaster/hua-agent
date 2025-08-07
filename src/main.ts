@@ -14,7 +14,6 @@ import dayjs from 'dayjs';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { setGlobalConfig } from '@utils/app-config';
-import { sendExceptionToFeishu } from './common/feishu/utils';
 
 declare const module: any;
 
@@ -69,19 +68,3 @@ async function bootstrap() {
   }
 }
 bootstrap();
-
-process.on('unhandledRejection', (reason, promise) => {
-  // console.error('-------Unhandled Rejection at:', reason);
-
-  promise.then().catch((error: Error) => {
-    sendExceptionToFeishu(error);
-  });
-});
-
-process.on('uncaughtException', (error: Error) => {
-  console.error('Uncaught Exception:---------', error);
-
-  sendExceptionToFeishu(error);
-  // 可能需要优雅地关闭应用
-  process.exit(1);
-});
