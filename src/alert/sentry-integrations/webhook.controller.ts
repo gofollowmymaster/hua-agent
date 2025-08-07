@@ -21,6 +21,7 @@ import {
 import { getModuleNameByUrl } from '../common/utils';
 import {
   AlertEvent,
+  Environment,
   ErrorEndpoint,
   IssueAction,
   PageModuleName,
@@ -78,16 +79,12 @@ export class SentryWebhookController {
     if (!headers['sentry-hook-signature']) {
       throw new UnauthorizedException('Sentry Hook签名验证失败');
     }
-    if (!headers['developer']) {
-      return;
-    }
 
     const resource = headers['sentry-hook-resource'];
     switch (resource) {
       case SentryHookType.Error:
         this.error(params);
         break;
-
       case SentryHookType.Issue:
         this.issue(params);
         break;
@@ -137,6 +134,7 @@ export class SentryWebhookController {
   }
   async error(params: SentryHookErrorDto) {
     const alertError = params.data.error;
+    if (alertError.environment == Environment.PROD) return;
 
     const requestData = alertError.extra?.__serialized__;
     const serverModuleName = getModuleNameByUrl(requestData?.url);

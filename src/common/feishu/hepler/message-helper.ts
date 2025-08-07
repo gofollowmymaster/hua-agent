@@ -102,31 +102,6 @@ class FeishuMessageHelper extends FeishuApiHelper {
       });
     });
   }
-
-  async updateByCard(
-    messageId: string,
-    templateId: string,
-    templateVersion: string,
-    variables: Record<string, any>,
-  ) {
-    return this.requestWrapper(async () => {
-      // return;
-      console.log(
-        '-=-------',
-
-        JSON.stringify({
-          data: {
-            template_id: templateId,
-            template_version_name: templateVersion,
-            template_variable: variables,
-          },
-
-          type: 'template',
-        }),
-      );
-      return this.httpService.patch('');
-    });
-  }
 }
 
 export default FeishuMessageHelper;
