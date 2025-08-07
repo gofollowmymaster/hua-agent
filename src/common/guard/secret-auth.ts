@@ -51,9 +51,8 @@ export class SecretAuthGuard implements CanActivate {
       record: { fields: appInfo },
     } = await this.clientSecretTable.get(token);
     // return true;
-
     // Compare the generated signature with the provided signature
-    if (!appInfo.AppID) {
+    if (!appInfo.是否启用) {
       throw new UnauthorizedException();
     }
     return true;

@@ -53,6 +53,9 @@ export class SignAuthGuard implements CanActivate {
       const {
         record: { fields: appInfo },
       } = await this.clientSecretTable.get(restData.appId);
+      if (!appInfo.是否启用) {
+        throw new UnauthorizedException();
+      }
       // return true;
       const secretKey = appInfo?.AppSecret; // Replace with your actual secret key
       // Sort keys and construct the string

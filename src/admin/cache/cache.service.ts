@@ -25,7 +25,7 @@ export class CacheService extends BaseService {
       code = 200;
     if (!(await this.cache.get(fullKey))) {
       message = '缓存不存在';
-      code = 200;
+      code = 404;
     } else if (!(await this.cache.del(fullKey))) {
       message = '清除缓存失败';
       code = 500;
