@@ -7,31 +7,16 @@ import {
 } from '../utils';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 
-import FeishuApiAlertTable from '../table/api-alert-table';
-import FeishuFrontendAlertTable from '../table/frontend-alert-table';
-import FeishuFrontendAlertIssueTable from '../table/frontend-alert-issue-table';
-import FeishuApiAlertIssueTable from '../table/api-alert-issue-table';
 import { BaseService } from '@src/common/base/BaseService';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { ConfigService } from '@nestjs/config';
-import {
-  AlertEvent,
-  AssignEvent,
-  CloseIssueEvent,
-  Environment,
-  ModifyStatusEvent,
-  PageModuleName,
-} from '../type/alert';
+import { AlertEvent, Environment, PageModuleName } from '../type/alert';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import Redis from 'ioredis';
-import { FeishuMsgType } from '@src/common/feishu/type/im';
 import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
-import {
-  issueStatusMap,
-  UnresolvedCardData,
-} from '@src/common/feishu/card/error-unresolve-card';
+import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolve-card';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import { firstValueFrom } from 'rxjs';
 import * as lark from '@larksuiteoapi/node-sdk';
@@ -287,6 +272,5 @@ export abstract class AlertBaseService extends BaseService {
         },
       ),
     );
-    console.log('[ resData ] >', resData);
   }
 }

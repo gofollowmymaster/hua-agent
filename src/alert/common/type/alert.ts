@@ -73,7 +73,7 @@ export enum AlertAction {
 export type RequestData = {
   url: string;
 
-  code: number;
+  code: number | string;
   payload: string;
   resData: {
     path: string;

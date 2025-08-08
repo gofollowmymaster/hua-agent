@@ -42,6 +42,9 @@ export class RequestErrorService extends ErrorBaseService {
     await this.setErrorEvent(errorEvent);
 
     const eventRecord = await this.writeToTable(errorEvent);
+    if (this.ignoreCodeList.includes(errorEvent.requestData.code + '')) {
+      return;
+    }
     this.errorHandler(eventRecord);
   }
 

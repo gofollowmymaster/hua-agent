@@ -84,11 +84,10 @@ export class SentryWebhookService {
         return;
 
       case IssueAction.Assigned:
-        await this.assignTo(eventData);
         return;
+        await this.assignTo(eventData);
       case IssueAction.Resolved:
       case IssueAction.Unresolved:
-        console.log('[ resolved ] >', eventData);
         this.modifyStatus(eventData);
         return;
     }
@@ -109,10 +108,10 @@ export class SentryWebhookService {
       emails: [eventData.assignedTo.email, eventData.operator.email],
       userIdType: 'open_id',
     });
+    console.log('[ userInfo ] >', userInfo);
 
     const service = await this.getServiceByIssueId(eventData.issueId);
 
-    console.log('[ userInfo ] >', userInfo);
     service.assignToHandler({
       issueId: eventData.issueId,
       operator: eventData.operator.email,

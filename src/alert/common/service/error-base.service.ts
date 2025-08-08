@@ -65,11 +65,13 @@ export abstract class ErrorBaseService extends AlertBaseService {
     }
     // 如果issue在，修改数量并回复之前的错误
     await this.redis.hset(key, {
-      count: parseInt(issueInfo?.count || '0') + 1,
+      count: parseInt(issueInfo?.count || '1') + 1,
     });
     const cardData: UnresolvedCardData = JSON.parse(issueInfo.cardData);
+
+    if (cardData.status == '暂时忽略') return;
     let messageText = `错误再次被触发，本周累计发生**${issueInfo.count}**次,[查看详情](${eventRecord.recordUrl}) `;
-    if (['已解决', '暂时忽略'].includes(cardData.status)) {
+    if (['已解决'].includes(cardData.status)) {
       messageText = `<at user_id="${cardData.userId}"></at>错误被重新打开,请及时排查,[查看详情](${eventRecord.recordUrl}) `;
       //更新卡片信息  激活
       this.updateByCard(issueInfo.messageId, {
