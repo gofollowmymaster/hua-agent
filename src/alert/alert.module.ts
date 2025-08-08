@@ -27,6 +27,7 @@ import { PageErrorService } from './common/service/page-error-service';
 import { RequestErrorService } from './common/service/request-error-service';
 import PageAlertFeishuAdapter from './common/adapter/page-alert-feishu-adapter';
 import RequestAlertFeishuAdapter from './common/adapter/request-alert-feishu-adapter';
+import AlertStatisticService from './common/alert-statistic-schedule';
 
 @Module({
   imports: [
@@ -57,7 +58,13 @@ import RequestAlertFeishuAdapter from './common/adapter/request-alert-feishu-ada
     SentryApiService,
     PageErrorService,
     RequestErrorService,
+    AlertStatisticService,
   ],
-  exports: [AlertMsgService, FeishuEventService, SentryWebhookService],
+  exports: [
+    AlertMsgService,
+    FeishuEventService,
+    SentryWebhookService,
+    AlertStatisticService,
+  ],
 })
 export class AlertModule {}
