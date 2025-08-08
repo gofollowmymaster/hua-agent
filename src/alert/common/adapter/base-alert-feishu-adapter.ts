@@ -1,9 +1,7 @@
-import { Injectable } from '@nestjs/common';
 import { AlertEvent } from '@src/alert/common/type/alert';
 import { CommonCardData } from '@src/common/feishu/card/alert-card';
 import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolve-card';
 
-@Injectable()
 export default abstract class BaseAlertFeishuAdapter {
   protected event: AlertEvent;
 

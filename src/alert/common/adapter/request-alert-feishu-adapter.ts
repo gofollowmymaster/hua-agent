@@ -2,7 +2,7 @@ import { ApiAlertIssueTableDto, ApiAlertTableDto } from '../type/alert-table';
 import { apiModuleBuMap } from '../../alert-message/app-user-map';
 import { RequestData } from '@src/alert/common/type/alert';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Scope } from '@nestjs/common';
 import { RequestAlertEvent } from '@src/alert/common/type/alert';
 import {
   issueStatusMap,
@@ -11,7 +11,7 @@ import {
 import dayjs from 'dayjs';
 import BaseAlertFeishuAdapter from './base-alert-feishu-adapter';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
   protected event: RequestAlertEvent;
   protected requestData: RequestData;

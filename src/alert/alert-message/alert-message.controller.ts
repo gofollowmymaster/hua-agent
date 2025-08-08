@@ -22,6 +22,7 @@ export class AlertMsgController {
   @ApiBody({ type: SentryRawDto })
   @Post('alertRaw')
   async sentryAlert(@Body() alertInfo: SentryRawDto) {
+    return;
     const event = alertInfo.event;
     const urlParsed = alertInfo.url?.split('?');
     const eventUrl =

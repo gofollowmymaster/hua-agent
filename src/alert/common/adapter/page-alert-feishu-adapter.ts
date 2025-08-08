@@ -3,7 +3,7 @@ import {
   FrontendAlertTableDto,
 } from '../type/alert-table';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Scope } from '@nestjs/common';
 import { PageAlertEvent } from '@src/alert/common/type/alert';
 import {
   issueStatusMap,
@@ -12,7 +12,7 @@ import {
 import dayjs from 'dayjs';
 import BaseAlertFeishuAdapter from './base-alert-feishu-adapter';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
   protected event: PageAlertEvent;
   private appInfo: any;
