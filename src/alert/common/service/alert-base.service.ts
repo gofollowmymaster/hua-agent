@@ -7,8 +7,6 @@ import {
 } from '../utils';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 
-import AlertFeishuAdapter from '../adapter/alert-feishu-adapter';
-import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import FeishuApiAlertTable from '../table/api-alert-table';
 import FeishuFrontendAlertTable from '../table/frontend-alert-table';
 import FeishuFrontendAlertIssueTable from '../table/frontend-alert-issue-table';
@@ -22,7 +20,6 @@ import {
   AssignEvent,
   CloseIssueEvent,
   Environment,
-  ErrorEndpoint,
   ModifyStatusEvent,
   PageModuleName,
 } from '../type/alert';
@@ -41,23 +38,17 @@ import * as lark from '@larksuiteoapi/node-sdk';
 import { HttpService } from '@nestjs/axios';
 
 @Injectable()
-export class AlertBaseService extends BaseService {
+export abstract class AlertBaseService extends BaseService {
   protected readonly redis: Redis;
   protected prisma: PrismaService;
   protected readonly logger: LoggerService;
   protected readonly config: ConfigService;
   protected readonly messageHelper: FeishuMessageHelper;
-  protected readonly feishuApiTable: FeishuApiAlertTable;
-  protected readonly feishuApiIssueTable: FeishuApiAlertIssueTable;
-  protected readonly feishuFrontendTable: FeishuFrontendAlertTable;
-  protected readonly feishuFrontendIssueTable: FeishuFrontendAlertIssueTable;
   protected readonly feishuBusinessLineTable: FeishuBusinessLineTable;
   protected readonly redisService: RedisService;
-  protected readonly alertFeishuAdapter: AlertFeishuAdapter;
   protected readonly feishuUserHelper: FeishuUserHelper;
   protected readonly httpService: HttpService;
 
-  protected ignoreCodeList = ['401', '10002'];
   constructor(redisService) {
     super();
     this.redis = redisService.getClient();
@@ -237,114 +228,6 @@ export class AlertBaseService extends BaseService {
       groupId,
     };
   }
-  async writeToTable(errorEvent: AlertEvent) {
-    switch (errorEvent.errorEndpoint) {
-      case ErrorEndpoint.Server:
-        this.writeToBackEndIssueTable(errorEvent);
-        const backEndFields = this.alertFeishuAdapter.toApiAlertTableData();
-        // 异步记录事件到多维表格
-        const { record: backEventRecord } =
-          await this.feishuApiTable.create(backEndFields);
-        const {
-          record: { record_url },
-        } = await this.feishuApiTable.get(backEventRecord.record_id, {
-          with_shared_url: true,
-        });
-
-        return {
-          ...backEventRecord,
-          recordUrl: record_url,
-        };
-      case ErrorEndpoint.Page:
-        this.writeToFrontendIssueTable(errorEvent);
-        // 异步记录事件到多维表格
-        const frontEndFields =
-          this.alertFeishuAdapter.toFrontendAlertTableData();
-
-        const { record: frontEventRecord } =
-          await this.feishuFrontendTable.create(frontEndFields);
-        const {
-          record: { record_url: recordUrl },
-        } = await this.feishuFrontendTable.get(frontEventRecord.record_id, {
-          with_shared_url: true,
-        });
-
-        return {
-          ...frontEventRecord,
-          recordUrl,
-        };
-      default:
-        sendExceptionToFeishu(new Error('未知错误端点类型'));
-        break;
-    }
-  }
-
-  async writeToFrontendIssueTable(alertInfo: AlertEvent) {
-    let issueRecord;
-    try {
-      const { total, items: records } =
-        await this.feishuFrontendIssueTable.search(
-          {
-            conjunction: 'and',
-            conditions: [
-              {
-                field_name: 'IssueId',
-                operator: 'is',
-                value: [alertInfo.issueId],
-              },
-            ],
-          },
-          false,
-        );
-      if (total == 0) {
-        const issue = this.alertFeishuAdapter.toFrontendAlertIssueTableData();
-        issueRecord = await this.feishuFrontendIssueTable.create(issue);
-      } else {
-        const { record_id: recordId, fields } = records[0];
-        issueRecord = await this.feishuFrontendIssueTable.update(recordId, {
-          错误次数: (fields['错误次数'] as number) + 1,
-          是否解决: false,
-        });
-      }
-
-      // issueRecord.record.record_url =record
-    } catch (err) {
-      sendExceptionToFeishu(err);
-    }
-
-    return issueRecord.record;
-  }
-  async writeToBackEndIssueTable(alertInfo: AlertEvent) {
-    try {
-      //查询issue
-      const issueRes = await this.feishuApiIssueTable.search(
-        {
-          conjunction: 'and',
-          conditions: [
-            {
-              field_name: 'IssueId',
-              operator: 'is',
-              value: [alertInfo.issueId],
-            },
-          ],
-        },
-        false,
-      );
-      if (issueRes.total == 0) {
-        const issue = this.alertFeishuAdapter.toApiAlertIssueTableData();
-        await this.feishuApiIssueTable.create(issue);
-      } else {
-        const record = issueRes.items[0];
-        const { record_id: recordId, fields } = record;
-        await this.feishuApiIssueTable.update(recordId, {
-          错误次数: (fields['错误次数'] as number) + 1,
-          是否解决: false,
-        });
-      }
-    } catch (err) {
-      sendExceptionToFeishu(err);
-    }
-  }
 
   async checkIssueInCache(issueId: string) {
     const issueInfo = await this.redis.hgetall(
@@ -369,172 +252,8 @@ export class AlertBaseService extends BaseService {
     const cardData = JSON.parse(cardDataStr) as UnresolvedCardData;
     await this.redis.hset(
       RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),
-      { cardData: { ...cardData, ...issueInfo } },
+      { cardData: JSON.stringify({ ...cardData, ...issueInfo }) },
     );
-  }
-
-  async assignToHandler(eventData: AssignEvent) {
-    const issueInfo = await this.checkIssueInCache(eventData.issueId);
-
-    this.updateIssueCardDataInCache(eventData.issueId, {
-      userId: eventData.assignTo,
-    });
-    if (issueInfo.messageId) {
-      this.messageHelper.replyInThread(
-        JSON.stringify({
-          zh_cn: {
-            content: [
-              [
-                {
-                  tag: 'at',
-                  user_id: eventData.operator,
-                },
-                {
-                  tag: 'text',
-                  text: `将问题指派给`,
-                },
-                {
-                  tag: 'at',
-                  user_id: eventData.assignTo,
-                },
-              ],
-            ],
-          },
-        }),
-        issueInfo.messageId,
-        FeishuMsgType.Post,
-      );
-    }
-
-    this.updateTable(
-      issueInfo.issueId,
-      issueInfo.errorEndpoint as ErrorEndpoint,
-      {
-        负责人: [{ id: eventData.assignTo }],
-      },
-    );
-  }
-
-  async modifyStatusHandler(eventData: ModifyStatusEvent) {
-    const issueInfo = await this.checkIssueInCache(eventData.issueId);
-    if (issueInfo.messageId) {
-      this.updateIssueCardDataInCache(eventData.issueId, {
-        status: issueStatusMap[eventData.issueStatus],
-      });
-
-      this.messageHelper.replyInThread(
-        JSON.stringify({
-          zh_cn: {
-            content: [
-              [
-                {
-                  tag: 'at',
-                  user_id: eventData.operator,
-                },
-                {
-                  tag: 'text',
-                  text: `将问题状态修改为`,
-                },
-                {
-                  tag: 'text',
-                  text:
-                    issueStatusMap[eventData.issueStatus] ||
-                    eventData.issueStatus,
-                  style: ['bold'],
-                },
-              ],
-            ],
-          },
-        }),
-        issueInfo.messageId,
-        FeishuMsgType.Post,
-      );
-    }
-    if (
-      !['resolved', 'ignoreCount100', 'ignoreCount1000'].includes(
-        eventData.issueStatus,
-      )
-    ) {
-      return;
-    }
-    this.updateTable(
-      issueInfo.issueId,
-      issueInfo.errorEndpoint as ErrorEndpoint,
-      {
-        是否解决: true,
-      },
-    );
-  }
-
-  async closeIssueHandler(eventData: CloseIssueEvent) {
-    const issueInfo = await this.checkIssueInCache(eventData.issueId);
-    if (issueInfo.messageId) {
-      this.updateIssueCardDataInCache(eventData.issueId, {
-        reason: eventData.reason,
-        solution: eventData.solution,
-      });
-
-      this.messageHelper.replyInThread(
-        JSON.stringify({
-          zh_cn: {
-            content: [
-              [
-                {
-                  tag: 'at',
-                  user_id: eventData.operator,
-                },
-                {
-                  tag: 'text',
-                  text: `将本问题关闭🎉🎉\n【问题原因】${eventData.reason}\n【处理方法】${eventData.solution}`,
-                },
-              ],
-            ],
-          },
-        }),
-        issueInfo.messageId,
-        FeishuMsgType.Post,
-      );
-    }
-
-    this.updateTable(
-      issueInfo.issueId,
-      issueInfo.errorEndpoint as ErrorEndpoint,
-      {
-        错误原因: eventData.reason,
-        解决方案: eventData.solution,
-      },
-    );
-  }
-
-  async updateTable(
-    issue_id: string,
-    errorEndpoint: ErrorEndpoint,
-    recordNew: Record<string, any>,
-  ) {
-    const table =
-      errorEndpoint === ErrorEndpoint.Server
-        ? this.feishuApiIssueTable
-        : this.feishuFrontendIssueTable;
-    const issueRes = await table.search(
-      {
-        conjunction: 'and',
-        conditions: [
-          {
-            field_name: 'IssueId',
-            operator: 'is',
-            value: [issue_id],
-          },
-        ],
-      },
-      false,
-    );
-    if (issueRes.total == 0) {
-      sendExceptionToFeishu(new Error('修改卡片消息是未找到issue:' + issue_id));
-    } else {
-      const record = issueRes.items[0];
-      const { record_id: recordId } = record;
-      await table.update(recordId, recordNew);
-    }
   }
 
   async updateByCard(message_id: string, data) {

@@ -43,10 +43,10 @@ export class AlertMsgService extends AlertBaseService {
    */
   async sentryAlertHook(errorEvent: AlertEvent) {
     await this.alertFeishuAdapter.setEvent(errorEvent);
-    this.writeToTable(errorEvent);
-    if (this.ignoreCodeList.includes(errorEvent.requestData?.code + '')) {
-      return;
-    }
+    // this.writeToTable(errorEvent);
+    // if (this.ignoreCodeList.includes(errorEvent.requestData?.code + '')) {
+    //   return;
+    // }
     const cardData = this.alertFeishuAdapter.toCommonCardeData();
     const content = CommonAlertCard.buildCardMsg(cardData);
 

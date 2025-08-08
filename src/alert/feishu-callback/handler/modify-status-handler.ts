@@ -8,7 +8,7 @@ import { ModifyStatusEvent } from '@src/alert/common/type/alert';
 
 const ModifyStatusHandler: CustomCallbackHandleType = async (
   event,
-  service,
+  handerService,
 ) => {
   const {
     operator: { open_id },
@@ -19,6 +19,8 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
     // token,
     // context: { open_message_id, open_chat_id },
   } = event;
+  const service = await handerService.getServiceByIssueId(issueId);
+
   const issueInfo = await service.checkIssueInCache(issueId);
   console.log('[ issueInfo ] >', issueInfo);
   service.modifyStatusHandler({
@@ -50,7 +52,7 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
     ) {
       //修改sentry
 
-      service.sentryService.updateIssue(
+      handerService.sentryService.updateIssue(
         {
           status: issueStatus as IssueStatus,
           // assignee: assignToUserId,

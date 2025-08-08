@@ -1,9 +1,8 @@
 import { SentryUser } from './sentry';
 
-export type AlertEvent = {
-  requestData?: RequestData;
-  pageModuleName?: PageModuleName;
-  serverModuleName?: string;
+export class AlertEvent {
+  pageModuleName: PageModuleName;
+  serverModuleName: string;
   timestamp: number;
   environment: Environment;
   issueId: string;
@@ -14,7 +13,18 @@ export type AlertEvent = {
   type: string;
   errorEndpoint: ErrorEndpoint;
   feishuUrl?: string;
-};
+  [key: string]: any;
+}
+
+export class PageAlertEvent extends AlertEvent {
+  errorEndpoint: ErrorEndpoint.Page;
+  feishuUrl?: string;
+}
+
+export class RequestAlertEvent extends AlertEvent {
+  requestData: RequestData;
+  errorEndpoint: ErrorEndpoint.Server;
+}
 
 export enum PageModuleName {
   APLUS_ADMIN_BMS = 'aplus-admin-bms',
@@ -122,4 +132,12 @@ export type CloseIssueEvent = {
   issueId: string;
   reason: string;
   solution: string;
+};
+
+export type IssueInCache = {
+  issueId: string;
+  count: number;
+  messageId: string;
+  cardData: string;
+  errorEndpoint: ErrorEndpoint;
 };

@@ -2,7 +2,7 @@ import { CustomCallbackHandleType } from '.';
 
 import ErrorClosedCard from '@src/common/feishu/card/error-closed-card';
 
-const CloseHandler: CustomCallbackHandleType = async (event, service) => {
+const CloseHandler: CustomCallbackHandleType = async (event, handerService) => {
   const {
     operator: { open_id },
     action: {
@@ -10,6 +10,8 @@ const CloseHandler: CustomCallbackHandleType = async (event, service) => {
       form_value: { reason, solution },
     },
   } = event;
+  const service = await handerService.getServiceByIssueId(issueId);
+
   service.closeIssueHandler({
     issueId,
     operator: open_id,

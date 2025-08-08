@@ -3,6 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { IssueStatus } from '@src/common/feishu/card/error-unresolve-card';
 import { firstValueFrom } from 'rxjs';
+import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 
 type IssueOriginStatus =
   | 'resolved'
@@ -65,20 +66,26 @@ export class SentryApiService {
     };
   }
   async updateIssue(body: UpdateIssueParams, issue_id: string) {
-    const reqBody = this.dataAdapter(body);
-    const { data } = await firstValueFrom(
-      this.httpService.put(
-        `https://cloud.elnkpro.com:9000/api/0/organizations/aplus-frontend-team/issues/${issue_id}/`,
-        reqBody,
-        {
-          headers: {
-            Authorization: `Bearer ${this.config.get('sentryIntegrationToken')}`,
-            'Content-Type': 'application/json',
+    try {
+      const reqBody = this.dataAdapter(body);
+
+      const { data } = await firstValueFrom(
+        this.httpService.put(
+          `https://cloud.elnkpro.com:9000/api/0/organizations/aplus-frontend-team/issues/${issue_id}/`,
+          reqBody,
+          {
+            headers: {
+              Authorization: `Bearer ${this.config.get('sentryIntegrationToken')}`,
+              'Content-Type': 'application/json',
+            },
           },
-        },
-      ),
-    );
-    console.log('[ updateIssue-res ] >', data);
-    return data;
+        ),
+      );
+      console.log('[ updateIssue-res ] >', data);
+      return data;
+    } catch (err) {
+      // console.log('[ err ] >');
+      sendExceptionToFeishu(err, '修改Sentry issue失败,IssueId:' + issue_id);
+    }
   }
 }

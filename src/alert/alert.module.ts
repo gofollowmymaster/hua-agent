@@ -23,6 +23,10 @@ import FeishuApiAlertIssueTable from './common/table/api-alert-issue-table';
 import AlertFeishuAdapter from './common/adapter/alert-feishu-adapter';
 import { SentryApiService } from './common/service/sentry-api-service';
 import { HttpModule } from '@nestjs/axios';
+import { PageErrorService } from './common/service/page-error-service';
+import { RequestErrorService } from './common/service/request-error-service';
+import PageAlertFeishuAdapter from './common/adapter/page-alert-feishu-adapter';
+import RequestAlertFeishuAdapter from './common/adapter/request-alert-feishu-adapter';
 
 @Module({
   imports: [
@@ -48,7 +52,11 @@ import { HttpModule } from '@nestjs/axios';
     FeishuCallbackService,
     SentryWebhookService,
     AlertFeishuAdapter,
+    PageAlertFeishuAdapter,
+    RequestAlertFeishuAdapter,
     SentryApiService,
+    PageErrorService,
+    RequestErrorService,
   ],
   exports: [AlertMsgService, FeishuEventService, SentryWebhookService],
 })

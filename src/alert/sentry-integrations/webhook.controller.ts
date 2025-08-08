@@ -8,7 +8,6 @@ import {
 
 // import { FeishuEventCallbackDto } from './dto/feishu-event.dto';
 import { SentryWebhookService } from './webhook.service';
-import { LoggerService } from '@src/common/service/logger/logger.service';
 import { ApiBody, ApiHeaders, ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
   SentryHookCommentDto,
@@ -20,12 +19,15 @@ import {
 } from './dto/sentry-hook';
 import { getModuleNameByUrl } from '../common/utils';
 import {
-  AlertEvent,
   Environment,
   ErrorEndpoint,
   IssueAction,
   PageModuleName,
 } from '../common/type/alert';
+import { RedisService } from '@src/common/service/redis/redis.service';
+import Redis from 'ioredis';
+import { PageErrorService } from '../common/service/page-error-service';
+import { RequestErrorService } from '../common/service/request-error-service';
 // import { verifySignature } from './util';
 @ApiTags('Sentry WebHook')
 @Controller('sentry-hook')
@@ -53,10 +55,15 @@ import {
   },
 ])
 export class SentryWebhookController {
+  private readonly redis: Redis;
   constructor(
     private readonly sentryWebhookService: SentryWebhookService,
-    private readonly logger: LoggerService,
-  ) {}
+    private readonly pageErrorService: PageErrorService,
+    private readonly requestErrorService: RequestErrorService,
+    protected readonly redisService: RedisService,
+  ) {
+    this.redis = redisService.getClient();
+  }
 
   @ApiOperation({
     summary: 'Sentry WebHook入口',
@@ -79,8 +86,8 @@ export class SentryWebhookController {
     if (!headers['sentry-hook-signature']) {
       throw new UnauthorizedException('Sentry Hook签名验证失败');
     }
-
     const resource = headers['sentry-hook-resource'];
+
     switch (resource) {
       case SentryHookType.Error:
         this.error(params);
@@ -132,6 +139,8 @@ export class SentryWebhookController {
       comment,
     });
   }
+  // getAlertEndTypeByErrorEvent(params: SentryHookErrorDto) {}
+
   async error(params: SentryHookErrorDto) {
     const alertError = params.data.error;
     if (alertError.environment == Environment.PROD) return;
@@ -140,8 +149,9 @@ export class SentryWebhookController {
     const serverModuleName = getModuleNameByUrl(requestData?.url);
     const pageModuleName =
       alertError.extra?.subModuleName || PageModuleName.APLUS_OTHER;
-    const eventData: AlertEvent = {
+    const eventData = {
       ...alertError,
+      requestData,
       title: alertError.title,
       issueId: alertError.issue_id,
       webUrl: alertError.web_url,

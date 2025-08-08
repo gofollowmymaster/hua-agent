@@ -56,7 +56,6 @@ export class SignAuthGuard implements CanActivate {
       if (!appInfo.是否启用) {
         throw new UnauthorizedException();
       }
-      // return true;
       const secretKey = appInfo?.AppSecret; // Replace with your actual secret key
       // Sort keys and construct the string
       const sortedKeys = Object.keys(restData).sort();
@@ -66,7 +65,6 @@ export class SignAuthGuard implements CanActivate {
 
       // Append the secret key
       const stringToHash = concatenatedString + secretKey;
-      console.log('[ signature ] >', stringToHash);
 
       // Generate MD5 hash
       generatedSignature = createHash('md5').update(stringToHash).digest('hex');
@@ -74,7 +72,6 @@ export class SignAuthGuard implements CanActivate {
       console.log('[ error ] >', error);
       throw new UnauthorizedException();
     }
-    console.log('[ signature ] >', signature, generatedSignature);
 
     // Compare the generated signature with the provided signature
     if (generatedSignature !== signature) {

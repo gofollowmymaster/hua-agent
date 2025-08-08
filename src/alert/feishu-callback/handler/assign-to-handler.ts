@@ -1,6 +1,9 @@
 import { CustomCallbackHandleType } from '.';
 
-const AssignToHandler: CustomCallbackHandleType = async (event, service) => {
+const AssignToHandler: CustomCallbackHandleType = async (
+  event,
+  handerService,
+) => {
   const {
     operator: { open_id },
     action: {
@@ -10,14 +13,14 @@ const AssignToHandler: CustomCallbackHandleType = async (event, service) => {
     // token,
     // context: { open_message_id, open_chat_id },
   } = event;
-
+  const service = await handerService.getServiceByIssueId(issueId);
   service.assignToHandler({
     issueId,
     operator: open_id,
     assignTo: assignToUserId,
   });
 
-  const userInfo = await service.feishuUserHelper.getUserInfo({
+  const userInfo = await handerService.feishuUserHelper.getUserInfo({
     userId: assignToUserId,
     userIdType: 'open_id',
   });
@@ -28,7 +31,7 @@ const AssignToHandler: CustomCallbackHandleType = async (event, service) => {
   console.log('[ user_id ] >', assignToUserId, open_id, userInfo);
   console.log('[ user_id ] >', user_id);
 
-  service.sentryService.updateIssue(
+  handerService.sentryService.updateIssue(
     {
       assignedTo: enterprise_email,
     },
