@@ -26,7 +26,7 @@ export default class AlertStatisticService {
     this.client = ClientFactory.create(FeishuApp.AlertClient);
   }
 
-  @Cron('0 * * * * *')
+  @Cron('0 0 0 * * *')
   async handleCron() {
     const towdayStart = dayjs().startOf('day').valueOf();
     const filter: BitTableFilter = {
