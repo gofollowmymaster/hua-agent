@@ -23,7 +23,8 @@ const CloseHandler: CustomCallbackHandleType = async (event, handerService) => {
   let cardReturn;
   if (issueInfo.cardData) {
     const cardData = JSON.parse(issueInfo.cardData);
-    const statusLabel = '已关闭';
+    const statusLabel =
+      cardData.status === '暂时忽略' ? cardData.status : '已关闭';
     cardReturn = {
       type: 'template',
       data: {
@@ -34,6 +35,7 @@ const CloseHandler: CustomCallbackHandleType = async (event, handerService) => {
           status: statusLabel,
           reason,
           solution,
+          color: statusLabel === '暂时忽略' ? 'blue' : 'green',
         },
       },
     };

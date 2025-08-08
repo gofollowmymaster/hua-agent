@@ -272,5 +272,6 @@ export abstract class AlertBaseService extends BaseService {
         },
       ),
     );
+    console.log('[ resData ] >', resData);
   }
 }

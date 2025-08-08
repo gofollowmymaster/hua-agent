@@ -60,7 +60,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
         errorEndpoint: this.errorEvent.errorEndpoint,
       };
       await this.redis.hset(key, issueInfo);
-      this.redis.expire(key, 60 * 60 * 24);
+      this.redis.expire(key, 60 * 60 * 24 * 7);
       return;
     }
     // 如果issue在，修改数量并回复之前的错误
@@ -110,8 +110,15 @@ export abstract class ErrorBaseService extends AlertBaseService {
   async assignToHandler(eventData: AssignEvent) {
     const issueInfo = await this.checkIssueInCache(eventData.issueId);
 
+    const {
+      user: { name },
+    } = await this.feishuUserHelper.getUserInfo({
+      userId: eventData.assignTo,
+      userIdType: 'open_id',
+    });
     this.updateIssueCardDataInCache(eventData.issueId, {
       userId: eventData.assignTo,
+      userName: name,
     });
     if (issueInfo.messageId) {
       this.messageHelper.replyInThread(
