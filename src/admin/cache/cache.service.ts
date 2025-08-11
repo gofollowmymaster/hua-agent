@@ -1,34 +1,38 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
 import { BaseService } from '@src/common/base/BaseService';
 import { CacheClearDto, KeyType } from './dto/cache-clear.dto';
 import {
   RedisPrefix,
   RedisPrefixMtable,
 } from '@src/common/const/redis-key.enum';
+import { RedisService } from '@src/common/service/redis/redis.service';
+import Redis from 'ioredis';
 
 @Injectable()
 export class CacheService extends BaseService {
-  // private messageHelper;
-  constructor(@Inject(CACHE_MANAGER) protected cache: Cache) {
+  private redis: Redis;
+  constructor(protected redisService: RedisService) {
     super();
+    this.redis = redisService.getClient();
   }
 
   async delCache(params: CacheClearDto) {
+    // delByPattern
     const fullKey =
       params.type == KeyType.多维表格
-        ? RedisPrefixMtable + params.key
+        ? RedisPrefixMtable + params.key + ':*'
         : RedisPrefix + params.key;
     let message = '清除缓存成功',
       code = 200;
-    if (!(await this.cache.get(fullKey))) {
+
+    // const  await this.redis.scan(fullKey)
+    if (await this.redisService.hasByPattern(fullKey)) {
+      this.redisService.delByPattern(fullKey);
+      code = 200;
+    } else {
       message = '缓存不存在';
       code = 404;
-    } else if (!(await this.cache.del(fullKey))) {
-      message = '清除缓存失败';
-      code = 500;
     }
 
     return {
@@ -38,6 +42,6 @@ export class CacheService extends BaseService {
   }
 
   async getCache(fullKey) {
-    return await this.cache.get(fullKey);
+    return await this.redis.get(fullKey);
   }
 }

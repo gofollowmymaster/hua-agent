@@ -28,6 +28,15 @@ export class RedisService {
     return current > limit;
   }
 
+  async hasByPattern(pattern: string) {
+    let cursor = '0';
+    const reply = await this.redis.scan(cursor, 'MATCH', pattern, 'COUNT', 1);
+    cursor = reply[0];
+    const keys = reply[1];
+    if (keys.length > 0) return true;
+    return false;
+  }
+
   async delByPattern(pattern: string, batchSize = 100) {
     let cursor = '0';
     let deletedCount = 0;
