@@ -49,7 +49,7 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
   toFrontendAlertIssueTableData(): FrontendAlertIssueTableDto {
     return {
       标题: this.event.title,
-      链接信息: this.event.webUrl,
+      // 链接信息: this.event.webUrl,
       是否解决: false,
       负责人: [{ id: this.appInfo.frontendLeaderId }],
       错误原因: '',

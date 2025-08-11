@@ -53,7 +53,7 @@ export type FrontendAlertTableDto = {
 
 export type FrontendAlertIssueTableDto = {
   标题: string;
-  链接信息: string;
+  // 链接信息: string;
   是否解决: boolean;
   // 优先级: ;
   负责人: { id: string }[];
