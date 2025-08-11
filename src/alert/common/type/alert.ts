@@ -14,6 +14,7 @@ export class AlertEvent {
   errorEndpoint: ErrorEndpoint;
   issueUrl: string;
   feishuUrl?: string;
+  rawData: Record<string, any>;
   [key: string]: any;
 }
 

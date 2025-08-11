@@ -11,6 +11,7 @@ export type ApiAlertTableDto = {
   业务端?: string;
   发生时间: number;
   环境: string;
+  链接信息: string;
   RawData: string;
 };
 

@@ -43,6 +43,7 @@ export class AlertMsgController {
         alertInfo.event.extra?.subModuleName || PageModuleName.APLUS_OTHER,
       serverModuleName,
       errorEndpoint: alertInfo.event.extra?.errorEndpoint || ErrorEndpoint.Page,
+      rawData: alertInfo,
     };
     // return;
     return await this.alertMsgService.sentryAlertHook(eventData);

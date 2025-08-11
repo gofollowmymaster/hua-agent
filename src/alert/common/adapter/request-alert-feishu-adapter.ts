@@ -42,7 +42,9 @@ export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       业务线: bu,
       发生时间: this.event.timestamp * 1000,
       环境: this.event.environment,
-      RawData: JSON.stringify(this.event),
+      链接信息: this.event.webUrl,
+
+      RawData: JSON.stringify(this.event.rawData),
     };
   }
 

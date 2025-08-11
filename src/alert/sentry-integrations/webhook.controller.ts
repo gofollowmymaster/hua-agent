@@ -159,6 +159,7 @@ export class SentryWebhookController {
       pageModuleName,
       serverModuleName,
       errorEndpoint: alertError.extra?.errorEndpoint || ErrorEndpoint.Page,
+      rawData: params,
     };
     return await this.sentryWebhookService.error(eventData);
   }
