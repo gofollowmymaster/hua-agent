@@ -8,9 +8,9 @@ export type UnresolvedCardData = {
   userId?: string;
   errorTime: string;
   title: string;
-  color?: string;
+  color: string;
   content: string;
-  count?: number;
+  count?: string;
   // status: IssueStatus;
   status: IssueStatusLabel;
   issueId: string;

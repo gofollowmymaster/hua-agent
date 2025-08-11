@@ -80,12 +80,15 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       eventType: this.event.type,
       abstract: this.event.culprit,
       content: this.event.title,
-      count: 1,
+      count: '1',
       status: issueStatusMap['unresolved'],
       issueId: this.event.issueId,
       errorTime: dayjs(this.event.timestamp * 1000).format(
         'YYYY-MM-DD HH:mm:ss',
       ),
+
+      messageId: undefined,
+      errorEndpoint: this.event.errorEndpoint
     };
   }
 }

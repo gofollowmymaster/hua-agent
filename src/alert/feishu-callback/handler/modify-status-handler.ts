@@ -21,16 +21,15 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
   } = event;
   const service = await handerService.getServiceByIssueId(issueId);
 
-  const issueInfo = await service.checkIssueInCache(issueId);
-  console.log('[ issueInfo ] >', issueInfo);
+  const issueCardData = await service.checkIssueInCache(issueId);
+  console.log('[ issueInfo ] >', issueCardData);
   service.modifyStatusHandler({
     issueId,
     operator: open_id,
     issueStatus,
   } as ModifyStatusEvent);
 
-  if (issueInfo.cardData) {
-    const cardData = JSON.parse(issueInfo.cardData);
+  if (issueCardData) {
     const statusLabel = issueStatusMap[issueStatus];
     let cardReturn = {
       type: 'template',
@@ -38,7 +37,7 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
         template_id: ErrorUnresolvedCard.templateId,
         template_version_name: ErrorUnresolvedCard.templateVersion,
         template_variable: {
-          ...cardData,
+          ...issueCardData,
           color: ErrorUnresolvedCard.getColor(statusLabel),
           status: statusLabel,
           statusOptions: ErrorUnresolvedCard.statusOptions(statusLabel),
@@ -57,7 +56,7 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
           status: issueStatus as IssueStatus,
           // assignee: assignToUserId,
         },
-        issueInfo.issueId,
+        issueCardData.issueId,
       );
 
       cardReturn = {
@@ -66,8 +65,9 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
           template_id: ErrorResolvedCard.templateId,
           template_version_name: ErrorResolvedCard.templateVersion,
           template_variable: {
-            ...cardData,
+            ...issueCardData,
             status: issueStatusMap[issueStatus],
+            statusOptions: []
           },
         },
       };

@@ -217,7 +217,7 @@ export abstract class AlertBaseService extends BaseService {
   async checkIssueInCache(issueId: string) {
     const issueInfo = await this.redis.hgetall(
       RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),
-    );
+    ) as UnresolvedCardData;
 
     if (!issueInfo.issueId) {
       //跨天问题
@@ -228,16 +228,11 @@ export abstract class AlertBaseService extends BaseService {
 
   async updateIssueCardDataInCache(
     issueId: string,
-    issueInfo: Record<string, any>,
+    issueInfo: UnresolvedCardData,
   ) {
-    const cardDataStr = await this.redis.hget(
-      RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),
-      'cardData',
-    );
-    const cardData = JSON.parse(cardDataStr) as UnresolvedCardData;
     await this.redis.hset(
       RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),
-      { cardData: JSON.stringify({ ...cardData, ...issueInfo }) },
+      issueInfo,
     );
   }
 

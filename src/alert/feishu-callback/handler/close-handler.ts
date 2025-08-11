@@ -19,19 +19,18 @@ const CloseHandler: CustomCallbackHandleType = async (event, handerService) => {
     solution,
   });
 
-  const issueInfo = await service.checkIssueInCache(issueId);
+  const issueCardData = await service.checkIssueInCache(issueId);
   let cardReturn;
-  if (issueInfo.cardData) {
-    const cardData = JSON.parse(issueInfo.cardData);
+  if (issueCardData) {
     const statusLabel =
-      cardData.status === '暂时忽略' ? cardData.status : '已关闭';
+    issueCardData.status === '暂时忽略' ? issueCardData.status : '已关闭';
     cardReturn = {
       type: 'template',
       data: {
         template_id: ErrorClosedCard.templateId,
         template_version_name: ErrorClosedCard.templateVersion,
         template_variable: {
-          ...cardData,
+          ...issueCardData,
           status: statusLabel,
           reason,
           solution,

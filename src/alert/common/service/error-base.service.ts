@@ -45,43 +45,41 @@ export abstract class ErrorBaseService extends AlertBaseService {
       '{issueId}',
       this.errorEvent.issueId,
     );
-    const issueInfo = await this.redis.hgetall(key);
+    let issueCardData = await this.redis.hgetall(key) as UnresolvedCardData;
     //新issue 发送卡片消息
-    if (!issueInfo.issueId) {
-      const cardData = this.alertFeishuAdapter.toAplusAlertCardeData();
-      cardData.linkUrl = eventRecord.recordUrl;
-      const content = ErrorUnresolvedCard.buildCardMsg(cardData);
+    if (!issueCardData.issueId) {
+        issueCardData = this.alertFeishuAdapter.toAplusAlertCardeData();
+      issueCardData.linkUrl = eventRecord.recordUrl;
+      const content = ErrorUnresolvedCard.buildCardMsg(issueCardData);
       const groupMsgInfo = await this.sendFsAlertMsg(this.errorEvent, content);
       const issueInfo = {
-        issueId: this.errorEvent.issueId,
-        count: 1,
+        ...issueCardData,
         messageId: groupMsgInfo.message_id,
-        cardData: JSON.stringify(cardData),
-        errorEndpoint: this.errorEvent.errorEndpoint,
       };
       await this.redis.hset(key, issueInfo);
       this.redis.expire(key, 60 * 60 * 24 * 7);
       return;
     }
+    if (issueCardData.status == '暂时忽略') return;
+
+    const count = parseInt(issueCardData.count)+1
     // 如果issue在，修改数量并回复之前的错误
     await this.redis.hset(key, {
-      count: parseInt(issueInfo?.count || '1') + 1,
+      count,
     });
-    const cardData: UnresolvedCardData = JSON.parse(issueInfo.cardData);
 
-    if (cardData.status == '暂时忽略') return;
-    let messageText = `错误再次被触发，本周累计发生**${issueInfo.count}**次,[查看详情](${eventRecord.recordUrl}) `;
-    if (['已解决'].includes(cardData.status)) {
-      messageText = `<at user_id="${cardData.userId}"></at>错误被重新打开,请及时排查,[查看详情](${eventRecord.recordUrl}) `;
+    let messageText = `错误再次被触发，本周累计发生**${count}**次,[查看详情](${eventRecord.recordUrl}) `;
+    if (['已解决'].includes(issueCardData.status)) {
+      messageText = `<at user_id="${issueCardData.userId}"></at>错误被重新打开,请及时排查,[查看详情](${eventRecord.recordUrl}) `;
       //更新卡片信息  激活
-      this.updateByCard(issueInfo.messageId, {
+      this.updateByCard(issueCardData.messageId, {
         content: JSON.stringify({
           type: 'template',
           data: {
             template_id: ErrorUnresolvedCard.templateId,
             template_version_name: ErrorUnresolvedCard.templateVersion,
             template_variable: {
-              ...JSON.parse(issueInfo.cardData),
+              ...issueCardData,
               status: '重新打开',
               color: 'red',
               statusOptions: ErrorUnresolvedCard.statusOptions('待处理'),
@@ -103,7 +101,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
           ],
         },
       }),
-      issueInfo.messageId,
+      issueCardData.messageId,
       FeishuMsgType.Post,
     );
   }
