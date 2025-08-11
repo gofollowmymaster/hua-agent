@@ -36,6 +36,7 @@ export class AlertMsgController {
       title: alertInfo.message,
       // issue_url: alertInfo.url,
       webUrl: eventUrl,
+      issueUrl: alertInfo.url,
       issueId: alertInfo.id,
       requestData,
       pageModuleName:
