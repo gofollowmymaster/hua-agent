@@ -36,11 +36,36 @@ export class RedisService {
     if (keys.length > 0) return true;
     return false;
   }
+  async getByPattern(pattern: string, batchSize = 100) {
+    let cursor = '0';
+    const values: any[] = [];
+
+    do {
+      // 使用 SCAN 命令查找匹配的键
+      const reply = await this.redis.scan(
+        cursor,
+        'MATCH',
+        pattern,
+        'COUNT',
+        batchSize,
+      );
+      cursor = reply[0];
+      const keys = reply[1];
+
+      if (keys.length > 0) {
+        const batchValues = await this.redis.mget(...keys);
+        values.push(...batchValues);
+      }
+    } while (cursor !== '0');
+
+    return values;
+  }
 
   async delByPattern(pattern: string, batchSize = 100) {
     let cursor = '0';
     let deletedCount = 0;
-    if (pattern.length < 10) {
+    //通过长度限制批量删除过多
+    if (pattern.length < 20) {
       throw new Error('pattern must be greater than 10');
     }
     do {

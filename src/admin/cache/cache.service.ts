@@ -42,6 +42,6 @@ export class CacheService extends BaseService {
   }
 
   async getCache(fullKey) {
-    return await this.redis.get(fullKey);
+    return await this.redisService.getByPattern(fullKey);
   }
 }
