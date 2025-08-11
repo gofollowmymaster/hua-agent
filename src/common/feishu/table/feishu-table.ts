@@ -17,7 +17,7 @@ abstract class FeishuTable {
   protected appToken = '';
   protected tableId = '';
   protected useCache = false;
-  protected ttl = 1000 * 60 * 10; //默认缓存10分钟
+  protected ttl = 60 * 10; //默认缓存10分钟
 
   setTableOption() {
     this.tableHelper.setTableOption({

@@ -6,7 +6,7 @@ import FeishuTable from '@src/common/feishu/table/feishu-table';
 class ClientTokenTable extends FeishuTable {
   // protected readonly tableHelper: FeishuTableHelper;
   protected readonly useCache = true;
-  protected readonly ttl = 1000 * 60 * 60 * 24 * 7;
+  protected readonly ttl = 60 * 24 * 7;
 
   constructor(
     readonly config: ConfigService,

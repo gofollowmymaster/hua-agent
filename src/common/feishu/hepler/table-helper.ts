@@ -24,7 +24,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
   protected appToken: string;
   protected tableId: string;
   protected useCache = false;
-  protected ttl = 1000 * 60 * 10; //默认缓存10分钟
+  protected ttl = 60 * 10; //默认缓存10分钟
 
   constructor(
     @Inject(FEISHU_CLIENT_ID) private readonly client: FeishuClient,
