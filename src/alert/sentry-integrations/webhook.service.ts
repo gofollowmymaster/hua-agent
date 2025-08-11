@@ -186,7 +186,7 @@ export class SentryWebhookService {
 
     const msgData = {
       ...errorEvent,
-      rawData: '',
+      rawData: {},
       level: ErrorLevel.FATAL,
       content: '最近3分钟内报错数超过10个,请及时处理',
       timestamp: dayjs().valueOf(),
