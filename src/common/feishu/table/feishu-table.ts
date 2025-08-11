@@ -27,9 +27,12 @@ abstract class FeishuTable {
       ttl: this.ttl,
     });
   }
-  async list(useCache = false): Promise<BitTablePagination> {
+  async list(
+    params: BitTableSearchPayloadParams = {},
+    useCache = true,
+  ): Promise<BitTablePagination> {
     this.setTableOption();
-    return await this.tableHelper.list({}, useCache);
+    return await this.tableHelper.list(params, useCache);
   }
 
   async search(

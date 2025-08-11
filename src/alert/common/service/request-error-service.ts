@@ -18,7 +18,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class RequestErrorService extends ErrorBaseService {
-  protected ignoreCodeList = ['401', '10002'];
+  protected ignoreCodeList = ['401', '10002', '408'];
 
   constructor(
     protected prisma: PrismaService,
@@ -116,7 +116,7 @@ export class RequestErrorService extends ErrorBaseService {
       false,
     );
     if (issueRes.total == 0) {
-      sendExceptionToFeishu(new Error('修改卡片消息是未找到issue:' + issue_id));
+      sendExceptionToFeishu(new Error('修改卡片消息时未找到issue:' + issue_id));
     } else {
       const record = issueRes.items[0];
       const { record_id: recordId } = record;
