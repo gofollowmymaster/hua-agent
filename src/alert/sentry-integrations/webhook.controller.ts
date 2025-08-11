@@ -154,6 +154,7 @@ export class SentryWebhookController {
       requestData,
       title: alertError.title,
       issueId: alertError.issue_id,
+      issueUrl: alertError.issue_url,
       webUrl: alertError.web_url,
       pageModuleName,
       serverModuleName,

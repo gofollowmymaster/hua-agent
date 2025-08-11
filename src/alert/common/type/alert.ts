@@ -12,13 +12,13 @@ export class AlertEvent {
   culprit: string;
   type: string;
   errorEndpoint: ErrorEndpoint;
+  issueUrl: string;
   feishuUrl?: string;
   [key: string]: any;
 }
 
 export class PageAlertEvent extends AlertEvent {
   errorEndpoint: ErrorEndpoint.Page;
-  feishuUrl?: string;
 }
 
 export class RequestAlertEvent extends AlertEvent {

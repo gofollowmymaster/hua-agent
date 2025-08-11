@@ -77,6 +77,7 @@ export class PageErrorService extends ErrorBaseService {
               },
             ],
           },
+          {},
           false,
         );
       if (total == 0) {
@@ -111,6 +112,7 @@ export class PageErrorService extends ErrorBaseService {
           },
         ],
       },
+      {},
       false,
     );
     if (issueRes.total == 0) {

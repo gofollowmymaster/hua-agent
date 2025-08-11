@@ -8,6 +8,7 @@ import {
   BitTableFilter,
   BitTableGetOption,
   BitTablePagination,
+  BitTableSearchPayloadParams,
 } from '../type/bitable';
 @Injectable()
 abstract class FeishuTable {
@@ -33,12 +34,13 @@ abstract class FeishuTable {
 
   async search(
     filter: BitTableFilter,
+    params: BitTableSearchPayloadParams = {},
     useCache = true,
   ): Promise<BitTablePagination> {
     this.setTableOption();
 
     // console.log('[ filter ] >', JSON.stringify(filter));
-    const res = await this.tableHelper.search(filter, useCache);
+    const res = await this.tableHelper.search(filter, params, useCache);
     // console.log('[ return ] >', res);
     return res;
   }

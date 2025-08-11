@@ -10,6 +10,8 @@ import { BitTableFilter } from '@src/common/feishu/type/bitable';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import dayjs from 'dayjs';
 import Redis from 'ioredis';
+import RequestIssueStatisticService from './services/request-issue.service';
+import PageIssueStatisticService from './services/page-issue.service';
 
 @Injectable()
 export default class AlertStatisticService {
@@ -19,39 +21,18 @@ export default class AlertStatisticService {
   constructor(
     private readonly config: ConfigService,
     protected readonly redisService: RedisService,
-    protected readonly feishuApiIssueTable: FeishuApiAlertIssueTable,
-    protected readonly feishuFrontendIssueTable: FeishuFrontendAlertIssueTable,
+    protected readonly requestIssueService: RequestIssueStatisticService,
+    protected readonly pageIssueService: PageIssueStatisticService,
   ) {
     this.redis = redisService.getClient();
     this.client = ClientFactory.create(FeishuApp.AlertClient);
   }
 
-  @Cron('0 0 0 * * *')
+  @Cron('0 0 17 * * *')
   async handleCron() {
-    const towdayStart = dayjs().startOf('day').valueOf();
-    const filter: BitTableFilter = {
-      conjunction: 'and',
-      conditions: [
-        {
-          field_name: '创建时间',
-          operator: 'isGreater',
-          value: ['ExactDate', towdayStart + ''],
-        },
-      ],
-    };
-    const RequestIssueData = await this.feishuApiIssueTable.search(
-      filter,
-      false,
-    );
-    const PageIssueData = await this.feishuFrontendIssueTable.search(
-      filter,
-      false,
-    );
-    console.log(
-      '[ ---AlertStatisticService-- data ] >',
-      RequestIssueData,
-      PageIssueData,
-    );
+    this.pageIssueService.statistic();
+    this.requestIssueService.statistic();
+
     return;
   }
 }

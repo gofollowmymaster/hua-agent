@@ -81,6 +81,7 @@ export class RequestErrorService extends ErrorBaseService {
             },
           ],
         },
+        {},
         false,
       );
       if (issueRes.total == 0) {
@@ -111,6 +112,7 @@ export class RequestErrorService extends ErrorBaseService {
           },
         ],
       },
+      {},
       false,
     );
     if (issueRes.total == 0) {

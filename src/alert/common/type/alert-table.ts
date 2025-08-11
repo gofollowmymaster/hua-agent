@@ -32,6 +32,7 @@ export type ApiAlertIssueTableDto = {
   错误次数: number;
   IssueId: string;
   是否解决: boolean;
+  外部链接: string;
 };
 
 export type FrontendAlertTableDto = {
@@ -66,6 +67,7 @@ export type FrontendAlertIssueTableDto = {
   环境: string;
   错误次数: number;
   IssueId: string;
+  外部链接: string;
 };
 // interface FeishuUser {
 //   id: string;

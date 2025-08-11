@@ -62,6 +62,7 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       环境: this.event.environment,
       错误次数: 1,
       IssueId: this.event.issueId,
+      外部链接: this.event.issueUrl,
     };
   }
   toAplusAlertCardeData(): UnresolvedCardData {

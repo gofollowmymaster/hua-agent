@@ -1,6 +1,6 @@
 import { FeishuCard } from './feishu-card';
 
-export type ResolvedCardData = {
+export type StatisticCardData = {
   date: string;
   total: number;
   resolved: number;
@@ -20,7 +20,7 @@ export default class ErrorStatisticCard extends FeishuCard {
    * @param alertInfo
    * @returns
    */
-  static buildCardMsg = (alertInfo: ResolvedCardData) => {
+  static buildCardMsg = (alertInfo: StatisticCardData) => {
     return super.build({
       ...alertInfo,
     });

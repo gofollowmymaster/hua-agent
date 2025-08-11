@@ -60,7 +60,11 @@ class FeishuTableHelper extends FeishuDataApiHelper {
       '',
     );
   }
-  async search(filter: BitTableFilter, useCache = true) {
+  async search(
+    filter: BitTableFilter,
+    params: BitTableSearchPayloadParams = {},
+    useCache = true,
+  ) {
     const cacheKey = JSON.stringify(filter).replaceAll(':', '');
 
     return this.readWrapper(
@@ -70,6 +74,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
             app_token: this.appToken,
             table_id: this.tableId,
           },
+          params,
           data: {
             filter,
           },

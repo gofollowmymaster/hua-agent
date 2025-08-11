@@ -62,6 +62,7 @@ export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       负责人: [{ id: this.appInfo.backendLeaderId }],
       错误次数: 1,
       IssueId: this.event.issueId,
+      外部链接: this.event.issueUrl,
       是否解决: false,
     };
   }

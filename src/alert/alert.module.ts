@@ -28,6 +28,8 @@ import { RequestErrorService } from './common/service/request-error-service';
 import PageAlertFeishuAdapter from './common/adapter/page-alert-feishu-adapter';
 import RequestAlertFeishuAdapter from './common/adapter/request-alert-feishu-adapter';
 import AlertStatisticService from './common/alert-statistic-schedule';
+import RequestIssueStatisticService from './common/alert-statistic-schedule/services/request-issue.service';
+import PageIssueStatisticService from './common/alert-statistic-schedule/services/page-issue.service';
 
 @Module({
   imports: [
@@ -59,6 +61,8 @@ import AlertStatisticService from './common/alert-statistic-schedule';
     PageErrorService,
     RequestErrorService,
     AlertStatisticService,
+    RequestIssueStatisticService,
+    PageIssueStatisticService,
   ],
   exports: [
     AlertMsgService,
