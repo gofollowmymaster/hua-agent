@@ -62,7 +62,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
         messageId: groupMsgInfo.message_id,
       };
       // await this.redis.hset(key, issueInfo);
-      await this.updateIssueCardDataInCache(key, issueInfo);
+      await this.updateIssueCardDataInCache(this.errorEvent.issueId, issueInfo);
 
       this.redis.expire(key, 60 * 60 * 24 * 7);
       return;
@@ -71,7 +71,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
 
     const count = issueCardData.count + 1;
     // 如果issue在，修改数量并回复之前的错误
-    await this.updateIssueCardDataInCache(key, {
+    await this.updateIssueCardDataInCache(this.errorEvent.issueId, {
       count,
     });
 
@@ -94,7 +94,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
           },
         }),
       });
-      await this.updateIssueCardDataInCache(key, {
+      await this.updateIssueCardDataInCache(this.errorEvent.issueId, {
         status: '重新打开',
       });
     }

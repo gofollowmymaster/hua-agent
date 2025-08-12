@@ -54,6 +54,7 @@ export class RedisService {
 
       if (keys.length > 0) {
         const batchValues = await this.redis.mget(...keys);
+        console.log('[ batchValues ] >', keys);
         values.push(...batchValues);
       }
     } while (cursor !== '0');
