@@ -43,7 +43,8 @@ export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       发生时间: this.event.timestamp * 1000,
       环境: this.event.environment,
       链接信息: this.event.webUrl,
-
+      应用名: this.event.pageModuleName,
+      IssueId: this.event.issueId,
       RawData: JSON.stringify(this.event.rawData),
     };
   }
@@ -63,9 +64,11 @@ export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       解决方案: '',
       负责人: [{ id: this.appInfo.backendLeaderId }],
       错误次数: 1,
+      日错误次数: 1,
       IssueId: this.event.issueId,
       外部链接: this.event.issueUrl,
       是否解决: false,
+      状态: '待处理',
     };
   }
 
@@ -84,14 +87,14 @@ export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       eventType: this.event.type,
       abstract: this.event.culprit,
       content: this.event.title,
-      count: '1',
+      count: 1,
       status: issueStatusMap['unresolved'],
       issueId: this.event.issueId,
       errorTime: dayjs(this.event.timestamp * 1000).format(
         'YYYY-MM-DD HH:mm:ss',
       ),
       messageId: undefined,
-      errorEndpoint: this.event.errorEndpoint
+      errorEndpoint: this.event.errorEndpoint,
     };
   }
 }

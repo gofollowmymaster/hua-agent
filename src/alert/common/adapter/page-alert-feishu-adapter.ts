@@ -37,6 +37,7 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       // 负责人: [{ id: appInfo.userId }],
       // 错误原因: '',
       // 解决方案: '',
+      IssueId: this.event.issueId,
       来源: 'Sentry告警',
       报警级别: this.event.level,
       描述信息: this.event.culprit,
@@ -61,8 +62,10 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       业务线: this.appInfo.bu,
       环境: this.event.environment,
       错误次数: 1,
+      日错误次数: 1,
       IssueId: this.event.issueId,
       外部链接: this.event.issueUrl,
+      状态: '待处理',
     };
   }
   toAplusAlertCardeData(): UnresolvedCardData {
@@ -80,7 +83,7 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       eventType: this.event.type,
       abstract: this.event.culprit,
       content: this.event.title,
-      count: '1',
+      count: 1,
       status: issueStatusMap['unresolved'],
       issueId: this.event.issueId,
       errorTime: dayjs(this.event.timestamp * 1000).format(
@@ -88,7 +91,7 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       ),
 
       messageId: undefined,
-      errorEndpoint: this.event.errorEndpoint
+      errorEndpoint: this.event.errorEndpoint,
     };
   }
 }

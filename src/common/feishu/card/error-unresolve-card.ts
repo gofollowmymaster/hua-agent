@@ -8,9 +8,9 @@ export type UnresolvedCardData = {
   userId?: string;
   errorTime: string;
   title: string;
-  color: string;
+  color?: string;
   content: string;
-  count?: string;
+  count?: number;
   // status: IssueStatus;
   status: IssueStatusLabel;
   issueId: string;
@@ -29,6 +29,7 @@ export const issueStatusMap = {
   ignoreCount1000: '已忽略',
   progressing: '处理中',
   reopened: '重新打开',
+  closed: '已关闭',
 } as const;
 export default class ErrorUnresolvedCard extends FeishuCard {
   static readonly templateId = 'AAqz6VqUmrfDw';

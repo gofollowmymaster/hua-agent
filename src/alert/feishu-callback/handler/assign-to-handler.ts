@@ -1,17 +1,17 @@
+import { CardCallbackReturnType } from '@src/common/feishu/type/card';
 import { CustomCallbackHandleType } from '.';
+import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolve-card';
 
 const AssignToHandler: CustomCallbackHandleType = async (
   event,
   handerService,
-) => {
+): Promise<CardCallbackReturnType<UnresolvedCardData>> => {
   const {
     operator: { open_id },
     action: {
       value: { issueId },
       option: assignToUserId,
     },
-    // token,
-    // context: { open_message_id, open_chat_id },
   } = event;
   const service = await handerService.getServiceByIssueId(issueId);
   service.assignToHandler({
@@ -26,10 +26,8 @@ const AssignToHandler: CustomCallbackHandleType = async (
   });
 
   const {
-    user: { user_id, enterprise_email },
+    user: { enterprise_email },
   } = userInfo;
-  console.log('[ user_id ] >', assignToUserId, open_id, userInfo);
-  console.log('[ user_id ] >', user_id);
 
   handerService.sentryService.updateIssue(
     {

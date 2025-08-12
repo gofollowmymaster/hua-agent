@@ -215,9 +215,9 @@ export abstract class AlertBaseService extends BaseService {
   }
 
   async checkIssueInCache(issueId: string) {
-    const issueInfo = await this.redis.hgetall(
+    const issueInfo = (await this.redis.hgetall(
       RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),
-    ) as UnresolvedCardData;
+    )) as UnresolvedCardData;
 
     if (!issueInfo.issueId) {
       //跨天问题
@@ -228,7 +228,7 @@ export abstract class AlertBaseService extends BaseService {
 
   async updateIssueCardDataInCache(
     issueId: string,
-    issueInfo: UnresolvedCardData,
+    issueInfo: Partial<UnresolvedCardData>,
   ) {
     await this.redis.hset(
       RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),

@@ -38,14 +38,13 @@ export class RequestErrorService extends ErrorBaseService {
     super(redisService);
   }
 
+  isIgnoreThisError() {
+    return this.ignoreCodeList.includes(this.errorEvent.requestData.code + '');
+  }
   async errorHookHandler(errorEvent: RequestAlertEvent) {
     await this.setErrorEvent(errorEvent);
 
-    const eventRecord = await this.writeToTable(errorEvent);
-    if (this.ignoreCodeList.includes(errorEvent.requestData.code + '')) {
-      return;
-    }
-    this.errorHandler(eventRecord);
+    this.errorHandler();
   }
 
   protected async writeToTable(errorEvent: RequestAlertEvent) {
@@ -86,12 +85,16 @@ export class RequestErrorService extends ErrorBaseService {
       );
       if (issueRes.total == 0) {
         const issue = this.alertFeishuAdapter.toApiAlertIssueTableData();
+        if (this.isIgnoreThisError()) {
+          issue['状态'] = '已忽略';
+        }
         await this.feishuApiIssueTable.create(issue);
       } else {
         const record = issueRes.items[0];
         const { record_id: recordId, fields } = record;
         await this.feishuApiIssueTable.update(recordId, {
           错误次数: (fields['错误次数'] as number) + 1,
+          日错误次数: (fields['日错误次数'] as number) + 1,
           是否解决: false,
         });
       }

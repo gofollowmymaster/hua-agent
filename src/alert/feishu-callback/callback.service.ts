@@ -16,6 +16,8 @@ import { PageErrorService } from '../common/service/page-error-service';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { ErrorBaseService } from '../common/service/error-base.service';
 import { ErrorEndpoint } from '../common/type/alert';
+import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolve-card';
+import { CardCallbackReturnType } from '@src/common/feishu/type/card';
 
 @Injectable()
 export class FeishuCallbackService extends CommonErrorService {
@@ -36,9 +38,9 @@ export class FeishuCallbackService extends CommonErrorService {
   }
 
   async checkIssueInCache(issueId: string) {
-    const issueInfo = await this.redis.hgetall(
+    const issueInfo = (await this.redis.hgetall(
       RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),
-    );
+    )) as UnresolvedCardData;
 
     if (!issueInfo.issueId) {
       //跨天问题
@@ -65,7 +67,9 @@ export class FeishuCallbackService extends CommonErrorService {
     return this.getServiceByEndPort(errorEndpoint);
   }
 
-  async handle(callbackInfo: FeishuCallbackDto) {
+  async handle(
+    callbackInfo: FeishuCallbackDto,
+  ): Promise<CardCallbackReturnType<UnresolvedCardData>> {
     const { header, event } = callbackInfo;
 
     const eventInfo = event || callbackInfo;

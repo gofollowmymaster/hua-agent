@@ -1,8 +1,16 @@
+import {
+  CardCallbackReturnType,
+  CardReturnType,
+} from '@src/common/feishu/type/card';
 import { CustomCallbackHandleType } from '.';
 
 import ErrorClosedCard from '@src/common/feishu/card/error-closed-card';
+import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolve-card';
 
-const CloseHandler: CustomCallbackHandleType = async (event, handerService) => {
+const CloseHandler: CustomCallbackHandleType = async (
+  event,
+  handerService,
+): Promise<CardCallbackReturnType<UnresolvedCardData>> => {
   const {
     operator: { open_id },
     action: {
@@ -20,10 +28,10 @@ const CloseHandler: CustomCallbackHandleType = async (event, handerService) => {
   });
 
   const issueCardData = await service.checkIssueInCache(issueId);
-  let cardReturn;
+  let cardReturn: CardReturnType<UnresolvedCardData>;
   if (issueCardData) {
     const statusLabel =
-    issueCardData.status === '暂时忽略' ? issueCardData.status : '已关闭';
+      issueCardData.status === '暂时忽略' ? issueCardData.status : '已关闭';
     cardReturn = {
       type: 'template',
       data: {

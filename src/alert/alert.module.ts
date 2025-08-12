@@ -27,9 +27,9 @@ import { PageErrorService } from './common/service/page-error-service';
 import { RequestErrorService } from './common/service/request-error-service';
 import PageAlertFeishuAdapter from './common/adapter/page-alert-feishu-adapter';
 import RequestAlertFeishuAdapter from './common/adapter/request-alert-feishu-adapter';
-import AlertStatisticService from './common/alert-statistic-schedule';
-import RequestIssueStatisticService from './common/alert-statistic-schedule/services/request-issue.service';
-import PageIssueStatisticService from './common/alert-statistic-schedule/services/page-issue.service';
+import AlertStatisticService from './common/schedule/alert-statistic';
+import RequestIssueStatisticService from './common/schedule/alert-statistic/services/request-issue.service';
+import PageIssueStatisticService from './common/schedule/alert-statistic/services/page-issue.service';
 
 @Module({
   imports: [

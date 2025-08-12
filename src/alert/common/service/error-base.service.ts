@@ -35,20 +35,25 @@ export abstract class ErrorBaseService extends AlertBaseService {
 
     this.errorEvent = errorEvent;
   }
-
+  isIgnoreThisError() {
+    return false;
+  }
   protected abstract writeToTable(errorEvent: AlertEvent);
   abstract errorHookHandler(alertInfo: AlertEvent);
   abstract updateTable(issueId: string, recordNew: Record<string, any>);
 
-  protected async errorHandler(eventRecord: Record<string, any>) {
+  protected async errorHandler() {
+    const eventRecord = await this.writeToTable(this.errorEvent);
+    if (this.isIgnoreThisError()) return;
+
     const key = RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace(
       '{issueId}',
       this.errorEvent.issueId,
     );
-    let issueCardData = await this.redis.hgetall(key) as UnresolvedCardData;
+    let issueCardData = (await this.redis.hgetall(key)) as UnresolvedCardData;
     //新issue 发送卡片消息
     if (!issueCardData.issueId) {
-        issueCardData = this.alertFeishuAdapter.toAplusAlertCardeData();
+      issueCardData = this.alertFeishuAdapter.toAplusAlertCardeData();
       issueCardData.linkUrl = eventRecord.recordUrl;
       const content = ErrorUnresolvedCard.buildCardMsg(issueCardData);
       const groupMsgInfo = await this.sendFsAlertMsg(this.errorEvent, content);
@@ -56,15 +61,17 @@ export abstract class ErrorBaseService extends AlertBaseService {
         ...issueCardData,
         messageId: groupMsgInfo.message_id,
       };
-      await this.redis.hset(key, issueInfo);
+      // await this.redis.hset(key, issueInfo);
+      await this.updateIssueCardDataInCache(key, issueInfo);
+
       this.redis.expire(key, 60 * 60 * 24 * 7);
       return;
     }
     if (issueCardData.status == '暂时忽略') return;
 
-    const count = parseInt(issueCardData.count)+1
+    const count = issueCardData.count + 1;
     // 如果issue在，修改数量并回复之前的错误
-    await this.redis.hset(key, {
+    await this.updateIssueCardDataInCache(key, {
       count,
     });
 
@@ -87,7 +94,11 @@ export abstract class ErrorBaseService extends AlertBaseService {
           },
         }),
       });
+      await this.updateIssueCardDataInCache(key, {
+        status: '重新打开',
+      });
     }
+
     await this.messageHelper.replyInThread(
       JSON.stringify({
         zh_cn: {
@@ -185,15 +196,12 @@ export abstract class ErrorBaseService extends AlertBaseService {
         FeishuMsgType.Post,
       );
     }
-    if (
-      !['resolved', 'ignoreCount100', 'ignoreCount1000'].includes(
-        eventData.issueStatus,
-      )
-    ) {
-      return;
-    }
+
+    const statusLabel = issueStatusMap[eventData.issueStatus];
+
     this.updateTable(issueInfo.issueId, {
-      是否解决: true,
+      //  状态:issueInfo
+      状态: statusLabel,
     });
   }
 
@@ -203,8 +211,10 @@ export abstract class ErrorBaseService extends AlertBaseService {
       this.updateIssueCardDataInCache(eventData.issueId, {
         reason: eventData.reason,
         solution: eventData.solution,
+        status: issueInfo.status == '已解决' ? '已关闭' : issueInfo.status,
       });
-
+      const statusAction = issueInfo.status == '已解决' ? '关闭🎉🎉' : '忽略';
+      const message = `将本问题${statusAction}\n【问题原因】${eventData.reason}\n【处理方法】${eventData.solution}`;
       this.messageHelper.replyInThread(
         JSON.stringify({
           zh_cn: {
@@ -216,7 +226,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
                 },
                 {
                   tag: 'text',
-                  text: `将本问题关闭🎉🎉\n【问题原因】${eventData.reason}\n【处理方法】${eventData.solution}`,
+                  text: message,
                 },
               ],
             ],

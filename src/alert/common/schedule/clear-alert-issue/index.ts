@@ -17,14 +17,9 @@ export default class ClearAlertIssueInService {
     this.redis = redisService.getClient();
   }
 
-  //每周一 0点运行一次
-  @Cron('0 0 0 * * 1')
+  //每日 0点运行一次
+  @Cron('0 0 0 * * *')
   async handleCron() {
-    this.logger.debug('Clear Alert Issue Info Called ');
-
-    this.redisService.delByPattern(
-      RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', '*'),
-      100,
-    );
+    this.logger.debug('Set Alert Issue count to 0 Called ');
   }
 }

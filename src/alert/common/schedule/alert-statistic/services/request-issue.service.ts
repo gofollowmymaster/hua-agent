@@ -3,12 +3,23 @@ import { Injectable } from '@nestjs/common';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import IssueStatisticService from './issue-base-statistic.service';
-import FeishuApiAlertIssueTable from '../../table/api-alert-issue-table';
+import FeishuApiAlertIssueTable from '@src/alert/common/table/api-alert-issue-table';
 
 @Injectable()
 export default class RequestStatisticService extends IssueStatisticService {
   protected busibessLines: Record<string, any>[] = [];
   protected name: string = '接口';
+  protected readonly tableViews = {
+    基础架构:
+      'https://q1njej8cpab.feishu.cn/share/base/view/shrcn8PkI1sZCV9wOlA7RpWaKQc',
+    商家运营:
+      'https://q1njej8cpab.feishu.cn/share/base/view/shrcnZVPQbnamy85FgAkjZo95Gh',
+
+    仓储物流:
+      'https://q1njej8cpab.feishu.cn/share/base/view/shrcn9v0aQylmggN8UiypvGHVqf',
+    业财一体:
+      'https://q1njej8cpab.feishu.cn/share/base/view/shrcndF3m3gpuGCJkJc6qhTCwbf',
+  };
 
   constructor(
     protected readonly config: ConfigService,

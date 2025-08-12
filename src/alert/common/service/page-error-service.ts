@@ -38,8 +38,7 @@ export class PageErrorService extends ErrorBaseService {
 
   async errorHookHandler(errorEvent: PageAlertEvent) {
     await this.setErrorEvent(errorEvent);
-    const eventRecord = await this.writeToTable(errorEvent);
-    this.errorHandler(eventRecord);
+    this.errorHandler();
     // console.log('[ res ] >', res);
   }
 
@@ -82,12 +81,17 @@ export class PageErrorService extends ErrorBaseService {
         );
       if (total == 0) {
         const issue = this.alertFeishuAdapter.toFrontendAlertIssueTableData();
+        if (this.isIgnoreThisError()) {
+          issue['状态'] = '已忽略';
+        }
+
         issueRecord = await this.feishuFrontendIssueTable.create(issue);
       } else {
         const { record_id: recordId, fields } = records[0];
         issueRecord = await this.feishuFrontendIssueTable.update(recordId, {
           错误次数: (fields['错误次数'] as number) + 1,
-          是否解决: false,
+          日错误次数: (fields['日错误次数'] as number) + 1,
+          // 状态: '',
         });
       }
 

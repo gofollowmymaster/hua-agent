@@ -88,8 +88,10 @@ export class SentryWebhookService {
         await this.assignTo(eventData);
       case IssueAction.Resolved:
       case IssueAction.Unresolved:
-        this.modifyStatus(eventData);
         return;
+
+        this.modifyStatus(eventData);
+      // return;
     }
   }
   async modifyStatus(eventData: IssueEvent) {

@@ -21,15 +21,18 @@ class FeishuUserHelper extends FeishuDataApiHelper {
   ) {
     super(redisService);
   }
-  async getUserInfo({
-    userId,
-    userIdType,
-    departmentIdType,
-  }: {
-    userId: string;
-    userIdType: UserIdType;
-    departmentIdType?: DepartmentIdType;
-  }): Promise<ContactUserGetReturnType> {
+  async getUserInfo(
+    {
+      userId,
+      userIdType,
+      departmentIdType,
+    }: {
+      userId: string;
+      userIdType: UserIdType;
+      departmentIdType?: DepartmentIdType;
+    },
+    useCache = true,
+  ): Promise<ContactUserGetReturnType> {
     return await this.readWrapper(
       async () =>
         await this.client.client.contact.user.get({
@@ -41,7 +44,7 @@ class FeishuUserHelper extends FeishuDataApiHelper {
             user_id: userId,
           },
         }),
-      true,
+      useCache,
       'getUserInfo' + userId,
     );
   }

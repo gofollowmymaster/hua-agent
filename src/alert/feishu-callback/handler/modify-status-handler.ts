@@ -2,14 +2,19 @@ import { CustomCallbackHandleType } from '.';
 import ErrorUnresolvedCard, {
   IssueStatus,
   issueStatusMap,
+  UnresolvedCardData,
 } from '@src/common/feishu/card/error-unresolve-card';
 import ErrorResolvedCard from '@src/common/feishu/card/error-resolved-card';
 import { ModifyStatusEvent } from '@src/alert/common/type/alert';
+import {
+  CardCallbackReturnType,
+  CardReturnType,
+} from '@src/common/feishu/type/card';
 
 const ModifyStatusHandler: CustomCallbackHandleType = async (
   event,
   handerService,
-) => {
+): Promise<CardCallbackReturnType<UnresolvedCardData>> => {
   const {
     operator: { open_id },
     action: {
@@ -22,7 +27,6 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
   const service = await handerService.getServiceByIssueId(issueId);
 
   const issueCardData = await service.checkIssueInCache(issueId);
-  console.log('[ issueInfo ] >', issueCardData);
   service.modifyStatusHandler({
     issueId,
     operator: open_id,
@@ -31,7 +35,7 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
 
   if (issueCardData) {
     const statusLabel = issueStatusMap[issueStatus];
-    let cardReturn = {
+    let cardReturn: CardReturnType<UnresolvedCardData> = {
       type: 'template',
       data: {
         template_id: ErrorUnresolvedCard.templateId,
@@ -67,7 +71,7 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
           template_variable: {
             ...issueCardData,
             status: issueStatusMap[issueStatus],
-            statusOptions: []
+            statusOptions: [],
           },
         },
       };

@@ -20,6 +20,7 @@ export default class IssueStatisticService {
   protected busibessLines: Record<string, any>[] = [];
   protected environment = process.env.NODE_ENV;
   protected name: string;
+  protected readonly tableViews: Record<string, any>;
   constructor(
     protected readonly config: ConfigService,
     protected readonly feishuIssueTable: FeishuTable,
@@ -60,7 +61,7 @@ export default class IssueStatisticService {
         conjunction: 'and',
         conditions: [
           {
-            field_name: '创建时间',
+            field_name: '最后更新时间',
             operator: 'isGreater',
             value: ['ExactDate', towdayStart + ''],
           },
@@ -88,7 +89,7 @@ export default class IssueStatisticService {
       const tableData = requestIssueList.map(({ fields }) => {
         return {
           issueId: fields.IssueId[0].text,
-          count: fields.错误次数,
+          count: fields.日错误次数,
           userId: [fields.负责人[0].id],
           status: [
             {
@@ -114,6 +115,7 @@ export default class IssueStatisticService {
         ).length,
         tableData,
         color: requestIssueList.length > 5 ? 'red' : 'yellow',
+        link: this.tableViews[businessLine],
       };
 
       const message = ErrorStatisticCard.buildCardMsg(cardData);
