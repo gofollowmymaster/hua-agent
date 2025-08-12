@@ -24,7 +24,7 @@ export default class AlertStatisticService {
     this.client = ClientFactory.create(FeishuApp.AlertClient);
   }
 
-  @Cron('0 45 17 * *')
+  @Cron('0 45 17 * * *')
   async handleCron() {
     this.pageIssueService.statistic();
     this.requestIssueService.statistic();
