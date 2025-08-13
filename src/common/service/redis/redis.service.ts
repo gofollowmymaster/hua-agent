@@ -46,10 +46,18 @@ export class RedisService {
 
   async hasByPattern(pattern: string) {
     let cursor = '0';
-    const reply = await this.redis.scan(cursor, 'MATCH', pattern, 'COUNT', 1);
-    cursor = reply[0];
-    const keys = reply[1];
-    if (keys.length > 0) return true;
+    do {
+      const reply = await this.redis.scan(
+        cursor,
+        'MATCH',
+        pattern,
+        'COUNT',
+        1000,
+      );
+      cursor = reply[0];
+      const keys = reply[1];
+      if (keys.length > 0) return true;
+    } while (cursor !== '0');
     return false;
   }
   async getByPattern(

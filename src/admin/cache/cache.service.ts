@@ -27,6 +27,7 @@ export class CacheService extends BaseService {
       code = 200;
 
     // const  await this.redis.scan(fullKey)
+    console.log('[ fullKey ] >', fullKey);
     if (await this.redisService.hasByPattern(fullKey)) {
       this.redisService.delByPattern(fullKey);
       code = 200;
