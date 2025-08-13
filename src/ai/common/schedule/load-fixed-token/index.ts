@@ -32,7 +32,7 @@ export default class FixedTokenService {
   }
 
   //每30分钟运行一次
-  @Cron('0 * * * * *')
+  @Cron('0 */30 * * * *')
   async handleCron() {
     this.logger.debug('FixedTokenService Called ');
     this.loadToken();
