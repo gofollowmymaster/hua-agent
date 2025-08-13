@@ -2,6 +2,16 @@ import { Inject, Injectable } from '@nestjs/common';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import Redis from 'ioredis';
 
+type RedisValueType = 'string' | 'hash' | 'set' | 'zset' | 'list';
+const redisValueTypeGetMap = {
+  string: 'get',
+  hash: 'hgetall',
+  set: 'smembers', // 添加对 SET 类型的支持
+  zset: 'zrange', // 添加对 ZSET 类型的支持
+  // 添加对 LIST 类型的支持
+  list: 'lrange',
+};
+
 @Injectable()
 export class RedisService {
   constructor(@Inject('REDIS_CLIENT') private readonly redis: Redis) {}
@@ -36,9 +46,13 @@ export class RedisService {
     if (keys.length > 0) return true;
     return false;
   }
-  async getByPattern(pattern: string, batchSize = 100) {
+  async getByPattern(
+    pattern: string,
+    type: RedisValueType = 'string',
+    batchSize = 100,
+  ) {
     let cursor = '0';
-    const values: any[] = [];
+    const values: Record<string, any> = {};
 
     do {
       // 使用 SCAN 命令查找匹配的键
@@ -51,11 +65,10 @@ export class RedisService {
       );
       cursor = reply[0];
       const keys = reply[1];
-
-      if (keys.length > 0) {
-        const batchValues = await this.redis.mget(...keys);
-        console.log('[ batchValues ] >', keys);
-        values.push(...batchValues);
+      const method = redisValueTypeGetMap[type];
+      for (const key of keys) {
+        const batchValues = await this.redis[method](key);
+        values[key] = batchValues;
       }
     } while (cursor !== '0');
 
