@@ -7,8 +7,8 @@ import {
   FeishuTokenDto,
 } from './dto/aily';
 import { AplusResponse } from '@src/type/global';
-import { FeishuAuthType } from '@src/common/schedule-task/load-fixed-token';
 import { SignAuthGuard } from '@src/common/guard/sign-auth';
+import { FeishuAuthType } from '../common/schedule/load-fixed-token';
 
 @Controller('aily')
 export class AilyController {
