@@ -12,7 +12,8 @@ const statusColorMap = {
   待处理: 'red',
   处理中: 'yellow',
   已解决: 'green',
-  已忽略: 'gray',
+  暂时忽略: 'blue',
+  已关闭: 'green',
 };
 
 @Injectable()

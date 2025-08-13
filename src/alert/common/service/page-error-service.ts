@@ -82,7 +82,7 @@ export class PageErrorService extends ErrorBaseService {
       if (total == 0) {
         const issue = this.alertFeishuAdapter.toFrontendAlertIssueTableData();
         if (this.isIgnoreThisError()) {
-          issue['状态'] = '已忽略';
+          issue['状态'] = '暂时忽略';
         }
 
         issueRecord = await this.feishuFrontendIssueTable.create(issue);

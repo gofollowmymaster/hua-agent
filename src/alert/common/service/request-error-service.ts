@@ -86,7 +86,7 @@ export class RequestErrorService extends ErrorBaseService {
       if (issueRes.total == 0) {
         const issue = this.alertFeishuAdapter.toApiAlertIssueTableData();
         if (this.isIgnoreThisError()) {
-          issue['状态'] = '已忽略';
+          issue['状态'] = '暂时忽略';
         }
         await this.feishuApiIssueTable.create(issue);
       } else {
