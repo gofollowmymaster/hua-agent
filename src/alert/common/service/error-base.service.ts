@@ -69,7 +69,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
     }
     if (issueCardData.status == '暂时忽略') return;
 
-    const count = issueCardData.count + 1;
+    const count = parseInt(issueCardData.count+'') + 1;
     // 如果issue在，修改数量并回复之前的错误
     await this.updateIssueCardDataInCache(this.errorEvent.issueId, {
       count,
