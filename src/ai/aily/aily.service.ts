@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import { FeishuApiException } from '@src/common/exception/feishu-api-exception';
@@ -55,6 +55,9 @@ export class AilyService {
       params.sessionId,
     );
 
-    return code == params.code;
+    if (code !== params.code) {
+      throw new UnauthorizedException('验证码错误');
+    }
+    return await this.getToken();
   }
 }
