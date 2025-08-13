@@ -1,4 +1,4 @@
-import { SentryUser } from './sentry';
+import { SentryStatus, SentryUser } from './sentry';
 
 export class AlertEvent {
   pageModuleName: PageModuleName;
@@ -47,7 +47,7 @@ export enum ErrorLevel {
   INFO = 'info',
 }
 export enum Environment {
-  PROD = 'production',
+  PROD = 'prod',
   UAT = 'uat',
   TEST = 'test',
   DEV = 'dev',
@@ -100,7 +100,7 @@ export type IssueEvent = {
   action: IssueAction;
   issueId: string;
   // substatus: params.data.issue.substatus;
-  status: 'resolved' | 'unresolved' | 'ignored';
+  status: SentryStatus;
   // statusDetails: params.data.issue.statusDetails;
   culprit: string;
   assignedTo: SentryUser;
@@ -125,7 +125,7 @@ export type AssignEvent = {
 export type ModifyStatusEvent = {
   operator: string;
   issueId: string;
-  issueStatus: 'resolved' | 'unresolved' | 'ignored';
+  issueStatus: SentryStatus;
 };
 
 export type CloseIssueEvent = {

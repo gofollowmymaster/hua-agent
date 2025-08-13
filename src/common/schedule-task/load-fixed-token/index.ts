@@ -2,13 +2,11 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
-import dayjs from 'dayjs';
 import * as lark from '@larksuiteoapi/node-sdk';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
-import { CommonAlertCard } from '@src/common/feishu/card/alert-card';
 import { sendCommonCardToFeishu } from '@src/common/feishu/utils';
 
 export type FeishuAuthType = Awaited<

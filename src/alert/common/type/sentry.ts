@@ -329,7 +329,24 @@ export type SentryUser = {
   openId?: string;
 };
 
-export type SentryStatus = 'ignored' | 'resolved' | 'unresolved';
+export type SentryStatus =
+  | 'resolved'
+  | 'resolvedInNextRelease'
+  | 'unresolved'
+  | 'ignored'
+  | 'unresolved';
+export type IssueStatusDetails =
+  | 'inRelease'
+  | 'inNextRelease'
+  | 'inCommit'
+  | 'ignoreDuration'
+  | 'ignoreCount'
+  | 'ignoreWindow'
+  | 'ignoreUserCount'
+  | 'ignoreUserWindow';
+export type IssueStatusDetailsType = {
+  [key in IssueStatusDetails]?: number;
+};
 // | 'ignored_in_release'
 // | 'ignored_in_next_release';
 export type StatusDetails = {
@@ -364,53 +381,55 @@ export type StatusDetails = {
   };
 };
 export type SentryIssue = {
+  id: string;
+  shareId: null;
+  shortId: string;
+  title: string;
+  culprit: string;
+  permalink: null;
+  logger: null;
+  level: ErrorLevel;
+  status: SentryStatus;
+  statusDetails: StatusDetails;
+  substatus: string;
+  isPublic: false;
+  platform: 'javascript';
+  project: {
+    id: '25';
+    name: 'aplus-user';
+    slug: 'aplus-user';
+    platform: 'javascript-vue';
+  };
+  type: 'error';
+  metadata: {
+    value: string;
+    sdk: {
+      name: 'sentry.javascript.vue';
+      name_normalized: 'sentry.javascript.vue';
+    };
+    initial_priority: number;
+    title: string | null;
+  };
+  numComments: number;
+  assignedTo: SentryUser;
+  isBookmarked: boolean;
+  isSubscribed: boolean;
+  subscriptionDetails: null;
+  hasSeen: boolean;
+  annotations: [];
+  issueType: 'error';
+  issueCategory: 'error';
+  priority: 'high';
+  priorityLockedAt: null;
+  isUnhandled: boolean;
+  count: string;
+  userCount: number;
+  firstSeen: string;
+  lastSeen: string;
+  firstRelease?: Record<string, any>;
+};
+export type SentryHookIssue = {
   resolution_type?: 'in_next_release' | 'in_release';
   assignee?: SentryUser;
-  issue: {
-    id: string;
-    shareId: null;
-    shortId: 'APLUS-USER-ZA';
-    title: string;
-    culprit: string;
-    permalink: null;
-    logger: null;
-    level: ErrorLevel;
-    status: SentryStatus;
-    statusDetails: StatusDetails;
-    substatus: string;
-    isPublic: false;
-    platform: 'javascript';
-    project: {
-      id: '25';
-      name: 'aplus-user';
-      slug: 'aplus-user';
-      platform: 'javascript-vue';
-    };
-    type: 'error';
-    metadata: {
-      value: string;
-      sdk: {
-        name: 'sentry.javascript.vue';
-        name_normalized: 'sentry.javascript.vue';
-      };
-      initial_priority: number;
-      title: string | null;
-    };
-    numComments: number;
-    assignedTo: SentryUser;
-    isBookmarked: boolean;
-    isSubscribed: boolean;
-    subscriptionDetails: null;
-    hasSeen: boolean;
-    annotations: [];
-    issueType: 'error';
-    issueCategory: 'error';
-    priority: 'high';
-    priorityLockedAt: null;
-    isUnhandled: boolean;
-    count: string;
-    userCount: number;
-    firstSeen: string;
-    lastSeen: string;
-  };
+  issue: SentryIssue;
 };

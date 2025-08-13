@@ -137,7 +137,7 @@ export class SentryWebhookService {
     const isTooManyWarning = await this.redisService.limiter(
       eventData.pageModuleName,
       10,
-      60 * 3,
+      60 * 5,
     );
 
     if (isTooManyWarning) {

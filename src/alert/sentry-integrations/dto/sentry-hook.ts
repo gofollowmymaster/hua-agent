@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   SentryComment,
   SentryEvent,
-  SentryIssue,
+  SentryHookIssue,
 } from '@src/alert/common/type/sentry';
 import { IsNotEmpty } from 'class-validator';
 
@@ -104,5 +104,5 @@ export class SentryHookCommentDto extends SentryHookDto {
 }
 
 export class SentryHookIssueDto extends SentryHookDto {
-  data: SentryIssue;
+  data: SentryHookIssue;
 }

@@ -37,3 +37,18 @@ export class FeishuGenerateTokenDto {
   })
   signature: string;
 }
+
+export class BindSessionCodeDto {
+  @IsNotEmpty()
+  @ApiProperty({
+    type: String,
+    description: '认证器生成的授权码',
+  })
+  code: string;
+  @IsNotEmpty()
+  @ApiProperty({
+    type: String,
+    description: 'aily的sessionId',
+  })
+  sessionId: string;
+}

@@ -4,25 +4,13 @@ import { ConfigService } from '@nestjs/config';
 import { IssueStatus } from '@src/common/feishu/card/error-unresolve-card';
 import { firstValueFrom } from 'rxjs';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
+import {
+  // IssueStatusDetails,
+  IssueStatusDetailsType,
+  SentryIssue,
+  SentryStatus,
+} from '../type/sentry';
 
-type IssueOriginStatus =
-  | 'resolved'
-  | 'resolvedInNextRelease'
-  | 'unresolved'
-  | 'ignored'
-  | 'unresolved';
-type IssueStatusDetails =
-  | 'inRelease'
-  | 'inNextRelease'
-  | 'inCommit'
-  | 'ignoreDuration'
-  | 'ignoreCount'
-  | 'ignoreWindow'
-  | 'ignoreUserCount'
-  | 'ignoreUserWindow';
-type IssueStatusDetailsType = {
-  [key in IssueStatusDetails]?: number;
-};
 type UpdateIssueParams = {
   status?: IssueStatus;
 
@@ -31,7 +19,7 @@ type UpdateIssueParams = {
   isBookmarked?: boolean;
 };
 type UpdateIssueOriginParams = {
-  status?: IssueOriginStatus;
+  status?: SentryStatus;
   statusDetails?: IssueStatusDetailsType;
   assignedTo?: string;
   hasSeen?: boolean;
@@ -39,6 +27,8 @@ type UpdateIssueOriginParams = {
 };
 @Injectable()
 export class SentryApiService {
+  prefix =
+    'https://cloud.elnkpro.com:9000/api/0/organizations/aplus-frontend-team';
   constructor(
     private readonly httpService: HttpService,
     private readonly config: ConfigService,
@@ -70,22 +60,38 @@ export class SentryApiService {
       const reqBody = this.dataAdapter(body);
 
       const { data } = await firstValueFrom(
-        this.httpService.put(
-          `https://cloud.elnkpro.com:9000/api/0/organizations/aplus-frontend-team/issues/${issue_id}/`,
-          reqBody,
-          {
-            headers: {
-              Authorization: `Bearer ${this.config.get('sentryIntegrationToken')}`,
-              'Content-Type': 'application/json',
-            },
+        this.httpService.put(`${this.prefix}/issues/${issue_id}/`, reqBody, {
+          headers: {
+            Authorization: `Bearer ${this.config.get('sentryIntegrationToken')}`,
+            'Content-Type': 'application/json',
           },
-        ),
+        }),
       );
-      console.log('[ updateIssue-res ] >', data);
       return data;
     } catch (err) {
-      // console.log('[ err ] >');
       sendExceptionToFeishu(err, '修改Sentry issue失败,IssueId:' + issue_id);
     }
+  }
+  async getIssueDetail(issueId: string): Promise<SentryIssue> {
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService.get(`${this.prefix}/issues/${issueId}/`, {
+          headers: {
+            Authorization: `Bearer ${this.config.get('sentryIntegrationToken')}`,
+            'Content-Type': 'application/json',
+          },
+        }),
+      );
+      return data;
+    } catch (err) {
+      sendExceptionToFeishu(
+        err,
+        '获取Sentry issue 详情失败,IssueId:' + issueId,
+      );
+    }
+  }
+  async isIssueIgnored(issueId: string) {
+    const { status } = await this.getIssueDetail(issueId);
+    return status === 'ignored';
   }
 }

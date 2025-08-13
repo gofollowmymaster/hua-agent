@@ -8,6 +8,7 @@ export enum RedisKeys {
   WIKI_DIRECTORY = RedisPrefix + 'wiki:directory:{spaceId}',
   FEISHU_MTABLE = RedisPrefixMtable + '{appToken}:{tableId}',
   FEISHU_FIXED_ACCESS_TOKEN = RedisPrefix + 'fixed-access-token',
+  FEISHU_AILY_SESSION_CODE = RedisPrefix + 'session-code',
   RATE_LIMITER = RedisPrefixLimiter + '{key}',
   SENTRY_ALERT_COUNT_ISSUE = SentryAlertPrefix + 'issue-error-count:{issueId}',
   SENTRY_ALERT_COUNT_FREQUENCY = SentryAlertPrefix + 'issue-error-frequency',

@@ -1,7 +1,11 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AilyService } from './aily.service';
 import { ApiBody, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
-import { FeishuGenerateTokenDto, FeishuTokenDto } from './dto/aily';
+import {
+  BindSessionCodeDto,
+  FeishuGenerateTokenDto,
+  FeishuTokenDto,
+} from './dto/aily';
 import { AplusResponse } from '@src/type/global';
 import { FeishuAuthType } from '@src/common/schedule-task/load-fixed-token';
 import { SignAuthGuard } from '@src/common/guard/sign-auth';
@@ -36,5 +40,27 @@ export class AilyController {
   @UseGuards(SignAuthGuard)
   async getTokenByCode(@Body() params: FeishuGenerateTokenDto) {
     return this.authService.getTokenByCode(params.code);
+  }
+  @Post('bindSession')
+  @ApiOperation({
+    summary: '注册session',
+    description: '将会话sessionId绑定一个随机Code',
+  })
+  @ApiBody({ type: BindSessionCodeDto })
+  @ApiOkResponse({ type: AplusResponse<FeishuAuthType> })
+  @UseGuards(SignAuthGuard)
+  async bindSession(@Body() params: BindSessionCodeDto) {
+    return this.authService.bindSession(params);
+  }
+  @Post('verifySession')
+  @ApiOperation({
+    summary: '校验session',
+    description: '校验session是否合法',
+  })
+  @ApiBody({ type: BindSessionCodeDto })
+  @ApiOkResponse({ type: AplusResponse<FeishuAuthType> })
+  @UseGuards(SignAuthGuard)
+  async verifySession(@Body() params: BindSessionCodeDto) {
+    return this.authService.verifySession(params);
   }
 }

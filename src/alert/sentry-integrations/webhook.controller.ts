@@ -19,16 +19,14 @@ import {
 } from './dto/sentry-hook';
 import { getModuleNameByUrl } from '../common/utils';
 import {
-  Environment,
   ErrorEndpoint,
   IssueAction,
   PageModuleName,
 } from '../common/type/alert';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
-import { PageErrorService } from '../common/service/page-error-service';
-import { RequestErrorService } from '../common/service/request-error-service';
-// import { verifySignature } from './util';
+
+import { SentryApiService } from '../common/service/sentry-api-service';
 @ApiTags('Sentry WebHook')
 @Controller('sentry-hook')
 @ApiHeaders([
@@ -58,9 +56,8 @@ export class SentryWebhookController {
   private readonly redis: Redis;
   constructor(
     private readonly sentryWebhookService: SentryWebhookService,
-    private readonly pageErrorService: PageErrorService,
-    private readonly requestErrorService: RequestErrorService,
     protected readonly redisService: RedisService,
+    protected readonly sentryApiService: SentryApiService,
   ) {
     this.redis = redisService.getClient();
   }
@@ -139,11 +136,11 @@ export class SentryWebhookController {
       comment,
     });
   }
-  // getAlertEndTypeByErrorEvent(params: SentryHookErrorDto) {}
 
   async error(params: SentryHookErrorDto) {
     const alertError = params.data.error;
-    if (alertError.environment == Environment.PROD) return;
+    // if (alertError.environment == Environment.PROD) return;
+    if (await this.sentryApiService.isIssueIgnored(alertError.issue_id)) return;
 
     const requestData = alertError.extra?.__serialized__;
     const serverModuleName = getModuleNameByUrl(requestData?.url);
