@@ -44,7 +44,7 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       应用名: [this.event.pageModuleName],
       业务线: this.appInfo.bu,
       环境: this.event.environment,
-      RawData: JSON.stringify(this.event),
+      RawData: JSON.stringify(this.event.rawData),
     };
   }
   toFrontendAlertIssueTableData(): FrontendAlertIssueTableDto {
