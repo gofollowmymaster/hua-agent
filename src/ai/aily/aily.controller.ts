@@ -9,6 +9,7 @@ import {
 import { AplusResponse } from '@src/type/global';
 import { SignAuthGuard } from '@src/common/guard/sign-auth';
 import { FeishuAuthType } from '../common/schedule/load-fixed-token';
+import { AuthGuard } from '@src/common/guard/auth';
 
 @Controller('aily')
 export class AilyController {
@@ -48,7 +49,7 @@ export class AilyController {
   })
   @ApiBody({ type: BindSessionCodeDto })
   @ApiOkResponse({ type: AplusResponse<FeishuAuthType> })
-  @UseGuards(SignAuthGuard)
+  @UseGuards(AuthGuard)
   async bindSession(@Body() params: BindSessionCodeDto) {
     return this.authService.bindSession(params);
   }
