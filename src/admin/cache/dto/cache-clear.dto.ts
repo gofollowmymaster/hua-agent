@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { RedisValueType } from '@src/common/service/redis/redis.service';
 import { IsNotEmpty } from 'class-validator';
 
 export enum KeyType {
@@ -23,4 +24,19 @@ export class CacheClearDto {
     description: '键类型',
   })
   type?: KeyType;
+}
+
+export class CacheGetDto {
+  @IsNotEmpty()
+  @ApiProperty({
+    type: String,
+    description: '键名',
+  })
+  key: string;
+
+  @ApiPropertyOptional({
+    enum: RedisValueType,
+    description: '键类型',
+  })
+  type?: RedisValueType;
 }

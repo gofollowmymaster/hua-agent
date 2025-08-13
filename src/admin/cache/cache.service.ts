@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { BaseService } from '@src/common/base/BaseService';
-import { CacheClearDto, KeyType } from './dto/cache-clear.dto';
+import { CacheClearDto, CacheGetDto, KeyType } from './dto/cache-clear.dto';
 import {
   RedisPrefix,
   RedisPrefixMtable,
@@ -41,7 +41,7 @@ export class CacheService extends BaseService {
     };
   }
 
-  async getCache(fullKey) {
-    return await this.redisService.getByPattern(fullKey, 'hash');
+  async getCache(params: CacheGetDto) {
+    return await this.redisService.getByPattern(params.key, params.type);
   }
 }

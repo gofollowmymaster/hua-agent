@@ -2,7 +2,13 @@ import { Inject, Injectable } from '@nestjs/common';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import Redis from 'ioredis';
 
-type RedisValueType = 'string' | 'hash' | 'set' | 'zset' | 'list';
+export enum RedisValueType {
+  STRING = 'string',
+  HASH = 'hash',
+  SET = 'set',
+  ZSET = 'zset',
+  LIST = 'list',
+}
 const redisValueTypeGetMap = {
   string: 'get',
   hash: 'hgetall',
@@ -48,7 +54,7 @@ export class RedisService {
   }
   async getByPattern(
     pattern: string,
-    type: RedisValueType = 'string',
+    type: RedisValueType = RedisValueType.STRING,
     batchSize = 100,
   ) {
     let cursor = '0';

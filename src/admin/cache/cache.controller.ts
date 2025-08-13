@@ -2,7 +2,7 @@ import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 
 import { CacheService } from './cache.service';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CacheClearDto } from './dto/cache-clear.dto';
+import { CacheClearDto, CacheGetDto } from './dto/cache-clear.dto';
 import { SecretAuthGuard } from '@src/common/guard/secret-auth';
 
 @ApiTags('缓存管理')
@@ -37,11 +37,11 @@ export class CacheController {
   })
   @UseGuards(SecretAuthGuard)
   @ApiBody({
-    type: CacheClearDto,
+    type: CacheGetDto,
   })
   @Post('getCache')
-  async getCache(@Body() params: CacheClearDto) {
+  async getCache(@Body() params: CacheGetDto) {
     //发送消息
-    return await this.cacheService.getCache(params.key);
+    return await this.cacheService.getCache(params);
   }
 }
