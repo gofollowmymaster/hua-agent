@@ -44,7 +44,10 @@ export abstract class ErrorBaseService extends AlertBaseService {
 
   protected async errorHandler() {
     const eventRecord = await this.writeToTable(this.errorEvent);
-    if (this.isIgnoreThisError()) return;
+    if (this.isIgnoreThisError()) {
+      this.logger.info('[ ignore this error ] >', this.errorEvent.issueId);
+      return;
+    }
 
     const key = RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace(
       '{issueId}',
