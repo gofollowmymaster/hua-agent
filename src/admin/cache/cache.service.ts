@@ -21,7 +21,7 @@ export class CacheService extends BaseService {
     // delByPattern
     const fullKey =
       params.type == KeyType.多维表格
-        ? RedisPrefixMtable + params.key + ':*'
+        ? RedisPrefixMtable + params.table + ':*'
         : RedisPrefix + params.key;
     let message = '清除缓存成功',
       code = 200;

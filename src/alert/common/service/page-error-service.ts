@@ -91,7 +91,7 @@ export class PageErrorService extends ErrorBaseService {
         issueRecord = await this.feishuFrontendIssueTable.update(recordId, {
           错误次数: (fields['错误次数'] as number) + 1,
           日错误次数: (fields['日错误次数'] as number) + 1,
-          // 状态: '',
+          状态: fields['状态'] == '已关闭' ? '重新打开' : fields['状态'],
         });
       }
 

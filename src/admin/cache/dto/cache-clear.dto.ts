@@ -12,6 +12,12 @@ export class CacheClearDto {
     description: '键名',
   })
   key: string;
+  @IsNotEmpty()
+  @ApiProperty({
+    type: String,
+    description: '表格',
+  })
+  table: string;
   @ApiPropertyOptional({
     enum: KeyType,
     description: '键类型',
