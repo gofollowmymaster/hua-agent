@@ -67,6 +67,11 @@ export default class IssueStatisticService {
             value: ['ExactDate', towdayStart + ''],
           },
           {
+            field_name: '日错误次数',
+            operator: 'isGreater',
+            value: ['0'],
+          },
+          {
             field_name: '环境',
             operator: 'is',
             value: ['prod'],

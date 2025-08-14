@@ -30,6 +30,9 @@ import RequestAlertFeishuAdapter from './common/adapter/request-alert-feishu-ada
 import AlertStatisticService from './common/schedule/alert-statistic';
 import RequestIssueStatisticService from './common/schedule/alert-statistic/services/request-issue.service';
 import PageIssueStatisticService from './common/schedule/alert-statistic/services/page-issue.service';
+import ClearAlertPerDayService from './common/schedule/clear-alert-issue';
+import PageClearIssueService from './common/schedule/clear-alert-issue/services/page-issue.service';
+import RequestClearIssueService from './common/schedule/clear-alert-issue/services/request-issue.service';
 
 @Module({
   imports: [
@@ -63,6 +66,9 @@ import PageIssueStatisticService from './common/schedule/alert-statistic/service
     AlertStatisticService,
     RequestIssueStatisticService,
     PageIssueStatisticService,
+    ClearAlertPerDayService,
+    PageClearIssueService,
+    RequestClearIssueService,
   ],
   exports: [
     AlertMsgService,

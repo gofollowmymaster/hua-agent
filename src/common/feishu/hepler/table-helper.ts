@@ -4,6 +4,7 @@ import {
   BitTableFields,
   BitTableFilter,
   BitTableGetOption,
+  BitTableRecord,
   BitTableSearchPayloadParams,
 } from '../type/bitable';
 // import { ConfigService } from '@nestjs/config';
@@ -66,7 +67,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
     useCache = true,
   ) {
     const cacheKey = JSON.stringify(filter).replaceAll(':', '');
-
+    console.log('[ params ] >', params);
     return this.readWrapper(
       async () =>
         await this.client.client.bitable.appTableRecord.search({
@@ -134,6 +135,21 @@ class FeishuTableHelper extends FeishuDataApiHelper {
             fields: field,
           },
           params,
+        }),
+    );
+  }
+  async batchUpdate(records: BitTableRecord[], params?: BitTableCreateOption) {
+    return this.requestWrapper(
+      async () =>
+        await this.client.client.bitable.appTableRecord.batchUpdate({
+          params,
+          path: {
+            app_token: this.appToken,
+            table_id: this.tableId,
+          },
+          data: {
+            records,
+          },
         }),
     );
   }

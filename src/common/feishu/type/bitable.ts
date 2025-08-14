@@ -37,3 +37,15 @@ export type BitTableGetParams = Parameters<
 >;
 
 export type BitTableGetOption = BitTableGetParams[0]['params'];
+
+// 批量更新
+// export type BitTableBatchUpdateReturn = Awaited<
+//   ReturnType<lark.Client['bitable']['appTableRecord']['batchUpdate']>
+// >;
+
+// export type BitTableBatchUpdateParams = Parameters<
+//   lark.Client['bitable']['appTableRecord']['batchUpdate']
+// >;
+
+// export type BitTableBatchUpdateOption = BitTableBatchUpdateParams[0]['params'];
+// export type BitTableBatchUpdate = BitTableBatchUpdateParams[0]['data'];
