@@ -11,7 +11,6 @@ import { MockServerModule } from './mock-server/mock-server.module';
 import { LoggerModule } from './common/service/logger/logger.module';
 import configuration from './config';
 import { CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
-import { AuthModule } from './aplus/auth/auth.module';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
 import { ConfigModule } from '@nestjs/config';
 import { Cache } from 'cache-manager';
@@ -77,7 +76,6 @@ const envFilePath = [
     LoggerModule,
     AiModule,
     AdminModule,
-    AuthModule,
     WikiModule,
     DemoPluginModule,
     ScheduleModule.forRoot(),
