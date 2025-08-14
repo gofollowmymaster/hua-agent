@@ -36,7 +36,7 @@ export class CacheGetDto {
 
   @ApiPropertyOptional({
     enum: RedisValueType,
-    description: '键类型',
+    description: '值类型',
   })
   type?: RedisValueType;
 }

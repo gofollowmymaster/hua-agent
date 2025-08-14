@@ -67,7 +67,7 @@ export class RedisService {
   ) {
     let cursor = '0';
     const values: Record<string, any> = {};
-
+    const method = redisValueTypeGetMap[type];
     do {
       // 使用 SCAN 命令查找匹配的键
       const reply = await this.redis.scan(
@@ -77,11 +77,13 @@ export class RedisService {
         'COUNT',
         batchSize,
       );
+
       cursor = reply[0];
       const keys = reply[1];
-      const method = redisValueTypeGetMap[type];
+      console.log('[ keys ] >', keys);
       for (const key of keys) {
         const batchValues = await this.redis[method](key);
+        console.log('[ batchValues ] >', batchValues);
         values[key] = batchValues;
       }
     } while (cursor !== '0');
