@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import Redis from 'ioredis';
+import { LoggerService } from '../logger/logger.service';
 
 export enum RedisValueType {
   STRING = 'string',
@@ -20,7 +21,10 @@ const redisValueTypeGetMap = {
 
 @Injectable()
 export class RedisService {
-  constructor(@Inject('REDIS_CLIENT') private readonly redis: Redis) {}
+  constructor(
+    @Inject('REDIS_CLIENT') private readonly redis: Redis,
+    protected readonly logger: LoggerService,
+  ) {}
   getClient(): Redis {
     return this.redis;
   }
@@ -82,9 +86,13 @@ export class RedisService {
       const keys = reply[1];
       console.log('[ keys ] >', keys);
       for (const key of keys) {
-        const batchValues = await this.redis[method](key);
-        console.log('[ batchValues ] >', batchValues);
-        values[key] = batchValues;
+        try {
+          const batchValues = await this.redis[method](key);
+          console.log('[ batchValues ] >', batchValues);
+          values[key] = batchValues;
+        } catch (e) {
+          this.logger.error(e.message);
+        }
       }
     } while (cursor !== '0');
 
