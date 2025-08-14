@@ -36,7 +36,6 @@ export type ApiAlertIssueTableDto = {
   错误次数: number;
   日错误次数: number;
   IssueId: string;
-  是否解决: boolean;
   外部链接: string;
   状态: IssueStatusLabel;
 };
@@ -61,7 +60,6 @@ export type FrontendAlertTableDto = {
 export type FrontendAlertIssueTableDto = {
   标题: string;
   // 链接信息: string;
-  是否解决: boolean;
   // 优先级: ;
   负责人: { id: string }[];
   错误原因: string;

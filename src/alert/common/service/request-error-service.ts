@@ -95,7 +95,6 @@ export class RequestErrorService extends ErrorBaseService {
         await this.feishuApiIssueTable.update(recordId, {
           错误次数: (fields['错误次数'] as number) + 1,
           日错误次数: (fields['日错误次数'] as number) + 1,
-          是否解决: false,
         });
       }
     } catch (err) {

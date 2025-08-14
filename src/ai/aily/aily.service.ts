@@ -42,21 +42,20 @@ export class AilyService {
   async bindSession(params: BindSessionCodeDto) {
     await this.redis.hset(
       RedisKeys.FEISHU_AILY_SESSION_CODE,
-      params.sessionId,
       params.code,
+      params.sessionId,
     );
     this.redis.expire(RedisKeys.FEISHU_AILY_SESSION_CODE, 60 * 60 * 24);
-
     return;
   }
   async verifySession(params: BindSessionCodeDto) {
-    const code = await this.redis.hget(
+    const sessionId = await this.redis.hget(
       RedisKeys.FEISHU_AILY_SESSION_CODE,
-      params.sessionId,
+      params.code,
     );
 
-    if (code !== params.code) {
-      throw new UnauthorizedException('验证码错误');
+    if (sessionId !== params.sessionId) {
+      throw new UnauthorizedException('非法的Aily会话');
     }
     return await this.getToken();
   }

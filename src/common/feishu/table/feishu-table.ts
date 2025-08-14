@@ -8,6 +8,7 @@ import {
   BitTableFilter,
   BitTableGetOption,
   BitTablePagination,
+  BitTableRecord,
   BitTableSearchPayloadParams,
 } from '../type/bitable';
 @Injectable()
@@ -57,6 +58,12 @@ abstract class FeishuTable {
     this.setTableOption();
 
     return await this.tableHelper.update(recordId, field, params);
+  }
+
+  async batchUpdate(records: BitTableRecord[], params?: BitTableCreateOption) {
+    this.setTableOption();
+
+    return await this.tableHelper.batchUpdate(records, params);
   }
 
   async create(record: BitTableFields) {

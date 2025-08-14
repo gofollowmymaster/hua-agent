@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
 const secretKey = 'w1JHRBTylvbXFKNP'; // Replace with your actual secret key
 const restData = {
-  code: 'cFAtLe4dxccAAF09aE2xe1GdL0AaHbGL',
+  code: '9IDnw543y0fzAw3IaLHF8GIdD1yd2Iff',
   appId: 'recuRy2RxDT28R',
 };
 // Sort keys and construct the string
