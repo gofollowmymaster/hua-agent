@@ -5,13 +5,13 @@ import { FeishuApiException } from '@src/common/exception/feishu-api-exception';
 
 @Injectable({ scope: Scope.TRANSIENT })
 abstract class FeishuApiHelper {
-  async requestWrapper(handler: () => Promise<any>) {
+  async requestWrapper(handler: () => Promise<any>, requestName: string = '') {
     const res = await handler();
     const { code, data } = res;
     if (code !== 0) {
       // console.log('[ FeishuMessageHelper ] >', res);
       throw new FeishuApiException(
-        `【${code}】   ->  ${JSON.stringify(res)}`,
+        `【${requestName || handler.name}】【${code}】   ->  ${JSON.stringify(res)}`,
         500,
       );
     }

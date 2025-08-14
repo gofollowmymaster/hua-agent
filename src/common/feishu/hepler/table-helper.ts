@@ -58,7 +58,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
           },
         }),
       useCache,
-      '',
+      'list',
     );
   }
   async search(
@@ -66,7 +66,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
     params: BitTableSearchPayloadParams = {},
     useCache = true,
   ) {
-    const cacheKey = JSON.stringify(filter).replaceAll(':', '');
+    const cacheKey = 'search:' + JSON.stringify(filter).replaceAll(':', '');
     console.log('[ params ] >', params);
     return this.readWrapper(
       async () =>
@@ -100,7 +100,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
           params,
         }),
       useCache,
-      record_id,
+      'get:' + record_id,
     );
   }
 
@@ -116,6 +116,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
             fields: records,
           },
         }),
+      'mtable-create',
     );
   }
   async update(
@@ -136,6 +137,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
           },
           params,
         }),
+      'mtable-update',
     );
   }
   async batchUpdate(records: BitTableRecord[], params?: BitTableCreateOption) {
@@ -151,6 +153,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
             records,
           },
         }),
+      'mtable-batchupdate',
     );
   }
 
@@ -164,6 +167,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
             record_id: recordId,
           },
         }),
+      'mtable-delete',
     );
   }
 }

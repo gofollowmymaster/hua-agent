@@ -41,6 +41,6 @@ export class CacheService extends BaseService {
   }
 
   async getCache(params: CacheGetDto) {
-    return await this.redisService.getByPattern(params.key, params.type);
+    return await this.redisService.getByPattern(params.key, params.type, 1000);
   }
 }
