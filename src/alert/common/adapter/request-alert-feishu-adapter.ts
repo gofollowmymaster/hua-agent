@@ -67,7 +67,6 @@ export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       日错误次数: 1,
       IssueId: this.event.issueId,
       外部链接: this.event.issueUrl,
-      是否解决: false,
       状态: '待处理',
     };
   }
