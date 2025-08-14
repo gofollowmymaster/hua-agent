@@ -45,7 +45,7 @@ class FeishuUserHelper extends FeishuDataApiHelper {
           },
         }),
       useCache,
-      'getUserInfo' + userId,
+      'getUserInfo:' + userId,
     );
   }
   async getUserIdByEmailOrPhone({

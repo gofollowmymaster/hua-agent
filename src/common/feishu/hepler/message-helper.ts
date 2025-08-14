@@ -16,7 +16,7 @@ class FeishuMessageHelper extends FeishuApiHelper {
   async create(msgParams: CreateMessageType) {
     return await this.requestWrapper(async () => {
       return await this.client.client.im.message.create(msgParams);
-    });
+    }, 'message-create');
   }
   async createToUser(msgParams: CreateMessageType['data']) {
     return await this.create({
@@ -59,7 +59,7 @@ class FeishuMessageHelper extends FeishuApiHelper {
           message_id: messageId,
         },
       });
-    });
+    }, 'message-reply');
   }
   async replyInThread(
     content: string,
@@ -81,7 +81,7 @@ class FeishuMessageHelper extends FeishuApiHelper {
           message_id: messageId,
         },
       });
-    });
+    }, 'message-urgentPhone');
   }
   async urgentApp(
     userId: string[],
@@ -100,7 +100,7 @@ class FeishuMessageHelper extends FeishuApiHelper {
           message_id: messageId,
         },
       });
-    });
+    }, 'message-urgentApp');
   }
 }
 
