@@ -113,10 +113,10 @@ export default class IssueStatisticService {
         total: requestIssueList.length,
         date: dayjs().format('YYYY-MM-DD') + this.name,
         resolved: requestIssueList.filter(
-          (item) => item.fields.status === '已解决',
+          (item) => item.fields['状态'] === '已解决',
         ).length,
         ignored: requestIssueList.filter(
-          (item) => item.fields.status === '暂时忽略',
+          (item) => item.fields['状态'] === '暂时忽略',
         ).length,
         unresolved: requestIssueList.filter(
           (item) => !['已解决', '暂时忽略'].includes(item.fields['状态'] + ''),
