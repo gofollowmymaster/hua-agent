@@ -1,8 +1,9 @@
 import { createHash } from 'crypto';
 const secretKey = 'w1JHRBTylvbXFKNP'; // Replace with your actual secret key
 const restData = {
-  code: '9IDnw543y0fzAw3IaLHF8GIdD1yd2Iff',
   appId: 'recuRy2RxDT28R',
+  code: 'Diana|20250814163415',
+  sessionId: '7538356709696831000',
 };
 // Sort keys and construct the string
 const sortedKeys = Object.keys(restData).sort();

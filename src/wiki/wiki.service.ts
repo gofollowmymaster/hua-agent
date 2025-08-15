@@ -6,7 +6,7 @@ import { Cache } from 'cache-manager';
 
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
-import WikiDirectoryService from '@src/common/schedule-task/wiki-directory';
+import WikiDirectoryService from './schedule/wiki-directory';
 
 @Injectable()
 export class WikiService {

@@ -10,6 +10,7 @@ import { AplusResponse } from '@src/type/global';
 import { SignAuthGuard } from '@src/common/guard/sign-auth';
 import { FeishuAuthType } from '../common/schedule/load-fixed-token';
 import { AuthGuard } from '@src/common/guard/auth';
+import { SecretAuthGuard } from '@src/common/guard/secret-auth';
 
 @Controller('aily')
 export class AilyController {
@@ -28,20 +29,33 @@ export class AilyController {
     if (!feishuUser) {
       throw new Error('获取飞书用户信息失败');
     }
-    console.log('[ feishuUser ] >', feishuUser);
     return feishuUser;
   }
+
   @Post('getTokenByCode')
   @ApiOperation({
     summary: '生成新的token',
-    description: '通过授权code获取飞书accessToken，用于定期手动更新token',
+    description: '通过授权code获取飞书accessToken',
   })
   @ApiBody({ type: FeishuGenerateTokenDto })
   @ApiOkResponse({ type: AplusResponse<FeishuAuthType> })
-  @UseGuards(SignAuthGuard)
+  @UseGuards(SecretAuthGuard)
   async getTokenByCode(@Body() params: FeishuGenerateTokenDto) {
     return this.authService.getTokenByCode(params.code);
   }
+
+  @Post('useTokenByCode')
+  @ApiOperation({
+    summary: '启用新的token',
+    description: '通过授权code启用已经生成的accessToken',
+  })
+  @ApiBody({ type: FeishuGenerateTokenDto })
+  @ApiOkResponse({ type: AplusResponse<FeishuAuthType> })
+  @UseGuards(SecretAuthGuard)
+  async useTokenByCode(@Body() params: FeishuGenerateTokenDto) {
+    return this.authService.useTokenByCode(params.code);
+  }
+
   @Post('bindSession')
   @ApiOperation({
     summary: '注册session',
@@ -53,6 +67,7 @@ export class AilyController {
   async bindSession(@Body() params: BindSessionCodeDto) {
     return this.authService.bindSession(params);
   }
+
   @Post('verifySession')
   @ApiOperation({
     summary: '校验session',

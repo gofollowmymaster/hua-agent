@@ -35,11 +35,12 @@ export default class FixedTokenService {
   @Cron('0 */30 * * * *')
   async handleCron() {
     this.logger.debug('FixedTokenService Called ');
+    if (process.env.NODE_ENV !== 'production') return;
     this.loadToken();
   }
   async loadToken() {
     const tokenInCached: FeishuAuthType = await this.redis.hgetall(
-      RedisKeys.FEISHU_FIXED_ACCESS_TOKEN,
+      RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED,
     );
     this.logger.log('[ cachedinfo ] >' + JSON.stringify(tokenInCached));
 
@@ -62,9 +63,9 @@ export default class FixedTokenService {
       return;
     }
 
-    await this.redis.hset(RedisKeys.FEISHU_FIXED_ACCESS_TOKEN, res.data);
+    await this.redis.hset(RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED, res.data);
 
-    this.redis.expire(RedisKeys.FEISHU_FIXED_ACCESS_TOKEN, 60 * 60 * 24);
+    this.redis.expire(RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED, 60 * 60 * 24);
   }
 
   sendAlertMsg(errorMessage: string) {

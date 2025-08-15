@@ -6,6 +6,7 @@ import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import ErrorStatisticCard from '@src/common/feishu/card/error-statistic-card';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import FeishuTable from '@src/common/feishu/table/feishu-table';
+import { wait } from '@utils/job';
 
 const businessLines = ['商家运营', '仓储物流', '业财一体', '基础架构'];
 const statusColorMap = {
@@ -56,7 +57,8 @@ export default class IssueStatisticService {
   async statistic() {
     const { items: list } = await this.busibessLineTable.list();
     this.busibessLines = list;
-    businessLines.forEach(async (businessLine) => {
+    businessLines;
+    for (const businessLine of businessLines) {
       const towdayStart = dayjs().startOf('day').valueOf();
       const filter: BitTableFilter = {
         conjunction: 'and',
@@ -128,6 +130,7 @@ export default class IssueStatisticService {
       const lineInfo = this.getBusinessLineInfo(businessLine);
       console.log('[ lineInfo ] >', lineInfo);
       this.messageHelper.createInteractToGroup(message, lineInfo.groupId);
-    });
+      await wait(1000);
+    }
   }
 }
