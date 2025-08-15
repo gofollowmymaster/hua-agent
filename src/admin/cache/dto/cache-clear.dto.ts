@@ -7,13 +7,11 @@ export enum KeyType {
   自定义键 = '自定义键',
 }
 export class CacheClearDto {
-  @IsNotEmpty()
   @ApiProperty({
     type: String,
     description: '键名',
   })
   key: string;
-  @IsNotEmpty()
   @ApiProperty({
     type: String,
     description: '表格',
