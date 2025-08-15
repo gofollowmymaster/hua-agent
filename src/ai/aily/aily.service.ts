@@ -16,9 +16,8 @@ export class AilyService {
 
   async getToken(): Promise<FeishuAuthType> {
     const cachedinfo: FeishuAuthType = await this.redis.hgetall(
-      RedisKeys.FEISHU_FIXED_ACCESS_TOKEN,
+      RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED,
     );
-
     return cachedinfo;
   }
   async getTokenByCode(code: string): Promise<FeishuAuthType> {
@@ -33,10 +32,17 @@ export class AilyService {
     if (res.code !== 0) {
       throw new FeishuApiException(res.msg);
     }
-
-    await this.redis.hset(RedisKeys.FEISHU_FIXED_ACCESS_TOKEN, res.data);
-    this.redis.expire(RedisKeys.FEISHU_FIXED_ACCESS_TOKEN, 60 * 60 * 24);
+    const key = RedisKeys.FEISHU_FIXED_ACCESS_TOKEN.replace('{code}', code);
+    await this.redis.hset(key, res.data);
+    this.redis.expire(key, 60 * 60 * 24);
     return res.data;
+  }
+  async useTokenByCode(code: string) {
+    const codeKey = RedisKeys.FEISHU_FIXED_ACCESS_TOKEN.replace('{code}', code);
+
+    const userInfo = await this.redis.hgetall(codeKey);
+    const usedKey = RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED;
+    await this.redis.hset(usedKey, userInfo);
   }
 
   async bindSession(params: BindSessionCodeDto) {
