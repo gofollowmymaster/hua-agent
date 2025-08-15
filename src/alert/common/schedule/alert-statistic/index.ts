@@ -25,9 +25,9 @@ export default class AlertStatisticService {
   }
 
   @Cron('0 45 17 * * *')
-  async handleCron() {
+  async handleCron(force = false) {
     //由于统计需要大量请求飞书接口，多环境
-    if (process.env.NODE_ENV !== 'production') return;
+    if (!force && process.env.NODE_ENV !== 'production') return;
     this.pageIssueService.statistic();
     this.requestIssueService.statistic();
 

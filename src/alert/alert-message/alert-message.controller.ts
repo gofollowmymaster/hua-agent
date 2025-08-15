@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 
 import { AlertMsgService } from './alert-message.service';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -9,11 +9,18 @@ import {
   PageModuleName,
 } from '../common/type/alert';
 import { getModuleNameByUrl } from '../common/utils';
+import AlertStatisticService from '../common/schedule/alert-statistic';
+import ClearAlertPerDayService from '../common/schedule/clear-alert-issue';
+import { SecretAuthGuard } from '@src/common/guard/secret-auth';
 
 @ApiTags('飞书消息报警')
 @Controller('alert-message')
 export class AlertMsgController {
-  constructor(private readonly alertMsgService: AlertMsgService) {}
+  constructor(
+    private readonly alertMsgService: AlertMsgService,
+    private readonly alertStatisticService: AlertStatisticService,
+    private readonly clearAlertPerDayService: ClearAlertPerDayService,
+  ) {}
 
   @ApiOperation({
     summary: 'sentry直连报警消息通知',
@@ -47,5 +54,25 @@ export class AlertMsgController {
     };
     // return;
     return await this.alertMsgService.sentryAlertHook(eventData);
+  }
+
+  @ApiOperation({
+    summary: '手动触发日报警统计',
+    description: '手动触发日报警统计定时任务',
+  })
+  @Post('triggerStatistic')
+  @UseGuards(SecretAuthGuard)
+  async triggerStatistic() {
+    this.alertStatisticService.handleCron(true);
+  }
+
+  @ApiOperation({
+    summary: '手动触发清理日错误数量',
+    description: '手动触发清理日错误数量定时任务',
+  })
+  @Post('triggerClearPerDay')
+  @UseGuards(SecretAuthGuard)
+  async triggerClearPerDay() {
+    this.clearAlertPerDayService.handleCron(true);
   }
 }
