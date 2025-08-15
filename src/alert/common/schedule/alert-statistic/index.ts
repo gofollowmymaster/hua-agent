@@ -24,10 +24,10 @@ export default class AlertStatisticService {
     this.client = ClientFactory.create(FeishuApp.AlertClient);
   }
 
-  @Cron('0 * * * * *')
+  @Cron('0 45 17 * * *')
   async handleCron() {
     //由于统计需要大量请求飞书接口，多环境
-    // if (process.env.NODE_ENV !== 'production') return;
+    if (process.env.NODE_ENV !== 'production') return;
     this.pageIssueService.statistic();
     this.requestIssueService.statistic();
 
