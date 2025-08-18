@@ -35,7 +35,7 @@ export default class FixedTokenService {
   @Cron('0 */30 * * * *')
   async handleCron(force = false) {
     this.logger.debug('FixedTokenService Called ');
-    if (!force && process.env.NODE_ENV !== 'production') return;
+    if (!force && ['development', 'dev'].includes(process.env.NODE_ENV)) return;
 
     this.loadToken();
   }
