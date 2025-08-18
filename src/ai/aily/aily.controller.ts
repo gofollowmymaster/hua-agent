@@ -8,13 +8,18 @@ import {
 } from './dto/aily';
 import { AplusResponse } from '@src/type/global';
 import { SignAuthGuard } from '@src/common/guard/sign-auth';
-import { FeishuAuthType } from '../common/schedule/load-fixed-token';
+import FixedTokenService, {
+  FeishuAuthType,
+} from '../common/schedule/load-fixed-token';
 import { AuthGuard } from '@src/common/guard/auth';
 import { SecretAuthGuard } from '@src/common/guard/secret-auth';
 
 @Controller('aily')
 export class AilyController {
-  constructor(private authService: AilyService) {}
+  constructor(
+    private authService: AilyService,
+    private fixedTokenService: FixedTokenService,
+  ) {}
 
   @Post('getToken')
   @ApiOperation({
@@ -78,5 +83,15 @@ export class AilyController {
   @UseGuards(SignAuthGuard)
   async verifySession(@Body() params: BindSessionCodeDto) {
     return this.authService.verifySession(params);
+  }
+
+  @Post('triggerRefreshToken')
+  @ApiOperation({
+    summary: '手动触发刷新token',
+    description: '手动触发刷新token定时任务',
+  })
+  @UseGuards(SecretAuthGuard)
+  async triggerRefreshToken() {
+    return this.fixedTokenService.handleCron(true);
   }
 }

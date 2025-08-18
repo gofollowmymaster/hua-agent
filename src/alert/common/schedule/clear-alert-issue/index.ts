@@ -25,7 +25,9 @@ export default class ClearAlertPerDayService {
   }
 
   @Cron('0 0 0 * * *')
-  async handleCron() {
+  async handleCron(force = false) {
+    if (!force && process.env.NODE_ENV !== 'production') return;
+
     this.pageIssueService.clear();
     this.requestIssueService.clear();
 

@@ -70,7 +70,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
       this.redis.expire(key, 60 * 60 * 24 * 7);
       return;
     }
-    if (issueCardData.status == '暂时忽略') return;
+    // if (issueCardData.status == '暂时忽略') return;
 
     const count = parseInt(issueCardData.count + '') + 1;
     // 如果issue在，修改数量并回复之前的错误
@@ -79,7 +79,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
     });
 
     let messageText = `错误再次被触发，本周累计发生**${count}**次,[查看详情](${eventRecord.recordUrl}) `;
-    if (['已解决'].includes(issueCardData.status)) {
+    if (['已解决', '暂时忽略'].includes(issueCardData.status)) {
       messageText = `<at user_id="${issueCardData.userId}"></at>错误被重新打开,请及时排查,[查看详情](${eventRecord.recordUrl}) `;
       //更新卡片信息  激活
       this.updateByCard(issueCardData.messageId, {
