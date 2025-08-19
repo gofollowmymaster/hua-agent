@@ -1,8 +1,5 @@
 import { ConfigService } from '@nestjs/config';
-import {
-  BitTableConditions,
-  BitTableFilter,
-} from '@src/common/feishu/type/bitable';
+import { BitTableFilter } from '@src/common/feishu/type/bitable';
 import dayjs, { OpUnitType } from 'dayjs';
 import { Injectable } from '@nestjs/common';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
@@ -26,7 +23,6 @@ export default class IssueStatisticService {
   protected businessLines: Record<string, any>[] = [];
   protected environment = process.env.NODE_ENV;
   protected errorEndpoint: ErrorEndpoint;
-  protected readonly extraConditions: BitTableConditions = [];
   protected readonly tableViews = {};
   constructor(
     protected readonly config: ConfigService,
@@ -89,7 +85,6 @@ export default class IssueStatisticService {
           operator: 'is',
           value: [businessLine],
         },
-        ...this.extraConditions,
       ],
     };
 
@@ -160,7 +155,7 @@ export default class IssueStatisticService {
     userId: string,
     period: OpUnitType = 'day',
   ) {
-    const towdayStart = dayjs().startOf(period).valueOf();
+    const towdayStart = dayjs(period).startOf('day').valueOf();
 
     const filter: BitTableFilter = {
       conjunction: 'and',
@@ -181,10 +176,9 @@ export default class IssueStatisticService {
           operator: 'is',
           value: [businessLine],
         },
-
-        ...this.extraConditions,
       ],
     };
+
     let issues = await this.getIssues(filter);
     issues = issues.filter(
       (item) =>
