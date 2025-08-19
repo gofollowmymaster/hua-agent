@@ -9,7 +9,6 @@ import Redis from 'ioredis';
 import RequestIssueStatisticService from './services/request-issue.service';
 import PageIssueStatisticService from './services/page-issue.service';
 import { ErrorEndpoint } from '../../type/alert';
-import { OpUnitType } from 'dayjs';
 import { PushIssueCardToUserParams } from '../../type/sentry';
 
 @Injectable()

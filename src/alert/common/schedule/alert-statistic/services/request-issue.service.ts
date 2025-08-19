@@ -4,13 +4,13 @@ import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import IssueStatisticService from './issue-base-statistic.service';
 import FeishuApiAlertIssueTable from '@src/alert/common/table/api-alert-issue-table';
-import { BitTableConditions } from '@src/common/feishu/type/bitable';
 import { ignoreCodeList } from '@src/alert/common/service/request-error-service';
+import { ErrorEndpoint } from '@src/alert/common/type/alert';
 
 @Injectable()
 export default class RequestStatisticService extends IssueStatisticService {
   protected businessLines: Record<string, any>[] = [];
-  protected name: string = '接口';
+  protected errorEndpoint: ErrorEndpoint = ErrorEndpoint.Server;
 
   protected readonly tableViews = {
     基础架构:
@@ -30,7 +30,6 @@ export default class RequestStatisticService extends IssueStatisticService {
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly businessLineTable: FeishuBusinessLineTable,
   ) {
-    // return this.statisticService.handleCron();
     super(config, feishuIssueTable, messageHelper, businessLineTable);
   }
   protected customFilter(item: Record<string, any>) {

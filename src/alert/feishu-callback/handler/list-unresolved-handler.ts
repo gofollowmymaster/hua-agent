@@ -23,10 +23,10 @@ const listUnresolvedHandler: CustomCallbackHandleType = async (
   return {
     toast: {
       type: 'info',
-      content: '发送成功',
+      content: '所有未解决问题以发送给您',
       i18n: {
-        zh_cn: '发送成功',
-        en_us: 'card action success',
+        zh_cn: '所有未解决问题以发送给您',
+        // en_us: 'card action success',
       },
     },
   };

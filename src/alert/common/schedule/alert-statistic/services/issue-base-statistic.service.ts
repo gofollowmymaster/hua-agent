@@ -10,6 +10,7 @@ import ErrorStatisticCard from '@src/common/feishu/card/error-statistic-card';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import FeishuTable from '@src/common/feishu/table/feishu-table';
 import { wait } from '@utils/job';
+import { ErrorEndpoint } from '@src/alert/common/type/alert';
 
 const businessLines = ['商家运营', '仓储物流', '业财一体', '基础架构'];
 const statusColorMap = {
@@ -24,7 +25,7 @@ const statusColorMap = {
 export default class IssueStatisticService {
   protected businessLines: Record<string, any>[] = [];
   protected environment = process.env.NODE_ENV;
-  protected name: string;
+  protected errorEndpoint: ErrorEndpoint;
   protected readonly extraConditions: BitTableConditions = [];
   protected readonly tableViews = {};
   constructor(
@@ -97,7 +98,7 @@ export default class IssueStatisticService {
   async dayStatistic() {
     const { items: list } = await this.businessLineTable.list();
     this.businessLines = list;
-    businessLines;
+
     for (const businessLine of businessLines) {
       const requestIssueList = await this.getIssuesToday(businessLine);
       const tableData = requestIssueList.map(({ fields }) => {
@@ -117,7 +118,9 @@ export default class IssueStatisticService {
 
       const cardData = {
         total: requestIssueList.length,
-        date: dayjs().format('YYYY-MM-DD') + this.name,
+        date:
+          dayjs().format('YYYY-MM-DD') +
+          (this.errorEndpoint == ErrorEndpoint.Page ? '前端' : '接口'),
         resolved: requestIssueList.filter(
           (item) => item.fields['状态'] === '已解决',
         ).length,
@@ -130,6 +133,8 @@ export default class IssueStatisticService {
         tableData,
         color: requestIssueList.length > 5 ? 'red' : 'yellow',
         link: this.tableViews[businessLine],
+        errorEndpoint: this.errorEndpoint,
+        businessLine,
       };
 
       const message = ErrorStatisticCard.buildCardMsg(cardData);
@@ -176,16 +181,25 @@ export default class IssueStatisticService {
           operator: 'is',
           value: [businessLine],
         },
-        {
-          field_name: 'status',
-          operator: 'is',
-          value: ['处理中', '待处理'],
-        },
 
         ...this.extraConditions,
       ],
     };
-    const issues = this.getIssues(filter);
-    console.log('[ issues ] >', issues);
+    let issues = await this.getIssues(filter);
+    issues = issues.filter(
+      (item) =>
+        ['待处理', '处理中', '重新打开'].includes(
+          item.fields['状态'] as string,
+        ) && item.fields['话题信息'],
+    );
+    for (const issue of issues) {
+      console.log('[ issue ] >', JSON.stringify(issue));
+      const threadInfo = JSON.parse(
+        issue.fields['话题信息']?.[0].text as string,
+      );
+      const threadId = threadInfo.threadId;
+      threadId &&
+        (await this.messageHelper.forwardThread(userId, threadId, 'open_id'));
+    }
   }
 }

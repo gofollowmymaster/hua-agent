@@ -4,11 +4,12 @@ import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import IssueStatisticService from './issue-base-statistic.service';
 import FeishuFrontendAlertIssueTable from '@src/alert/common/table/frontend-alert-issue-table';
+import { ErrorEndpoint } from '@src/alert/common/type/alert';
 
 @Injectable()
 export default class PageIssueStatisticService extends IssueStatisticService {
   protected businessLines: Record<string, any>[] = [];
-  protected name: string = '前端';
+  protected errorEndpoint: ErrorEndpoint = ErrorEndpoint.Page;
   protected readonly tableViews = {
     基础架构:
       'https://q1njej8cpab.feishu.cn/share/base/view/shrcnILJrLDvkbYzu8c0xDuCuot',

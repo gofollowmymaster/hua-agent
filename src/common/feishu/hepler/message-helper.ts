@@ -102,6 +102,25 @@ class FeishuMessageHelper extends FeishuApiHelper {
       });
     }, 'message-urgentApp');
   }
+  async forwardThread(
+    receiveId: string,
+    threadId: string,
+    receiveIdType: UserIdType = 'user_id',
+  ) {
+    return this.requestWrapper(async () => {
+      return await this.client.client.im.thread.forward({
+        data: {
+          receive_id: receiveId,
+        },
+        params: {
+          receive_id_type: receiveIdType,
+        },
+        path: {
+          thread_id: threadId,
+        },
+      });
+    }, 'forwardThread');
+  }
 }
 
 export default FeishuMessageHelper;
