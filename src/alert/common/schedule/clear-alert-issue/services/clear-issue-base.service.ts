@@ -44,7 +44,7 @@ export default class ClearAlertPerDayBaseService {
     const { items: list } = await this.feishuIssueTable.search(
       filter,
       {
-        page_size: 2,
+        page_size: 100,
       },
       false,
     );

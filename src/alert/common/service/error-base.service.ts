@@ -63,15 +63,19 @@ export abstract class ErrorBaseService extends AlertBaseService {
       const issueInfo = {
         ...issueCardData,
         messageId: groupMsgInfo.message_id,
+        threadId: groupMsgInfo.thread_id,
       };
-      // await this.redis.hset(key, issueInfo);
+      console.log('[ groupMsgInfo ] >', groupMsgInfo);
       await this.updateIssueCardDataInCache(this.errorEvent.issueId, issueInfo);
-
-      this.redis.expire(key, 60 * 60 * 24 * 7);
+      this.updateTable(issueInfo.issueId, {
+        话题信息: JSON.stringify({
+          messageId: groupMsgInfo.message_id,
+          threadId: groupMsgInfo.thread_id,
+          linkUrl: eventRecord.recordUrl,
+        }),
+      });
       return;
     }
-    // if (issueCardData.status == '暂时忽略') return;
-
     const count = parseInt(issueCardData.count + '') + 1;
     // 如果issue在，修改数量并回复之前的错误
     await this.updateIssueCardDataInCache(this.errorEvent.issueId, {

@@ -230,10 +230,12 @@ export abstract class AlertBaseService extends BaseService {
     issueId: string,
     issueInfo: Partial<UnresolvedCardData>,
   ) {
-    await this.redis.hset(
-      RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),
-      issueInfo,
+    const key = RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace(
+      '{issueId}',
+      issueId,
     );
+    await this.redis.hset(key, issueInfo);
+    this.redis.expire(key, 60 * 60 * 24 * 7);
   }
 
   async updateByCard(message_id: string, data) {

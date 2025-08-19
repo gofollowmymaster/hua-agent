@@ -1,6 +1,9 @@
 import { ConfigService } from '@nestjs/config';
-import { BitTableFilter } from '@src/common/feishu/type/bitable';
-import dayjs from 'dayjs';
+import {
+  BitTableConditions,
+  BitTableFilter,
+} from '@src/common/feishu/type/bitable';
+import dayjs, { OpUnitType } from 'dayjs';
 import { Injectable } from '@nestjs/common';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import ErrorStatisticCard from '@src/common/feishu/card/error-statistic-card';
@@ -22,13 +25,19 @@ export default class IssueStatisticService {
   protected busibessLines: Record<string, any>[] = [];
   protected environment = process.env.NODE_ENV;
   protected name: string;
-  protected readonly tableViews: Record<string, any>;
+  protected readonly extraConditions: BitTableConditions = [];
+  protected readonly tableViews = {};
   constructor(
     protected readonly config: ConfigService,
     protected readonly feishuIssueTable: FeishuTable,
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly busibessLineTable: FeishuBusinessLineTable,
   ) {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected customFilter(item: Record<string, any>) {
+    return true;
+  }
+
   getBusinessLineInfo(businessLine: string) {
     // const { pageModuleName, environment } = alertInfo;
     if (this.environment == 'dev' || this.environment == 'development') {
@@ -54,46 +63,43 @@ export default class IssueStatisticService {
       frontendLeader: line.fields['前端leader'][0].id,
     };
   }
-  async statistic() {
+  async getIssuesToday(businessLine: string) {
+    const towdayStart = dayjs().startOf('day').valueOf();
+    const filter: BitTableFilter = {
+      conjunction: 'and',
+      conditions: [
+        {
+          field_name: '最后更新时间',
+          operator: 'isGreater',
+          value: ['ExactDate', towdayStart + ''],
+        },
+        {
+          field_name: '日错误次数',
+          operator: 'isGreater',
+          value: ['0'],
+        },
+        {
+          field_name: '环境',
+          operator: 'is',
+          value: ['prod'],
+        },
+        {
+          field_name: '业务线',
+          operator: 'is',
+          value: [businessLine],
+        },
+        ...this.extraConditions,
+      ],
+    };
+
+    return this.getIssues(filter);
+  }
+  async dayStatistic() {
     const { items: list } = await this.busibessLineTable.list();
     this.busibessLines = list;
     businessLines;
     for (const businessLine of businessLines) {
-      const towdayStart = dayjs().startOf('day').valueOf();
-      const filter: BitTableFilter = {
-        conjunction: 'and',
-        conditions: [
-          {
-            field_name: '最后更新时间',
-            operator: 'isGreater',
-            value: ['ExactDate', towdayStart + ''],
-          },
-          {
-            field_name: '日错误次数',
-            operator: 'isGreater',
-            value: ['0'],
-          },
-          {
-            field_name: '环境',
-            operator: 'is',
-            value: ['prod'],
-          },
-          {
-            field_name: '业务线',
-            operator: 'is',
-            value: [businessLine],
-          },
-        ],
-      };
-      const { items: requestIssueList } = await this.feishuIssueTable.search(
-        filter,
-        {
-          page_size: 100,
-        },
-        false,
-      );
-      // console.log('[ requestIssueList ] >', JSON.stringify(requestIssueList));
-
+      const requestIssueList = await this.getIssuesToday(businessLine);
       const tableData = requestIssueList.map(({ fields }) => {
         return {
           issueId: fields.IssueId[0].text,
@@ -128,9 +134,58 @@ export default class IssueStatisticService {
 
       const message = ErrorStatisticCard.buildCardMsg(cardData);
       const lineInfo = this.getBusinessLineInfo(businessLine);
-      console.log('[ lineInfo ] >', lineInfo);
       this.messageHelper.createInteractToGroup(message, lineInfo.groupId);
       await wait(1000);
     }
+  }
+
+  async getIssues(filter: BitTableFilter) {
+    const { items: requestIssueList } = await this.feishuIssueTable.search(
+      filter,
+      {
+        page_size: 100,
+      },
+      false,
+    );
+    return requestIssueList.filter(this.customFilter);
+  }
+
+  async pushIssueCardToUser(
+    businessLine: string,
+    userId: string,
+    period: OpUnitType = 'day',
+  ) {
+    const towdayStart = dayjs().startOf(period).valueOf();
+
+    const filter: BitTableFilter = {
+      conjunction: 'and',
+      conditions: [
+        {
+          field_name: '最后更新时间',
+          operator: 'isGreater',
+          value: ['ExactDate', towdayStart + ''],
+        },
+
+        {
+          field_name: '环境',
+          operator: 'is',
+          value: ['prod'],
+        },
+        {
+          field_name: '业务线',
+          operator: 'is',
+          value: [businessLine],
+        },
+        {
+          field_name: 'status',
+          operator: 'is',
+          value: ['处理中', '待处理'],
+        },
+
+        ...this.extraConditions,
+      ],
+    };
+    const issues = this.getIssues(filter);
+    console.log('[ issues ] >', issues);
   }
 }

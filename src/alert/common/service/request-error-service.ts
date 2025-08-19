@@ -15,10 +15,11 @@ import { ErrorBaseService } from './error-base.service';
 import RequestAlertFeishuAdapter from '../adapter/request-alert-feishu-adapter';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { Injectable } from '@nestjs/common';
+export const ignoreCodeList = ['401', '10002', '408'];
 
 @Injectable()
 export class RequestErrorService extends ErrorBaseService {
-  protected ignoreCodeList = ['401', '10002', '408'];
+  protected ignoreCodeList = ignoreCodeList;
 
   constructor(
     protected prisma: PrismaService,

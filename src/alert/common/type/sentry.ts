@@ -6,6 +6,7 @@ import {
   PageModuleName,
   RequestData,
 } from './alert';
+import { OpUnitType } from 'dayjs';
 
 class SentryEventExtra {
   @ApiPropertyOptional({
@@ -432,4 +433,17 @@ export type SentryHookIssue = {
   resolution_type?: 'in_next_release' | 'in_release';
   assignee?: SentryUser;
   issue: SentryIssue;
+};
+
+export type BusibessLine =
+  | '商家运营'
+  | '仓储物流'
+  | '业财一体'
+  | '基础架构'
+  | '其他';
+export type PushIssueCardToUserParams = {
+  busibessLine: BusibessLine;
+  errorEndpoint: ErrorEndpoint;
+  userId: string;
+  period: OpUnitType;
 };

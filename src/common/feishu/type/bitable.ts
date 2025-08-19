@@ -8,6 +8,7 @@ export type BitTableSearchParams = Parameters<
 export type BitTableSearchPayload = BitTableSearchParams[0];
 export type BitTableSearchPayloadData = BitTableSearchPayload['data'];
 export type BitTableFilter = BitTableSearchPayloadData['filter'];
+export type BitTableConditions = BitTableFilter['conditions'];
 export type BitTableSearchPayloadParams = BitTableSearchPayload['params'];
 
 export type BitTableSearchReturn = Awaited<
