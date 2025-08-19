@@ -11,8 +11,8 @@ export default class PageClearIssueService extends ClearIssueService {
     protected readonly config: ConfigService,
     protected readonly feishuIssueTable: FeishuFrontendAlertIssueTable,
     protected readonly messageHelper: FeishuMessageHelper,
-    protected readonly busibessLineTable: FeishuBusinessLineTable,
+    protected readonly businessLineTable: FeishuBusinessLineTable,
   ) {
-    super(config, feishuIssueTable, messageHelper, busibessLineTable);
+    super(config, feishuIssueTable, messageHelper, businessLineTable);
   }
 }

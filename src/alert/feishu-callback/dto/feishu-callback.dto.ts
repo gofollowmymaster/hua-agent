@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ErrorEndpoint } from '@src/alert/common/type/alert';
-import { BusibessLine } from '@src/alert/common/type/sentry';
+import { businessLine } from '@src/alert/common/type/sentry';
 import { OpUnitType } from 'dayjs';
 
 export class FeishuCallbackHeader {
@@ -49,7 +49,7 @@ type CallbackHost = 'im_message' | 'im_top_notice';
 //     enum: ErrorEndpoint,
 //   })
 //   'errorEndpoint': ErrorEndpoint;
-//   busibessLine: BusibessLine;
+//   businessLine: businessLine;
 //   period: OpUnitType;
 // }
 class CallbackValueDto {
@@ -62,7 +62,7 @@ class CallbackValueDto {
   })
   'issueId': string;
   'errorEndpoint'?: ErrorEndpoint;
-  busibessLine?: BusibessLine;
+  businessLine?: businessLine;
   period?: OpUnitType;
 }
 class CallbackActionDto {

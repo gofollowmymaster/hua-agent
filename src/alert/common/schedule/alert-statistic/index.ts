@@ -37,16 +37,16 @@ export default class AlertStatisticService {
     return;
   }
   async pushIssueCardToUser({
-    busibessLine,
+    businessLine,
     errorEndpoint,
     userId,
     period = 'day',
   }: PushIssueCardToUserParams) {
     if (errorEndpoint === ErrorEndpoint.Page) {
-      this.pageIssueService.pushIssueCardToUser(busibessLine, userId, period);
+      this.pageIssueService.pushIssueCardToUser(businessLine, userId, period);
     } else if (errorEndpoint === ErrorEndpoint.Server) {
       this.requestIssueService.pushIssueCardToUser(
-        busibessLine,
+        businessLine,
         userId,
         period,
       );

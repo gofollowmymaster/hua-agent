@@ -7,7 +7,7 @@ import FeishuFrontendAlertIssueTable from '@src/alert/common/table/frontend-aler
 
 @Injectable()
 export default class PageIssueStatisticService extends IssueStatisticService {
-  protected busibessLines: Record<string, any>[] = [];
+  protected businessLines: Record<string, any>[] = [];
   protected name: string = '前端';
   protected readonly tableViews = {
     基础架构:
@@ -24,9 +24,9 @@ export default class PageIssueStatisticService extends IssueStatisticService {
     protected readonly config: ConfigService,
     protected readonly feishuIssueTable: FeishuFrontendAlertIssueTable,
     protected readonly messageHelper: FeishuMessageHelper,
-    protected readonly busibessLineTable: FeishuBusinessLineTable,
+    protected readonly businessLineTable: FeishuBusinessLineTable,
   ) {
     // return this.statisticService.handleCron();
-    super(config, feishuIssueTable, messageHelper, busibessLineTable);
+    super(config, feishuIssueTable, messageHelper, businessLineTable);
   }
 }

@@ -9,13 +9,13 @@ const listUnresolvedHandler: CustomCallbackHandleType = async (
   const {
     operator: { open_id },
     action: {
-      value: { period, errorEndpoint, busibessLine },
+      value: { period, errorEndpoint, businessLine },
     },
   } = event;
   const service = await handerService.alertStatisticService;
   //   service.
   service.pushIssueCardToUser({
-    busibessLine,
+    businessLine,
     userId: open_id,
     errorEndpoint,
     period,

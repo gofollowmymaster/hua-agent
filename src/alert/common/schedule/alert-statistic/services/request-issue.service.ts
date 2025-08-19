@@ -9,7 +9,7 @@ import { ignoreCodeList } from '@src/alert/common/service/request-error-service'
 
 @Injectable()
 export default class RequestStatisticService extends IssueStatisticService {
-  protected busibessLines: Record<string, any>[] = [];
+  protected businessLines: Record<string, any>[] = [];
   protected name: string = '接口';
 
   protected readonly tableViews = {
@@ -28,10 +28,10 @@ export default class RequestStatisticService extends IssueStatisticService {
     protected readonly config: ConfigService,
     protected readonly feishuIssueTable: FeishuApiAlertIssueTable,
     protected readonly messageHelper: FeishuMessageHelper,
-    protected readonly busibessLineTable: FeishuBusinessLineTable,
+    protected readonly businessLineTable: FeishuBusinessLineTable,
   ) {
     // return this.statisticService.handleCron();
-    super(config, feishuIssueTable, messageHelper, busibessLineTable);
+    super(config, feishuIssueTable, messageHelper, businessLineTable);
   }
   protected customFilter(item: Record<string, any>) {
     return !ignoreCodeList.includes(item.fields['业务状态码'][0].text);

@@ -22,7 +22,7 @@ const statusColorMap = {
 
 @Injectable()
 export default class IssueStatisticService {
-  protected busibessLines: Record<string, any>[] = [];
+  protected businessLines: Record<string, any>[] = [];
   protected environment = process.env.NODE_ENV;
   protected name: string;
   protected readonly extraConditions: BitTableConditions = [];
@@ -31,7 +31,7 @@ export default class IssueStatisticService {
     protected readonly config: ConfigService,
     protected readonly feishuIssueTable: FeishuTable,
     protected readonly messageHelper: FeishuMessageHelper,
-    protected readonly busibessLineTable: FeishuBusinessLineTable,
+    protected readonly businessLineTable: FeishuBusinessLineTable,
   ) {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected customFilter(item: Record<string, any>) {
@@ -55,7 +55,7 @@ export default class IssueStatisticService {
       };
     }
 
-    const line = this.busibessLines.find(({ fields }) => {
+    const line = this.businessLines.find(({ fields }) => {
       return fields['业务线'] === businessLine;
     });
     return {
@@ -95,8 +95,8 @@ export default class IssueStatisticService {
     return this.getIssues(filter);
   }
   async dayStatistic() {
-    const { items: list } = await this.busibessLineTable.list();
-    this.busibessLines = list;
+    const { items: list } = await this.businessLineTable.list();
+    this.businessLines = list;
     businessLines;
     for (const businessLine of businessLines) {
       const requestIssueList = await this.getIssuesToday(businessLine);
