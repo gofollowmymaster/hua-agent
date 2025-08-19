@@ -8,7 +8,7 @@ import FeishuTable from '@src/common/feishu/table/feishu-table';
 
 @Injectable()
 export default class ClearAlertPerDayBaseService {
-  protected busibessLines: Record<string, any>[] = [];
+  protected businessLines: Record<string, any>[] = [];
   protected environment = process.env.NODE_ENV;
   protected name: string;
   protected readonly tableViews: Record<string, any>;
@@ -16,7 +16,7 @@ export default class ClearAlertPerDayBaseService {
     protected readonly config: ConfigService,
     protected readonly feishuIssueTable: FeishuTable,
     protected readonly messageHelper: FeishuMessageHelper,
-    protected readonly busibessLineTable: FeishuBusinessLineTable,
+    protected readonly businessLineTable: FeishuBusinessLineTable,
   ) {}
 
   async clear() {
@@ -44,7 +44,7 @@ export default class ClearAlertPerDayBaseService {
     const { items: list } = await this.feishuIssueTable.search(
       filter,
       {
-        page_size: 2,
+        page_size: 100,
       },
       false,
     );

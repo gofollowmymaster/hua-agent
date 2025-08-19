@@ -13,7 +13,7 @@ export type StatisticCardData = {
 
 export default class ErrorStatisticCard extends FeishuCard {
   static readonly templateId = 'AAqz7GFur0NrV';
-  static readonly templateVersion = '1.0.4';
+  static readonly templateVersion = '1.0.7';
 
   /**
    * 构建飞书报警卡片消息

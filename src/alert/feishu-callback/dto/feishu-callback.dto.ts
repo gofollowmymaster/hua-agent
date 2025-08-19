@@ -1,4 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ErrorEndpoint } from '@src/alert/common/type/alert';
+import { businessLine } from '@src/alert/common/type/sentry';
+import { OpUnitType } from 'dayjs';
 
 export class FeishuCallbackHeader {
   @ApiProperty({
@@ -37,6 +40,18 @@ class CallbackOperator {
 
 type CallbackHost = 'im_message' | 'im_top_notice';
 
+// class CallbackStatisticValueDto {
+//   @ApiProperty({
+//     type: String,
+//   })
+//   'action': string;
+//   @ApiProperty({
+//     enum: ErrorEndpoint,
+//   })
+//   'errorEndpoint': ErrorEndpoint;
+//   businessLine: businessLine;
+//   period: OpUnitType;
+// }
 class CallbackValueDto {
   @ApiProperty({
     type: String,
@@ -46,6 +61,9 @@ class CallbackValueDto {
     type: String,
   })
   'issueId': string;
+  'errorEndpoint'?: ErrorEndpoint;
+  businessLine?: businessLine;
+  period?: OpUnitType;
 }
 class CallbackActionDto {
   @ApiProperty({

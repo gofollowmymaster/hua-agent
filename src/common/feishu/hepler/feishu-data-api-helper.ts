@@ -36,7 +36,7 @@ abstract class FeishuDataApiHelper extends FeishuApiHelper {
       this.redis.expire(cachaeKey, this.ttl);
       return res;
     }
-    return await this.requestWrapper(handler);
+    return await this.requestWrapper(handler, key.split(':')[0]);
   }
 }
 

@@ -39,12 +39,12 @@ export class SentryApiService {
     if (params.status == 'ignoreCount100') {
       status = 'ignored';
       statusDetails = {
-        ignoreCount: 100,
+        ignoreCount: 20,
       };
     } else if (params.status == 'ignoreCount1000') {
       status = 'ignored';
       statusDetails = {
-        ignoreCount: 1000,
+        ignoreCount: 100,
       };
     } else {
       status = params.status;

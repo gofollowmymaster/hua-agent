@@ -4,11 +4,14 @@ import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import IssueStatisticService from './issue-base-statistic.service';
 import FeishuApiAlertIssueTable from '@src/alert/common/table/api-alert-issue-table';
+import { ignoreCodeList } from '@src/alert/common/service/request-error-service';
+import { ErrorEndpoint } from '@src/alert/common/type/alert';
 
 @Injectable()
 export default class RequestStatisticService extends IssueStatisticService {
-  protected busibessLines: Record<string, any>[] = [];
-  protected name: string = '接口';
+  protected businessLines: Record<string, any>[] = [];
+  protected errorEndpoint: ErrorEndpoint = ErrorEndpoint.Server;
+
   protected readonly tableViews = {
     基础架构:
       'https://q1njej8cpab.feishu.cn/share/base/view/shrcn8PkI1sZCV9wOlA7RpWaKQc',
@@ -25,9 +28,11 @@ export default class RequestStatisticService extends IssueStatisticService {
     protected readonly config: ConfigService,
     protected readonly feishuIssueTable: FeishuApiAlertIssueTable,
     protected readonly messageHelper: FeishuMessageHelper,
-    protected readonly busibessLineTable: FeishuBusinessLineTable,
+    protected readonly businessLineTable: FeishuBusinessLineTable,
   ) {
-    // return this.statisticService.handleCron();
-    super(config, feishuIssueTable, messageHelper, busibessLineTable);
+    super(config, feishuIssueTable, messageHelper, businessLineTable);
+  }
+  protected customFilter(item: Record<string, any>) {
+    return !ignoreCodeList.includes(item.fields['业务状态码'][0].text);
   }
 }

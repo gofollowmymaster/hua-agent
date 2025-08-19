@@ -1,5 +1,6 @@
 import AssignToHandler from './assign-to-handler';
 import ModifyStatusHandler from './modify-status-handler';
+import listUnresolvedHandler from './list-unresolved-handler';
 import CloseHandler from './close-handler';
 // import MsgReactionHandler from './msg-reaction-handler';
 // import { EventHandles } from '@larksuiteoapi/node-sdk';
@@ -20,5 +21,6 @@ const EventHandler = {
   assignTo: AssignToHandler,
   modifyStatus: ModifyStatusHandler,
   close: CloseHandler,
+  listUnresolved: listUnresolvedHandler,
 };
 export default EventHandler;

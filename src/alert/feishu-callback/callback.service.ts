@@ -18,6 +18,8 @@ import { ErrorBaseService } from '../common/service/error-base.service';
 import { ErrorEndpoint } from '../common/type/alert';
 import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolve-card';
 import { CardCallbackReturnType } from '@src/common/feishu/type/card';
+import AlertStatisticService from '../common/schedule/alert-statistic';
+import { PushIssueCardToUserParams } from '../common/type/sentry';
 
 @Injectable()
 export class FeishuCallbackService extends CommonErrorService {
@@ -33,38 +35,9 @@ export class FeishuCallbackService extends CommonErrorService {
     readonly feishuUserHelper: FeishuUserHelper,
     protected readonly pageErrorService: PageErrorService,
     protected readonly requestErrorService: RequestErrorService,
+    readonly alertStatisticService: AlertStatisticService,
   ) {
     super(redisService);
-  }
-
-  async checkIssueInCache(issueId: string) {
-    const issueInfo = (await this.redis.hgetall(
-      RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),
-    )) as UnresolvedCardData;
-
-    if (!issueInfo.issueId) {
-      //跨天问题
-      throw new Error(`Issue:${issueId}已失效`);
-    }
-    return issueInfo;
-  }
-  async getServiceByEndPort(
-    errorEndpoint: ErrorEndpoint,
-  ): Promise<ErrorBaseService> {
-    switch (errorEndpoint) {
-      case ErrorEndpoint.Page:
-        return this.pageErrorService;
-      case ErrorEndpoint.Server:
-        return this.requestErrorService;
-      default:
-        throw new Error('errorEndpoint is not defined');
-    }
-  }
-  async getServiceByIssueId(IssueId = ''): Promise<ErrorBaseService> {
-    const issueInfo = await this.checkIssueInCache(IssueId);
-    const errorEndpoint = issueInfo.errorEndpoint as ErrorEndpoint;
-
-    return this.getServiceByEndPort(errorEndpoint);
   }
 
   async handle(
@@ -86,4 +59,7 @@ export class FeishuCallbackService extends CommonErrorService {
     }
     throw new Error('未知事件类型');
   }
+  // pushIssueCardToUser(params: PushIssueCardToUserParams) {
+  //   this.alertStatisticService.pushIssueCardToUser(params);
+  // }
 }

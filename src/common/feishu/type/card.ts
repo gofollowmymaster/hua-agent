@@ -11,7 +11,7 @@ export type ToastReturnType = {
   content: string;
   i18n: Record<string, string>;
 };
-export type CardCallbackReturnType<T> = {
+export type CardCallbackReturnType<T = any> = {
   toast?: ToastReturnType;
   card?: CardReturnType<T>;
 };
