@@ -121,17 +121,9 @@ export class SentryWebhookService {
     });
   }
   async error(eventData: AlertEvent) {
-    let res;
     const service = await this.getServiceByEndPort(eventData.errorEndpoint);
 
-    switch (eventData.errorEndpoint) {
-      case ErrorEndpoint.Page:
-        res = await service.errorHookHandler(eventData as PageAlertEvent);
-        break;
-      case ErrorEndpoint.Server:
-        res = await service.errorHookHandler(eventData as RequestAlertEvent);
-        break;
-    }
+    const res = await service.errorHookHandler(eventData);
 
     //按前端业务模块3min 内超过10次告警，发送额外致命错误
     const isTooManyWarning = await this.redisService.limiter(
@@ -141,7 +133,7 @@ export class SentryWebhookService {
     );
 
     if (isTooManyWarning) {
-      this.highFrequencyAlertMsg(eventData);
+      this.highFrequencyAlertMsg(service, eventData);
     }
     return res;
   }
@@ -183,14 +175,17 @@ export class SentryWebhookService {
    * 高频错误报警
    * @param alertInfo
    */
-  async highFrequencyAlertMsg(errorEvent: AlertEvent) {
+  async highFrequencyAlertMsg(
+    service: ErrorBaseService,
+    errorEvent: AlertEvent,
+  ) {
     // await this.alertFeishuAdapter.setEvent(errorEvent);
 
     const msgData = {
       ...errorEvent,
-      rawData: {},
       level: ErrorLevel.FATAL,
-      content: '最近3分钟内报错数超过10个,请及时处理',
+      message: '当前系统最近5分钟内报错数超过10个,请及时处理',
+      content: '',
       timestamp: dayjs().valueOf(),
     };
     const content = CommonAlertCard.buildCardMsg({
@@ -199,11 +194,11 @@ export class SentryWebhookService {
         errorEvent?.errorEndpoint === ErrorEndpoint.Page
           ? errorEvent.pageModuleName
           : errorEvent.serverModuleName,
-      errorType: '高频报错提醒',
+      title: '高频报错提醒',
       linkUrl:
         'https://cloud.elnkpro.com:9000/organizations/aplus-frontend-team/issues/?query=is%3Aunresolved%20issue.priority%3A%5Bhigh%2C%20medium%5D%20event.timestamp%3A-1h&referrer=issue-list&statsPeriod=14d',
     });
     // 异步发送飞书消息
-    this.errorAlertService.sendFsAlertMsg(msgData, content);
+    service.sendFsAlertMsg(msgData, content);
   }
 }

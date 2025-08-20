@@ -62,25 +62,25 @@ export class FeishuEventService {
     const issueInCache = (await this.redis.hgetall(
       RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),
     )) as UnresolvedCardData;
-    // if (issueInCache.issueId) {
-    //   this.messageHelper.replyInThread(
-    //     JSON.stringify({
-    //       zh_cn: {
-    //         content: [
-    //           [
-    //             {
-    //               tag: 'md',
-    //               text: `<at user_id="${userId}"></at>追踪了此问题`,
-    //             },
-    //           ],
-    //         ],
-    //       },
-    //     }),
-    //     issueInCache.messageId,
-    //     FeishuMsgType.Post,
-    //   );
-    //   return;
-    // }
+    if (issueInCache.issueId) {
+      this.messageHelper.replyInThread(
+        JSON.stringify({
+          zh_cn: {
+            content: [
+              [
+                {
+                  tag: 'md',
+                  text: `<at user_id="${userId}"></at>追踪了此问题`,
+                },
+              ],
+            ],
+          },
+        }),
+        issueInCache.messageId,
+        FeishuMsgType.Post,
+      );
+      return;
+    }
     const issue = await this.getIssueInfo(issueId);
     if (!issue) {
       this.messageHelper.createToUser(

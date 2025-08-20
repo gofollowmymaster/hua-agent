@@ -13,12 +13,10 @@ export default class AlertFeishuAdapter {
   toCommonCardeData(): CommonCardData {
     return {
       environment: this.event.environment,
-      rawData: '',
-      userEmail: '',
       project: this.event.pageModuleName,
       linkUrl: this.event.webUrl,
       level: this.event.level,
-      errorType: this.event.type,
+      message: this.event.type,
       content: this.event.culprit,
       timestamp: this.event.timestamp,
     };

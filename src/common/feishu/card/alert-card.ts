@@ -4,18 +4,19 @@ import { FeishuCard } from './feishu-card';
 export type CommonCardData = {
   project: string;
   level?: string;
-  errorType: string;
+  message: string;
   content: string;
   linkUrl?: string;
   userId?: string;
   timestamp?: number;
   title?: string;
   color?: string;
-  [key: string]: any;
+  environment?: string;
+  // [key: string]: any;
 };
 export class CommonAlertCard extends FeishuCard {
   protected static templateId = 'AAqSyNBCovM2j';
-  protected static templateVersion = '1.0.10';
+  protected static templateVersion = '1.0.12';
 
   /**
    * 构建飞书报警卡片消息

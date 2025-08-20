@@ -74,7 +74,7 @@ export default class FixedTokenService {
       title: '定时刷新Token异常报警',
       project: 'aplus-sql-server',
       color: 'red',
-      errorType: `刷新飞书Token异常`,
+      message: `刷新飞书Token异常`,
       content: errorMessage,
     });
   }
