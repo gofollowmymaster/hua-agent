@@ -18,11 +18,14 @@ class FeishuMessageHelper extends FeishuApiHelper {
       return await this.client.client.im.message.create(msgParams);
     }, 'message-create');
   }
-  async createToUser(msgParams: CreateMessageType['data']) {
+  async createToUser(
+    msgParams: CreateMessageType['data'],
+    receiveIdType: UserIdType = 'open_id',
+  ) {
     return await this.create({
       data: msgParams,
       params: {
-        receive_id_type: 'user_id',
+        receive_id_type: receiveIdType,
       },
     });
   }

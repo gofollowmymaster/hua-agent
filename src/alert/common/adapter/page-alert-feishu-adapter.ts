@@ -81,7 +81,10 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       level: this.event.level,
       eventType: this.event.type,
       abstract: this.event.culprit,
-      content: this.event.title,
+      content:
+        this.event.title.length < 20
+          ? this.event.title + ' ' + this.event.message
+          : this.event.title,
       count: 1,
       status: issueStatusMap['unresolved'],
       issueId: this.event.issueId,
