@@ -9,7 +9,6 @@ abstract class FeishuApiHelper {
     const res = await handler();
     const { code, data } = res;
     if (code !== 0) {
-      // console.log('[ FeishuMessageHelper ] >', res);
       throw new FeishuApiException(
         `【${requestName || handler.name}】【${code}】   ->  ${JSON.stringify(res)}`,
         500,

@@ -78,7 +78,7 @@ export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       environment: this.event.environment,
       errorType: this.event.type,
       errorMessage: this.event.title,
-      userName: this.appInfo.frontendLeaderName,
+      userName: this.appInfo.backendLeaderName,
       project: this.event.pageModuleName,
       outerLink: this.event.webUrl,
       linkUrl: this.event.feishuUrl,

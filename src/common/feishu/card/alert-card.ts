@@ -16,7 +16,7 @@ export type CommonCardData = {
 };
 export class CommonAlertCard extends FeishuCard {
   protected static templateId = 'AAqSyNBCovM2j';
-  protected static templateVersion = '1.0.12';
+  protected static templateVersion = '1.0.13';
 
   /**
    * 构建飞书报警卡片消息

@@ -143,6 +143,7 @@ export class SentryWebhookController {
 
     const requestData = alertError.extra?.__serialized__;
     const serverModuleName = getModuleNameByUrl(requestData?.url);
+    console.log('[ serverModuleName ] >', serverModuleName);
     const pageModuleName =
       alertError.extra?.subModuleName || PageModuleName.APLUS_OTHER;
     const eventData = {
