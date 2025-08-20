@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import Redis from 'ioredis';
 import { LoggerService } from '../logger/logger.service';
+import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 
 export enum RedisValueType {
   STRING = 'string',
@@ -46,6 +47,37 @@ export class RedisService {
     }
 
     return current > limit;
+  }
+
+  /**
+   * 一定时间内的幂等性处理，适用与一定时间内会被反复请求的场景
+   * @param tag
+   * @param handle
+   * @returns
+   */
+  async idempotent(
+    tag: string,
+    handle: () => Promise<any>,
+    expireTime: number = 60 * 60 * 24,
+  ) {
+    const key = RedisKeys.REDIS_IDEMPOTENT.replace('{key}', tag);
+    const eventHandleStatus = await this.redis.get(key);
+    if (!eventHandleStatus) {
+      await this.redis.set(key, 'handling');
+      this.redis.expire(key, expireTime);
+    } else if (['handling', 'handled'].includes(eventHandleStatus)) {
+      return;
+    }
+    let res;
+    try {
+      res = await handle();
+      this.redis.set(key, 'handled');
+    } catch (error) {
+      this.redis.set(key, 'failed');
+      sendExceptionToFeishu(error);
+    } finally {
+      return res;
+    }
   }
 
   async hasByPattern(pattern: string) {

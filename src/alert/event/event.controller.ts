@@ -17,7 +17,7 @@ export class FeishuEventController {
     summary: '发送报警消息',
     description: '发送飞书报警消息，非节假日指定时段会电话通知',
   })
-  @ApiBody({ type:  FeishuEventCallbackDto })
+  @ApiBody({ type: FeishuEventCallbackDto })
   @Post('callback')
   // 接收已表情回复webhook
   async feishuEventCallback(@Body() callbackInfo: FeishuEventCallbackDto) {
@@ -27,6 +27,6 @@ export class FeishuEventController {
     }
     const res = await this.feishuEventService.handle(callbackInfo);
     this.logger.info('res:', res);
-    return { challenge: callbackInfo.challenge, data: res, code: 200 };
+    return { message: res, code: 200 };
   }
 }

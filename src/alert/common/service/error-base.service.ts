@@ -55,7 +55,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
     );
     let issueCardData = (await this.redis.hgetall(key)) as UnresolvedCardData;
     //新issue 发送卡片消息
-    if (!issueCardData.issueId) {
+    if (!issueCardData.threadId) {
       issueCardData = this.alertFeishuAdapter.toAplusAlertCardeData();
       issueCardData.linkUrl = eventRecord.recordUrl;
       const content = ErrorUnresolvedCard.buildCardMsg(issueCardData);
@@ -65,7 +65,6 @@ export abstract class ErrorBaseService extends AlertBaseService {
         messageId: groupMsgInfo.message_id,
         threadId: groupMsgInfo.thread_id,
       };
-      console.log('[ groupMsgInfo ] >', groupMsgInfo);
       await this.updateIssueCardDataInCache(this.errorEvent.issueId, issueInfo);
       this.updateTable(issueInfo.issueId, {
         话题信息: JSON.stringify({
@@ -143,16 +142,8 @@ export abstract class ErrorBaseService extends AlertBaseService {
             content: [
               [
                 {
-                  tag: 'at',
-                  user_id: eventData.operator,
-                },
-                {
-                  tag: 'text',
-                  text: `将问题指派给`,
-                },
-                {
-                  tag: 'at',
-                  user_id: eventData.assignTo,
+                  tag: 'md',
+                  text: `<at user_id="${eventData.operator}"></at>将问题指派给<at user_id="${eventData.assignTo}"></at>`,
                 },
               ],
             ],
@@ -181,19 +172,11 @@ export abstract class ErrorBaseService extends AlertBaseService {
             content: [
               [
                 {
-                  tag: 'at',
-                  user_id: eventData.operator,
-                },
-                {
-                  tag: 'text',
-                  text: `将问题状态修改为`,
-                },
-                {
-                  tag: 'text',
-                  text:
+                  tag: 'md',
+                  text: `<at user_id="${eventData.operator}"></at>将问题状态修改为 **${
                     issueStatusMap[eventData.issueStatus] ||
-                    eventData.issueStatus,
-                  style: ['bold'],
+                    eventData.issueStatus
+                  }**`,
                 },
               ],
             ],
@@ -221,18 +204,14 @@ export abstract class ErrorBaseService extends AlertBaseService {
         status: issueInfo.status == '已解决' ? '已关闭' : issueInfo.status,
       });
       const statusAction = issueInfo.status == '已解决' ? '关闭🎉🎉' : '忽略';
-      const message = `将本问题${statusAction}\n【问题原因】${eventData.reason}\n【处理方法】${eventData.solution}`;
+      const message = `<at user_id="${eventData.operator}"></at>将本问题${statusAction}\n【问题原因】${eventData.reason}\n【处理方法】${eventData.solution}`;
       this.messageHelper.replyInThread(
         JSON.stringify({
           zh_cn: {
             content: [
               [
                 {
-                  tag: 'at',
-                  user_id: eventData.operator,
-                },
-                {
-                  tag: 'text',
+                  tag: 'md',
                   text: message,
                 },
               ],
