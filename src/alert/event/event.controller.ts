@@ -37,8 +37,7 @@ export class FeishuEventController {
     // const handler = EventHandler[header.event_type];
 
     const tag = header.event_type + ':' + header.event_id;
-    const res = this.redisService.idempotent(tag, async () => {
-      console.log('[ header.event_type ] >', header.event_type);
+    const res = await this.redisService.idempotent(tag, async () => {
       switch (header.event_type) {
         case 'im.message.receive_v1':
           return await this.receive(event);

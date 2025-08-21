@@ -67,7 +67,6 @@ class FeishuTableHelper extends FeishuDataApiHelper {
     useCache = true,
   ) {
     const cacheKey = 'search:' + JSON.stringify(filter).replaceAll(':', '');
-    console.log('[ params ] >', params);
     return this.readWrapper(
       async () =>
         await this.client.client.bitable.appTableRecord.search({
