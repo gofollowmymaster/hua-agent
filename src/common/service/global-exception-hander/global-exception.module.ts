@@ -6,6 +6,7 @@ export class GlobalExceptionHandlerModule implements OnApplicationBootstrap {
   onApplicationBootstrap() {
     if (!process.listeners('unhandledRejection').length) {
       process.on('unhandledRejection', (reason, promise) => {
+        console.error('-------Unhandled Rejection at:', reason);
         promise.catch((error: Error) => {
           sendExceptionToFeishu(error);
         });
