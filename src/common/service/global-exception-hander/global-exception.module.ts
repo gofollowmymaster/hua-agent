@@ -4,6 +4,14 @@ import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 @Module({})
 export class GlobalExceptionHandlerModule implements OnApplicationBootstrap {
   onApplicationBootstrap() {
+    console.log(
+      '[ process.listeners>',
+      process.listeners('unhandledRejection').length,
+    );
+    console.log(
+      '[ process.uncaughtException>',
+      process.listeners('uncaughtException').length,
+    );
     if (!process.listeners('unhandledRejection').length) {
       process.on('unhandledRejection', (reason, promise) => {
         console.error('-------Unhandled Rejection at:', reason);
