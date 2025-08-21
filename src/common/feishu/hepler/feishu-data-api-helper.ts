@@ -32,8 +32,7 @@ abstract class FeishuDataApiHelper extends FeishuApiHelper {
       if (res) return JSON.parse(res);
 
       res = await this.requestWrapper(handler, key.split(':')[0]);
-      this.redis.set(cachaeKey, JSON.stringify(res));
-      this.redis.expire(cachaeKey, this.ttl);
+      this.redis.setex(cachaeKey, JSON.stringify(res), this.ttl);
       return res;
     }
     return await this.requestWrapper(handler, key.split(':')[0]);

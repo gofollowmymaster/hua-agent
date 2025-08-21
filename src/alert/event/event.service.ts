@@ -28,8 +28,7 @@ export class FeishuEventService {
   }
 
   async receive(event: ReceiveEventParams) {
-    await this.feishuReceiveCallback.handle(event);
-    return 'ok';
+    return await this.feishuReceiveCallback.handle(event);
   }
   async read(event: EventHandlerParameters<'im.message.message_read_v1'>) {
     const { reader, message_id_list } = event;

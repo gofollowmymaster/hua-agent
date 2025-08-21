@@ -41,7 +41,7 @@ export class FeishuReceiveCallback {
     if (message_type !== 'text') return;
     const { text: content } = JSON.parse(msgContent);
     const handler = this.getHandler(content).bind(this);
-    handler(event);
+    await handler(event);
 
     return 'ok';
   }
@@ -100,41 +100,38 @@ export class FeishuReceiveCallback {
       return;
     }
     const issue = await this.getIssueInfo(issueId);
-    if (!issue) {
+    console.log('[ issue ] >', issue.fields['话题信息']);
+    if (!issue?.fields['话题信息']?.[0]?.length) {
       this.messageHelper.createToUser(
         {
           receive_id: userId,
           msg_type: 'text',
           content: JSON.stringify({
-            text: `抱歉issue Id为${issueId} 的问题不存在`,
+            text: `抱歉issueId为${issueId} 的问题不存在`,
           }),
         },
         'open_id',
       );
       return;
     }
-    try {
-      const threadInfo = JSON.parse(
-        (issue.fields['话题信息']?.[0]?.text || '') as string,
+    const threadInfo = JSON.parse(
+      (issue.fields['话题信息']?.[0]?.text || '') as string,
+    );
+    const threadId = threadInfo.threadId;
+    if (!threadId) {
+      this.messageHelper.createToUser(
+        {
+          receive_id: userId,
+          msg_type: 'text',
+          content: JSON.stringify({
+            text: `抱歉issue Id为${issueId} 的问题当前没有记录到话题信息`,
+          }),
+        },
+        'open_id',
       );
-      const threadId = threadInfo.threadId;
-      if (!threadId) {
-        this.messageHelper.createToUser(
-          {
-            receive_id: userId,
-            msg_type: 'text',
-            content: JSON.stringify({
-              text: `抱歉issue Id为${issueId} 的问题当前没有记录到话题信息`,
-            }),
-          },
-          'open_id',
-        );
-        return;
-      }
-      threadId &&
-        (await this.messageHelper.forwardThread(userId, threadId, 'open_id'));
-    } catch (e) {
-      this.logger.error(e.message);
+      return;
     }
+    threadId &&
+      (await this.messageHelper.forwardThread(userId, threadId, 'open_id'));
   }
 }

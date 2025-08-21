@@ -39,7 +39,6 @@ export class PageErrorService extends ErrorBaseService {
   async errorHookHandler(errorEvent: PageAlertEvent) {
     await this.setErrorEvent(errorEvent);
     this.errorHandler();
-    // console.log('[ res ] >', res);
   }
 
   protected async writeToTable(errorEvent: PageAlertEvent) {
