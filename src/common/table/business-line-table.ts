@@ -35,24 +35,30 @@ class FeishuBusinessLineTable extends FeishuTable {
         },
       ],
     });
+
     if (res.items?.length < 1) {
       console.log('[ res ] >', res);
       throw new FeishuApiException(`未找到对应的业务线: ${projectName}`, 501);
     }
-    const frontendLeaderId = res.items[0].fields['前端leader'][0].id;
-    const frontendAlertGroupId = res.items[0].fields['前端监控群'][0].id;
-    const frontendGroupId = res.items[0].fields['前端组织群'][0].id;
-    const backendLeaderId = res.items[0].fields['后端leader'][0].id;
+    const frontendLeaderId = res.items[0].fields['前端leader']?.[0].id;
+    const frontendLeaderName = res.items[0].fields['前端leader'][0].name;
+
+    const frontendAlertGroupId = res.items[0].fields['前端监控群']?.[0].id;
+    const frontendGroupId = res.items[0].fields['前端组织群']?.[0].id;
+    const backendLeaderId = res.items[0].fields['后端leader']?.[0].id;
+    const backendLeaderName = res.items[0].fields['后端leader'][0].name;
+
     const backendAlertGroupId = res.items[0].fields['接口告警群']?.[0]?.id;
     const feishuProjectUrl = res.items[0].fields['飞书项目地址'];
     const bu = res.items[0].fields['业务线']?.[0]?.text;
+
     return {
       frontendLeaderId,
-      frontendLeaderName: res.items[0].fields['前端leader'][0].name,
+      frontendLeaderName,
       frontendAlertGroupId,
       frontendGroupId,
       backendLeaderId,
-      backendLeaderName: res.items[0].fields['后端leader'][0].name,
+      backendLeaderName,
       backendAlertGroupId,
       feishuProjectUrl,
       bu,
