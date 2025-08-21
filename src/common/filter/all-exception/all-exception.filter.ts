@@ -29,7 +29,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message,
       path,
     };
-
     sendExceptionToFeishu(exception, reqContext);
 
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
