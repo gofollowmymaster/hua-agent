@@ -12,13 +12,14 @@ import {
   ErrorLevel,
   IssueAction,
   IssueEvent,
-  PageAlertEvent,
-  RequestAlertEvent,
 } from '../common/type/alert';
 import dayjs from 'dayjs';
 import CommonAlertCard from '@src/common/feishu/card/alert-card';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
-import { FeishuMsgType } from '@src/common/feishu/type/im';
+import {
+  FeishuMessageCreateReturnBody,
+  FeishuMsgType,
+} from '@src/common/feishu/type/im';
 import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
 import { PageErrorService } from '../common/service/page-error-service';
 import { RequestErrorService } from '../common/service/request-error-service';
@@ -121,27 +122,19 @@ export class SentryWebhookService {
     });
   }
   async error(eventData: AlertEvent) {
-    let res;
     const service = await this.getServiceByEndPort(eventData.errorEndpoint);
 
-    switch (eventData.errorEndpoint) {
-      case ErrorEndpoint.Page:
-        res = await service.errorHookHandler(eventData as PageAlertEvent);
-        break;
-      case ErrorEndpoint.Server:
-        res = await service.errorHookHandler(eventData as RequestAlertEvent);
-        break;
-    }
+    const res = await service.errorHookHandler(eventData);
 
     //按前端业务模块3min 内超过10次告警，发送额外致命错误
     const isTooManyWarning = await this.redisService.limiter(
-      eventData.pageModuleName,
+      this.buildhighFrequencyKey(eventData),
       10,
       60 * 5,
     );
 
     if (isTooManyWarning) {
-      this.highFrequencyAlertMsg(eventData);
+      this.highFrequencyAlertMsg(service, eventData);
     }
     return res;
   }
@@ -179,18 +172,51 @@ export class SentryWebhookService {
     sendExceptionToFeishu(new Error(JSON.stringify(params)));
   }
 
+  buildhighFrequencyKey(errorEvent: AlertEvent) {
+    return errorEvent.errorEndpoint == ErrorEndpoint.Page
+      ? `${errorEvent.errorEndpoint}:${errorEvent.pageModuleName}`
+      : `${errorEvent.errorEndpoint}:${errorEvent.serverModuleName}`;
+  }
   /**
    * 高频错误报警
    * @param alertInfo
    */
-  async highFrequencyAlertMsg(errorEvent: AlertEvent) {
+  async highFrequencyAlertMsg(
+    service: ErrorBaseService,
+    errorEvent: AlertEvent,
+  ) {
     // await this.alertFeishuAdapter.setEvent(errorEvent);
-
+    const key = RedisKeys.SENTRY_ALERT_COUNT_FREQUENCY.replace(
+      '{module}',
+      this.buildhighFrequencyKey(errorEvent),
+    );
+    const msgInfo: FeishuMessageCreateReturnBody =
+      await this.redis.hgetall(key);
+    if (msgInfo.message_id) {
+      this.messageHelper.replyInThread(
+        JSON.stringify({
+          zh_cn: {
+            content: [
+              [
+                {
+                  tag: 'md',
+                  text: `<at user_id="all"></at>有新的错误发生`,
+                },
+              ],
+            ],
+          },
+        }),
+        msgInfo.message_id,
+        FeishuMsgType.Post,
+      );
+      return;
+    }
+    //发送加急消息
     const msgData = {
       ...errorEvent,
-      rawData: {},
       level: ErrorLevel.FATAL,
-      content: '最近3分钟内报错数超过10个,请及时处理',
+      message: '当前系统最近5分钟内报错数超过10个,请及时处理',
+      content: '',
       timestamp: dayjs().valueOf(),
     };
     const content = CommonAlertCard.buildCardMsg({
@@ -199,11 +225,13 @@ export class SentryWebhookService {
         errorEvent?.errorEndpoint === ErrorEndpoint.Page
           ? errorEvent.pageModuleName
           : errorEvent.serverModuleName,
-      errorType: '高频报错提醒',
+      title: '高频报错提醒',
       linkUrl:
         'https://cloud.elnkpro.com:9000/organizations/aplus-frontend-team/issues/?query=is%3Aunresolved%20issue.priority%3A%5Bhigh%2C%20medium%5D%20event.timestamp%3A-1h&referrer=issue-list&statsPeriod=14d',
     });
     // 异步发送飞书消息
-    this.errorAlertService.sendFsAlertMsg(msgData, content);
+    const groupMsgInfo = await service.sendFsAlertMsg(msgData, content);
+    this.redis.hset(key, groupMsgInfo);
+    this.redis.expire(key, 60 * 30);
   }
 }

@@ -48,6 +48,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
       this.logger.info('[ ignore this error ] >', this.errorEvent.issueId);
       return;
     }
+    if (this.errorEvent.level === 'info') return;
 
     const key = RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace(
       '{issueId}',

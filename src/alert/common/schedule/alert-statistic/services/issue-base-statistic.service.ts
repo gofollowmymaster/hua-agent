@@ -153,9 +153,12 @@ export default class IssueStatisticService {
   async pushIssueCardToUser(
     businessLine: string,
     userId: string,
-    period: OpUnitType = 'day',
+    period: string,
   ) {
+    period = period.slice(0, 10);
     const towdayStart = dayjs(period).startOf('day').valueOf();
+
+    console.log('[ towdayStart ] >', towdayStart, period);
 
     const filter: BitTableFilter = {
       conjunction: 'and',

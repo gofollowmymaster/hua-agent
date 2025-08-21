@@ -4,6 +4,11 @@ export type FeishuMessageCreateParams = Parameters<
   lark.Client['im']['message']['create']
 >;
 
+export type FeishuMessageCreateReturn = Awaited<
+  ReturnType<lark.Client['im']['message']['create']>
+>;
+export type FeishuMessageCreateReturnBody = FeishuMessageCreateReturn['data'];
+
 export enum FeishuMsgType {
   Text = 'text',
   Post = 'post',

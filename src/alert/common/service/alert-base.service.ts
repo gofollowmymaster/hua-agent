@@ -21,6 +21,7 @@ import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import { firstValueFrom } from 'rxjs';
 import * as lark from '@larksuiteoapi/node-sdk';
 import { HttpService } from '@nestjs/axios';
+import { FeishuMsgType } from '@src/common/feishu/type/im';
 
 @Injectable()
 export abstract class AlertBaseService extends BaseService {
@@ -90,7 +91,7 @@ export abstract class AlertBaseService extends BaseService {
     const urgentType = isNeedSendAlertMsg(alertInfo.timestamp)
       ? 'Phone'
       : 'App';
-    const { userId: feishuUserId } = await this.getGroupAndUserByProject(
+    const { fUserId: feishuUserId } = await this.getGroupAndUserByProject(
       alertInfo.pageModuleName,
       alertInfo.environment,
     );
@@ -148,6 +149,23 @@ export abstract class AlertBaseService extends BaseService {
     });
     this.logger.info(alertMsgInfo);
 
+    this.messageHelper.replyInThread(
+      JSON.stringify({
+        zh_cn: {
+          content: [
+            [
+              {
+                tag: 'md',
+                text: `已发送加急消息给<at user_id="${userId}"></at>`,
+              },
+            ],
+          ],
+        },
+      }),
+      fMessageId,
+      FeishuMsgType.Post,
+    );
+
     //每1分钟查看消息是否已读
     return await addRetryJob(
       async () => {
@@ -189,7 +207,8 @@ export abstract class AlertBaseService extends BaseService {
     if (environment == 'dev' || environment == 'development') {
       return {
         groupId: this.config.getOrThrow('FeishuMsgDebugGroupId'),
-        userId: this.config.getOrThrow('DefaultAlertFeishuUserId'),
+        fUserId: this.config.getOrThrow('DefaultAlertFeishuUserId'),
+        bUserId: this.config.getOrThrow('DefaultAlertFeishuUserId'),
       };
     }
 
@@ -197,7 +216,8 @@ export abstract class AlertBaseService extends BaseService {
       // uat、test 环境使用的飞书群组
       return {
         groupId: 'oc_b69c0e3bf64478075363125e4fd32507',
-        userId: this.config.getOrThrow('DefaultAlertFeishuUserId'),
+        fUserId: this.config.getOrThrow('DefaultAlertFeishuUserId'),
+        bUserId: this.config.getOrThrow('DefaultAlertFeishuUserId'),
       };
     }
 
@@ -205,11 +225,14 @@ export abstract class AlertBaseService extends BaseService {
      * 解码并处理有空格的情况
      */
     const projectName = decodeURIComponent(pageModuleName).trim();
-    const { frontendAlertGroupId: groupId, frontendLeaderId: userId } =
-      await this.feishuBusinessLineTable.getBusinessLineBySubapp(projectName);
-    console.log('[ projectName ] >', projectName, userId);
+    const {
+      frontendAlertGroupId: groupId,
+      frontendLeaderId: fUserId,
+      backendLeaderId: bUserId,
+    } = await this.feishuBusinessLineTable.getBusinessLineBySubapp(projectName);
     return {
-      userId,
+      fUserId,
+      bUserId,
       groupId,
     };
   }

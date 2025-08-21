@@ -16,6 +16,6 @@ export enum RedisKeys {
   RATE_LIMITER = RedisPrefixLimiter + '{key}',
   REDIS_IDEMPOTENT = RedisPrefixIdempotent + '{key}',
   SENTRY_ALERT_COUNT_ISSUE = SentryAlertPrefix + 'issue-error-count:{issueId}',
-  SENTRY_ALERT_COUNT_FREQUENCY = SentryAlertPrefix + 'issue-error-frequency',
+  SENTRY_ALERT_COUNT_FREQUENCY = SentryAlertPrefix + 'error-frequency:{module}',
   FEISHU_API_CACHE = FeishuApiPrefix + '{apiName}',
 }

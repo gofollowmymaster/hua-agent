@@ -2,7 +2,11 @@ import FeishuClient from '../clients/client';
 // import { ConfigService } from '@nestjs/config';
 import { FEISHU_CLIENT_ID } from './constants';
 import { Inject, Injectable, Scope } from '@nestjs/common';
-import { CreateMessageType, FeishuMsgType } from '../type/im';
+import {
+  CreateMessageType,
+  FeishuMessageCreateReturnBody,
+  FeishuMsgType,
+} from '../type/im';
 import FeishuApiHelper from './feishu-api-helper';
 import { UserIdType } from '../type/contact';
 // import { HttpService } from '@nestjs/axios';
@@ -13,7 +17,9 @@ class FeishuMessageHelper extends FeishuApiHelper {
     super();
   }
 
-  async create(msgParams: CreateMessageType) {
+  async create(
+    msgParams: CreateMessageType,
+  ): Promise<FeishuMessageCreateReturnBody> {
     return await this.requestWrapper(async () => {
       return await this.client.client.im.message.create(msgParams);
     }, 'message-create');

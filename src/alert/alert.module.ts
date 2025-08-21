@@ -33,6 +33,7 @@ import PageIssueStatisticService from './common/schedule/alert-statistic/service
 import ClearAlertPerDayService from './common/schedule/clear-alert-issue';
 import PageClearIssueService from './common/schedule/clear-alert-issue/services/page-issue.service';
 import RequestClearIssueService from './common/schedule/clear-alert-issue/services/request-issue.service';
+import { FeishuReceiveCallback } from './event/handler/receive-handler';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import RequestClearIssueService from './common/schedule/clear-alert-issue/servic
     ClearAlertPerDayService,
     PageClearIssueService,
     RequestClearIssueService,
+    FeishuReceiveCallback,
   ],
   exports: [
     AlertMsgService,
