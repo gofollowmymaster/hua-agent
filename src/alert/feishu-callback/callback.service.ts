@@ -13,13 +13,9 @@ import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
 import { CommonErrorService } from '../common/service/error-common.service';
 import { RequestErrorService } from '../common/service/request-error-service';
 import { PageErrorService } from '../common/service/page-error-service';
-import { RedisKeys } from '@src/common/const/redis-key.enum';
-import { ErrorBaseService } from '../common/service/error-base.service';
-import { ErrorEndpoint } from '../common/type/alert';
 import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolve-card';
 import { CardCallbackReturnType } from '@src/common/feishu/type/card';
 import AlertStatisticService from '../common/schedule/alert-statistic';
-import { PushIssueCardToUserParams } from '../common/type/sentry';
 
 @Injectable()
 export class FeishuCallbackService extends CommonErrorService {

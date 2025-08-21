@@ -50,5 +50,5 @@ export class FeishuEventCallbackDto extends FeishuEventCallbackBase {
     type: Object,
     description: '事件主体信息',
   })
-  event: Record<string, any>;
+  event: any;
 }

@@ -445,5 +445,5 @@ export type PushIssueCardToUserParams = {
   businessLine: businessLine;
   errorEndpoint: ErrorEndpoint;
   userId: string;
-  period: OpUnitType;
+  period: string;
 };

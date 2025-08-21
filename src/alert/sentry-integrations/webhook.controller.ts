@@ -23,8 +23,6 @@ import {
   IssueAction,
   PageModuleName,
 } from '../common/type/alert';
-import { RedisService } from '@src/common/service/redis/redis.service';
-import Redis from 'ioredis';
 
 import { SentryApiService } from '../common/service/sentry-api-service';
 @ApiTags('Sentry WebHook')
@@ -53,13 +51,13 @@ import { SentryApiService } from '../common/service/sentry-api-service';
   },
 ])
 export class SentryWebhookController {
-  private readonly redis: Redis;
+  // private readonly redis: Redis;
   constructor(
     private readonly sentryWebhookService: SentryWebhookService,
-    protected readonly redisService: RedisService,
+    // protected readonly redisService: RedisService,
     protected readonly sentryApiService: SentryApiService,
   ) {
-    this.redis = redisService.getClient();
+    // this.redis = redisService.getClient();
   }
 
   @ApiOperation({

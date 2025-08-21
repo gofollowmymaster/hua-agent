@@ -39,7 +39,7 @@ export default class AlertStatisticService {
     businessLine,
     errorEndpoint,
     userId,
-    period = 'day',
+    period,
   }: PushIssueCardToUserParams) {
     if (errorEndpoint === ErrorEndpoint.Page) {
       this.pageIssueService.pushIssueCardToUser(businessLine, userId, period);
