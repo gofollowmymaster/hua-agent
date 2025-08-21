@@ -12,7 +12,7 @@ export class GlobalExceptionHandlerModule implements OnApplicationBootstrap {
       '[ process.uncaughtException>',
       process.listeners('uncaughtException').length,
     );
-    if (!process.listeners('unhandledRejection').length) {
+    if (process.listeners('unhandledRejection').length < 2) {
       process.on('unhandledRejection', (reason, promise) => {
         console.error('-------Unhandled Rejection at:', reason);
         promise.catch((error: Error) => {
@@ -21,7 +21,7 @@ export class GlobalExceptionHandlerModule implements OnApplicationBootstrap {
       });
     }
 
-    if (!process.listeners('uncaughtException').length) {
+    if (process.listeners('uncaughtException').length < 2) {
       process.on('uncaughtException', (error: Error) => {
         sendExceptionToFeishu(error);
         // 可能需要优雅地关闭应用
