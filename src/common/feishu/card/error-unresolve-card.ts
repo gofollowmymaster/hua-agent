@@ -11,26 +11,22 @@ export type UnresolvedCardData = {
   color?: string;
   content: string;
   count?: number;
-  // status: IssueStatus;
-  status: IssueStatusLabel;
+  status: IssueStatusEnum;
   issueId: string;
   environment: string;
   [key: string]: any;
 };
-export type IssueStatus = keyof typeof issueStatusMap;
-// export type IssueStatusLabel = keyof typeof issueStatusMap;
-export type IssueStatusLabel =
-  (typeof issueStatusMap)[keyof typeof issueStatusMap];
 
-export const issueStatusMap = {
-  unresolved: '待处理',
-  resolved: '已解决',
-  ignoreCount100: '暂时忽略',
-  ignoreCount1000: '已忽略',
-  progressing: '处理中',
-  reopened: '重新打开',
-  closed: '已关闭',
-} as const;
+export enum IssueStatusEnum {
+  unresolved = '待处理',
+  resolved = '已解决',
+  ignoreCount100 = '暂时忽略',
+  // ignoreCount1000 = '已忽略',
+  progressing = '处理中',
+  reopened = '重新打开',
+  closed = '已关闭',
+}
+
 export default class ErrorUnresolvedCard extends FeishuCard {
   static readonly templateId = 'AAqz6VqUmrfDw';
   static readonly templateVersion = '1.0.23';
@@ -47,7 +43,7 @@ export default class ErrorUnresolvedCard extends FeishuCard {
       color: ErrorUnresolvedCard.getColor(alertInfo.status),
     });
   };
-  static getColor(status: IssueStatusLabel) {
+  static getColor(status: IssueStatusEnum) {
     return {
       待处理: 'red',
       重新激活: 'red',
@@ -57,7 +53,7 @@ export default class ErrorUnresolvedCard extends FeishuCard {
       已关闭: 'green',
     }[status];
   }
-  static statusOptions(status: IssueStatusLabel) {
+  static statusOptions(status: IssueStatusEnum) {
     return {
       待处理: [
         {

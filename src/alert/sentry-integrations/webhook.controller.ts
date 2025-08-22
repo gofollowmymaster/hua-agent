@@ -138,7 +138,7 @@ export class SentryWebhookController {
     const alertError = params.data.error;
     if (await this.sentryApiService.isIssueIgnored(alertError.issue_id)) {
       console.log('issue is ignored');
-      return;
+      // return;
     }
 
     const requestData = alertError.extra?.__serialized__;

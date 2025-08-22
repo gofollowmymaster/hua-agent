@@ -158,8 +158,6 @@ export default class IssueStatisticService {
     period = period.slice(0, 10);
     const towdayStart = dayjs(period).startOf('day').valueOf();
 
-    console.log('[ towdayStart ] >', towdayStart, period);
-
     const filter: BitTableFilter = {
       conjunction: 'and',
       conditions: [
@@ -190,7 +188,6 @@ export default class IssueStatisticService {
         ) && item.fields['话题信息'],
     );
     for (const issue of issues) {
-      console.log('[ issue ] >', JSON.stringify(issue));
       const threadInfo = JSON.parse(
         issue.fields['话题信息']?.[0].text as string,
       );

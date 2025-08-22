@@ -1,4 +1,4 @@
-import { IssueStatusLabel } from '@src/common/feishu/card/error-unresolve-card';
+import { IssueStatusEnum } from '@src/common/feishu/card/error-unresolve-card';
 
 export type ApiAlertTableDto = {
   接口地址: string;
@@ -37,7 +37,7 @@ export type ApiAlertIssueTableDto = {
   日错误次数: number;
   IssueId: string;
   外部链接: string;
-  状态: IssueStatusLabel;
+  状态: IssueStatusEnum;
 };
 
 export type FrontendAlertTableDto = {
@@ -74,7 +74,7 @@ export type FrontendAlertIssueTableDto = {
   日错误次数: number;
   IssueId: string;
   外部链接: string;
-  状态: IssueStatusLabel;
+  状态: IssueStatusEnum;
 };
 // interface FeishuUser {
 //   id: string;

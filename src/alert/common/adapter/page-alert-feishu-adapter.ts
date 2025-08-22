@@ -6,7 +6,7 @@ import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { Injectable, Scope } from '@nestjs/common';
 import { PageAlertEvent } from '@src/alert/common/type/alert';
 import {
-  issueStatusMap,
+  IssueStatusEnum,
   UnresolvedCardData,
 } from '@src/common/feishu/card/error-unresolve-card';
 import dayjs from 'dayjs';
@@ -64,7 +64,7 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       日错误次数: 1,
       IssueId: this.event.issueId,
       外部链接: this.event.issueUrl,
-      状态: '待处理',
+      状态: IssueStatusEnum.unresolved,
     };
   }
   toAplusAlertCardeData(): UnresolvedCardData {
@@ -86,7 +86,7 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
           ? this.event.title + ' ' + this.event.message
           : this.event.title,
       count: 1,
-      status: issueStatusMap['unresolved'],
+      status: IssueStatusEnum['unresolved'],
       issueId: this.event.issueId,
       errorTime: dayjs(this.event.timestamp * 1000).format(
         'YYYY-MM-DD HH:mm:ss',

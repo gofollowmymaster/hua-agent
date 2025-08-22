@@ -1,7 +1,6 @@
 import { CustomCallbackHandleType } from '.';
 import ErrorUnresolvedCard, {
-  IssueStatus,
-  issueStatusMap,
+  IssueStatusEnum,
   UnresolvedCardData,
 } from '@src/common/feishu/card/error-unresolve-card';
 import ErrorResolvedCard from '@src/common/feishu/card/error-resolved-card';
@@ -34,7 +33,7 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
   } as ModifyStatusEvent);
 
   if (issueCardData) {
-    const statusLabel = issueStatusMap[issueStatus];
+    const statusLabel = IssueStatusEnum[issueStatus];
     let cardReturn: CardReturnType<UnresolvedCardData> = {
       type: 'template',
       data: {
@@ -49,16 +48,13 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
       },
     };
     if (
-      ['resolved', 'ignoreCount100', 'ignoreCount1000'].includes(
-        issueStatus as IssueStatus,
-      )
+      ['resolved', 'ignoreCount100', 'ignoreCount1000'].includes(issueStatus)
     ) {
       //修改sentry
 
       handerService.sentryService.updateIssue(
         {
-          status: issueStatus as IssueStatus,
-          // assignee: assignToUserId,
+          status: issueStatus as IssueStatusEnum,
         },
         issueCardData.issueId,
       );
@@ -70,7 +66,7 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
           template_version_name: ErrorResolvedCard.templateVersion,
           template_variable: {
             ...issueCardData,
-            status: issueStatusMap[issueStatus],
+            status: IssueStatusEnum[issueStatus],
             statusOptions: [],
           },
         },

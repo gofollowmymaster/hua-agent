@@ -15,6 +15,7 @@ import { ErrorBaseService } from './error-base.service';
 import RequestAlertFeishuAdapter from '../adapter/request-alert-feishu-adapter';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { Injectable } from '@nestjs/common';
+import { IssueStatusEnum } from '@src/common/feishu/card/error-unresolve-card';
 export const ignoreCodeList = ['401', '10002', '408'];
 
 @Injectable()
@@ -87,7 +88,7 @@ export class RequestErrorService extends ErrorBaseService {
       if (issueRes.total == 0) {
         const issue = this.alertFeishuAdapter.toApiAlertIssueTableData();
         if (this.isIgnoreThisError()) {
-          issue['状态'] = '暂时忽略';
+          issue['状态'] = IssueStatusEnum.ignoreCount100;
         }
         await this.feishuApiIssueTable.create(issue);
       } else {
@@ -96,6 +97,7 @@ export class RequestErrorService extends ErrorBaseService {
         await this.feishuApiIssueTable.update(recordId, {
           错误次数: (fields['错误次数'] as number) + 1,
           日错误次数: (fields['日错误次数'] as number) + 1,
+          状态: this.getStatusThenError(fields['状态'] as IssueStatusEnum),
         });
       }
     } catch (err) {
