@@ -15,6 +15,7 @@ import PageAlertFeishuAdapter from '../adapter/page-alert-feishu-adapter';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { ErrorBaseService } from './error-base.service';
 import { Injectable } from '@nestjs/common';
+import { IssueStatusEnum } from '@src/common/feishu/card/error-unresolve-card';
 
 @Injectable()
 export class PageErrorService extends ErrorBaseService {
@@ -81,7 +82,7 @@ export class PageErrorService extends ErrorBaseService {
       if (total == 0) {
         const issue = this.alertFeishuAdapter.toFrontendAlertIssueTableData();
         if (this.isIgnoreThisError()) {
-          issue['状态'] = '暂时忽略';
+          issue['状态'] = IssueStatusEnum.ignoreCount100;
         }
 
         issueRecord = await this.feishuFrontendIssueTable.create(issue);
@@ -90,7 +91,7 @@ export class PageErrorService extends ErrorBaseService {
         issueRecord = await this.feishuFrontendIssueTable.update(recordId, {
           错误次数: (fields['错误次数'] as number) + 1,
           日错误次数: (fields['日错误次数'] as number) + 1,
-          状态: fields['状态'] == '已关闭' ? '重新打开' : fields['状态'],
+          状态: this.getStatusThenError(fields['状态'] as IssueStatusEnum),
         });
       }
 
@@ -101,6 +102,7 @@ export class PageErrorService extends ErrorBaseService {
 
     return issueRecord.record;
   }
+  // get
 
   async updateTable(issue_id: string, recordNew: Record<string, any>) {
     const table = this.feishuFrontendIssueTable;

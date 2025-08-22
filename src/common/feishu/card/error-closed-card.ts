@@ -1,4 +1,4 @@
-import { IssueStatus } from './error-unresolve-card';
+import { IssueStatusEnum } from './error-unresolve-card';
 import { FeishuCard } from './feishu-card';
 
 export type ResolvedCardData = {
@@ -12,7 +12,7 @@ export type ResolvedCardData = {
   color?: string;
   content: string;
   count?: number;
-  status: IssueStatus;
+  status: IssueStatusEnum;
   issueId: string;
   environment: string;
   [key: string]: any;

@@ -1,6 +1,5 @@
-import dayjs from 'dayjs';
 import { FeishuCard } from './feishu-card';
-import { IssueStatus } from './error-unresolve-card';
+import { IssueStatusEnum } from './error-unresolve-card';
 
 export type ResolvedCardData = {
   project: string;
@@ -13,7 +12,7 @@ export type ResolvedCardData = {
   color?: string;
   content: string;
   count?: number;
-  status: IssueStatus;
+  status: IssueStatusEnum;
   issueId: string;
   environment: string;
   [key: string]: any;

@@ -8,7 +8,7 @@ import {
 } from '../type/alert';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import ErrorUnresolvedCard, {
-  issueStatusMap,
+  IssueStatusEnum,
   UnresolvedCardData,
 } from '@src/common/feishu/card/error-unresolve-card';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
@@ -41,7 +41,20 @@ export abstract class ErrorBaseService extends AlertBaseService {
   protected abstract writeToTable(errorEvent: AlertEvent);
   abstract errorHookHandler(alertInfo: AlertEvent);
   abstract updateTable(issueId: string, recordNew: Record<string, any>);
-
+  /**
+   * 新的错误发生时，获取issue的新状态
+   * @param currentStatus
+   * @returns
+   */
+  getStatusThenError(currentStatus: IssueStatusEnum) {
+    return [
+      IssueStatusEnum.closed,
+      IssueStatusEnum.resolved,
+      IssueStatusEnum.ignoreCount100,
+    ].includes(currentStatus)
+      ? IssueStatusEnum.reopened
+      : currentStatus;
+  }
   protected async errorHandler() {
     const eventRecord = await this.writeToTable(this.errorEvent);
     if (this.isIgnoreThisError()) {
@@ -83,7 +96,8 @@ export abstract class ErrorBaseService extends AlertBaseService {
     });
 
     let messageText = `错误再次被触发，累计发生**${count}**次,[查看详情](${eventRecord.recordUrl}) `;
-    if (['已解决', '暂时忽略'].includes(issueCardData.status)) {
+    const issueStatusNew = this.getStatusThenError(issueCardData.status);
+    if (issueStatusNew === IssueStatusEnum.reopened) {
       messageText = `<at user_id="${issueCardData.userId}"></at>错误被重新打开,请及时排查,[查看详情](${eventRecord.recordUrl}) `;
       //更新卡片信息  激活
       this.updateByCard(issueCardData.messageId, {
@@ -94,15 +108,17 @@ export abstract class ErrorBaseService extends AlertBaseService {
             template_version_name: ErrorUnresolvedCard.templateVersion,
             template_variable: {
               ...issueCardData,
-              status: '重新打开',
+              status: IssueStatusEnum.reopened,
               color: 'red',
-              statusOptions: ErrorUnresolvedCard.statusOptions('待处理'),
+              statusOptions: ErrorUnresolvedCard.statusOptions(
+                IssueStatusEnum.unresolved,
+              ),
             },
           },
         }),
       });
       await this.updateIssueCardDataInCache(this.errorEvent.issueId, {
-        status: '重新打开',
+        status: IssueStatusEnum.reopened,
       });
     }
 
@@ -164,7 +180,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
     const issueInfo = await this.checkIssueInCache(eventData.issueId);
     if (issueInfo.messageId) {
       this.updateIssueCardDataInCache(eventData.issueId, {
-        status: issueStatusMap[eventData.issueStatus],
+        status: IssueStatusEnum[eventData.issueStatus],
       });
 
       this.messageHelper.replyInThread(
@@ -175,7 +191,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
                 {
                   tag: 'md',
                   text: `<at user_id="${eventData.operator}"></at>将问题状态修改为 **${
-                    issueStatusMap[eventData.issueStatus] ||
+                    IssueStatusEnum[eventData.issueStatus] ||
                     eventData.issueStatus
                   }**`,
                 },
@@ -188,7 +204,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
       );
     }
 
-    const statusLabel = issueStatusMap[eventData.issueStatus];
+    const statusLabel = IssueStatusEnum[eventData.issueStatus];
 
     this.updateTable(issueInfo.issueId, {
       //  状态:issueInfo
@@ -202,9 +218,13 @@ export abstract class ErrorBaseService extends AlertBaseService {
       this.updateIssueCardDataInCache(eventData.issueId, {
         reason: eventData.reason,
         solution: eventData.solution,
-        status: issueInfo.status == '已解决' ? '已关闭' : issueInfo.status,
+        status:
+          issueInfo.status == IssueStatusEnum.resolved
+            ? IssueStatusEnum.closed
+            : issueInfo.status,
       });
-      const statusAction = issueInfo.status == '已解决' ? '关闭🎉🎉' : '忽略';
+      const statusAction =
+        issueInfo.status == IssueStatusEnum.resolved ? '关闭🎉🎉' : '忽略';
       const message = `<at user_id="${eventData.operator}"></at>将本问题${statusAction}\n【问题原因】${eventData.reason}\n【处理方法】${eventData.solution}`;
       this.messageHelper.replyInThread(
         JSON.stringify({

@@ -5,7 +5,10 @@ import {
 import { CustomCallbackHandleType } from '.';
 
 import ErrorClosedCard from '@src/common/feishu/card/error-closed-card';
-import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolve-card';
+import {
+  IssueStatusEnum,
+  UnresolvedCardData,
+} from '@src/common/feishu/card/error-unresolve-card';
 
 const CloseHandler: CustomCallbackHandleType = async (
   event,
@@ -31,7 +34,9 @@ const CloseHandler: CustomCallbackHandleType = async (
   let cardReturn: CardReturnType<UnresolvedCardData>;
   if (issueCardData) {
     const statusLabel =
-      issueCardData.status === '暂时忽略' ? issueCardData.status : '已关闭';
+      issueCardData.status === IssueStatusEnum.ignoreCount100
+        ? issueCardData.status
+        : IssueStatusEnum.closed;
     cardReturn = {
       type: 'template',
       data: {
@@ -42,7 +47,8 @@ const CloseHandler: CustomCallbackHandleType = async (
           status: statusLabel,
           reason,
           solution,
-          color: statusLabel === '暂时忽略' ? 'blue' : 'green',
+          color:
+            statusLabel === IssueStatusEnum.ignoreCount100 ? 'blue' : 'green',
         },
       },
     };
