@@ -1,5 +1,6 @@
 import { CustomCallbackHandleType } from '.';
 import ErrorUnresolvedCard, {
+  IssueStatus,
   IssueStatusEnum,
   UnresolvedCardData,
 } from '@src/common/feishu/card/error-unresolve-card';
@@ -54,7 +55,7 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
 
       handerService.sentryService.updateIssue(
         {
-          status: issueStatus as IssueStatusEnum,
+          status: issueStatus as IssueStatus,
         },
         issueCardData.issueId,
       );

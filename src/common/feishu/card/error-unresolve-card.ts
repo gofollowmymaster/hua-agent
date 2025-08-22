@@ -26,6 +26,7 @@ export enum IssueStatusEnum {
   reopened = '重新打开',
   closed = '已关闭',
 }
+export type IssueStatus = keyof typeof IssueStatusEnum;
 
 export default class ErrorUnresolvedCard extends FeishuCard {
   static readonly templateId = 'AAqz6VqUmrfDw';
