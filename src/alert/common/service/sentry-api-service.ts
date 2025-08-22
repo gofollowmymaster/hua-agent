@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { IssueStatusEnum } from '@src/common/feishu/card/error-unresolve-card';
+import { IssueStatus } from '@src/common/feishu/card/error-unresolve-card';
 import { firstValueFrom } from 'rxjs';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import {
@@ -12,7 +12,7 @@ import {
 } from '../type/sentry';
 
 type UpdateIssueParams = {
-  status?: IssueStatusEnum;
+  status?: IssueStatus;
 
   assignedTo?: string;
   hasSeen?: boolean;
@@ -36,7 +36,7 @@ export class SentryApiService {
   dataAdapter(params: UpdateIssueParams): UpdateIssueOriginParams {
     let status,
       statusDetails = {} as IssueStatusDetailsType;
-    if (params.status == IssueStatusEnum.ignoreCount100) {
+    if (params.status == 'ignoreCount100') {
       status = 'ignored';
       statusDetails = {
         ignoreCount: 50,
