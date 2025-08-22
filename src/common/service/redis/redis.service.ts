@@ -63,7 +63,7 @@ export class RedisService {
     const key = RedisKeys.REDIS_IDEMPOTENT.replace('{key}', tag);
     const eventHandleStatus = await this.redis.get(key);
     if (!eventHandleStatus) {
-      await this.redis.setex(key, 'handling', expireTime);
+      await this.redis.setex(key, expireTime, 'handling');
     } else if (['handling', 'handled'].includes(eventHandleStatus)) {
       this.logger.info(tag + '在当前时间段已经被处理过');
       return;
@@ -72,9 +72,9 @@ export class RedisService {
     try {
       res = await handle();
       console.log('[ res ] >', res);
-      this.redis.setex(key, 'handled', expireTime);
+      this.redis.setex(key, expireTime, 'handled');
     } catch (error) {
-      this.redis.setex(key, 'failed', expireTime);
+      this.redis.setex(key, expireTime, 'failed');
       sendExceptionToFeishu(error);
     } finally {
       return res;
