@@ -165,7 +165,7 @@ export class SentryWebhookService {
    * @returns
    */
   async alert(params: SentryHookDto) {
-    return;
+    // return;
     sendExceptionToFeishu(new Error(JSON.stringify(params)));
   }
   async installation(params: SentryHookDto) {
