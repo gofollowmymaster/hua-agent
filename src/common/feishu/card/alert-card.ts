@@ -16,7 +16,7 @@ export type CommonCardData = {
 };
 export class CommonAlertCard extends FeishuCard {
   protected static templateId = 'AAqSyNBCovM2j';
-  protected static templateVersion = '1.0.13';
+  protected static templateVersion = '1.0.14';
 
   /**
    * 构建飞书报警卡片消息
@@ -33,6 +33,7 @@ export class CommonAlertCard extends FeishuCard {
         ? alertInfo.timestamp * 1000
         : alertInfo.timestamp;
     const errorTime = dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss');
+
     return super.build({ ...alertInfo, color, title, errorTime });
   };
 }
