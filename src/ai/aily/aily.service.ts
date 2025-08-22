@@ -50,7 +50,7 @@ export class AilyService {
       '{code}',
       params.code,
     );
-    await this.redis.setex(key, params.sessionId, 60 * 60 * 24);
+    await this.redis.setex(key, 60 * 60 * 24, params.sessionId);
     return;
   }
   async verifySession(params: BindSessionCodeDto) {
