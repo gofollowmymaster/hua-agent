@@ -75,7 +75,6 @@ export class FeishuReceiveCallback {
     if (!userId) return;
 
     const issueId = content.replace('issue:', '');
-    // this.pushIssueCardToUser(issueId, sender.sender_id?.open_id);
 
     const issueInCache = (await this.redis.hgetall(
       RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),
@@ -100,8 +99,7 @@ export class FeishuReceiveCallback {
       return;
     }
     const issue = await this.getIssueInfo(issueId);
-    console.log('[ issue ] >', issue.fields['话题信息']);
-    if (!issue?.fields['话题信息']?.[0]?.length) {
+    if (!(issue?.fields['话题信息'] as []).length) {
       this.messageHelper.createToUser(
         {
           receive_id: userId,
