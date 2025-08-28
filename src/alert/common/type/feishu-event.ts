@@ -12,3 +12,5 @@ export type MsgReadEventParams =
 
 export type ReactionCreatedEventParams =
   EventHandlerParameters<'im.message.reaction.created_v1'>;
+
+export type ChatType = 'group' | 'p2p';

@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import FeishuApiAlertIssueTable from '@src/alert/common/table/api-alert-issue-table';
 import FeishuFrontendAlertIssueTable from '@src/alert/common/table/frontend-alert-issue-table';
-import { ReceiveEventParams } from '@src/alert/common/type/feishu-event';
+import {
+  ChatType,
+  ReceiveEventParams,
+} from '@src/alert/common/type/feishu-event';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolve-card';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
@@ -14,9 +17,15 @@ import Redis from 'ioredis';
 @Injectable()
 export class FeishuReceiveCallback {
   readonly redis: Redis;
-  readonly handlers: Map<RegExp, string> = new Map([
-    [/(issue:)?\d+/, 'pushIssueCardToUser'],
-  ]);
+  readonly handlers: Record<ChatType, Map<RegExp, string>> = {
+    p2p: new Map([
+      [/(issue:)?\d+/, 'pushIssueCardToUser'],
+      // [/(issue:)?\d+/, 'pushIssueCardToUser'],
+    ]),
+    group: new Map([
+      // [/(issue:)?\d+/, 'pushIssueCardToUser'],
+    ]),
+  };
   constructor(
     readonly logger: LoggerService,
     readonly messageHelper: FeishuMessageHelper,
@@ -26,21 +35,26 @@ export class FeishuReceiveCallback {
   ) {
     this.redis = redisService.getClient();
   }
-  getHandler(message: string) {
-    for (const [regex, handlerName] of this.handlers) {
+  getHandler(message: string, type: ChatType) {
+    const handlers = this.handlers[type];
+    for (const [regex, handlerName] of handlers) {
       if (regex.test(message)) {
         return this[handlerName];
       }
     }
-    throw new Error('No message recieve handler found');
+    return () => {
+      this.logger.warn('该消息没有找到:', message);
+    };
   }
   async handle(event: ReceiveEventParams) {
     const {
-      message: { content: msgContent, message_type },
+      message: { content: msgContent, message_type, chat_type },
     } = event;
     if (message_type !== 'text') return;
     const { text: content } = JSON.parse(msgContent);
-    const handler = this.getHandler(content).bind(this);
+
+    const handler = this.getHandler(content, chat_type as ChatType).bind(this);
+
     await handler(event);
 
     return 'ok';
@@ -68,10 +82,9 @@ export class FeishuReceiveCallback {
       sender: {
         sender_id: { open_id: userId },
       },
-      message: { chat_type, content: msgContent },
+      message: { content: msgContent },
     } = event;
     const { text: content } = JSON.parse(msgContent);
-    if (chat_type !== 'p2p') return;
     if (!userId) return;
 
     const issueId = content.replace('issue:', '');
