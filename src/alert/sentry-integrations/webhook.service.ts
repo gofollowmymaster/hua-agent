@@ -200,7 +200,7 @@ export class SentryWebhookService {
               [
                 {
                   tag: 'md',
-                  text: `<at user_id="all"></at>有新的错误发生`,
+                  text: `有新的错误发生[点击查看详情](${errorEvent.webUrl})`,
                 },
               ],
             ],

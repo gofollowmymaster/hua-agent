@@ -97,6 +97,7 @@ export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       ),
       messageId: undefined,
       errorEndpoint: this.event.errorEndpoint,
+      trackers: '',
     };
   }
 }
