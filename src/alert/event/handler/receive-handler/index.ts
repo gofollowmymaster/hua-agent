@@ -19,7 +19,7 @@ export class FeishuReceiveCallback {
   readonly redis: Redis;
   readonly handlers: Record<ChatType, Map<RegExp, string>> = {
     p2p: new Map([
-      [/(issue:)?\d+/, 'pushIssueCardToUser'],
+      [/(issue:)?\d+$/, 'pushIssueCardToUser'],
       // [/(issue:)?\d+/, 'pushIssueCardToUser'],
     ]),
     group: new Map([
@@ -89,10 +89,18 @@ export class FeishuReceiveCallback {
 
     const issueId = content.replace('issue:', '');
 
+    const issueKey = RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace(
+      '{issueId}',
+      issueId,
+    );
     const issueInCache = (await this.redis.hgetall(
-      RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),
+      issueKey,
     )) as UnresolvedCardData;
-    if (issueInCache.issueId) {
+    const tackers = issueInCache.trackers
+      ? JSON.parse(issueInCache.trackers)
+      : [];
+    // if (tackers.includes(userId)) return;
+    if (!tackers.includes(userId) && issueInCache.issueId) {
       this.messageHelper.replyInThread(
         JSON.stringify({
           zh_cn: {
@@ -109,10 +117,11 @@ export class FeishuReceiveCallback {
         issueInCache.messageId,
         FeishuMsgType.Post,
       );
-      return;
+
+      this.redis.hset(issueKey, { tackers: JSON.stringify(tackers) });
     }
     const issue = await this.getIssueInfo(issueId);
-    if (!(issue?.fields['话题信息'] as []).length) {
+    if (!((issue?.fields['话题信息'] || []) as []).length) {
       this.messageHelper.createToUser(
         {
           receive_id: userId,

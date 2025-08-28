@@ -94,6 +94,7 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
 
       messageId: undefined,
       errorEndpoint: this.event.errorEndpoint,
+      trackers: '',
     };
   }
 }

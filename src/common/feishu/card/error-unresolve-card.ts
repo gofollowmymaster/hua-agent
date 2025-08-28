@@ -14,6 +14,7 @@ export type UnresolvedCardData = {
   status: IssueStatusEnum;
   issueId: string;
   environment: string;
+  trackers: string;
   [key: string]: any;
 };
 
