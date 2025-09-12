@@ -74,6 +74,15 @@ model AlertMessage {
   createTime DateTime @default(now())
 }
 
+model FeishuUser {
+  userId  String   String
+  userAlerted     AlertMessageUser[]
+  content    String   @db.Text 
+  createTime DateTime @default(now())
+}
+
+
+
 enum MIdStatusEnum {
   Enable
   Disable

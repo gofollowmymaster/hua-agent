@@ -10,26 +10,24 @@ import WikiDirectoryService from './schedule/wiki-directory';
 
 @Injectable()
 export class WikiService {
-  private readonly wikiDirectoryServer: WikiDirectoryService;
-
-  // private messageHelper;
+  // private wikiDirectoryService: WikiDirectoryService;
   constructor(
     private readonly logger: LoggerService,
     private readonly config: ConfigService,
     @Inject(CACHE_MANAGER) protected cache: Cache,
+    private wikiDirectoryService: WikiDirectoryService,
   ) {
-    this.wikiDirectoryServer = new WikiDirectoryService(
-      this.config,
-      this.cache,
-    );
+    // this.wikiDirectoryService = new WikiDirectoryService(
+    //   this.config,
+    //   this.cache,
+    // );
   }
 
-  async tree() {
-    const spaceId = this.config.getOrThrow('FeishuAplusWikiSpaceId');
+  async tree(spaceId: string) {
     const key = RedisKeys.WIKI_DIRECTORY.replace('{spaceId}', spaceId);
     let tree = await this.cache.get(key);
     if (!tree) {
-      tree = await this.wikiDirectoryServer.loadWikiNodeTree();
+      tree = await this.wikiDirectoryService.loadWikiNodeTree(spaceId);
     }
 
     return {

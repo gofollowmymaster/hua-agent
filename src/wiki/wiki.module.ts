@@ -10,7 +10,7 @@ import WikiDirectoryService from './schedule/wiki-directory';
 
 @Module({
   imports: [
-    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AilyAplusClient)),
+    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.XiaoAClient)),
   ],
   controllers: [WikiController],
   providers: [WikiService, PrismaService, LoggerService, WikiDirectoryService],

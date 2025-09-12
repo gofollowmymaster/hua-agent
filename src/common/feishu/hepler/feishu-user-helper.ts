@@ -6,6 +6,7 @@ import {
   ContactUserGetReturnType,
   DepartmentIdType,
   UserIdType,
+  FindByDepartmentParams,
 } from '../type/contact';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import FeishuDataApiHelper from './feishu-data-api-helper';
@@ -48,6 +49,7 @@ class FeishuUserHelper extends FeishuDataApiHelper {
       'getUserInfo:' + userId,
     );
   }
+
   async getUserIdByEmailOrPhone({
     emails,
     mobiles,
@@ -73,6 +75,19 @@ class FeishuUserHelper extends FeishuDataApiHelper {
         }),
       true,
       'getUserInfo',
+    );
+  }
+
+  async getUserByDepartment(
+    params: FindByDepartmentParams,
+  ): Promise<ContactUserGetReturnType> {
+    return await this.readWrapper(
+      async () =>
+        await this.client.client.contact.user.findByDepartment({
+          params,
+        }),
+      true,
+      'getUserByDepartment',
     );
   }
 }
