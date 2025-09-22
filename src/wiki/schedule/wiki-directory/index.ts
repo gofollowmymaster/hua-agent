@@ -34,6 +34,9 @@ export default class WikiDirectoryService {
     }
   }
   async loadWikiNodeTree(spaceId: string) {
-    return await this.feishuWikiHelper.loadWikiTree(spaceId);
+    const wikiTree = await this.feishuWikiHelper.loadWikiTree(spaceId);
+    const key = RedisKeys.WIKI_DIRECTORY.replace('{spaceId}', spaceId);
+    this.cache.set(key, wikiTree, 0);
+    return wikiTree;
   }
 }

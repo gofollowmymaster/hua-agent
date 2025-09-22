@@ -7,9 +7,9 @@
   "license": "UNLICENSED",
   "scripts": {
     "env:dev": "dotenv -e .env.dev.local   -e .env.dev -e .env ",
-    "env:test": "dotenv -e .env -e .env.test -e .env.test.local ",
-    "env:prod": "dotenv -e .env -e .env.prod -e .env.prod.local ",
-    "env:prod-boat": "dotenv -e .env -e .env.prod-boat -e .env.prod-boat.local ",
+    "env:test": "dotenv -e .env.test.local  -e .env.test -e .env    ",
+    "env:prod": "dotenv -e .env.prod.local  -e .env.prod  -e .env  ",
+    "env:prod-boat": "dotenv  -e .env.prod-boat.local -e .env.prod-boat -e .env   ",
     "build:dev": "pnpm env:dev -- nest build",
     "build:test": "pnpm env:test -- nest build",
     "build:prod": "pnpm env:prod -- nest build",
