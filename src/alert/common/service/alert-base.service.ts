@@ -11,7 +11,12 @@ import { BaseService } from '@src/common/base/BaseService';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { ConfigService } from '@nestjs/config';
-import { AlertEvent, Environment, PageModuleName } from '../type/alert';
+import {
+  AlertEvent,
+  Environment,
+  ErrorLevel,
+  PageModuleName,
+} from '../type/alert';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import Redis from 'ioredis';
@@ -74,7 +79,7 @@ export abstract class AlertBaseService extends BaseService {
       throw new Error('消息发送失败，message_id为空');
     }
 
-    if (alertInfo.level !== 'fatal') {
+    if (alertInfo.level !== ErrorLevel.FATAL) {
       return groupMsgInfo;
     }
 

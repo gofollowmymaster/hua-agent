@@ -19,7 +19,6 @@ export abstract class FeishuCard {
         template_variable: { ...alertInfo },
       },
     };
-    console.log('[ alertInfo ] >', alertInfo);
     return JSON.stringify(content);
   }
 }
