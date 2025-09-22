@@ -28,15 +28,15 @@ import { RedisModule } from './common/service/redis/redis.module';
 import { GlobalExceptionHandlerModule } from './common/service/global-exception-hander/global-exception.module';
 // import { BaseTableModule } from './common/table/base-table.module';
 
-const envFilePath = [
-  '.env',
-  `.env.${process.env.NODE_ENV}`,
-  `.env.${process.env.NODE_ENV}.local`,
-];
+// const envFilePath = [
+//   '.env',
+//   `.env.${process.env.NODE_ENV}`,
+//   `.env.${process.env.NODE_ENV}.local`,
+// ];
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: envFilePath,
+      // envFilePath: envFilePath,
       isGlobal: true,
       load: [() => configuration],
     }),

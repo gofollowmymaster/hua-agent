@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "env:dev": "dotenv -e .env -e .env.dev -e .env.dev.local ",
+    "env:dev": "dotenv -e .env.dev.local   -e .env.dev -e .env ",
     "env:test": "dotenv -e .env -e .env.test -e .env.test.local ",
     "env:prod": "dotenv -e .env -e .env.prod -e .env.prod.local ",
     "env:prod-boat": "dotenv -e .env -e .env.prod-boat -e .env.prod-boat.local ",
