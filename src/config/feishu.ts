@@ -35,5 +35,5 @@ export default {
   //默认报警人 Ahua
   DefaultAlertFeishuUserId: process.env.DEFAULT_ALERT_USERID || '762a5468',
 
-  FeishuAplusWikiSpaceId: process.env.FEISHU_APLUS_WIWI_SPACE_ID,
+  FeishuWikiSpaceIds: [process.env.FEISHU_APLUS_WIWI_SPACE_ID],
 };

@@ -1,8 +1,9 @@
-import { Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { WikiService } from './wiki.service';
 import { AuthGuard } from '@src/common/guard/auth';
+import { WikiTreeDto } from './dto/wiki.dto';
 
 @ApiTags('wiki相关接口')
 @Controller('wiki')
@@ -19,8 +20,9 @@ export class WikiController {
   })
   @UseGuards(AuthGuard)
   @Post('/tree')
-  async tree() {
+  @ApiBody({ type: WikiTreeDto })
+  async tree(@Body() params: WikiTreeDto) {
     //发送消息
-    return await this.wikiService.tree();
+    return await this.wikiService.tree(params.spaceId);
   }
 }

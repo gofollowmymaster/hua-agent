@@ -34,6 +34,7 @@ import ClearAlertPerDayService from './common/schedule/clear-alert-issue';
 import PageClearIssueService from './common/schedule/clear-alert-issue/services/page-issue.service';
 import RequestClearIssueService from './common/schedule/clear-alert-issue/services/request-issue.service';
 import { FeishuReceiveCallback } from './event/handler/receive-handler';
+import SyncFeishuUser from './common/schedule/sync-feishu-user';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { FeishuReceiveCallback } from './event/handler/receive-handler';
     PageClearIssueService,
     RequestClearIssueService,
     FeishuReceiveCallback,
+    SyncFeishuUser,
   ],
   exports: [
     AlertMsgService,

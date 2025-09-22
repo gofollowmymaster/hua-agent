@@ -38,6 +38,7 @@ export class PageErrorService extends ErrorBaseService {
   }
 
   async errorHookHandler(errorEvent: PageAlertEvent) {
+    console.log('[ errorEvent ] >', errorEvent);
     await this.setErrorEvent(errorEvent);
     this.errorHandler();
   }
