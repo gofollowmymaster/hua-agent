@@ -72,7 +72,7 @@ export default class FixedTokenService {
   sendAlertMsg(errorMessage: string) {
     sendCommonCardToFeishu({
       title: '定时刷新Token异常报警',
-      project: 'aplus-sql-server',
+      project: process.env.PROJECT_NAME,
       color: 'red',
       message: `刷新飞书Token异常`,
       content: errorMessage,

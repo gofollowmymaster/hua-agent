@@ -32,6 +32,23 @@ import { GlobalExceptionHandlerModule } from './common/service/global-exception-
 //   `.env.${process.env.NODE_ENV}`,
 //   `.env.${process.env.NODE_ENV}.local`,
 // ];
+const ModuleInUsed = process.env.MODULE_USED;
+const modulesAll = [
+  SubappModule,
+  VersionModule,
+  VerifyModule,
+  RobotModule,
+  MockServerModule,
+  AiModule,
+  AdminModule,
+  WikiModule,
+  DemoPluginModule,
+  AlertModule,
+];
+
+const modules = ModuleInUsed
+  ? modulesAll.filter((item) => ModuleInUsed.includes(item.name))
+  : modulesAll;
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -65,20 +82,10 @@ import { GlobalExceptionHandlerModule } from './common/service/global-exception-
       secret: configuration['jwtSecret'],
     }),
     RedisModule,
-    // BaseTableModule,
-    GlobalExceptionHandlerModule,
-    SubappModule,
-    VersionModule,
-    VerifyModule,
-    RobotModule,
-    MockServerModule,
-    LoggerModule,
-    AiModule,
-    AdminModule,
-    WikiModule,
-    DemoPluginModule,
     ScheduleModule.forRoot(),
-    AlertModule,
+    GlobalExceptionHandlerModule,
+    LoggerModule,
+    ...modules,
   ],
   providers: [PrismaService],
 })

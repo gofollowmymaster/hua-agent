@@ -20,7 +20,7 @@ export const sendExceptionToFeishuOrigin = (
   //构建消息内容
   const options = {
     title: `Node Server异常报警【${exception.name}】`,
-    project: 'aplus-sql-server',
+    project: process.env.PROJECT_NAME,
     color: 'red',
     message: exception.message || '内部错误',
     content: reqContext || exception.stack,
