@@ -17,7 +17,6 @@ export type FeishuAuthType = Awaited<
 export default class FixedTokenService {
   private readonly client: lark.Client;
   private readonly logger = new Logger(FixedTokenService.name);
-  private readonly messagerHelper: FeishuMessageHelper;
   private readonly redis: Redis;
   constructor(
     private readonly config: ConfigService,
@@ -25,9 +24,7 @@ export default class FixedTokenService {
   ) {
     const authClient = ClientFactory.create(FeishuApp.AilyAplusClient);
     this.client = authClient.client;
-    this.messagerHelper = new FeishuMessageHelper(
-      ClientFactory.create(FeishuApp.AlertClient, config),
-    );
+
     this.redis = redisService.getClient();
   }
 
