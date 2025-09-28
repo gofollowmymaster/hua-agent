@@ -14,7 +14,7 @@ import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 @Module({
   imports: [
     HttpModule,
-    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AlertClient)),
+    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.XiaoAClient)),
   ],
   providers: [
     CacheService,
