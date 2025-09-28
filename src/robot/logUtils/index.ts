@@ -9,7 +9,7 @@ export function FromFeishuLogger() {
         args[0] as MessageFromRobotType;
       const { appToken, tableId } = args[1];
       logger.info(
-        `飞书群消息 【内容是：${originalContent}】【发送人：${sender}}】【引用内容：${replyContent}】【多为表格token：${appToken}】【多维表格tableId：${tableId}】`,
+        `飞书群消息 【内容是：${originalContent}】【发送人：${sender}}】【引用内容：${replyContent}】【多维表格token：${appToken}】【多维表格tableId：${tableId}】`,
       );
       return originalMethod.apply(this, args);
     };
