@@ -25,6 +25,20 @@ export class FeishuCallbackController {
     if (callbackInfo.type === 'url_verification') {
       return { challenge: callbackInfo.challenge };
     }
-    return await this.feishucallbackService.handle(callbackInfo);
+    try {
+      return await this.feishucallbackService.handle(callbackInfo);
+    } catch (error) {
+      const msg = `修改失败:` + error.message;
+      return {
+        toast: {
+          type: 'info',
+          content: msg,
+          i18n: {
+            zh_cn: msg,
+            en_us: 'card action failed',
+          },
+        },
+      };
+    }
   }
 }
