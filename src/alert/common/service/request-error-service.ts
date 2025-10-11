@@ -16,7 +16,7 @@ import RequestAlertFeishuAdapter from '../adapter/request-alert-feishu-adapter';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { Injectable } from '@nestjs/common';
 import { IssueStatusEnum } from '@src/common/feishu/card/error-unresolve-card';
-export const ignoreCodeList = ['401', '10002', '408'];
+export const ignoreCodeList = ['401', '10002', '408', '65013'];
 
 @Injectable()
 export class RequestErrorService extends ErrorBaseService {
