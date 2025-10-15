@@ -148,6 +148,7 @@ export class SentryWebhookController {
     const eventData = {
       ...alertError,
       requestData,
+      project: alertError.project,
       title: alertError.title,
       issueId: alertError.issue_id,
       issueUrl: alertError.issue_url,
