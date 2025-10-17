@@ -9,7 +9,7 @@ import Redis from 'ioredis';
 import RequestIssueStatisticService from './services/request-issue.service';
 import PageIssueStatisticService from './services/page-issue.service';
 import { ErrorEndpoint } from '../../type/alert';
-import { PushIssueCardToUserParams } from '../../type/sentry';
+import { PushIssueCardToUserParams } from '../../type/sentry-issue';
 
 @Injectable()
 export default class AlertStatisticService {

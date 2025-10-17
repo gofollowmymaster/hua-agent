@@ -3,7 +3,7 @@ import {
   SentryComment,
   SentryEvent,
   SentryHookIssue,
-} from '@src/alert/common/type/sentry';
+} from '@src/alert/common/type/sentry-issue';
 import { IsNotEmpty } from 'class-validator';
 
 export enum SentryHookType {

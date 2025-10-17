@@ -24,7 +24,9 @@ import {
   PageModuleName,
 } from '../common/type/alert';
 
-import { SentryApiService } from '../common/service/sentry-api-service';
+import { SentryIssueService } from '../common/service/sentry/sentry-issue-service';
+import { SentryProjectService } from '../common/service/sentry/sentry-project-service';
+
 @ApiTags('Sentry WebHook')
 @Controller('sentry-hook')
 @ApiHeaders([
@@ -51,14 +53,11 @@ import { SentryApiService } from '../common/service/sentry-api-service';
   },
 ])
 export class SentryWebhookController {
-  // private readonly redis: Redis;
   constructor(
     private readonly sentryWebhookService: SentryWebhookService,
-    // protected readonly redisService: RedisService,
-    protected readonly sentryApiService: SentryApiService,
-  ) {
-    // this.redis = redisService.getClient();
-  }
+    protected readonly sentryIssueService: SentryIssueService,
+    protected readonly sentryProjectService: SentryProjectService,
+  ) {}
 
   @ApiOperation({
     summary: 'Sentry WebHook入口',
@@ -75,8 +74,6 @@ export class SentryWebhookController {
     @Headers() headers: SentryWebHookHeader,
     @Body() params: SentryHookDto,
   ) {
-    // 验证
-    // if ( !verifySignature(params, headers)) {
     //sentry-hook签名验证存在问题，等待解决  https://github.com/getsentry/sentry/issues/71025
     if (!headers['sentry-hook-signature']) {
       throw new UnauthorizedException('Sentry Hook签名验证失败');
@@ -136,7 +133,7 @@ export class SentryWebhookController {
 
   async error(params: SentryHookErrorDto) {
     const alertError = params.data.error;
-    if (await this.sentryApiService.isIssueIgnored(alertError.issue_id)) {
+    if (await this.sentryIssueService.isIssueIgnored(alertError.issue_id)) {
       console.log('issue is ignored');
       return;
     }
@@ -145,10 +142,14 @@ export class SentryWebhookController {
     const serverModuleName = getModuleNameByUrl(requestData?.url);
     const pageModuleName =
       alertError.extra?.subModuleName || PageModuleName.APLUS_OTHER;
+
+    const projectName = await this.sentryProjectService.getProjectNameById(
+      alertError.project,
+    );
     const eventData = {
       ...alertError,
       requestData,
-      project: alertError.project,
+      project: projectName,
       title: alertError.title,
       issueId: alertError.issue_id,
       issueUrl: alertError.issue_url,

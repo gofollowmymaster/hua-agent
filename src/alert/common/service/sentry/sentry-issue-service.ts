@@ -3,13 +3,13 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { IssueStatus } from '@src/common/feishu/card/error-unresolve-card';
 import { firstValueFrom } from 'rxjs';
-import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import {
-  // IssueStatusDetails,
   IssueStatusDetailsType,
   SentryIssue,
   SentryStatus,
-} from '../type/sentry';
+} from '../../type/sentry-issue';
+
+import SentryApiHelper from './sentry-api-service';
 
 type UpdateIssueParams = {
   status?: IssueStatus;
@@ -26,13 +26,15 @@ type UpdateIssueOriginParams = {
   isBookmarked?: boolean;
 };
 @Injectable()
-export class SentryApiService {
+export class SentryIssueService extends SentryApiHelper {
   prefix =
     'https://cloud.elnkpro.com:9000/api/0/organizations/aplus-frontend-team';
   constructor(
     private readonly httpService: HttpService,
     private readonly config: ConfigService,
-  ) {}
+  ) {
+    super();
+  }
   dataAdapter(params: UpdateIssueParams): UpdateIssueOriginParams {
     let status,
       statusDetails = {} as IssueStatusDetailsType;
@@ -51,7 +53,7 @@ export class SentryApiService {
     };
   }
   async updateIssue(body: UpdateIssueParams, issue_id: string) {
-    try {
+    return this.requestWrapper(async () => {
       const reqBody = this.dataAdapter(body);
 
       const { data } = await firstValueFrom(
@@ -63,12 +65,10 @@ export class SentryApiService {
         }),
       );
       return data;
-    } catch (err) {
-      sendExceptionToFeishu(err, '修改Sentry issue失败,IssueId:' + issue_id);
-    }
+    }, 'updateIssue');
   }
   async getIssueDetail(issueId: string): Promise<SentryIssue> {
-    try {
+    return this.requestWrapper(async () => {
       const { data } = await firstValueFrom(
         this.httpService.get(`${this.prefix}/issues/${issueId}/`, {
           headers: {
@@ -78,16 +78,11 @@ export class SentryApiService {
         }),
       );
       return data;
-    } catch (err) {
-      sendExceptionToFeishu(
-        err,
-        '获取Sentry issue 详情失败,IssueId:' + issueId,
-      );
-      return { status: 'ignored' } as SentryIssue;
-    }
+    }, 'getIssueDetail');
   }
+
   async isIssueIgnored(issueId: string) {
-    const { status } = await this.getIssueDetail(issueId);
+    const { status = 'activited' } = (await this.getIssueDetail(issueId)) || {};
     return status === 'ignored';
   }
 }

@@ -25,7 +25,6 @@ export const sendExceptionToFeishuOrigin = (
     message: exception.message || '内部错误',
     content: reqContext || exception.stack,
   };
-  console.log('[   exception ] >', exception.message, exception.stack);
   sendCommonCardToFeishu(options);
 };
 

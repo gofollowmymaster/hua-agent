@@ -75,7 +75,7 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       errorType: this.event.type,
       errorMessage: this.event.title,
       userName: this.appInfo.frontendLeaderName,
-      project: `[${this.event.project}]-${this.event.pageModuleName}`,
+      project: `[${this.event.project}]->${this.event.pageModuleName}`,
       outerLink: this.event.webUrl,
       linkUrl: this.event.feishuUrl,
       level: this.event.level,

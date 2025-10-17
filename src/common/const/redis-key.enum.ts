@@ -5,6 +5,7 @@ export const RedisPrefixIdempotent = 'frontend-node:idempotent:';
 
 export const SentryAlertPrefix = 'frontend-node:alert:sentry-integration:';
 export const FeishuApiPrefix = 'frontend-node:feishu-api:';
+export const SentryApiPrefix = 'frontend-node:sentry-api:';
 export const AilyPrefix = 'frontend-node:aily:';
 
 export enum RedisKeys {
@@ -18,4 +19,5 @@ export enum RedisKeys {
   SENTRY_ALERT_COUNT_ISSUE = SentryAlertPrefix + 'issue-error-count:{issueId}',
   SENTRY_ALERT_COUNT_FREQUENCY = SentryAlertPrefix + 'error-frequency:{module}',
   FEISHU_API_CACHE = FeishuApiPrefix + '{apiName}',
+  SENTRY_API_CACHE = SentryApiPrefix + '{apiName}',
 }

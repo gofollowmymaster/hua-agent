@@ -1,4 +1,4 @@
-import { SentryStatus, SentryUser } from './sentry';
+import { SentryStatus, SentryUser } from './sentry-issue';
 
 export class AlertEvent {
   pageModuleName: PageModuleName;

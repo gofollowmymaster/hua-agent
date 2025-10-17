@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ErrorLevel } from '@src/alert/common/type/alert';
-import { SentryEvent } from '@src/alert/common/type/sentry';
+import { SentryEvent } from '@src/alert/common/type/sentry-issue';
 import { IsNotEmpty, IsNotEmptyObject } from 'class-validator';
 
 export class SentryRawDto {

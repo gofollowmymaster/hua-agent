@@ -21,7 +21,7 @@ import { SentryWebhookController } from './sentry-integrations/webhook.controlle
 import { SentryWebhookService } from './sentry-integrations/webhook.service';
 import FeishuApiAlertIssueTable from './common/table/api-alert-issue-table';
 import AlertFeishuAdapter from './common/adapter/alert-feishu-adapter';
-import { SentryApiService } from './common/service/sentry-api-service';
+import { SentryIssueService } from './common/service/sentry/sentry-issue-service';
 import { HttpModule } from '@nestjs/axios';
 import { PageErrorService } from './common/service/page-error-service';
 import { RequestErrorService } from './common/service/request-error-service';
@@ -35,6 +35,7 @@ import PageClearIssueService from './common/schedule/clear-alert-issue/services/
 import RequestClearIssueService from './common/schedule/clear-alert-issue/services/request-issue.service';
 import { FeishuReceiveCallback } from './event/handler/receive-handler';
 import SyncFeishuUser from './common/schedule/sync-feishu-user';
+import { SentryProjectService } from './common/service/sentry/sentry-project-service';
 
 @Module({
   imports: [
@@ -56,13 +57,15 @@ import SyncFeishuUser from './common/schedule/sync-feishu-user';
     AlertMsgService,
     PrismaService,
     SentryApiAlertAdapter,
+    SentryProjectService,
+
     FeishuEventService,
     FeishuCallbackService,
     SentryWebhookService,
     AlertFeishuAdapter,
     PageAlertFeishuAdapter,
     RequestAlertFeishuAdapter,
-    SentryApiService,
+    SentryIssueService,
     PageErrorService,
     RequestErrorService,
     AlertStatisticService,

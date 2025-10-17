@@ -6,7 +6,6 @@ import {
   PageModuleName,
   RequestData,
 } from './alert';
-import { OpUnitType } from 'dayjs';
 
 class SentryEventExtra {
   @ApiPropertyOptional({

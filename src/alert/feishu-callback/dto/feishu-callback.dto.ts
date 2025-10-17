@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ErrorEndpoint } from '@src/alert/common/type/alert';
-import { businessLine } from '@src/alert/common/type/sentry';
+import { businessLine } from '@src/alert/common/type/sentry-issue';
 import { OpUnitType } from 'dayjs';
 
 export class FeishuCallbackHeader {

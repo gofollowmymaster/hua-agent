@@ -8,7 +8,7 @@ import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import Redis from 'ioredis';
 import FeishuApiAlertIssueTable from '../common/table/api-alert-issue-table';
 import FeishuFrontendAlertIssueTable from '../common/table/frontend-alert-issue-table';
-import { SentryApiService } from '../common/service/sentry-api-service';
+import { SentryIssueService } from '../common/service/sentry/sentry-issue-service';
 import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
 import { CommonErrorService } from '../common/service/error-common.service';
 import { RequestErrorService } from '../common/service/request-error-service';
@@ -27,7 +27,7 @@ export class FeishuCallbackService extends CommonErrorService {
     readonly messageHelper: FeishuMessageHelper,
     protected readonly feishuApiIssueTable: FeishuApiAlertIssueTable,
     protected readonly feishuFrontendIssueTable: FeishuFrontendAlertIssueTable,
-    readonly sentryService: SentryApiService,
+    readonly sentryService: SentryIssueService,
     readonly feishuUserHelper: FeishuUserHelper,
     protected readonly pageErrorService: PageErrorService,
     protected readonly requestErrorService: RequestErrorService,
