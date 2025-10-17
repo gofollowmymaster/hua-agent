@@ -86,9 +86,9 @@ export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       eventType: this.event.type,
       abstract: this.event.culprit,
       content:
-        this.event.title.length < 20
-          ? this.event.title + ' ' + this.event.message
-          : this.event.title,
+        this.event.requestData?.message +
+        ' traceId:' +
+        this.event.requestData.resData?.traceId,
       count: 1,
       status: IssueStatusEnum['unresolved'],
       issueId: this.event.issueId,

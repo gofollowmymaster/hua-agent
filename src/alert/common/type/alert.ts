@@ -81,7 +81,7 @@ export type RequestData = {
     status: number;
     error: string;
     message?: null;
-    requestId?: string;
+    traceId?: string;
   };
   message: string;
 
