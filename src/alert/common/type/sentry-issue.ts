@@ -1,11 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  Environment,
-  ErrorEndpoint,
-  ErrorLevel,
-  PageModuleName,
-  RequestData,
-} from './alert';
+import { Environment, ErrorEndpoint, ErrorLevel, RequestData } from './alert';
 
 class SentryEventExtra {
   @ApiPropertyOptional({
@@ -14,10 +8,10 @@ class SentryEventExtra {
   })
   __serialized__?: RequestData;
   @ApiProperty({
-    enum: PageModuleName,
+    type: String,
     description: '错误页面模块名称',
   })
-  subModuleName: PageModuleName;
+  subModuleName: string;
   @ApiProperty({
     enum: ErrorEndpoint,
     description: '错误端点类型',

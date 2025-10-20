@@ -1,7 +1,7 @@
 import { SentryStatus, SentryUser } from './sentry-issue';
 
 export class AlertEvent {
-  pageModuleName: PageModuleName;
+  pageModuleName: string;
   serverModuleName: string;
   timestamp: number;
   environment: Environment;
@@ -25,19 +25,6 @@ export class PageAlertEvent extends AlertEvent {
 export class RequestAlertEvent extends AlertEvent {
   requestData: RequestData;
   errorEndpoint: ErrorEndpoint.Server;
-}
-
-export enum PageModuleName {
-  APLUS_ADMIN_BMS = 'aplus-admin-bms',
-  APLUS_USER_BMS = 'aplus-user-bms',
-  APLUS_ADMIN_MOS = 'aplus-admin-mos',
-  APLUS_USER_MOS = 'aplus-user-mos',
-  APLUS_ADMIN_WMS = 'aplus-admin-wms',
-  APLUS_APLUS_WMS = 'aplus-user-wms',
-  APLUS_ADMIN_MAIN = 'aplus-admin-main',
-  APLUS_USER_MAIN = 'aplus-user-main',
-  APLUS_LOGIN = 'aplus-login-center',
-  APLUS_OTHER = 'others',
 }
 
 export enum ErrorLevel {

@@ -11,12 +11,7 @@ import { BaseService } from '@src/common/base/BaseService';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { ConfigService } from '@nestjs/config';
-import {
-  AlertEvent,
-  Environment,
-  ErrorLevel,
-  PageModuleName,
-} from '../type/alert';
+import { AlertEvent, Environment, ErrorLevel } from '../type/alert';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import Redis from 'ioredis';
@@ -205,7 +200,7 @@ export abstract class AlertBaseService extends BaseService {
   }
 
   async getGroupAndUserByProject(
-    pageModuleName: PageModuleName,
+    pageModuleName: string,
     environment: Environment,
   ) {
     // const { pageModuleName, environment } = alertInfo;

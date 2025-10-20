@@ -3,11 +3,7 @@ import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AlertMsgService } from './alert-message.service';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SentryRawDto } from './dto/sentry-raw.dto';
-import {
-  AlertEvent,
-  ErrorEndpoint,
-  PageModuleName,
-} from '../common/type/alert';
+import { AlertEvent, ErrorEndpoint } from '../common/type/alert';
 import { getModuleNameByUrl } from '../common/utils';
 import AlertStatisticService from '../common/schedule/alert-statistic';
 import ClearAlertPerDayService from '../common/schedule/clear-alert-issue';
@@ -48,8 +44,7 @@ export class AlertMsgController {
       issueUrl: alertInfo.url,
       issueId: alertInfo.id,
       requestData,
-      pageModuleName:
-        alertInfo.event.extra?.subModuleName || PageModuleName.APLUS_OTHER,
+      pageModuleName: alertInfo.event.extra?.subModuleName || '',
       serverModuleName,
       errorEndpoint: alertInfo.event.extra?.errorEndpoint || ErrorEndpoint.Page,
       rawData: alertInfo,

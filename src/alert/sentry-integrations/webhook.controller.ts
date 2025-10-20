@@ -18,11 +18,7 @@ import {
   SentryWebHookHeader,
 } from './dto/sentry-hook';
 import { getModuleNameByUrl } from '../common/utils';
-import {
-  ErrorEndpoint,
-  IssueAction,
-  PageModuleName,
-} from '../common/type/alert';
+import { ErrorEndpoint, IssueAction } from '../common/type/alert';
 
 import { SentryIssueService } from '../common/service/sentry/sentry-issue-service';
 import { SentryProjectService } from '../common/service/sentry/sentry-project-service';
