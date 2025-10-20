@@ -140,12 +140,11 @@ export class SentryWebhookController {
 
     const requestData = alertError.extra?.__serialized__;
     const serverModuleName = getModuleNameByUrl(requestData?.url);
-    const pageModuleName =
-      alertError.extra?.subModuleName || PageModuleName.APLUS_OTHER;
-
     const projectName = await this.sentryProjectService.getProjectNameById(
       alertError.project,
     );
+    const pageModuleName = alertError.extra?.subModuleName || projectName;
+
     const eventData = {
       ...alertError,
       requestData,
