@@ -42,14 +42,18 @@ export class SecretAuthGuard implements CanActivate {
     return true;
   }
   private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+    const token = request.headers.authorization;
+    return token;
   }
 
   private async verify(token: string) {
+    console.log('[ token ] >', token);
+
     const {
       record: { fields: appInfo },
     } = await this.clientSecretTable.get(token);
+    console.log('[ appInfo ] >', appInfo);
+
     // return true;
     // Compare the generated signature with the provided signature
     if (!appInfo.是否启用) {

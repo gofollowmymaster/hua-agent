@@ -4,6 +4,7 @@ import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { WikiService } from './wiki.service';
 import { AuthGuard } from '@src/common/guard/auth';
 import { WikiTreeDto } from './dto/wiki.dto';
+import { SecretAuthGuard } from '@src/common/guard/secret-auth';
 
 @ApiTags('wiki相关接口')
 @Controller('wiki')
@@ -12,7 +13,7 @@ export class WikiController {
 
   @ApiOperation({
     summary: '获取飞书知识库空间节点',
-    description: '通过传入知识库id获取树形知识库节点列表',
+    description: '通过传入知识库id获取树形知识库节点列表，进行Token认证',
   })
   @ApiOkResponse({
     description: 'success',
@@ -22,6 +23,17 @@ export class WikiController {
   @Post('/tree')
   @ApiBody({ type: WikiTreeDto })
   async tree(@Body() params: WikiTreeDto) {
+    //发送消息
+    return await this.wikiService.tree(params.spaceId);
+  }
+  @ApiOperation({
+    summary: '获取飞书知识库空间节点-v2',
+    description: '通过传入知识库id获取树形知识库节点列表,进行Secret认证',
+  })
+  @UseGuards(SecretAuthGuard)
+  @Post('/tree2')
+  @ApiBody({ type: WikiTreeDto })
+  async tree2(@Body() params: WikiTreeDto) {
     //发送消息
     return await this.wikiService.tree(params.spaceId);
   }
