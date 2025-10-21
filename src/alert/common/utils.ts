@@ -1,3 +1,5 @@
+import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
+import FeishuAilyHelper from '@src/common/feishu/hepler/feishu-aily-helper';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween'; // nodejs
 const { isWorkday } = require('chinese-workday');
@@ -56,4 +58,31 @@ export const isNeedSendAlertMsg = (time: number = dayjs().valueOf()) => {
     return true;
   }
   return false;
+};
+
+/**
+ * 调用飞书报警助手辅助分析
+ * @param message
+ * @returns
+ */
+export const useAilyAlertSkill = async (message: string) => {
+  const client = ClientFactory.create(FeishuApp.AiAlertClient);
+
+  const feishuAilyHelper = new FeishuAilyHelper(client);
+
+  const res = await feishuAilyHelper.useAilySkill(
+    {
+      app_id: 'spring_7886bc2b6f__c',
+      skill_id: 'skill_553f9a1e04fc',
+    },
+    {
+      global_variable: {
+        query: message,
+      },
+    },
+  );
+
+  const output = JSON.parse(res.output);
+
+  return output.data.answer;
 };

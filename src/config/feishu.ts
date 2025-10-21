@@ -6,7 +6,7 @@ export default {
   XiaoAAppId: process.env.FEISHU_APP_ID,
   XiaoAAppSecret: process.env.FEISHU_APP_SECRET,
   //机器人Aplus智能体相关
-  AplusAilyAppId: process.env.FEISHU_AILY_APP_ID,
+  ApluAilysAppId: process.env.FEISHU_AILY_APP_ID,
   AplusAilyAppSecret: process.env.FEISHU_AILY_APP_SECRET,
 
   //Aplus智能体表格相关
@@ -18,6 +18,9 @@ export default {
   AplusNodeAdminAppToken: process.env.FEISHU_APLUS_NODE_ADMIN_APP_TOKEN,
   AplusNodeAdminMtableTableId:
     process.env.FEISHU_APLUS_NODE_ADMIN_MTABLE_TABLE_ID,
+  //Aily智能报警提示相关
+  AilyAlertAppId: process.env.FEISHU_AILY_ALERT_APP_ID,
+  AilyAlertAppSecret: process.env.FEISHU_AILY_ALERT_APP_SECRET,
   //报警机器人相关
   AlertAppId: process.env.FEISHU_ALERT_APP_APPID,
   AlertAppSecret: process.env.FEISHU_ALERT_APP_APPSECRET,

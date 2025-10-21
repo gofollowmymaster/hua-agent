@@ -5,6 +5,7 @@ import {
   ChatType,
   ReceiveEventParams,
 } from '@src/alert/common/type/feishu-event';
+import { useAilyAlertSkill } from '@src/alert/common/utils';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolve-card';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
@@ -19,11 +20,13 @@ export class FeishuReceiveCallback {
   readonly redis: Redis;
   readonly handlers: Record<ChatType, Map<RegExp, string>> = {
     p2p: new Map([
-      [/(issue:)?\d+$/, 'pushIssueCardToUser'],
+      [/^(issue:)?\d+$/, 'pushIssueCardToUser'],
+      [/(分析:)?\d+/, 'ailyAnalyzeIssue'],
       // [/(issue:)?\d+/, 'pushIssueCardToUser'],
     ]),
     group: new Map([
-      // [/(issue:)?\d+/, 'pushIssueCardToUser'],
+      // [/分析/, 'ailyAnalyzeIssue'],
+      [/(分析:)?\d+/, 'ailyAnalyzeIssue'],
     ]),
   };
   constructor(
@@ -77,6 +80,7 @@ export class FeishuReceiveCallback {
     issues = await this.feishuFrontendAlertIssueTable.search(filter);
     if (issues.items.length > 0) return issues.items[0];
   }
+  //推送Issue卡片给用户
   async pushIssueCardToUser(event: ReceiveEventParams) {
     const {
       sender: {
@@ -99,7 +103,6 @@ export class FeishuReceiveCallback {
     const tackers = issueInCache.trackers
       ? JSON.parse(issueInCache.trackers)
       : [];
-    // if (tackers.includes(userId)) return;
     if (!tackers.includes(userId) && issueInCache.issueId) {
       this.messageHelper.replyInThread(
         JSON.stringify({
@@ -117,6 +120,8 @@ export class FeishuReceiveCallback {
         issueInCache.messageId,
         FeishuMsgType.Post,
       );
+
+      tackers.push(userId);
 
       this.redis.hset(issueKey, { tackers: JSON.stringify(tackers) });
     }
@@ -153,5 +158,58 @@ export class FeishuReceiveCallback {
     }
     threadId &&
       (await this.messageHelper.forwardThread(userId, threadId, 'open_id'));
+  }
+
+  /**
+   * 使用Aily分析问题
+   */
+
+  async ailyAnalyzeIssue(event: ReceiveEventParams) {
+    const {
+      message: {
+        content: msgContent,
+        message_id,
+        thread_id,
+        chat_type,
+        chat_id,
+      },
+      sender: {
+        sender_id: { open_id: userId },
+      },
+    } = event;
+    const { text: content } = JSON.parse(msgContent);
+    const issueId = content.replace('分析:', '');
+
+    const issue = await this.getIssueInfo(issueId);
+    const answer = await useAilyAlertSkill(
+      issue.fields['标题']?.[0]?.text as string,
+    );
+
+    let message = answer;
+    message = JSON.stringify({
+      zh_cn: {
+        content: [
+          [
+            {
+              tag: 'md',
+              text: message,
+            },
+          ],
+        ],
+      },
+    });
+    if (thread_id) {
+      this.messageHelper.replyInThread(message, message_id, FeishuMsgType.Post);
+    } else {
+      message =
+        chat_type === 'p2p'
+          ? message
+          : `<at user_id="${userId}"></at>\n` + message;
+      this.messageHelper.createToGroup({
+        content: message,
+        msg_type: FeishuMsgType.Post,
+        receive_id: chat_id,
+      });
+    }
   }
 }

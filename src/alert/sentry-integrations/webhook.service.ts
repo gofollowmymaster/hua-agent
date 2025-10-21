@@ -123,7 +123,6 @@ export class SentryWebhookService {
   }
   async error(eventData: AlertEvent) {
     const service = await this.getServiceByEndPort(eventData.errorEndpoint);
-
     const res = await service.errorHookHandler(eventData);
 
     //按前端业务模块3min 内超过10次告警，发送额外致命错误

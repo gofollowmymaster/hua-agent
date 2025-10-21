@@ -128,4 +128,5 @@ export class RequestErrorService extends ErrorBaseService {
       await table.update(recordId, recordNew);
     }
   }
+  protected afterCreateIssueCard() {}
 }

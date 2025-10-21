@@ -1,4 +1,5 @@
 // import { nextTick } from 'process';
+import AiAlertClient from './aily-alert-client';
 import AlertClient from './alert-client';
 import XiaoAClient from './xiao-a-client';
 import AilyAplusClient from './aplus-aily-client';
@@ -10,9 +11,11 @@ export const feishuAppClents = {
   XiaoAClient,
   AilyAplusClient,
   AuthClient,
+  AiAlertClient,
 };
 export enum FeishuApp {
   AlertClient = 'AlertClient',
+  AiAlertClient = 'AiAlertClient',
   XiaoAClient = 'XiaoAClient',
   AilyAplusClient = 'AilyAplusClient',
   AuthClient = 'AuthClient',

@@ -14,14 +14,14 @@ export default class RequestStatisticService extends IssueStatisticService {
 
   protected readonly tableViews = {
     基础架构:
-      'https://q1njej8cpab.feishu.cn/share/base/view/shrcn8PkI1sZCV9wOlA7RpWaKQc',
+      'https://q1njej8cpab.feishu.cn/share/base/view/shrcncd85SOtRGK4RWcvnb03yoh',
     商家运营:
-      'https://q1njej8cpab.feishu.cn/share/base/view/shrcnZVPQbnamy85FgAkjZo95Gh',
+      'https://q1njej8cpab.feishu.cn/share/base/view/shrcnX0Y5xbDczGXLASVK4XQQ8e',
 
     仓储物流:
-      'https://q1njej8cpab.feishu.cn/share/base/view/shrcn9v0aQylmggN8UiypvGHVqf',
+      'https://q1njej8cpab.feishu.cn/share/base/view/shrcn8StQE6rXFKQsRGOA4sOgdY',
     业财一体:
-      'https://q1njej8cpab.feishu.cn/share/base/view/shrcndF3m3gpuGCJkJc6qhTCwbf',
+      'https://q1njej8cpab.feishu.cn/share/base/view/shrcnHqVnQVia4MfE85Nm4F9PEd',
   };
 
   constructor(

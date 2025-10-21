@@ -16,6 +16,9 @@ import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { ErrorBaseService } from './error-base.service';
 import { Injectable } from '@nestjs/common';
 import { IssueStatusEnum } from '@src/common/feishu/card/error-unresolve-card';
+import FeishuAilyHelper from '@src/common/feishu/hepler/feishu-aily-helper';
+import { FeishuMsgType } from '@src/common/feishu/type/im';
+import { useAilyAlertSkill } from '../utils';
 
 @Injectable()
 export class PageErrorService extends ErrorBaseService {
@@ -33,6 +36,7 @@ export class PageErrorService extends ErrorBaseService {
     protected readonly alertFeishuAdapter: PageAlertFeishuAdapter,
     protected readonly feishuUserHelper: FeishuUserHelper,
     protected readonly httpService: HttpService,
+    protected readonly feishuAilyHelper: FeishuAilyHelper,
   ) {
     super(redisService);
   }
@@ -127,5 +131,28 @@ export class PageErrorService extends ErrorBaseService {
       const { record_id: recordId } = record;
       await table.update(recordId, recordNew);
     }
+  }
+
+  protected async afterCreateIssueCard() {
+    const answer = await useAilyAlertSkill(this.errorEvent.message);
+    if (!answer) return;
+    const message = '辅助分析：' + answer;
+    const issueInfo = await this.checkIssueInCache(this.errorEvent.issueId);
+    this.messageHelper.replyInThread(
+      JSON.stringify({
+        zh_cn: {
+          content: [
+            [
+              {
+                tag: 'md',
+                text: message,
+              },
+            ],
+          ],
+        },
+      }),
+      issueInfo.messageId,
+      FeishuMsgType.Post,
+    );
   }
 }

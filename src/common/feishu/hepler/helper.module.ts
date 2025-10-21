@@ -6,6 +6,7 @@ import { FEISHU_CLIENT_ID } from './constants';
 import FeishuClient from '../clients/client';
 import FeishuDepartmentHelper from './feishu-department-helper';
 import FeishuWikiHelper from './feishu-wiki-helper';
+import FeishuAilyHelper from './feishu-aily-helper';
 
 @Module({})
 export class FeishuHelperModule {
@@ -38,6 +39,10 @@ export class FeishuHelperModule {
           provide: FeishuWikiHelper,
           useClass: FeishuWikiHelper,
         },
+        {
+          provide: FeishuAilyHelper,
+          useClass: FeishuAilyHelper,
+        },
       ],
       exports: [
         FeishuMessageHelper,
@@ -45,6 +50,7 @@ export class FeishuHelperModule {
         FeishuUserHelper,
         FeishuDepartmentHelper,
         FeishuWikiHelper,
+        FeishuAilyHelper,
       ],
     };
   }

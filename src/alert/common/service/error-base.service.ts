@@ -41,6 +41,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
   protected abstract writeToTable(errorEvent: AlertEvent);
   abstract errorHookHandler(alertInfo: AlertEvent);
   abstract updateTable(issueId: string, recordNew: Record<string, any>);
+  protected afterCreateIssueCard() {}
   /**
    * 新的错误发生时，获取issue的新状态
    * @param currentStatus
@@ -69,6 +70,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
     );
     let issueCardData = (await this.redis.hgetall(key)) as UnresolvedCardData;
     //新issue 发送卡片消息
+
     if (!issueCardData.threadId) {
       issueCardData = this.alertFeishuAdapter.toAplusAlertCardeData();
       issueCardData.linkUrl = eventRecord.recordUrl;
@@ -87,6 +89,8 @@ export abstract class ErrorBaseService extends AlertBaseService {
           linkUrl: eventRecord.recordUrl,
         }),
       });
+      this.afterCreateIssueCard();
+
       return;
     }
     const count = parseInt(issueCardData.count + '') + 1;

@@ -12,14 +12,14 @@ export default class PageIssueStatisticService extends IssueStatisticService {
   protected errorEndpoint: ErrorEndpoint = ErrorEndpoint.Page;
   protected readonly tableViews = {
     基础架构:
-      'https://q1njej8cpab.feishu.cn/share/base/view/shrcnILJrLDvkbYzu8c0xDuCuot',
+      'https://q1njej8cpab.feishu.cn/share/base/view/shrcn1X5BdgACeyjB5M7RdTxaOb',
     商家运营:
-      'https://q1njej8cpab.feishu.cn/share/base/view/shrcnDQK29Vm5a3NkvqVK0bRLSf',
+      'https://q1njej8cpab.feishu.cn/share/base/view/shrcnYRH11ky7fjerPbilzeCtuh',
 
     仓储物流:
-      'https://q1njej8cpab.feishu.cn/share/base/view/shrcnyIeJ1exSOfCVdfn4wKJCNd',
+      'https://q1njej8cpab.feishu.cn/share/base/view/shrcnAwSpp3REFIpMZpMbNRmR4f',
     业财一体:
-      'https://q1njej8cpab.feishu.cn/share/base/view/shrcnqV9epUFGJlsKZSDoeKNByg',
+      'https://q1njej8cpab.feishu.cn/share/base/view/shrcne8Q63wbWZSo2BJZGWpk0zf',
   };
   constructor(
     protected readonly config: ConfigService,
