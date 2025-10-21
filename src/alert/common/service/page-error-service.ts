@@ -135,7 +135,7 @@ export class PageErrorService extends ErrorBaseService {
 
   protected async afterCreateIssueCard() {
     const answer = await useAilyAlertSkill(this.errorEvent.message);
-    if (!answer) return;
+    if (answer.length > 20) return;
     const message = '辅助分析：' + answer;
     const issueInfo = await this.checkIssueInCache(this.errorEvent.issueId);
     this.messageHelper.replyInThread(
