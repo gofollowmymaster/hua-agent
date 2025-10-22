@@ -134,11 +134,18 @@ export class PageErrorService extends ErrorBaseService {
   }
 
   protected async afterCreateIssueCard() {
+    //部分消息不需要AI辅助分析 比如：403
+    if (
+      [
+        'Object captured as exception with keys: code, message, method, payload, resData',
+      ].includes(this.errorEvent.message)
+    )
+      return;
     const answer = await useAilyAlertSkill(
       this.errorEvent.message || this.errorEvent.title,
     );
     if (answer.length < 20) return;
-    const message = '辅助分析：' + answer;
+    const message = '辅助分析：\n' + answer;
     const issueInfo = await this.checkIssueInCache(this.errorEvent.issueId);
     this.messageHelper.replyInThread(
       JSON.stringify({

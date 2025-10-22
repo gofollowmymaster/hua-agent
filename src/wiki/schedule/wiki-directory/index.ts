@@ -21,7 +21,7 @@ export default class WikiDirectoryService {
     this.spaceIds = this.config.getOrThrow('FeishuWikiSpaceIds');
   }
 
-  @Cron('0 0 10-21/6 * * *')
+  @Cron('0 0 11-18/5 * * *')
   async handleCron() {
     this.logger.debug('WikiDirectoryService Called ');
     for (let index = 0; index < this.spaceIds.length; index++) {

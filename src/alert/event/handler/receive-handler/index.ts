@@ -40,6 +40,7 @@ export class FeishuReceiveCallback {
   }
   getHandler(message: string, type: ChatType) {
     const handlers = this.handlers[type];
+
     for (const [regex, handlerName] of handlers) {
       if (regex.test(message)) {
         return this[handlerName];
@@ -51,7 +52,7 @@ export class FeishuReceiveCallback {
   }
   async handle(event: ReceiveEventParams) {
     const {
-      message: { content: msgContent, message_type, chat_type },
+      message: { content: msgContent, message_type, chat_type, mentions },
     } = event;
     if (message_type !== 'text') return;
     const { text: content } = JSON.parse(msgContent);
@@ -181,7 +182,10 @@ export class FeishuReceiveCallback {
     const issueId = content.replace('分析:', '');
 
     const issue = await this.getIssueInfo(issueId);
-    if (!issue) return;
+    if (!issue) {
+      console.log('[ issue ] >', issue);
+      return;
+    }
     const answer = await useAilyAlertSkill(
       issue.fields['标题']?.[0]?.text as string,
     );
