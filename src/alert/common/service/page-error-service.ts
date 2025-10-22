@@ -137,8 +137,10 @@ export class PageErrorService extends ErrorBaseService {
     //部分消息不需要AI辅助分析 比如：403
     if (
       [
+        'request.onerror Network Error',
         'Object captured as exception with keys: code, message, method, payload, resData',
-      ].includes(this.errorEvent.message)
+      ].includes(this.errorEvent.message) ||
+      process.env.NODE_ENV !== 'production'
     )
       return;
     const answer = await useAilyAlertSkill(
