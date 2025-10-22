@@ -181,6 +181,7 @@ export class FeishuReceiveCallback {
     const issueId = content.replace('分析:', '');
 
     const issue = await this.getIssueInfo(issueId);
+    if (!issue) return;
     const answer = await useAilyAlertSkill(
       issue.fields['标题']?.[0]?.text as string,
     );

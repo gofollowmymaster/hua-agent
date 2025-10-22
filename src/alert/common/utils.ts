@@ -69,7 +69,7 @@ export const useAilyAlertSkill = async (message: string) => {
   const client = ClientFactory.create(FeishuApp.AiAlertClient);
 
   const feishuAilyHelper = new FeishuAilyHelper(client);
-
+  console.log('[ message ] >', message);
   const res = await feishuAilyHelper.useAilySkill(
     {
       app_id: 'spring_7886bc2b6f__c',
