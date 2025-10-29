@@ -5,8 +5,7 @@ import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import FeishuWikiHelper from '@src/common/feishu/hepler/feishu-wiki-helper';
-
-// import
+import { sendCommonCardToFeishu } from '@src/common/feishu/utils';
 
 @Injectable()
 export default class WikiDirectoryService {
@@ -21,16 +20,20 @@ export default class WikiDirectoryService {
     this.spaceIds = this.config.getOrThrow('FeishuWikiSpaceIds');
   }
 
-  @Cron('0 0 11-18/5 * * *')
+  @Cron('0 * 11-19 * * *')
   async handleCron() {
     this.logger.debug('WikiDirectoryService Called ');
-    for (let index = 0; index < this.spaceIds.length; index++) {
-      const wikiTree = await this.loadWikiNodeTree(this.spaceIds[index]);
-      const key = RedisKeys.WIKI_DIRECTORY.replace(
-        '{spaceId}',
-        this.spaceIds[index],
-      );
-      this.cache.set(key, wikiTree, 0);
+    for (const spaceId of this.spaceIds) {
+      try {
+        const wikiTree = await this.loadWikiNodeTree(spaceId);
+        const key = RedisKeys.WIKI_DIRECTORY.replace('{spaceId}', spaceId);
+        this.cache.set(key, wikiTree, 0);
+      } catch (error) {
+        console.log('[ [error] ] >', error);
+        this.sendAlertMsg(
+          `load wiki space ${spaceId} error: ${error.message}，`,
+        );
+      }
     }
   }
   async loadWikiNodeTree(spaceId: string) {
@@ -38,5 +41,14 @@ export default class WikiDirectoryService {
     const key = RedisKeys.WIKI_DIRECTORY.replace('{spaceId}', spaceId);
     this.cache.set(key, wikiTree, 0);
     return wikiTree;
+  }
+  sendAlertMsg(errorMessage: string) {
+    sendCommonCardToFeishu({
+      title: '定时同步飞书文档目录失败',
+      project: process.env.PROJECT_NAME,
+      color: 'red',
+      message: `定时同步飞书文档目录失败`,
+      content: errorMessage,
+    });
   }
 }

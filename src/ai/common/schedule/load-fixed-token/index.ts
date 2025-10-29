@@ -4,7 +4,6 @@ import { Cron } from '@nestjs/schedule';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import * as lark from '@larksuiteoapi/node-sdk';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
-import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import { sendCommonCardToFeishu } from '@src/common/feishu/utils';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';

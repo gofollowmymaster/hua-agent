@@ -16,7 +16,14 @@ import RequestAlertFeishuAdapter from '../adapter/request-alert-feishu-adapter';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { Injectable } from '@nestjs/common';
 import { IssueStatusEnum } from '@src/common/feishu/card/error-unresolve-card';
-export const ignoreCodeList = ['401', '10002', '408', '65013'];
+export const ignoreCodeList = [
+  '401',
+  '10002',
+  '408',
+  '65013',
+  'order_quantity_not_package',
+  'no_more_than_thirty_thousand',
+];
 
 @Injectable()
 export class RequestErrorService extends ErrorBaseService {
@@ -41,7 +48,10 @@ export class RequestErrorService extends ErrorBaseService {
   }
 
   isIgnoreThisError() {
-    return this.ignoreCodeList.includes(this.errorEvent.requestData.code + '');
+    return (
+      this.ignoreCodeList.includes(this.errorEvent.requestData.code + '') ||
+      super.isIgnoreThisError()
+    );
   }
   async errorHookHandler(errorEvent: RequestAlertEvent) {
     await this.setErrorEvent(errorEvent);
