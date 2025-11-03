@@ -18,7 +18,25 @@ class FeishuWikiHelper extends FeishuDataApiHelper {
   ) {
     super(redisService);
   }
-
+  async createDocument(title: string) {
+    return await this.requestWrapper(() =>
+      this.client.client.docx.v1.document.create({
+        data: {
+          title,
+        },
+      }),
+    );
+  }
+  async convertDocument(content: string) {
+    return await this.requestWrapper(() =>
+      this.client.client.docx.v1.document.convert({
+        data: {
+          content_type: 'markdown',
+          content,
+        },
+      }),
+    );
+  }
   async list(
     spaceId: string,
     nodeToken?: string,

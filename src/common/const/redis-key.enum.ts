@@ -7,6 +7,7 @@ export const SentryAlertPrefix = 'frontend-node:alert:sentry-integration:';
 export const FeishuApiPrefix = 'frontend-node:feishu-api:';
 export const SentryApiPrefix = 'frontend-node:sentry-api:';
 export const AilyPrefix = 'frontend-node:aily:';
+export const PushFeishuDocPrefix = 'frontend-node:push-feishu-doc:';
 
 export enum RedisKeys {
   WIKI_DIRECTORY = RedisPrefix + 'wiki:directory:{spaceId}',
@@ -20,4 +21,5 @@ export enum RedisKeys {
   SENTRY_ALERT_COUNT_FREQUENCY = SentryAlertPrefix + 'error-frequency:{module}',
   FEISHU_API_CACHE = FeishuApiPrefix + '{apiName}',
   SENTRY_API_CACHE = SentryApiPrefix + '{apiName}',
+  PUSH_FEISHU_DOC_CACHE = PushFeishuDocPrefix + '{tag}',
 }

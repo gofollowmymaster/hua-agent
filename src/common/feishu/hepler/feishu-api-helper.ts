@@ -8,8 +8,8 @@ abstract class FeishuApiHelper {
   async requestWrapper(handler: () => Promise<any>, requestName: string = '') {
     try {
       const res = await handler();
-      const { code, data } = res;
 
+      const { code, data } = res;
       if (code !== 0) {
         throw new FeishuApiException(
           `【${requestName || handler.name}】【${code}】   ->  ${JSON.stringify(res)}`,

@@ -21,6 +21,8 @@ export const ignoreCodeList = [
   '10002',
   '408',
   '65013',
+  '70102',
+  '70101',
   'order_quantity_not_package',
   'no_more_than_thirty_thousand',
 ];

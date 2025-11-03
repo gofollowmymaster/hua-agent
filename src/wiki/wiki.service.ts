@@ -10,18 +10,12 @@ import WikiDirectoryService from './schedule/wiki-directory';
 
 @Injectable()
 export class WikiService {
-  // private wikiDirectoryService: WikiDirectoryService;
   constructor(
     private readonly logger: LoggerService,
     private readonly config: ConfigService,
     @Inject(CACHE_MANAGER) protected cache: Cache,
     private wikiDirectoryService: WikiDirectoryService,
-  ) {
-    // this.wikiDirectoryService = new WikiDirectoryService(
-    //   this.config,
-    //   this.cache,
-    // );
-  }
+  ) {}
 
   async tree(spaceId: string) {
     const key = RedisKeys.WIKI_DIRECTORY.replace('{spaceId}', spaceId);

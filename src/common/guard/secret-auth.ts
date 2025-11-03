@@ -52,9 +52,7 @@ export class SecretAuthGuard implements CanActivate {
     const {
       record: { fields: appInfo },
     } = await this.clientSecretTable.get(token);
-    console.log('[ appInfo ] >', appInfo);
 
-    // return true;
     // Compare the generated signature with the provided signature
     if (!appInfo.是否启用) {
       throw new UnauthorizedException();

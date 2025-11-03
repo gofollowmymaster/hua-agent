@@ -25,6 +25,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AlertModule } from './alert/alert.module';
 import { RedisModule } from './common/service/redis/redis.module';
 import { GlobalExceptionHandlerModule } from './common/service/global-exception-hander/global-exception.module';
+import { FdCopilotModule } from './fd-copilot/fd-copilot.module';
 // import { BaseTableModule } from './common/table/base-table.module';
 
 // const envFilePath = [
@@ -44,6 +45,7 @@ const modulesAll = [
   WikiModule,
   DemoPluginModule,
   AlertModule,
+  FdCopilotModule,
 ];
 
 const modules = ModuleInUsed
