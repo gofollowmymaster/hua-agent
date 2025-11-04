@@ -5,15 +5,21 @@ export class FeishuPushDto {
   @IsNotEmpty()
   @ApiProperty({
     type: String,
-    description: 'tag',
+    description: '文档标识',
   })
   tag: string;
   @IsNotEmpty()
   @ApiProperty({
     type: String,
+    description: '模块标识',
+  })
+  module: string;
+
+  @ApiProperty({
+    type: String,
     description: '标题',
   })
-  title: string;
+  title?: string;
   @IsNotEmpty()
   @ApiProperty({
     type: String,

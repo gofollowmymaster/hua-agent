@@ -7,11 +7,13 @@ import FeishuDataApiHelper from './feishu-data-api-helper';
 import {
   DocumentBlockDescendantCreateData,
   DocumentBlockDescendantCreateParams,
-  DocumentBlockDescendantCreatePath,
+  DocumentBlockPath,
   DocumentBlockDescendantCreateReturn,
   DocxConvertData,
   DocxConvertReturn,
   DocxCreateReturn,
+  DocumentBlockDeleteData,
+  DocumentBlockDeletePath,
 } from '../type/docx';
 
 @Injectable({ scope: Scope.TRANSIENT })
@@ -43,9 +45,8 @@ class FeishuDocxHelper extends FeishuDataApiHelper {
   }
   async createBlocks(
     data: DocumentBlockDescendantCreateData,
-    path: DocumentBlockDescendantCreatePath,
+    path: DocumentBlockPath,
   ): Promise<DocumentBlockDescendantCreateReturn> {
-    console.log('[ data ] >', data, path);
     return await this.requestWrapper(
       () =>
         this.client.client.docx.v1.documentBlockDescendant.create({
@@ -53,6 +54,20 @@ class FeishuDocxHelper extends FeishuDataApiHelper {
           path,
         }),
       'createBlocks',
+    );
+  }
+
+  async deleteBlock(
+    data: DocumentBlockDeleteData,
+    path: DocumentBlockDeletePath,
+  ): Promise<DocumentBlockDescendantCreateReturn> {
+    return await this.requestWrapper(
+      () =>
+        this.client.client.docx.v1.documentBlockChildren.batchDelete({
+          data,
+          path,
+        }),
+      'deleteBlock',
     );
   }
 }

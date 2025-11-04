@@ -19,3 +19,10 @@ export type WikiTreeItem = {
   title: string;
   children?: WikiTreeItem[];
 };
+
+export type WikiMoveDocsToWikiParams = Parameters<
+  lark.Client['wiki']['v2']['spaceNode']['moveDocsToWiki']
+>['0']['data'];
+export type WikiMoveDocsToWikiReturn = Awaited<
+  ReturnType<lark.Client['wiki']['v2']['spaceNode']['moveDocsToWiki']>
+>['data'];

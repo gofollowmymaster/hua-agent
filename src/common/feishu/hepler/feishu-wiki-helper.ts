@@ -4,7 +4,12 @@ import { FEISHU_CLIENT_ID } from './constants';
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import FeishuDataApiHelper from './feishu-data-api-helper';
-import { WikiDirectoryListReturn, WikiTreeItem } from '../type/wiki';
+import {
+  WikiDirectoryListReturn,
+  WikiMoveDocsToWikiParams,
+  WikiMoveDocsToWikiReturn,
+  WikiTreeItem,
+} from '../type/wiki';
 import { createHash } from 'crypto';
 
 @Injectable({ scope: Scope.TRANSIENT })
@@ -18,21 +23,15 @@ class FeishuWikiHelper extends FeishuDataApiHelper {
   ) {
     super(redisService);
   }
-  async createDocument(title: string) {
+  async moveDocumentToSpace(
+    data: WikiMoveDocsToWikiParams,
+    spaceId: string,
+  ): Promise<WikiMoveDocsToWikiReturn> {
     return await this.requestWrapper(() =>
-      this.client.client.docx.v1.document.create({
-        data: {
-          title,
-        },
-      }),
-    );
-  }
-  async convertDocument(content: string) {
-    return await this.requestWrapper(() =>
-      this.client.client.docx.v1.document.convert({
-        data: {
-          content_type: 'markdown',
-          content,
+      this.client.client.wiki.v2.spaceNode.moveDocsToWiki({
+        data,
+        path: {
+          space_id: spaceId,
         },
       }),
     );
