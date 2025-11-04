@@ -1,4 +1,4 @@
-import { Processor, Process } from '@nestjs/bull';
+import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import FeishuDocxHelper from '@src/common/feishu/hepler/feishu-docx-helper';
@@ -8,12 +8,12 @@ import { RedisService } from '@src/common/service/redis/redis.service';
 import { parentWikiToken, spaceId } from '@src/fd-copilot/sync/config';
 import { FeishuPushDto } from '@src/fd-copilot/sync/dto/sync';
 import { wait } from '@utils/job';
-import { Job } from 'bull';
+import { Job } from 'bullmq';
 import { createHash } from 'crypto';
 import Redis from 'ioredis';
 
-@Processor('document')
-export class SyncDocumentProcessor {
+@Processor('sync-document')
+export class SyncDocumentProcessor extends WorkerHost {
   protected readonly redis: Redis;
   constructor(
     protected redisService: RedisService,
@@ -21,6 +21,7 @@ export class SyncDocumentProcessor {
     protected feishuWikiHelper: FeishuWikiHelper,
     protected feishuFileHelper: FeishuFileHelper,
   ) {
+    super();
     this.redis = redisService.getClient();
   }
   async contenthandler(params: FeishuPushDto) {
@@ -66,8 +67,7 @@ export class SyncDocumentProcessor {
     }
   }
 
-  @Process('syncDocument') // 处理名为 'sync' 的任务
-  async syncDocument(job: Job<FeishuPushDto>): Promise<any> {
+  async process(job: Job<FeishuPushDto>): Promise<any> {
     const params = job.data;
     const key = RedisKeys.PUSH_FEISHU_DOC_CACHE.replace('{tag}', params.tag);
 
@@ -107,5 +107,21 @@ export class SyncDocumentProcessor {
     });
     await wait(1000);
     return res;
+  }
+
+  @OnWorkerEvent('active')
+  onJobActive(job: Job) {
+    console.log(
+      `Processing job ${job.id} of type ${job.name} with data ${JSON.stringify(job.data)}`,
+    );
+  }
+  @OnWorkerEvent('completed')
+  onJobCompleted(job: Job) {
+    console.log(`Job ${job.id} completed with result:`, job.returnvalue);
+  }
+
+  @OnWorkerEvent('failed')
+  onJobFailed(job: Job, error: Error) {
+    console.error(`Job ${job.id} failed with error:`, error.message);
   }
 }

@@ -17,9 +17,9 @@ importers:
       '@nestjs/axios':
         specifier: ^4.0.0
         version: 4.0.0(@nestjs/common@10.3.10(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.9.0)(rxjs@7.8.1)
-      '@nestjs/bull':
+      '@nestjs/bullmq':
         specifier: ^11.0.4
-        version: 11.0.4(@nestjs/common@10.3.10(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.3.10)(bull@4.16.5)
+        version: 11.0.4(@nestjs/common@10.3.10(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.3.10)(bullmq@5.63.0)
       '@nestjs/cache-manager':
         specifier: ^3.0.1
         version: 3.0.1(@nestjs/common@10.3.10(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.3.10)(cache-manager@6.4.2)(keyv@5.3.2)(rxjs@7.8.1)
@@ -65,9 +65,9 @@ importers:
       body-parser:
         specifier: ^1.20.3
         version: 1.20.3
-      bull:
-        specifier: ^4.16.5
-        version: 4.16.5
+      bullmq:
+        specifier: ^5.63.0
+        version: 5.63.0
       cache-manager:
         specifier: ^6.4.2
         version: 6.4.2
@@ -144,9 +144,6 @@ importers:
       '@nestjs/testing':
         specifier: ^10.0.0
         version: 10.3.10(@nestjs/common@10.3.10(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.3.10)(@nestjs/platform-express@10.3.10)
-      '@types/bull':
-        specifier: ^4.10.4
-        version: 4.10.4
       '@types/express':
         specifier: ^4.17.17
         version: 4.17.21
@@ -625,12 +622,12 @@ packages:
       '@nestjs/common': ^10.0.0 || ^11.0.0
       '@nestjs/core': ^10.0.0 || ^11.0.0
 
-  '@nestjs/bull@11.0.4':
-    resolution: {integrity: sha512-QVz2PR/rJF/isy7otVnMTSqLf/O71p9Ka7lBZt9Gm+NQFv8fcH2L11GL7TA0whyCcw/kAX5iRepUXz/wed4JoA==}
+  '@nestjs/bullmq@11.0.4':
+    resolution: {integrity: sha512-wBzK9raAVG0/6NTMdvLGM4/FQ1lsB35/pYS8L6a0SDgkTiLpd7mAjQ8R692oMx5s7IjvgntaZOuTUrKYLNfIkA==}
     peerDependencies:
-      '@nestjs/common': ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
-      '@nestjs/core': ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
-      bull: ^3.3 || ^4.0.0
+      '@nestjs/common': ^10.0.0 || ^11.0.0
+      '@nestjs/core': ^10.0.0 || ^11.0.0
+      bullmq: ^3.0.0 || ^4.0.0 || ^5.0.0
 
   '@nestjs/cache-manager@3.0.1':
     resolution: {integrity: sha512-4UxTnR0fsmKL5YDalU2eLFVnL+OBebWUpX+hEduKGncrVKH4PPNoiRn1kXyOCjmzb0UvWgqubpssNouc8e0MCw==}
@@ -968,10 +965,6 @@ packages:
 
   '@types/body-parser@1.19.5':
     resolution: {integrity: sha512-fB3Zu92ucau0iQ0JMCFQE7b/dv8Ot07NI3KaZIkIUNXq82k4eBAqUaneXfleGY9JWskeS9y+u0nXMyspcuQrCg==}
-
-  '@types/bull@4.10.4':
-    resolution: {integrity: sha512-A+8uxa5GbzKcS7kZ9Z1OcOeSyrvVmfHtZi3VIrH1Gws0G0sTknB2SRllxTaAYhycGn7+nC0Pb8VjxIyZiTM81A==}
-    deprecated: This is a stub types definition. bull provides its own type definitions, so you do not need this installed.
 
   '@types/connect@3.4.38':
     resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
@@ -1414,9 +1407,8 @@ packages:
   buffer@6.0.3:
     resolution: {integrity: sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==}
 
-  bull@4.16.5:
-    resolution: {integrity: sha512-lDsx2BzkKe7gkCYiT5Acj02DpTwDznl/VNN7Psn7M3USPG7Vs/BaClZJJTAG+ufAR9++N1/NiUTdaFBWDIl5TQ==}
-    engines: {node: '>=12'}
+  bullmq@5.63.0:
+    resolution: {integrity: sha512-HT1iM3Jt4bZeg3Ru/MxrOy2iIItxcl1Pz5Ync1Vrot70jBpVguMxFEiSaDU57BwYwR4iwnObDnzct2lirKkX5A==}
 
   busboy@1.6.0:
     resolution: {integrity: sha512-8SFQbg/0hQ9xy3UNTB0YEnsNBbWfhf7RtnzpL7TkBiTBRfrQ9Fxcnz7VJsleJpyp6rVLvXiuORqjlHi5q+PYuA==}
@@ -2131,10 +2123,6 @@ packages:
   get-package-type@0.1.0:
     resolution: {integrity: sha512-pjzuKtY64GYfWizNAJ0fr9VqttZkNiK2iS430LtIHzjBEr6bX8Am2zm4sW4Ro5wjWW5cAlRL1qAMTcXbjNAO2Q==}
     engines: {node: '>=8.0.0'}
-
-  get-port@5.1.1:
-    resolution: {integrity: sha512-g/Q1aTSDOxFpchXC4i8ZWvxA1lnPqx/JHqcpIw0/LX9T8x/GBbi6YnlN5nhaKIFkT8oFsscUKgDJYxfwfS6QsQ==}
-    engines: {node: '>=8'}
 
   get-stream@6.0.1:
     resolution: {integrity: sha512-ts6Wi+2j3jQjqi70w5AlN8DFnkSwC+MqmxEzdEALB2qXZYV3X/b1CTfgPLGJNMeAWxdPfU8FO1ms3NUfaHCPYg==}
@@ -3683,8 +3671,8 @@ packages:
     resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
 
-  uuid@8.3.2:
-    resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+  uuid@11.1.0:
+    resolution: {integrity: sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==}
     hasBin: true
 
   v8-compile-cache-lib@3.0.1:
@@ -4402,12 +4390,12 @@ snapshots:
       '@nestjs/core': 10.3.10(@nestjs/common@10.3.10(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.3.10)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       tslib: 2.8.1
 
-  '@nestjs/bull@11.0.4(@nestjs/common@10.3.10(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.3.10)(bull@4.16.5)':
+  '@nestjs/bullmq@11.0.4(@nestjs/common@10.3.10(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.3.10)(bullmq@5.63.0)':
     dependencies:
       '@nestjs/bull-shared': 11.0.4(@nestjs/common@10.3.10(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.3.10)
       '@nestjs/common': 10.3.10(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/core': 10.3.10(@nestjs/common@10.3.10(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.3.10)(reflect-metadata@0.2.2)(rxjs@7.8.1)
-      bull: 4.16.5
+      bullmq: 5.63.0
       tslib: 2.8.1
 
   '@nestjs/cache-manager@3.0.1(@nestjs/common@10.3.10(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.3.10)(cache-manager@6.4.2)(keyv@5.3.2)(rxjs@7.8.1)':
@@ -4780,12 +4768,6 @@ snapshots:
     dependencies:
       '@types/connect': 3.4.38
       '@types/node': 20.14.9
-
-  '@types/bull@4.10.4':
-    dependencies:
-      bull: 4.16.5
-    transitivePeerDependencies:
-      - supports-color
 
   '@types/connect@3.4.38':
     dependencies:
@@ -5179,7 +5161,7 @@ snapshots:
 
   ast-types@0.13.4:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   async@2.6.4:
     dependencies:
@@ -5350,15 +5332,15 @@ snapshots:
       base64-js: 1.5.1
       ieee754: 1.2.1
 
-  bull@4.16.5:
+  bullmq@5.63.0:
     dependencies:
       cron-parser: 4.9.0
-      get-port: 5.1.1
       ioredis: 5.6.1
-      lodash: 4.17.21
       msgpackr: 1.11.5
+      node-abort-controller: 3.1.1
       semver: 7.6.2
-      uuid: 8.3.2
+      tslib: 2.8.1
+      uuid: 11.1.0
     transitivePeerDependencies:
       - supports-color
 
@@ -6101,8 +6083,6 @@ snapshots:
       hasown: 2.0.2
 
   get-package-type@0.1.0: {}
-
-  get-port@5.1.1: {}
 
   get-stream@6.0.1: {}
 
@@ -7861,7 +7841,7 @@ snapshots:
 
   utils-merge@1.0.1: {}
 
-  uuid@8.3.2: {}
+  uuid@11.1.0: {}
 
   v8-compile-cache-lib@3.0.1: {}
 

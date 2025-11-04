@@ -23,13 +23,8 @@
       "@src/*": ["src/*"],
       "@mockServer/*": ["mockServer/*"]
     },
-    "typeRoots": ["./node_modules/@types", "./type"]
+    "typeRoots": ["node_modules/@types", "./type"]
   },
-  "include": [
-    "src/**/*.ts",
-    "type/**/*.ts",
-    "ecosystem.config.js",
-    "src/wiki/.controller.ts"
-  ],
+  "include": ["src/**/*.ts", "type/**/*.ts", "ecosystem.config.js"],
   "exclude": ["node_modules", "dist"]
 }

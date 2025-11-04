@@ -4,15 +4,15 @@ import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import { FeishuPushDto } from './dto/sync';
 import { createHash } from 'crypto';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class SyncService {
   protected readonly redis: Redis;
   constructor(
     protected redisService: RedisService,
-    @InjectQueue('document') private syncDocumentQueue: Queue,
+    @InjectQueue('sync-document') private syncDocumentQueue: Queue,
   ) {
     this.redis = redisService.getClient();
   }
@@ -28,7 +28,7 @@ export class SyncService {
       throw new HttpException('文档内容未改变', 200);
     }
     const res = await this.syncDocumentQueue.add('syncDocument', params);
-    console.log('syncDocument', res);
+    console.log('sync-document', res);
     return { msg: 'ok', data: res.id };
   }
 }
