@@ -28,11 +28,6 @@ import { GlobalExceptionHandlerModule } from './common/service/global-exception-
 import { FdCopilotModule } from './fd-copilot/fd-copilot.module';
 // import { BaseTableModule } from './common/table/base-table.module';
 
-// const envFilePath = [
-//   '.env',
-//   `.env.${process.env.NODE_ENV}`,
-//   `.env.${process.env.NODE_ENV}.local`,
-// ];
 const ModuleInUsed = process.env.MODULE_USED;
 const modulesAll = [
   SubappModule,
