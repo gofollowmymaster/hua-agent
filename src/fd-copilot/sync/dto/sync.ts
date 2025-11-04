@@ -14,12 +14,12 @@ export class FeishuPushDto {
     description: '模块标识',
   })
   module: string;
-
+  @IsNotEmpty()
   @ApiProperty({
     type: String,
     description: '标题',
   })
-  title?: string;
+  title: string;
   @IsNotEmpty()
   @ApiProperty({
     type: String,
