@@ -5,6 +5,7 @@ export const parentWikiToken = {
   charts: 'Z5MRwcpddiRfq5k29T2cZjZWn6d',
   hooks: 'Hq2iwx1jviao3Mk0nLzcEXILndd',
   utils: 'PydnwowN2ixOm6kfbQtcmJ2ZnSc',
+  blog: 'D1BZwGpeqinFrTkty8Ucgoi0n4d',
   other: 'Uf6iwYIqXizRrLknzzycd6SunQH',
 };
 
