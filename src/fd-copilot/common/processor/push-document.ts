@@ -5,7 +5,7 @@ import FeishuDocxHelper from '@src/common/feishu/hepler/feishu-docx-helper';
 import FeishuFileHelper from '@src/common/feishu/hepler/feishu-file-helper';
 import FeishuWikiHelper from '@src/common/feishu/hepler/feishu-wiki-helper';
 import { RedisService } from '@src/common/service/redis/redis.service';
-import { parentWikiToken, spaceId } from '@src/fd-copilot/sync/config';
+import { getParentWikiToken, spaceId } from '@src/fd-copilot/sync/config';
 import { FeishuPushDto } from '@src/fd-copilot/sync/dto/sync';
 import { wait } from '@utils/job';
 import { Job } from 'bullmq';
@@ -17,7 +17,7 @@ export class SyncDocumentProcessor extends WorkerHost {
   protected readonly redis: Redis;
   constructor(
     protected redisService: RedisService,
-    protected FeishuDocxHelper: FeishuDocxHelper,
+    protected feishuDocxHelper: FeishuDocxHelper,
     protected feishuWikiHelper: FeishuWikiHelper,
     protected feishuFileHelper: FeishuFileHelper,
   ) {
@@ -25,7 +25,7 @@ export class SyncDocumentProcessor extends WorkerHost {
     this.redis = redisService.getClient();
   }
   async contenthandler(params: FeishuPushDto) {
-    const documconstent = await this.FeishuDocxHelper.convertDocument({
+    const documconstent = await this.feishuDocxHelper.convertDocument({
       content_type: 'markdown',
       content: params.content,
     });
@@ -42,14 +42,14 @@ export class SyncDocumentProcessor extends WorkerHost {
   async createDocument(params: FeishuPushDto) {
     let documentId = '';
     try {
-      const { document } = await this.FeishuDocxHelper.createDocument(
+      const { document } = await this.feishuDocxHelper.createDocument(
         params.title,
       );
       documentId = document.document_id;
       //移动文档到指定知识库
       await this.feishuWikiHelper.moveDocumentToSpace(
         {
-          parent_wiki_token: parentWikiToken[params.module],
+          parent_wiki_token: getParentWikiToken(params.module),
           obj_token: documentId,
           obj_type: 'docx',
         },
@@ -69,9 +69,13 @@ export class SyncDocumentProcessor extends WorkerHost {
 
   async process(job: Job<FeishuPushDto>): Promise<any> {
     const params = job.data;
-    const key = RedisKeys.PUSH_FEISHU_DOC_CACHE.replace('{tag}', params.tag);
+    const key = RedisKeys.PUSH_FEISHU_DOC_CACHE.replace(
+      '{tag}',
+      params.module + ':' + params.tag,
+    );
 
     //1. 获取文档id ,如果没有创建文档,如果有删除节点
+    // eslint-disable-next-line prefer-const
     let { documentId, hash, blocksNum } = await this.redis.hgetall(key);
 
     const contentHash = createHash('md5').update(params.content).digest('hex');
@@ -83,7 +87,7 @@ export class SyncDocumentProcessor extends WorkerHost {
         documentId = await this.createDocument(params);
       } else {
         //删除节点
-        await this.FeishuDocxHelper.deleteBlock(
+        await this.feishuDocxHelper.deleteBlock(
           { start_index: 0, end_index: parseInt(blocksNum) },
           { document_id: documentId, block_id: documentId },
         );
@@ -91,7 +95,7 @@ export class SyncDocumentProcessor extends WorkerHost {
       //2. 转换文档内容
       const documconstent = await this.contenthandler(params);
       //3. 上传文档内容
-      const res = await this.FeishuDocxHelper.createBlocks(
+      await this.feishuDocxHelper.createBlocks(
         {
           children_id: documconstent.first_level_block_ids,
           descendants: documconstent.blocks,

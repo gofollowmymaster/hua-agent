@@ -7,3 +7,8 @@ export const parentWikiToken = {
   utils: 'PydnwowN2ixOm6kfbQtcmJ2ZnSc',
   other: 'Uf6iwYIqXizRrLknzzycd6SunQH',
 };
+
+export const getParentWikiToken = (name: string) => {
+  if (!parentWikiToken[name]) name = 'other';
+  return parentWikiToken[name];
+};

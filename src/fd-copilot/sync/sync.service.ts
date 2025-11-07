@@ -18,17 +18,18 @@ export class SyncService {
   }
 
   async pushDocument(params: FeishuPushDto): Promise<any> {
-    const key = RedisKeys.PUSH_FEISHU_DOC_CACHE.replace('{tag}', params.tag);
+    const key = RedisKeys.PUSH_FEISHU_DOC_CACHE.replace(
+      '{tag}',
+      params.module + ':' + params.tag,
+    );
 
-    //1. 获取文档id ,如果没有创建文档,如果有删除节点
-    let { hash } = await this.redis.hgetall(key);
+    const { hash } = await this.redis.hgetall(key);
 
     const contentHash = createHash('md5').update(params.content).digest('hex');
     if (contentHash == hash) {
       throw new HttpException('文档内容未改变', 200);
     }
     const res = await this.syncDocumentQueue.add('syncDocument', params);
-    console.log('sync-document', res);
     return { msg: 'ok', data: res.id };
   }
 }
