@@ -20,7 +20,8 @@ export default class ClearAlertPerDayBaseService {
   ) {}
 
   async clear() {
-    const towdayStart = dayjs().startOf('day').valueOf();
+    const towdayStart =
+      dayjs().subtract(1, 'D').startOf('day').valueOf() - 60 * 1000;
     const filter: BitTableFilter = {
       conjunction: 'and',
       conditions: [
