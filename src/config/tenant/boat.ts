@@ -1,12 +1,10 @@
 export default {
-  //机器人Aplus鉴权应用
-  AplusAuthAppId: process.env.FEISHU_AUTH_APP_ID,
-  AplusAuthAppSecret: process.env.FEISHU_AUTH_APP_SECRET,
-  //机器人小A相关
-  XiaoAAppId: process.env.FEISHU_APP_ID,
-  XiaoAAppSecret: process.env.FEISHU_APP_SECRET,
+  FeishuWikiSpaceIds: ['7549126549107195906'],
+  XiaoAAppId: 'cli_a85a4dc1c9259013',
+  XiaoAAppSecret: 'wmea3GufO6ADkITtv0CjkexcZmpCAsWi',
+
   //机器人Aplus智能体相关
-  ApluAilysAppId: process.env.FEISHU_AILY_APP_ID,
+  AplusAilyAppId: process.env.FEISHU_AILY_APP_ID,
   AplusAilyAppSecret: process.env.FEISHU_AILY_APP_SECRET,
 
   //Aplus智能体表格相关
@@ -31,12 +29,4 @@ export default {
   AlertFrontendIssueTableAppId:
     process.env.FEISHU_ALERT_FRONTEND_ISUUE_TABLE_ID,
   AlertApiIssueTableId: process.env.FEISHU_ALERT_API_ISSUE_TABLE_ID,
-  //node-server报警群
-  DefaultAlertFeishuGroupId: process.env.SERVER_ALERT_GROUPID,
-  //dev调试报警群
-  FeishuMsgDebugGroupId: 'oc_504fc5a30c33892570ffb5163b6bec93',
-  //默认报警人 Ahua
-  DefaultAlertFeishuUserId: process.env.DEFAULT_ALERT_USERID || '762a5468',
-
-  FeishuWikiSpaceIds: [process.env.FEISHU_APLUS_WIWI_SPACE_ID],
 };

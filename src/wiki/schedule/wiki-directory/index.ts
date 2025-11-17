@@ -17,7 +17,9 @@ export default class WikiDirectoryService {
     @Inject(CACHE_MANAGER) protected cache: Cache,
     private readonly feishuWikiHelper: FeishuWikiHelper,
   ) {
-    this.spaceIds = this.config.getOrThrow('FeishuWikiSpaceIds');
+    this.spaceIds = this.config.getOrThrow(
+      'tenantConfig.aplus.FeishuWikiSpaceIds',
+    );
   }
 
   @Cron('0 0 15 * * *')

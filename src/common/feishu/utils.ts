@@ -31,7 +31,7 @@ export const sendExceptionToFeishuOrigin = (
 export const sendCommonCardToFeishu = (options: CommonCardData) => {
   const config = getGlobalAppInstance(ConfigService);
   const messagerHelper = new FeishuMessageHelper(
-    ClientFactory.create(FeishuApp.AlertClient, config),
+    ClientFactory.create(FeishuApp.AlertClient),
   );
   const errorTime = dayjs();
 

@@ -21,8 +21,6 @@ export class WikiService {
     const key = RedisKeys.WIKI_DIRECTORY.replace('{spaceId}', spaceId);
     let tree = await this.cache.get(key);
 
-    console.log('[ tree ] >', tree);
-
     if (!tree) {
       tree = await this.wikiDirectoryService.loadWikiNodeTree(spaceId);
     }

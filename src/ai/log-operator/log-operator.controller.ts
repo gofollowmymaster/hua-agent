@@ -4,7 +4,6 @@ import { LogOperatorDto } from './dto/log-operator.dto';
 import { LogOperatorService } from './log-operator.service';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@src/common/guard/auth';
-// import SentryAdapter from './adapter/sentry-apialert-adapter';
 
 @ApiTags('ai问答日志操作器')
 @Controller('log-operator')

@@ -11,8 +11,10 @@ class FeishuFrontendAlertIssueTable extends FeishuTable {
     readonly tableHelper: FeishuTableHelper,
   ) {
     super();
-    this.appToken = config.getOrThrow('AlertTableAppToken');
-    this.tableId = config.getOrThrow('AlertFrontendIssueTableAppId');
+    this.appToken = config.getOrThrow('tenantConfig.aplus.AlertTableAppToken');
+    this.tableId = config.getOrThrow(
+      'tenantConfig.aplus.AlertFrontendIssueTableAppId',
+    );
     this.tableHelper.setTableOption({
       appToken: this.appToken,
       tableId: this.tableId,

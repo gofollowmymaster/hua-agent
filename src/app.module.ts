@@ -26,6 +26,9 @@ import { AlertModule } from './alert/alert.module';
 import { RedisModule } from './common/service/redis/redis.module';
 import { GlobalExceptionHandlerModule } from './common/service/global-exception-hander/global-exception.module';
 import { FdCopilotModule } from './fd-copilot/fd-copilot.module';
+import { TenantMiddleware } from './common/middleware/tenant.middleware';
+import { ContextModule } from './common/service/context/context.module';
+import { DiscardMiddleware } from './common/middleware/discard.middleware';
 // import { BaseTableModule } from './common/table/base-table.module';
 
 const ModuleInUsed = process.env.MODULE_USED;
@@ -48,6 +51,8 @@ const modules = ModuleInUsed
   : modulesAll;
 @Module({
   imports: [
+    ContextModule,
+
     ConfigModule.forRoot({
       // envFilePath: envFilePath,
       isGlobal: true,
@@ -89,7 +94,15 @@ const modules = ModuleInUsed
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*'); // 你可以指定特定的路由
+    consumer.apply(DiscardMiddleware).forRoutes('*'); // 你可以指定特定的路由
+    consumer
+      .apply(TenantMiddleware)
+      .forRoutes(
+        { path: '/log-operator/add', method: 1 },
+        { path: '/aily/bindSession', method: 1 },
+        '/wiki/*',
+      );
   }
 
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+  constructor() {}
 }

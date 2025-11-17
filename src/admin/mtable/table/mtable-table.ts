@@ -15,8 +15,8 @@ class AdminMtableTable extends FeishuTable {
   ) {
     super();
 
-    this.appToken = config.get('AplusNodeAdminAppToken');
-    this.tableId = config.get('AplusNodeAdminMtableTableId');
+    this.appToken = config.get('tenantConfig.aplus.AplusNodeAdminAppToken');
+    this.tableId = config.get('tenantConfig.aplus.AplusNodeAdminMtableTableId');
     this.tableHelper.setTableOption({
       appToken: this.appToken,
       tableId: this.tableId,

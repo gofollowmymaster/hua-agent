@@ -13,7 +13,9 @@ class ClientTokenTable extends FeishuTable {
     readonly tableHelper: FeishuTableHelper,
   ) {
     super();
-    this.appToken = config.getOrThrow('AplusNodeAdminAppToken');
+    this.appToken = config.getOrThrow(
+      'tenantConfig.aplus.AplusNodeAdminAppToken',
+    );
     this.tableId = 'tblNF8bpfSvc4ZK0';
     this.tableHelper.setTableOption({
       appToken: this.appToken,
