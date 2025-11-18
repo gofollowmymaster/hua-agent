@@ -10,6 +10,7 @@ import {
 } from '../type/contact';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import FeishuDataApiHelper from './feishu-data-api-helper';
+import { TenantContext } from '@src/common/service/context/tenant.context';
 
 @Injectable({ scope: Scope.TRANSIENT })
 class FeishuUserHelper extends FeishuDataApiHelper {
@@ -17,7 +18,8 @@ class FeishuUserHelper extends FeishuDataApiHelper {
   protected readonly ttl = 60 * 60 * 24;
   constructor(
     // private readonly config: ConfigService,
-    @Inject(FEISHU_CLIENT_ID) private readonly client: FeishuClient,
+    @Inject(FEISHU_CLIENT_ID) protected readonly feishuClient: FeishuClient,
+    protected readonly userContext: TenantContext,
     protected redisService: RedisService,
   ) {
     super(redisService);
@@ -36,7 +38,7 @@ class FeishuUserHelper extends FeishuDataApiHelper {
   ): Promise<ContactUserGetReturnType> {
     return await this.readWrapper(
       async () =>
-        await this.client.client.contact.user.get({
+        await this.client.contact.user.get({
           params: {
             user_id_type: userIdType,
             department_id_type: departmentIdType,
@@ -63,7 +65,7 @@ class FeishuUserHelper extends FeishuDataApiHelper {
   }): Promise<ContactUserGetReturnType> {
     return await this.readWrapper(
       async () =>
-        await this.client.client.contact.user.batchGetId({
+        await this.client.contact.user.batchGetId({
           data: {
             emails,
             mobiles,
@@ -83,7 +85,7 @@ class FeishuUserHelper extends FeishuDataApiHelper {
   ): Promise<ContactUserGetReturnType> {
     return await this.readWrapper(
       async () =>
-        await this.client.client.contact.user.findByDepartment({
+        await this.client.contact.user.findByDepartment({
           params,
         }),
       true,

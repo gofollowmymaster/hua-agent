@@ -1,5 +1,7 @@
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import FeishuAilyHelper from '@src/common/feishu/hepler/feishu-aily-helper';
+import { TenantContext } from '@src/common/service/context/tenant.context';
+import { getGlobalAppInstance } from '@utils/app-config';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween'; // nodejs
 const { isWorkday } = require('chinese-workday');
@@ -67,8 +69,9 @@ export const isNeedSendAlertMsg = (time: number = dayjs().valueOf()) => {
  */
 export const useAilyAlertSkill = async (message: string) => {
   const client = ClientFactory.create(FeishuApp.AiAlertClient);
+  const userContext = getGlobalAppInstance(TenantContext);
 
-  const feishuAilyHelper = new FeishuAilyHelper(client);
+  const feishuAilyHelper = new FeishuAilyHelper(client, userContext);
   console.log('[ message ] >', message);
   const res = await feishuAilyHelper.useAilySkill(
     {

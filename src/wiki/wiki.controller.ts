@@ -23,7 +23,6 @@ export class WikiController {
   @Post('/tree')
   @ApiBody({ type: WikiTreeDto })
   async tree(@Body() params: WikiTreeDto) {
-    //发送消息
     return await this.wikiService.tree(params.spaceId);
   }
   @ApiOperation({

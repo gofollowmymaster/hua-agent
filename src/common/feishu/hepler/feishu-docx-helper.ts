@@ -6,7 +6,6 @@ import { RedisService } from '@src/common/service/redis/redis.service';
 import FeishuDataApiHelper from './feishu-data-api-helper';
 import {
   DocumentBlockDescendantCreateData,
-  DocumentBlockDescendantCreateParams,
   DocumentBlockPath,
   DocumentBlockDescendantCreateReturn,
   DocxConvertData,
@@ -15,6 +14,7 @@ import {
   DocumentBlockDeleteData,
   DocumentBlockDeletePath,
 } from '../type/docx';
+import { TenantContext } from '@src/common/service/context/tenant.context';
 
 @Injectable({ scope: Scope.TRANSIENT })
 class FeishuDocxHelper extends FeishuDataApiHelper {
@@ -22,14 +22,15 @@ class FeishuDocxHelper extends FeishuDataApiHelper {
   protected readonly ttl = 60 * 60 * 24;
   constructor(
     // private readonly config: ConfigService,
-    @Inject(FEISHU_CLIENT_ID) private readonly client: FeishuClient,
+    @Inject(FEISHU_CLIENT_ID) protected readonly feishuClient: FeishuClient,
+    protected readonly userContext: TenantContext,
     protected redisService: RedisService,
   ) {
     super(redisService);
   }
   async createDocument(title: string): Promise<DocxCreateReturn> {
     return await this.requestWrapper(() =>
-      this.client.client.docx.v1.document.create({
+      this.client.docx.v1.document.create({
         data: {
           title,
         },
@@ -38,7 +39,7 @@ class FeishuDocxHelper extends FeishuDataApiHelper {
   }
   async convertDocument(data: DocxConvertData): Promise<DocxConvertReturn> {
     return await this.requestWrapper(() =>
-      this.client.client.docx.v1.document.convert({
+      this.client.docx.v1.document.convert({
         data,
       }),
     );
@@ -49,7 +50,7 @@ class FeishuDocxHelper extends FeishuDataApiHelper {
   ): Promise<DocumentBlockDescendantCreateReturn> {
     return await this.requestWrapper(
       () =>
-        this.client.client.docx.v1.documentBlockDescendant.create({
+        this.client.docx.v1.documentBlockDescendant.create({
           data,
           path,
         }),
@@ -63,7 +64,7 @@ class FeishuDocxHelper extends FeishuDataApiHelper {
   ): Promise<DocumentBlockDescendantCreateReturn> {
     return await this.requestWrapper(
       () =>
-        this.client.client.docx.v1.documentBlockChildren.batchDelete({
+        this.client.docx.v1.documentBlockChildren.batchDelete({
           data,
           path,
         }),

@@ -9,6 +9,7 @@ import {
   FeishuFileDeletePath,
   FeishuFileDeleteReturn,
 } from '../type/file';
+import { TenantContext } from '@src/common/service/context/tenant.context';
 
 @Injectable({ scope: Scope.TRANSIENT })
 class FeishuFileHelper extends FeishuDataApiHelper {
@@ -16,7 +17,8 @@ class FeishuFileHelper extends FeishuDataApiHelper {
   protected readonly ttl = 60 * 60 * 24;
   constructor(
     // private readonly config: ConfigService,
-    @Inject(FEISHU_CLIENT_ID) private readonly client: FeishuClient,
+    @Inject(FEISHU_CLIENT_ID) protected readonly feishuClient: FeishuClient,
+    protected readonly userContext: TenantContext,
     protected redisService: RedisService,
   ) {
     super(redisService);
@@ -28,7 +30,7 @@ class FeishuFileHelper extends FeishuDataApiHelper {
   ): Promise<FeishuFileDeleteReturn> {
     return await this.requestWrapper(
       () =>
-        this.client.client.drive.v1.file.delete({
+        this.client.drive.v1.file.delete({
           params,
           path,
         }),

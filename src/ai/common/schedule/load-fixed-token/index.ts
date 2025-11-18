@@ -14,16 +14,13 @@ export type FeishuAuthType = Awaited<
 
 @Injectable()
 export default class FixedTokenService {
-  private readonly client: lark.Client;
+  private client: lark.Client;
   private readonly logger = new Logger(FixedTokenService.name);
   private readonly redis: Redis;
   constructor(
     private readonly config: ConfigService,
     protected redisService: RedisService,
   ) {
-    const authClient = ClientFactory.create(FeishuApp.AilyAplusClient);
-    this.client = authClient.client;
-
     this.redis = redisService.getClient();
   }
 
@@ -32,7 +29,8 @@ export default class FixedTokenService {
   async handleCron(force = false) {
     this.logger.debug('FixedTokenService Called ');
     if (!force && ['development', 'dev'].includes(process.env.NODE_ENV)) return;
-
+    const authClient = ClientFactory.create(FeishuApp.AilyAplusClient);
+    this.client = authClient.client;
     this.loadToken();
   }
   async loadToken() {

@@ -1,33 +1,34 @@
-import { Injectable, Scope } from '@nestjs/common';
-import { REQUEST } from '@nestjs/core';
-import { Inject } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable } from '@nestjs/common';
+import { TenantCode, tenantCodeMap } from '@src/config/tenant';
+import { UserContext } from '@src/type/global';
+import { AsyncLocalStorage } from 'async_hooks';
 
-@Injectable({ scope: Scope.REQUEST })
+export interface RequestContext {
+  user: UserContext;
+  // requestId: string;
+  // timestamp: number;
+}
+
+@Injectable()
 export class TenantContext {
-  constructor(
-    @Inject(REQUEST) private readonly request: Request,
-    private readonly config: ConfigService,
-  ) {}
+  private readonly asyncLocalStorage = new AsyncLocalStorage<RequestContext>();
 
-  get tenantId(): string {
-    return this.request['tenantId'];
+  run(context: RequestContext, callback: () => void) {
+    this.asyncLocalStorage.run(context, callback);
   }
 
-  get tenantConfig(): Record<string, any> {
-    // 返回租户特定配置
-    // console.log(
-    //   '[ this.config.get(tenantConfig) ] >',
-    //   this.config.get('tenantConfig'),
-    // );
-    // console.log(
-    //   '[ this.request[supplierCode] ] >',
-    //   this.request['supplierCode'],
-    // );
-    const tenantConfig =
-      this.config.get('tenantConfig')?.[
-        this.request['supplierCode'] || 'aplus'
-      ];
-    return tenantConfig || {};
+  getStore(): RequestContext | undefined {
+    return this.asyncLocalStorage.getStore();
+  }
+
+  get user() {
+    return this.getStore()?.user;
+  }
+
+  get userId(): number | undefined {
+    return this.user?.userId;
+  }
+  get tenant(): TenantCode | undefined {
+    return tenantCodeMap[this.user?.supplierCode];
   }
 }

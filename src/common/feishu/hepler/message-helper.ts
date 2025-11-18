@@ -9,11 +9,15 @@ import {
 } from '../type/im';
 import FeishuApiHelper from './feishu-api-helper';
 import { UserIdType } from '../type/contact';
+import { TenantContext } from '@src/common/service/context/tenant.context';
 // import { HttpService } from '@nestjs/axios';
 
 @Injectable({ scope: Scope.TRANSIENT })
 class FeishuMessageHelper extends FeishuApiHelper {
-  constructor(@Inject(FEISHU_CLIENT_ID) private readonly client: FeishuClient) {
+  constructor(
+    @Inject(FEISHU_CLIENT_ID) protected readonly feishuClient: FeishuClient,
+    protected readonly userContext: TenantContext,
+  ) {
     super();
   }
 
@@ -21,7 +25,7 @@ class FeishuMessageHelper extends FeishuApiHelper {
     msgParams: CreateMessageType,
   ): Promise<FeishuMessageCreateReturnBody> {
     return await this.requestWrapper(async () => {
-      return await this.client.client.im.message.create(msgParams);
+      return await this.client.im.message.create(msgParams);
     }, 'message-create');
   }
   async createToUser(
@@ -58,7 +62,7 @@ class FeishuMessageHelper extends FeishuApiHelper {
     replyInThread = false,
   ) {
     return this.requestWrapper(async () => {
-      return await this.client.client.im.message.reply({
+      return await this.client.im.message.reply({
         data: {
           msg_type: msgType,
           content,
@@ -79,7 +83,7 @@ class FeishuMessageHelper extends FeishuApiHelper {
   }
   async urgentPhone(userId: string[], messageId: string) {
     return this.requestWrapper(async () => {
-      return await this.client.client.im.message.urgentPhone({
+      return await this.client.im.message.urgentPhone({
         data: {
           user_id_list: [...userId],
         },
@@ -98,7 +102,7 @@ class FeishuMessageHelper extends FeishuApiHelper {
     userIdType: UserIdType = 'user_id',
   ) {
     return this.requestWrapper(async () => {
-      return await this.client.client.im.message.urgentApp({
+      return await this.client.im.message.urgentApp({
         data: {
           user_id_list: [...userId],
         },
@@ -117,7 +121,7 @@ class FeishuMessageHelper extends FeishuApiHelper {
     receiveIdType: UserIdType = 'user_id',
   ) {
     return this.requestWrapper(async () => {
-      return await this.client.client.im.thread.forward({
+      return await this.client.im.thread.forward({
         data: {
           receive_id: receiveId,
         },

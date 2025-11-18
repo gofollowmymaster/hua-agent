@@ -8,6 +8,7 @@ import {
 } from '../type/contact';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import FeishuDataApiHelper from './feishu-data-api-helper';
+import { TenantContext } from '@src/common/service/context/tenant.context';
 
 @Injectable({ scope: Scope.TRANSIENT })
 class FeishuDepartmentHelper extends FeishuDataApiHelper {
@@ -15,7 +16,8 @@ class FeishuDepartmentHelper extends FeishuDataApiHelper {
   protected readonly ttl = 60 * 60 * 24;
   constructor(
     // private readonly config: ConfigService,
-    @Inject(FEISHU_CLIENT_ID) private readonly client: FeishuClient,
+    @Inject(FEISHU_CLIENT_ID) protected readonly feishuClient: FeishuClient,
+    protected readonly userContext: TenantContext,
     protected redisService: RedisService,
   ) {
     super(redisService);
@@ -31,7 +33,7 @@ class FeishuDepartmentHelper extends FeishuDataApiHelper {
   ): Promise<FindChildrenDepartmentReturn> {
     return await this.readWrapper(
       async () =>
-        await this.client.client.contact.v3.department.children({
+        await this.client.contact.v3.department.children({
           params,
           path: {
             department_id: departmentId,

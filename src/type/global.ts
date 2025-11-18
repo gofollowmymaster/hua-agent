@@ -17,3 +17,18 @@ export class AplusResponse<T> {
   })
   body: T;
 }
+
+export type UserContext = {
+  supplierName?: string;
+  loginId?: string;
+  tenantCode?: string;
+  appCode: 'APLUS' | 'ADMIN' | 'QUICK';
+  supplierCode: string;
+  userId?: number;
+  userCode?: string;
+  loginTime?: number;
+  tenantName?: string;
+  scope?: 'WEB' | 'APP';
+  tenantId?: number;
+  username?: string;
+};

@@ -11,6 +11,7 @@ import {
   WikiTreeItem,
 } from '../type/wiki';
 import { createHash } from 'crypto';
+import { TenantContext } from '@src/common/service/context/tenant.context';
 
 @Injectable({ scope: Scope.TRANSIENT })
 class FeishuWikiHelper extends FeishuDataApiHelper {
@@ -18,7 +19,8 @@ class FeishuWikiHelper extends FeishuDataApiHelper {
   protected readonly ttl = 60 * 60 * 24;
   constructor(
     // private readonly config: ConfigService,
-    @Inject(FEISHU_CLIENT_ID) private readonly client: FeishuClient,
+    @Inject(FEISHU_CLIENT_ID) protected readonly feishuClient: FeishuClient,
+    protected readonly userContext: TenantContext,
     protected redisService: RedisService,
   ) {
     super(redisService);
@@ -28,7 +30,7 @@ class FeishuWikiHelper extends FeishuDataApiHelper {
     spaceId: string,
   ): Promise<WikiMoveDocsToWikiReturn> {
     return await this.requestWrapper(() =>
-      this.client.client.wiki.v2.spaceNode.moveDocsToWiki({
+      this.client.wiki.v2.spaceNode.moveDocsToWiki({
         data,
         path: {
           space_id: spaceId,
@@ -43,7 +45,7 @@ class FeishuWikiHelper extends FeishuDataApiHelper {
   ): Promise<WikiDirectoryListReturn> {
     return await this.readWrapper(
       async () =>
-        await this.client.client.wiki.v2.spaceNode.list({
+        await this.client.wiki.v2.spaceNode.list({
           path: {
             space_id: spaceId,
           },

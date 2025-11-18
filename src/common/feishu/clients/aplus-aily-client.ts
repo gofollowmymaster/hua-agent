@@ -1,18 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import FeishuClient from './client';
-import { ConfigService } from '@nestjs/config';
+import { FeishuAppClentsType } from '.';
 
 @Injectable()
 class AilyAplusClient extends FeishuClient {
   // private readonly instance;
 
-  constructor(config?: ConfigService) {
-    const AplusAilyAppId =
-      config?.get('AplusAilyAppId') || process.env.FEISHU_AILY_APP_ID;
-    const AplusAilyAppSecret =
-      config?.get('AplusAilyAppSecret') || process.env.FEISHU_AILY_APP_SECRET;
-
-    super(AplusAilyAppId, AplusAilyAppSecret);
+  constructor() {
+    super(AilyAplusClient.name as FeishuAppClentsType);
   }
 }
 

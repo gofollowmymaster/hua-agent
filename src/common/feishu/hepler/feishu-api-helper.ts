@@ -1,10 +1,15 @@
-// import FeishuClient from '../clients/client';
-// import { ConfigService } from '@nestjs/config';
 import { Injectable, Scope } from '@nestjs/common';
 import { FeishuApiException } from '@src/common/exception/feishu-api-exception';
+import FeishuClient from '../clients/client';
+import { TenantContext } from '@src/common/service/context/tenant.context';
 
 @Injectable({ scope: Scope.TRANSIENT })
 abstract class FeishuApiHelper {
+  protected feishuClient: FeishuClient;
+  protected readonly userContext: TenantContext;
+  get client() {
+    return this.feishuClient.getClient(this.userContext.tenant);
+  }
   async requestWrapper(handler: () => Promise<any>, requestName: string = '') {
     try {
       const res = await handler();

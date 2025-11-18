@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import FeishuTableHelper from '../feishu/hepler/table-helper';
 import { ClientFactory, FeishuApp } from '../feishu/clients';
 import { RedisService } from '../service/redis/redis.service';
+import { TenantContext } from '../service/context/tenant.context';
 
 @Injectable()
 export class SignAuthGuard implements CanActivate {
@@ -17,11 +18,13 @@ export class SignAuthGuard implements CanActivate {
   constructor(
     private config: ConfigService,
     private redisService: RedisService,
+    protected readonly userContext: TenantContext,
   ) {
     this.clientSecretTable = new ClientSecretTable(
       this.config,
       new FeishuTableHelper(
         ClientFactory.create(FeishuApp.AilyAplusClient),
+        userContext,
         redisService,
       ),
     );

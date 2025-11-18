@@ -13,6 +13,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import FeishuDataApiHelper from './feishu-data-api-helper';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { RedisService } from '@src/common/service/redis/redis.service';
+import { TenantContext } from '@src/common/service/context/tenant.context';
 
 export type TableHelperOptions = {
   appToken: string;
@@ -28,7 +29,8 @@ class FeishuTableHelper extends FeishuDataApiHelper {
   protected ttl = 60 * 10; //默认缓存10分钟
 
   constructor(
-    @Inject(FEISHU_CLIENT_ID) private readonly client: FeishuClient,
+    @Inject(FEISHU_CLIENT_ID) protected readonly feishuClient: FeishuClient,
+    protected readonly userContext: TenantContext,
     protected redisService: RedisService,
   ) {
     super(redisService);
@@ -50,7 +52,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
   async list(params: BitTableSearchPayloadParams = {}, useCache = true) {
     return this.readWrapper(
       async () =>
-        await this.client.client.bitable.appTableRecord.list({
+        await this.client.bitable.appTableRecord.list({
           params,
           path: {
             app_token: this.appToken,
@@ -69,7 +71,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
     const cacheKey = 'search:' + JSON.stringify(filter).replaceAll(':', '');
     return this.readWrapper(
       async () =>
-        await this.client.client.bitable.appTableRecord.search({
+        await this.client.bitable.appTableRecord.search({
           path: {
             app_token: this.appToken,
             table_id: this.tableId,
@@ -90,7 +92,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
   ) {
     return this.readWrapper(
       async () =>
-        await this.client.client.bitable.appTableRecord.get({
+        await this.client.bitable.appTableRecord.get({
           path: {
             app_token: this.appToken,
             table_id: this.tableId,
@@ -106,7 +108,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
   async create(records: BitTableFields) {
     return this.requestWrapper(
       async () =>
-        await this.client.client.bitable.appTableRecord.create({
+        await this.client.bitable.appTableRecord.create({
           path: {
             app_token: this.appToken,
             table_id: this.tableId,
@@ -125,7 +127,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
   ) {
     return this.requestWrapper(
       async () =>
-        await this.client.client.bitable.appTableRecord.update({
+        await this.client.bitable.appTableRecord.update({
           path: {
             app_token: this.appToken,
             table_id: this.tableId,
@@ -142,7 +144,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
   async batchUpdate(records: BitTableRecord[], params?: BitTableCreateOption) {
     return this.requestWrapper(
       async () =>
-        await this.client.client.bitable.appTableRecord.batchUpdate({
+        await this.client.bitable.appTableRecord.batchUpdate({
           params,
           path: {
             app_token: this.appToken,
@@ -159,7 +161,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
   async delete(recordId: string) {
     return this.requestWrapper(
       async () =>
-        await this.client.client.bitable.appTableRecord.delete({
+        await this.client.bitable.appTableRecord.delete({
           path: {
             app_token: this.appToken,
             table_id: this.tableId,

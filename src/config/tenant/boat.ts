@@ -1,11 +1,20 @@
 export default {
   FeishuWikiSpaceIds: ['7549126549107195906'],
-  XiaoAAppId: 'cli_a85a4dc1c9259013',
-  XiaoAAppSecret: 'wmea3GufO6ADkITtv0CjkexcZmpCAsWi',
 
+  XiaoAClient: {
+    appId: 'cli_a7b9fe27cli_a85a4dc1c9259013a3f8d00e',
+    appSecret: 'wmea3GufO6ADkITtv0CjkexcZmpCAsWi',
+  },
+  AuthClient: {
+    appId: process.env.FEISHU_AUTH_APP_ID,
+    appSecret: process.env.FEISHU_AUTH_APP_SECRET,
+  },
   //机器人Aplus智能体相关
-  AplusAilyAppId: process.env.FEISHU_AILY_APP_ID,
-  AplusAilyAppSecret: process.env.FEISHU_AILY_APP_SECRET,
+
+  AilyAplusClient: {
+    appId: process.env.FEISHU_AILY_APP_ID,
+    appSecret: process.env.FEISHU_AILY_APP_SECRET,
+  },
 
   //Aplus智能体表格相关
   AilyLogTableAppToken:
@@ -17,11 +26,17 @@ export default {
   AplusNodeAdminMtableTableId:
     process.env.FEISHU_APLUS_NODE_ADMIN_MTABLE_TABLE_ID,
   //Aily智能报警提示相关
-  AilyAlertAppId: process.env.FEISHU_AILY_ALERT_APP_ID,
-  AilyAlertAppSecret: process.env.FEISHU_AILY_ALERT_APP_SECRET,
+  AiAlertClient: {
+    appId: process.env.FEISHU_AILY_ALERT_APP_ID,
+    appSecret: process.env.FEISHU_AILY_ALERT_APP_SECRET,
+  },
+
   //报警机器人相关
-  AlertAppId: process.env.FEISHU_ALERT_APP_APPID,
-  AlertAppSecret: process.env.FEISHU_ALERT_APP_APPSECRET,
+  FeishuAlertClient: {
+    appId: process.env.FEISHU_ALERT_APP_APPID,
+    appSecret: process.env.FEISHU_ALERT_APP_APPSECRET,
+  },
+
   //报警表格相关
   AlertTableAppToken: process.env.FEISHU_ALERT_APP_TOKEN,
   AlertApiTableId: process.env.FEISHU_ALERT_API_TABLE_ID,

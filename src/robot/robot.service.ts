@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UseGuards } from '@nestjs/common';
 import * as lark from '@larksuiteoapi/node-sdk';
 import {
   SearchParamsDto,
@@ -19,6 +19,8 @@ import { ClientFactory } from '@src/common/feishu/clients';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { logger } from '@src/common/middleware/logger.middleware';
+import { ApiOperation } from '@nestjs/swagger';
+import { AuthGuard } from '@src/common/guard/auth';
 @Injectable()
 export class RobotService {
   constructor(
@@ -126,11 +128,18 @@ export class RobotService {
       content: params.content,
     });
   }
+
+  @ApiOperation({
+    summary: '获取飞书机器人认证票据',
+    description: '获取飞书机器人认证票据，web端小组件使用',
+  })
+  @UseGuards(AuthGuard)
   async getTicket(params: FeishuTicketDto) {
-    const client = ClientFactory.create(params.appName);
-    const appId = client.client.appId;
-    const appSecret = client.client.appSecret;
-    const res = await client.client.auth.v3.appAccessToken.internal(
+    const feishuClient = ClientFactory.create(params.appName);
+    console.log('[ feishuClient ] >', feishuClient.client);
+    const appId = feishuClient.client.appId;
+    const appSecret = feishuClient.client.appSecret;
+    const res = await feishuClient.client.auth.v3.appAccessToken.internal(
       {
         data: {
           app_id: appId,

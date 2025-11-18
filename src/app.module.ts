@@ -95,13 +95,7 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*'); // 你可以指定特定的路由
     consumer.apply(DiscardMiddleware).forRoutes('*'); // 你可以指定特定的路由
-    consumer
-      .apply(TenantMiddleware)
-      .forRoutes(
-        { path: '/log-operator/add', method: 1 },
-        { path: '/aily/bindSession', method: 1 },
-        '/wiki/*',
-      );
+    consumer.apply(TenantMiddleware).forRoutes('*');
   }
 
   constructor() {}
