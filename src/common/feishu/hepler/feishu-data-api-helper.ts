@@ -15,7 +15,11 @@ abstract class FeishuDataApiHelper extends FeishuApiHelper {
     this.redis = redisService.getClient();
   }
   buildCacheKey(key: string) {
-    const cacheKey = RedisKeys.FEISHU_API_CACHE.replace('{apiName}', key);
+    const cacheKey = this.redisService.buildCacheKey(
+      RedisKeys.FEISHU_API_CACHE,
+      '{apiName}',
+      key,
+    );
     return cacheKey;
   }
 
