@@ -6,6 +6,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import FeishuWikiHelper from '@src/common/feishu/hepler/feishu-wiki-helper';
 import { sendCommonCardToFeishu } from '@src/common/feishu/utils';
+import { RedisService } from '@src/common/service/redis/redis.service';
 
 @Injectable()
 export default class WikiDirectoryService {
@@ -16,6 +17,7 @@ export default class WikiDirectoryService {
     private readonly config: ConfigService,
     @Inject(CACHE_MANAGER) protected cache: Cache,
     private readonly feishuWikiHelper: FeishuWikiHelper,
+    private readonly redisService: RedisService,
   ) {
     this.spaceIds = this.config.getOrThrow(
       'tenantConfig.aplus.FeishuWikiSpaceIds',
@@ -28,7 +30,11 @@ export default class WikiDirectoryService {
     for (const spaceId of this.spaceIds) {
       try {
         const wikiTree = await this.loadWikiNodeTree(spaceId);
-        const key = RedisKeys.WIKI_DIRECTORY.replace('{spaceId}', spaceId);
+        const key = this.redisService.buildCacheKey(
+          RedisKeys.WIKI_DIRECTORY,
+          '{spaceId}',
+          spaceId,
+        );
         this.cache.set(key, wikiTree, 0);
       } catch (error) {
         console.log('[ [error] ] >', error);
@@ -40,7 +46,11 @@ export default class WikiDirectoryService {
   }
   async loadWikiNodeTree(spaceId: string) {
     const wikiTree = await this.feishuWikiHelper.loadWikiTree(spaceId);
-    const key = RedisKeys.WIKI_DIRECTORY.replace('{spaceId}', spaceId);
+    const key = this.redisService.buildCacheKey(
+      RedisKeys.WIKI_DIRECTORY,
+      '{spaceId}',
+      spaceId,
+    );
     this.cache.set(key, wikiTree, 0);
     return wikiTree;
   }

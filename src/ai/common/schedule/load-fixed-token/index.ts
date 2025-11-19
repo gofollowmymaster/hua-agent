@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import * as lark from '@larksuiteoapi/node-sdk';
@@ -17,10 +16,7 @@ export default class FixedTokenService {
   private client: lark.Client;
   private readonly logger = new Logger(FixedTokenService.name);
   private readonly redis: Redis;
-  constructor(
-    private readonly config: ConfigService,
-    protected redisService: RedisService,
-  ) {
+  constructor(protected redisService: RedisService) {
     this.redis = redisService.getClient();
   }
 
@@ -35,7 +31,7 @@ export default class FixedTokenService {
   }
   async loadToken() {
     const tokenInCached: FeishuAuthType = await this.redis.hgetall(
-      RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED,
+      this.redisService.buildCacheKey(RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED),
     );
     this.logger.log('[ cachedinfo ] >' + JSON.stringify(tokenInCached));
 
@@ -58,9 +54,15 @@ export default class FixedTokenService {
       return;
     }
 
-    await this.redis.hset(RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED, res.data);
+    await this.redis.hset(
+      this.redisService.buildCacheKey(RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED),
+      res.data,
+    );
 
-    this.redis.expire(RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED, 60 * 60 * 24);
+    this.redis.expire(
+      this.redisService.buildCacheKey(RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED),
+      60 * 60 * 24,
+    );
   }
 
   sendAlertMsg(errorMessage: string) {

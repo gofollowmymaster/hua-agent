@@ -33,21 +33,32 @@ export class AilyService {
     if (res.code !== 0) {
       throw new FeishuApiException(res.msg);
     }
-    const key = RedisKeys.FEISHU_FIXED_ACCESS_TOKEN.replace('{code}', code);
+    const key = this.redisService.buildCacheKey(
+      RedisKeys.FEISHU_FIXED_ACCESS_TOKEN,
+      '{code}',
+      code,
+    );
     await this.redis.hset(key, res.data);
     this.redis.expire(key, 60 * 60 * 24);
     return res.data;
   }
   async useTokenByCode(code: string) {
-    const codeKey = RedisKeys.FEISHU_FIXED_ACCESS_TOKEN.replace('{code}', code);
+    const codeKey = this.redisService.buildCacheKey(
+      RedisKeys.FEISHU_FIXED_ACCESS_TOKEN,
+      '{code}',
+      code,
+    );
 
     const userInfo = await this.redis.hgetall(codeKey);
-    const usedKey = RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED;
+    const usedKey = this.redisService.buildCacheKey(
+      RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED,
+    );
     await this.redis.hset(usedKey, userInfo);
   }
 
   async bindSession(params: BindSessionCodeDto) {
-    const key = RedisKeys.FEISHU_AILY_SESSION_CODE.replace(
+    const key = this.redisService.buildCacheKey(
+      RedisKeys.FEISHU_AILY_SESSION_CODE,
       '{code}',
       params.code,
     );
@@ -55,7 +66,8 @@ export class AilyService {
     return;
   }
   async verifySession(params: BindSessionCodeDto) {
-    const key = RedisKeys.FEISHU_AILY_SESSION_CODE.replace(
+    const key = this.redisService.buildCacheKey(
+      RedisKeys.FEISHU_AILY_SESSION_CODE,
       '{code}',
       params.code,
     );
