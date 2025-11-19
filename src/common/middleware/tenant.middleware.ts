@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request, Response, NextFunction } from 'express';
 import { TenantContext } from '../service/context/tenant.context';
 import { UserContext } from '@src/type/global';
+import { tenantCodeMap } from '@src/config/tenant';
 
 @Injectable()
 export class TenantMiddleware implements NestMiddleware {
@@ -12,17 +13,19 @@ export class TenantMiddleware implements NestMiddleware {
   ) {}
   async use(req: Request, _res: Response, next: NextFunction) {
     // 从不同来源获取租户ID
-    const payload = await this.extractTokenFromHeader(req);
+    const user = await this.extractTokenFromHeader(req);
+    if (!tenantCodeMap[user.supplierCode]) {
+      user.supplierCode = 'B0004';
+    }
     // 设置租户上下文
-
-    const user = payload; // 从认证中间件获取的用户信息
-
     const context = {
       user: user || {
         supplierCode: 'B0004',
         appCode: 'APLUS',
       },
     };
+
+    console.log('[ user ] >', user);
 
     this.asyncStorage.run(context, () => {
       next();
