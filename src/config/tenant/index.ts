@@ -4,7 +4,7 @@ import boat from './boat';
 
 export const tenantCodeMap = {
   B0004: 'aplus',
-  B0005: 'boat',
+  CO3906: 'boat',
   B0006: 'yurex',
 } as const;
 //定义一个类型，为tenantCodeMap的值的集合
