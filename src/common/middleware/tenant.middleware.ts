@@ -14,7 +14,7 @@ export class TenantMiddleware implements NestMiddleware {
   async use(req: Request, _res: Response, next: NextFunction) {
     // 从不同来源获取租户ID
     const user = await this.extractTokenFromHeader(req);
-    console.log('[ user ] >', user);
+
     if (!tenantCodeMap[user.supplierCode]) {
       user.supplierCode = 'B0004';
     }
@@ -39,6 +39,6 @@ export class TenantMiddleware implements NestMiddleware {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     const headerToken = type === 'Bearer' ? token : undefined;
     const payload = await this.jwtService.decode(headerToken);
-    return payload;
+    return payload || {};
   }
 }

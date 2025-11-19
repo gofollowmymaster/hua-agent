@@ -3,6 +3,7 @@ import { RedisKeys } from '@src/common/const/redis-key.enum';
 import Redis from 'ioredis';
 import { LoggerService } from '../logger/logger.service';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
+import { TenantContext } from '../context/tenant.context';
 
 export enum RedisValueType {
   STRING = 'string',
@@ -25,9 +26,15 @@ export class RedisService {
   constructor(
     @Inject('REDIS_CLIENT') private readonly redis: Redis,
     protected readonly logger: LoggerService,
+    protected readonly tenantContext: TenantContext,
   ) {}
   getClient(): Redis {
     return this.redis;
+  }
+  buildCacheKey(keyTemplate: RedisKeys, template?: string, value?: string) {
+    const cacheKey = keyTemplate.replace('{tenant}', this.tenantContext.tenant);
+    if (!template) return cacheKey;
+    return cacheKey.replace(template, value);
   }
 
   /**

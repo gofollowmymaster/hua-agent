@@ -15,9 +15,10 @@ export class AilyService {
   }
 
   async getToken(): Promise<FeishuAuthType> {
-    const cachedinfo: FeishuAuthType = await this.redis.hgetall(
+    const cacheKey = this.redisService.buildCacheKey(
       RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED,
     );
+    const cachedinfo: FeishuAuthType = await this.redis.hgetall(cacheKey);
     return cachedinfo;
   }
   async getTokenByCode(code: string): Promise<FeishuAuthType> {
