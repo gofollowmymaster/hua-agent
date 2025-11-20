@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { TenantCode, tenantCodeMap } from '@src/config/tenant';
+import { TenantCode } from '@src/config/tenant';
 import { UserContext } from '@src/type/global';
 import { AsyncLocalStorage } from 'async_hooks';
 
 export interface RequestContext {
-  user: UserContext;
-  // requestId: string;
+  user?: UserContext;
+  tenantCode: TenantCode;
+  spaceIds?: string[];
   // timestamp: number;
 }
 
@@ -29,6 +30,6 @@ export class TenantContext {
     return this.user?.userId;
   }
   get tenant(): TenantCode | undefined {
-    return tenantCodeMap[this.user?.supplierCode];
+    return this.getStore().tenantCode;
   }
 }

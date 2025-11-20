@@ -3,32 +3,30 @@ import { FeishuAppClentsType } from '.';
 import globalConfig from '@src/config';
 import { getGlobalAppInstance } from '@utils/app-config';
 import { TenantContext } from '@src/common/service/context/tenant.context';
-import { TenantCode } from '@src/config/tenant';
+import { FeishuAppConfig, TenantCode } from '@src/config/tenant';
+import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
 class FeishuClient {
   private clientContainer: Record<string, lark.Client> = {};
+
   constructor(clientName: FeishuAppClentsType) {
-    const tenantConfig = globalConfig['tenantConfig'];
-    Object.keys(tenantConfig).forEach((tenant) => {
+    const robotConfigs = NodeConfigService.getRobotConfig(clientName);
+
+    Object.keys(robotConfigs).forEach((tenant) => {
       try {
+        if (!robotConfigs[tenant]) {
+          console.log('服务商：' + tenant + '没有配置机器人：' + clientName);
+          return;
+        }
         this.clientContainer[tenant] = this.create(
-          tenantConfig[tenant][clientName] || {},
+          robotConfigs[tenant] || {},
           clientName,
         );
       } catch (e) {
         console.log(e);
-        console.log(
-          '[ tenantConfig[tenant] ] >',
-          tenant,
-          clientName,
-          tenantConfig[tenant],
-        );
       }
     });
   }
-  create(
-    { appId, appSecret }: { appId: string; appSecret: string },
-    clientName: string,
-  ) {
+  create({ appId, appSecret }: FeishuAppConfig, clientName: string) {
     if (!appId || !appSecret) {
       throw new Error(clientName + 'AppId and AppSecret are required');
     }
@@ -46,7 +44,6 @@ class FeishuClient {
   // 用于非初始化创建实例的场景，初始化时创建获取不到tenantContext实例
   get client() {
     const tenantContext = getGlobalAppInstance(TenantContext);
-    console.log('[ tenantContext ] >', tenantContext.tenant);
     return this.clientContainer[tenantContext.tenant];
   }
   //用于初始化注入创建实例的场景

@@ -1,4 +1,3 @@
-import { ConfigService } from '@nestjs/config';
 import { ClientFactory, FeishuApp } from './clients';
 import FeishuMessageHelper from './hepler/message-helper';
 import { CommonAlertCard, CommonCardData } from './card/alert-card';
@@ -6,6 +5,7 @@ import dayjs from 'dayjs';
 import { getGlobalAppInstance } from '@utils/app-config';
 import { throttle } from 'lodash';
 import { TenantContext } from '../service/context/tenant.context';
+import { NodeConfigService } from '../service/node-config-service/node-config.service';
 /**
  * 使用预配置的 Feishu 客户端向 Feishu 群组发送异常通知。
  *
@@ -30,7 +30,7 @@ export const sendExceptionToFeishuOrigin = (
 };
 
 export const sendCommonCardToFeishu = (options: CommonCardData) => {
-  const config = getGlobalAppInstance(ConfigService);
+  const config = getGlobalAppInstance(NodeConfigService);
   const userContext = getGlobalAppInstance(TenantContext);
   const messagerHelper = new FeishuMessageHelper(
     ClientFactory.create(FeishuApp.AlertClient),

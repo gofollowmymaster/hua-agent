@@ -1,22 +1,19 @@
 import { Injectable } from '@nestjs/common';
-// import FeishuTable from './feishu-table';
-import { ConfigService } from '@nestjs/config';
 import FeishuTableHelper from '@src/common/feishu/hepler/table-helper';
 import FeishuTable from '@src/common/feishu/table/feishu-table';
-// import FeishuTableHelper from '../hepler/table-helper';
+import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
 @Injectable()
 class AdminMtableTable extends FeishuTable {
-  // protected readonly tableHelper: FeishuTableHelper;
   protected readonly useCache: boolean = true;
   protected readonly ttl = 60 * 60 * 24 * 7;
   constructor(
-    readonly config: ConfigService,
+    readonly config: NodeConfigService,
     readonly tableHelper: FeishuTableHelper,
   ) {
     super();
 
-    this.appToken = config.get('tenantConfig.aplus.AplusNodeAdminAppToken');
-    this.tableId = config.get('tenantConfig.aplus.AplusNodeAdminMtableTableId');
+    this.appToken = config.get('AplusNodeAdminAppToken');
+    this.tableId = config.get('AplusNodeAdminMtableTableId');
     this.tableHelper.setTableOption({
       appToken: this.appToken,
       tableId: this.tableId,

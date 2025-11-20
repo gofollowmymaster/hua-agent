@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import FeishuTableHelper from '@src/common/feishu/hepler/table-helper';
 import FeishuTable from '@src/common/feishu/table/feishu-table';
+import { NodeConfigService } from '../service/node-config-service/node-config.service';
 @Injectable()
 class ClientTokenTable extends FeishuTable {
   // protected readonly tableHelper: FeishuTableHelper;
@@ -9,13 +9,11 @@ class ClientTokenTable extends FeishuTable {
   protected readonly ttl = 60 * 24 * 7;
 
   constructor(
-    readonly config: ConfigService,
+    readonly config: NodeConfigService,
     readonly tableHelper: FeishuTableHelper,
   ) {
     super();
-    this.appToken = config.getOrThrow(
-      'tenantConfig.aplus.AplusNodeAdminAppToken',
-    );
+    this.appToken = config.get('AplusNodeAdminAppToken');
     this.tableId = 'tblNF8bpfSvc4ZK0';
     this.tableHelper.setTableOption({
       appToken: this.appToken,

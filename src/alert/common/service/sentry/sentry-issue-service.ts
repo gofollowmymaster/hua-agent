@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
 import { IssueStatus } from '@src/common/feishu/card/error-unresolve-card';
 import { firstValueFrom } from 'rxjs';
 import {
@@ -10,6 +9,7 @@ import {
 } from '../../type/sentry-issue';
 
 import SentryApiHelper from './sentry-api-service';
+import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
 
 type UpdateIssueParams = {
   status?: IssueStatus;
@@ -31,7 +31,7 @@ export class SentryIssueService extends SentryApiHelper {
     'https://cloud.elnkpro.com:9000/api/0/organizations/aplus-frontend-team';
   constructor(
     private readonly httpService: HttpService,
-    private readonly config: ConfigService,
+    private readonly config: NodeConfigService,
   ) {
     super();
   }

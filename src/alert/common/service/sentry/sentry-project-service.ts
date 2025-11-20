@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { SentryProject } from '../../type/sentry-project';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import SentryApiHelper from './sentry-api-service';
+import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
 
 @Injectable()
 export class SentryProjectService extends SentryApiHelper {
@@ -14,7 +14,7 @@ export class SentryProjectService extends SentryApiHelper {
   protected readonly ttl: number = 60 * 60 * 24;
   constructor(
     private readonly httpService: HttpService,
-    private readonly config: ConfigService,
+    private readonly config: NodeConfigService,
     protected readonly redisService: RedisService,
   ) {
     super(redisService);

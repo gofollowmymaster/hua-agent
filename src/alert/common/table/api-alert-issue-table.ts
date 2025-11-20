@@ -10,8 +10,8 @@ class FeishuApiAlertIssueTable extends FeishuTable {
     readonly tableHelper: FeishuTableHelper,
   ) {
     super();
-    this.appToken = config.getOrThrow('tenantConfig.aplus.AlertTableAppToken');
-    this.tableId = config.getOrThrow('tenantConfig.aplus.AlertApiIssueTableId');
+    this.appToken = config.getOrThrow('AlertTableAppToken');
+    this.tableId = config.getOrThrow('AlertApiIssueTableId');
     this.tableHelper.setTableOption({
       appToken: this.appToken,
       tableId: this.tableId,

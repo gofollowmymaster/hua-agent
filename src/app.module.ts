@@ -29,6 +29,7 @@ import { FdCopilotModule } from './fd-copilot/fd-copilot.module';
 import { TenantMiddleware } from './common/middleware/tenant.middleware';
 import { ContextModule } from './common/service/context/context.module';
 import { DiscardMiddleware } from './common/middleware/discard.middleware';
+import { NodeConfigModule } from './common/service/node-config-service/config.module';
 // import { BaseTableModule } from './common/table/base-table.module';
 
 const ModuleInUsed = process.env.MODULE_USED;
@@ -83,6 +84,7 @@ const modules = ModuleInUsed
       global: true,
       secret: configuration['jwtSecret'],
     }),
+    NodeConfigModule,
     RedisModule,
     ScheduleModule.forRoot(),
     GlobalExceptionHandlerModule,
