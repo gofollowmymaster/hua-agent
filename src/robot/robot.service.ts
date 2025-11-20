@@ -136,9 +136,10 @@ export class RobotService {
   @UseGuards(AuthGuard)
   async getTicket(params: FeishuTicketDto) {
     const feishuClient = ClientFactory.create(params.appName);
-    console.log('[ feishuClient ] >', feishuClient.client);
+    // console.log('[ feishuClient ] >', feishuClient.client);
     const appId = feishuClient.client.appId;
     const appSecret = feishuClient.client.appSecret;
+    console.log('[ appId ] >', appId, appSecret);
     const res = await feishuClient.client.auth.v3.appAccessToken.internal(
       {
         data: {
@@ -154,6 +155,7 @@ export class RobotService {
       app_access_token = res.app_access_token;
       // 使用 app_access_token
     } else {
+      console.log('[ res ] >', res);
       throw new Error('Failed to get app_access_token');
     }
     console.log('[ app_access_token ] >', app_access_token);
