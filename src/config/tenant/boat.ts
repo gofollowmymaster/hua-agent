@@ -2,7 +2,7 @@ export default {
   FeishuWikiSpaceIds: ['7549126549107195906'],
 
   XiaoAClient: {
-    appId: 'cli_a7b9fe27cli_a85a4dc1c9259013a3f8d00e',
+    appId: 'cli_a85a4dc1c9259013',
     appSecret: 'wmea3GufO6ADkITtv0CjkexcZmpCAsWi',
   },
   AuthClient: {
