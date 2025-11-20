@@ -11,7 +11,6 @@ class FeishuAilyHelper extends FeishuApiHelper {
   protected readonly useCache = true;
   protected readonly ttl = 60 * 60 * 24;
   constructor(
-    // private readonly config: ConfigService,
     @Inject(FEISHU_CLIENT_ID) protected readonly feishuClient: FeishuClient,
     protected readonly userContext: TenantContext,
   ) {

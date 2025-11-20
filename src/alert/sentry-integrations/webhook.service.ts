@@ -3,7 +3,6 @@ import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { SentryHookDto } from './dto/sentry-hook';
 
 import { RedisService } from '@src/common/service/redis/redis.service';
-import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 import {
   AlertEvent,
@@ -33,7 +32,6 @@ export class SentryWebhookService {
 
   constructor(
     protected readonly redisService: RedisService,
-    protected readonly config: ConfigService,
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly feishuUserHelper: FeishuUserHelper,
     protected readonly pageErrorService: PageErrorService,

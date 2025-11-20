@@ -59,7 +59,7 @@ export class SentryIssueService extends SentryApiHelper {
       const { data } = await firstValueFrom(
         this.httpService.put(`${this.prefix}/issues/${issue_id}/`, reqBody, {
           headers: {
-            Authorization: `Bearer ${this.config.get('sentryIntegrationToken')}`,
+            Authorization: `Bearer ${NodeConfigService.get('sentryIntegrationToken')}`,
             'Content-Type': 'application/json',
           },
         }),
@@ -72,7 +72,7 @@ export class SentryIssueService extends SentryApiHelper {
       const { data } = await firstValueFrom(
         this.httpService.get(`${this.prefix}/issues/${issueId}/`, {
           headers: {
-            Authorization: `Bearer ${this.config.get('sentryIntegrationToken')}`,
+            Authorization: `Bearer ${NodeConfigService.get('sentryIntegrationToken')}`,
             'Content-Type': 'application/json',
           },
         }),

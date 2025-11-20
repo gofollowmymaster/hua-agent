@@ -1,4 +1,3 @@
-import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
@@ -8,11 +7,10 @@ import FeishuApiAlertIssueTable from '@src/alert/common/table/api-alert-issue-ta
 @Injectable()
 export default class RequestClearIssueService extends ClearIssueService {
   constructor(
-    protected readonly config: ConfigService,
     protected readonly feishuIssueTable: FeishuApiAlertIssueTable,
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly businessLineTable: FeishuBusinessLineTable,
   ) {
-    super(config, feishuIssueTable, messageHelper, businessLineTable);
+    super(feishuIssueTable, messageHelper, businessLineTable);
   }
 }

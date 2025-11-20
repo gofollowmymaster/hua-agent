@@ -1,6 +1,5 @@
 import { PrismaService } from '@src/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
-import { ConfigService } from '@nestjs/config';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import FeishuApiAlertTable from '../table/api-alert-table';
 import FeishuApiAlertIssueTable from '../table/api-alert-issue-table';
@@ -25,7 +24,6 @@ export class PageErrorService extends ErrorBaseService {
   constructor(
     protected prisma: PrismaService,
     protected readonly logger: LoggerService,
-    protected readonly config: ConfigService,
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly feishuApiTable: FeishuApiAlertTable,
     protected readonly feishuApiIssueTable: FeishuApiAlertIssueTable,

@@ -1,13 +1,14 @@
 export default {
   FeishuWikiSpaceIds: ['7549126549107195906'],
-
-  //Aplus智能体表格相关
-  AilyLogTableAppToken: 'A6qfbapjtafVLYsn9xic6mYNnfT',
-  AilyLogOperatorTableId: 'tblcE7q8e2vD9c48',
+  feishuTables: {
+    //Aplus智能体表格相关
+    AilyLogTableAppToken: 'A6qfbapjtafVLYsn9xic6mYNnfT',
+    AilyLogOperatorTableId: 'tblcE7q8e2vD9c48',
+  },
 
   robots: {
     XiaoAClient: {
-      appId: 'cli_a7b9fe27cli_a85a4dc1c9259013a3f8d00e',
+      appId: 'cli_a85a4dc1c9259013',
       appSecret: 'wmea3GufO6ADkITtv0CjkexcZmpCAsWi',
     },
     AuthClient: {

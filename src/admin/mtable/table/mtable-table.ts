@@ -6,20 +6,14 @@ import { NodeConfigService } from '@src/common/service/node-config-service/node-
 class AdminMtableTable extends FeishuTable {
   protected readonly useCache: boolean = true;
   protected readonly ttl = 60 * 60 * 24 * 7;
-  constructor(
-    readonly config: NodeConfigService,
-    readonly tableHelper: FeishuTableHelper,
-  ) {
+  constructor(readonly tableHelper: FeishuTableHelper) {
     super();
 
-    this.appToken = config.get('AplusNodeAdminAppToken');
-    this.tableId = config.get('AplusNodeAdminMtableTableId');
-    this.tableHelper.setTableOption({
-      appToken: this.appToken,
-      tableId: this.tableId,
-      useCache: this.useCache,
-      ttl: this.ttl,
-    });
+    this.appToken = NodeConfigService.getFeishuTableConfig(
+      'AplusNodeAdminAppToken',
+    );
+    this.tableId = 'tblie9P1MV6WEoQC';
+    this.setTableOption();
   }
 }
 export default AdminMtableTable;

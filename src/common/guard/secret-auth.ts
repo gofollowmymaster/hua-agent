@@ -5,7 +5,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import ClientSecretTable from '../table/client-secret-table';
-import { ConfigService } from '@nestjs/config';
 import FeishuTableHelper from '../feishu/hepler/table-helper';
 import { ClientFactory, FeishuApp } from '../feishu/clients';
 import { Request } from 'express';
@@ -16,12 +15,10 @@ import { TenantContext } from '../service/context/tenant.context';
 export class SecretAuthGuard implements CanActivate {
   private clientSecretTable: ClientSecretTable;
   constructor(
-    private config: ConfigService,
-    private redisService: RedisService,
+    protected redisService: RedisService,
     protected readonly userContext: TenantContext,
   ) {
     this.clientSecretTable = new ClientSecretTable(
-      this.config,
       new FeishuTableHelper(
         ClientFactory.create(FeishuApp.AlertClient),
         userContext,

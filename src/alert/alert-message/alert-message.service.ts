@@ -11,7 +11,6 @@ import FeishuFrontendAlertIssueTable from '../common/table/frontend-alert-issue-
 import FeishuApiAlertIssueTable from '../common/table/api-alert-issue-table';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
-import { ConfigService } from '@nestjs/config';
 import { AlertBaseService } from '../common/service/alert-base.service';
 import { AlertEvent } from '../common/type/alert';
 import CommonAlertCard from '@src/common/feishu/card/alert-card';
@@ -24,7 +23,6 @@ export class AlertMsgService extends AlertBaseService {
   constructor(
     protected prisma: PrismaService,
     protected readonly logger: LoggerService,
-    protected readonly config: ConfigService,
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly feishuApiTable: FeishuApiAlertTable,
     protected readonly feishuApiIssueTable: FeishuApiAlertIssueTable,

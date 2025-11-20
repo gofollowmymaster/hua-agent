@@ -6,9 +6,7 @@ import { buildUUID } from 'src/utils/uuid';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 
 import dayjs from 'dayjs';
-import { ConfigService } from '@nestjs/config';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
-import { buildcommonCardMsg } from '@src/common/feishu/card/custom-card';
 import { BitTableFilter } from '@src/common/feishu/type/bitable';
 
 //过期时间
@@ -16,7 +14,6 @@ const EXPIRED_TIME = 1000 * 60 * 60 * 24;
 @Injectable()
 export class DemoPluginService {
   constructor(
-    private readonly config: ConfigService,
     private readonly demoPluginMidTable: DemoPluginMidTable,
     private readonly messageHelper: FeishuMessageHelper,
   ) {}

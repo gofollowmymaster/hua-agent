@@ -1,20 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import FeishuTableHelper from '@src/common/feishu/hepler/table-helper';
 import FeishuTable from '@src/common/feishu/table/feishu-table';
+import { NodeConfigService } from '../service/node-config-service/node-config.service';
 @Injectable()
 class ClientSecretTable extends FeishuTable {
-  // protected readonly tableHelper: FeishuTableHelper;
   protected readonly useCache = true;
   protected readonly ttl = 60 * 60 * 24 * 7;
 
-  constructor(
-    readonly config: ConfigService,
-    readonly tableHelper: FeishuTableHelper,
-  ) {
+  constructor(readonly tableHelper: FeishuTableHelper) {
     super();
-    this.appToken = config.getOrThrow('AplusNodeAdminAppToken');
+    this.appToken = NodeConfigService.getFeishuTableConfig(
+      'AplusNodeAdminAppToken',
+    );
     this.tableId = 'tblM4JUNtLKnrewV';
+
+    console.log(
+      '[ this.tableHelper.setTableOption ] >',
+      this.tableHelper.setTableOption,
+    );
+
     this.tableHelper.setTableOption({
       appToken: this.appToken,
       tableId: this.tableId,

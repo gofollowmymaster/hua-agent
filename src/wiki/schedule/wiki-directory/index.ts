@@ -28,6 +28,7 @@ export default class WikiDirectoryService {
     const tenantConfig = globalConfig['tenantConfig'];
 
     for (const tenant in tenantConfig) {
+      // console.log('[ tenantConfig ] >', tenantConfig, tenant);
       this.tenantContextDatas.push({
         tenantCode: tenant as TenantCode,
         spaceIds: tenantConfig[tenant]['FeishuWikiSpaceIds'],

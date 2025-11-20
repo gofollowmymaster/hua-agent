@@ -4,14 +4,15 @@ import FeishuTable from '@src/common/feishu/table/feishu-table';
 import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
 @Injectable()
 class AilyLogOperatorTable extends FeishuTable {
-  constructor(
-    readonly config: NodeConfigService,
-    readonly tableHelper: FeishuTableHelper,
-  ) {
+  constructor(readonly tableHelper: FeishuTableHelper) {
     super();
 
-    this.appToken = config.getTenantConfig('AilyLogTableAppToken');
-    this.tableId = config.getTenantConfig('AilyLogOperatorTableId');
+    this.appToken = NodeConfigService.getFeishuTableConfig(
+      'AilyLogTableAppToken',
+    );
+    this.tableId = NodeConfigService.getFeishuTableConfig(
+      'AilyLogOperatorTableId',
+    );
     this.tableHelper.setTableOption({
       appToken: this.appToken,
       tableId: this.tableId,

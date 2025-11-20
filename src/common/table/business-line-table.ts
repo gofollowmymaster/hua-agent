@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import FeishuTableHelper from '@src/common/feishu/hepler/table-helper';
 import FeishuTable from '@src/common/feishu/table/feishu-table';
 import { FeishuApiException } from '../exception/feishu-api-exception';
+import { NodeConfigService } from '../service/node-config-service/node-config.service';
 @Injectable()
 class FeishuBusinessLineTable extends FeishuTable {
   // protected readonly tableHelper: FeishuTableHelper;
   protected readonly useCache = true;
   protected readonly ttl = 60 * 60 * 24;
 
-  constructor(
-    readonly config: ConfigService,
-    readonly tableHelper: FeishuTableHelper,
-  ) {
+  constructor(readonly tableHelper: FeishuTableHelper) {
     super();
-    this.appToken = config.getOrThrow('AplusNodeAdminAppToken');
+    this.appToken = NodeConfigService.getFeishuTableConfig(
+      'AplusNodeAdminAppToken',
+    );
+    console.log('[ this.appToken ] >', this.appToken);
     this.tableId = 'tblbjBv6z2RXX5Qp';
     this.tableHelper.setTableOption({
       appToken: this.appToken,

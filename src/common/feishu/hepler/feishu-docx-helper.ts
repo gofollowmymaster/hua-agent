@@ -1,5 +1,5 @@
 import FeishuClient from '../clients/client';
-// import { ConfigService } from '@nestjs/config';
+
 import { FEISHU_CLIENT_ID } from './constants';
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { RedisService } from '@src/common/service/redis/redis.service';
@@ -21,7 +21,6 @@ class FeishuDocxHelper extends FeishuDataApiHelper {
   protected readonly useCache = false;
   protected readonly ttl = 60 * 60 * 24;
   constructor(
-    // private readonly config: ConfigService,
     @Inject(FEISHU_CLIENT_ID) protected readonly feishuClient: FeishuClient,
     protected readonly userContext: TenantContext,
     protected redisService: RedisService,

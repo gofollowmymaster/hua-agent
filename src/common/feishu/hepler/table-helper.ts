@@ -7,24 +7,24 @@ import {
   BitTableRecord,
   BitTableSearchPayloadParams,
 } from '../type/bitable';
-// import { ConfigService } from '@nestjs/config';
 import { FEISHU_CLIENT_ID } from './constants';
 import { Inject, Injectable } from '@nestjs/common';
 import FeishuDataApiHelper from './feishu-data-api-helper';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import { TenantContext } from '@src/common/service/context/tenant.context';
+import { TenantCode } from '@src/config/tenant';
 
 export type TableHelperOptions = {
-  appToken: string;
-  tableId: string;
+  appToken: string | Record<TenantCode, string>;
+  tableId: string | Record<TenantCode, string>;
   useCache: boolean;
   ttl: number;
 };
 @Injectable()
 class FeishuTableHelper extends FeishuDataApiHelper {
-  protected appToken: string;
-  protected tableId: string;
+  protected appTokenInfo: string | Record<TenantCode, string>;
+  protected tableIdInfo: string | Record<TenantCode, string>;
   protected useCache = false;
   protected ttl = 60 * 10; //默认缓存10分钟
 
@@ -36,10 +36,20 @@ class FeishuTableHelper extends FeishuDataApiHelper {
     super(redisService);
   }
   setTableOption({ appToken, tableId, useCache, ttl }: TableHelperOptions) {
-    this.appToken = appToken;
-    this.tableId = tableId;
+    this.appTokenInfo = appToken;
+    this.tableIdInfo = tableId;
     this.useCache = useCache;
     this.ttl = ttl;
+  }
+  get appToken() {
+    return typeof this.appTokenInfo === 'string'
+      ? this.appTokenInfo
+      : this.appTokenInfo[this.userContext.tenant];
+  }
+  get tableId() {
+    return typeof this.tableIdInfo === 'string'
+      ? this.tableIdInfo
+      : this.tableIdInfo[this.userContext.tenant];
   }
 
   buildCacheKey(key: string) {

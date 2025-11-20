@@ -1,6 +1,6 @@
 import aplus from './aplus';
 import boat from './boat';
-import yurex from './yurex';
+// import yurex from './yurex';
 export type FeishuAppConfig = {
   appId: string;
   appSecret: string;
@@ -24,13 +24,13 @@ export type TenantRobots = keyof TenantConfig['robots'];
 export const tenantCodeMap = {
   B0004: 'aplus',
   CO3906: 'boat',
-  B0006: 'yurex',
+  // B0006: 'yurex',
 } as const;
-//定义一个类型，为tenantCodeMap的值的集合
+//服务商码
 export type TenantCode = (typeof tenantCodeMap)[keyof typeof tenantCodeMap];
 const tenantConfig: Readonly<Record<TenantCode, Readonly<TenantConfig>>> = {
   aplus,
   boat,
-  yurex,
+  // yurex,
 };
 export default tenantConfig;

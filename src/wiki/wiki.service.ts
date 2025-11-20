@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 
-import { ConfigService } from '@nestjs/config';
 import { Cache } from 'cache-manager';
 
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -13,7 +12,6 @@ import { RedisService } from '@src/common/service/redis/redis.service';
 export class WikiService {
   constructor(
     private readonly logger: LoggerService,
-    private readonly config: ConfigService,
     @Inject(CACHE_MANAGER) protected cache: Cache,
     private wikiDirectoryService: WikiDirectoryService,
     private readonly redisService: RedisService,

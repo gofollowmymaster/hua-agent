@@ -30,7 +30,6 @@ export const sendExceptionToFeishuOrigin = (
 };
 
 export const sendCommonCardToFeishu = (options: CommonCardData) => {
-  const config = getGlobalAppInstance(NodeConfigService);
   const userContext = getGlobalAppInstance(TenantContext);
   const messagerHelper = new FeishuMessageHelper(
     ClientFactory.create(FeishuApp.AlertClient),
@@ -52,7 +51,7 @@ export const sendCommonCardToFeishu = (options: CommonCardData) => {
 
   messagerHelper.createInteractToGroup(
     content,
-    config.get('DefaultAlertFeishuGroupId'),
+    NodeConfigService.get('DefaultAlertFeishuGroupId'),
   );
 };
 

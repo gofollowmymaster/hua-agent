@@ -3,17 +3,14 @@ import { LogOperatorDto } from './dto/log-operator.dto';
 
 import { LoggerService } from '@src/common/service/logger/logger.service';
 
-import { ConfigService } from '@nestjs/config';
 import LogOperatorAdapter from './adapter/log-operator-adapter';
 import AilyLogOperatorTable from './adapter/aily-log-operator-table';
 
 @Injectable()
 export class LogOperatorService {
-  // private messageHelper;
   private LogOperatorAdapter: LogOperatorAdapter;
   constructor(
     private readonly logger: LoggerService,
-    private readonly config: ConfigService,
     private readonly ailyLogOperatorTable: AilyLogOperatorTable,
   ) {}
 

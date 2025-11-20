@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { BitTableFilter } from '@src/common/feishu/type/bitable';
-import dayjs, { OpUnitType } from 'dayjs';
+import dayjs from 'dayjs';
 import { Injectable } from '@nestjs/common';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import ErrorStatisticCard from '@src/common/feishu/card/error-statistic-card';

@@ -3,7 +3,6 @@ import { FeishuCallbackDto } from './dto/feishu-callback.dto';
 import EventHandler from './handler';
 import { PrismaService } from '@src/prisma.service';
 import { RedisService } from '@src/common/service/redis/redis.service';
-import { ConfigService } from '@nestjs/config';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import Redis from 'ioredis';
 import FeishuApiAlertIssueTable from '../common/table/api-alert-issue-table';
@@ -23,7 +22,6 @@ export class FeishuCallbackService extends CommonErrorService {
   constructor(
     readonly prisma: PrismaService,
     protected readonly redisService: RedisService,
-    protected readonly config: ConfigService,
     readonly messageHelper: FeishuMessageHelper,
     protected readonly feishuApiIssueTable: FeishuApiAlertIssueTable,
     protected readonly feishuFrontendIssueTable: FeishuFrontendAlertIssueTable,

@@ -14,7 +14,6 @@ export class SentryProjectService extends SentryApiHelper {
   protected readonly ttl: number = 60 * 60 * 24;
   constructor(
     private readonly httpService: HttpService,
-    private readonly config: NodeConfigService,
     protected readonly redisService: RedisService,
   ) {
     super(redisService);
@@ -27,7 +26,7 @@ export class SentryProjectService extends SentryApiHelper {
         const { data } = await firstValueFrom(
           this.httpService.get(`${this.prefix}/${projectId}/`, {
             headers: {
-              Authorization: `Bearer ${this.config.get('sentryIntegrationToken')}`,
+              Authorization: `Bearer ${NodeConfigService.get('sentryIntegrationToken')}`,
               'Content-Type': 'application/json',
             },
           }),

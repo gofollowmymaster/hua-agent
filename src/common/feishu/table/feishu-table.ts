@@ -11,12 +11,13 @@ import {
   BitTableRecord,
   BitTableSearchPayloadParams,
 } from '../type/bitable';
+import { TenantCode } from '@src/config/tenant';
 @Injectable()
 abstract class FeishuTable {
   protected readonly tableHelper: FeishuTableHelper;
-  @Inject(CACHE_MANAGER) protected cacheManager: Cache;
-  protected appToken = '';
-  protected tableId = '';
+  // @Inject(CACHE_MANAGER) protected cacheManager: Cache;
+  protected appToken: string | Record<TenantCode, string> = '';
+  protected tableId: string | Record<TenantCode, string> = '';
   protected useCache = false;
   protected ttl = 60 * 10; //默认缓存10分钟
 
@@ -43,9 +44,7 @@ abstract class FeishuTable {
   ): Promise<BitTablePagination> {
     this.setTableOption();
 
-    // console.log('[ filter ] >', JSON.stringify(filter));
     const res = await this.tableHelper.search(filter, params, useCache);
-    // console.log('[ return ] >', res);
     return res;
   }
 

@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import FeishuClient from '@src/common/feishu/clients/client';
@@ -17,7 +16,6 @@ export default class AlertStatisticService {
   private readonly client: FeishuClient;
   private readonly logger = new Logger(AlertStatisticService.name);
   constructor(
-    private readonly config: ConfigService,
     protected readonly redisService: RedisService,
     protected readonly requestIssueService: RequestIssueStatisticService,
     protected readonly pageIssueService: PageIssueStatisticService,

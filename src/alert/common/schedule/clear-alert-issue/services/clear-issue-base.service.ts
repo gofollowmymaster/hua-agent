@@ -1,4 +1,3 @@
-import { ConfigService } from '@nestjs/config';
 import { BitTableFilter } from '@src/common/feishu/type/bitable';
 import dayjs from 'dayjs';
 import { Injectable } from '@nestjs/common';
@@ -13,7 +12,6 @@ export default class ClearAlertPerDayBaseService {
   protected name: string;
   protected readonly tableViews: Record<string, any>;
   constructor(
-    protected readonly config: ConfigService,
     protected readonly feishuIssueTable: FeishuTable,
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly businessLineTable: FeishuBusinessLineTable,
