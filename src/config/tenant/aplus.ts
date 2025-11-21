@@ -9,11 +9,10 @@ export default {
       appId: 'cli_a6d55e522f71900e',
       appSecret: 'JQnGCO6eQtXFTEuZP0ZFCcJwZYKQ31e3',
     },
-    //机器人Aplus智能体相关
 
     AilyAplusClient: {
-      appId: process.env.FEISHU_AILY_APP_ID,
-      appSecret: process.env.FEISHU_AILY_APP_SECRET,
+      appId: process.env.FEISHU_AILY_APP_ID_APLUS,
+      appSecret: process.env.FEISHU_AILY_APP_SECRET_APLUS,
     },
   },
   feishuTables: {
