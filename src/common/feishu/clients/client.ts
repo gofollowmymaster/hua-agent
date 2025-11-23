@@ -1,6 +1,5 @@
 import * as lark from '@larksuiteoapi/node-sdk';
 import { FeishuAppClentsType } from '.';
-import globalConfig from '@src/config';
 import { getGlobalAppInstance } from '@utils/app-config';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import { FeishuAppConfig, TenantCode } from '@src/config/tenant';

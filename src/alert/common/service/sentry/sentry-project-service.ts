@@ -4,11 +4,12 @@ import { firstValueFrom } from 'rxjs';
 import { SentryProject } from '../../type/sentry-project';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
-import SentryApiHelper from './sentry-api-service';
 import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
+import HttpApiHelper from '@src/common/base/http-api-service';
+import { RedisKeys } from '@src/common/const/redis-key.enum';
 
 @Injectable()
-export class SentryProjectService extends SentryApiHelper {
+export class SentryProjectService extends HttpApiHelper {
   prefix = 'https://cloud.elnkpro.com:9000/api/0/projects/aplus-frontend-team';
   protected readonly redis: Redis;
   protected readonly ttl: number = 60 * 60 * 24;
@@ -16,7 +17,7 @@ export class SentryProjectService extends SentryApiHelper {
     private readonly httpService: HttpService,
     protected readonly redisService: RedisService,
   ) {
-    super(redisService);
+    super(redisService, RedisKeys.SENTRY_API_CACHE);
     this.redis = redisService.getClient();
   }
 

@@ -23,6 +23,7 @@ export class TenantMiddleware implements NestMiddleware {
       tenantCode: tenantCodeMap[user.supplierCode as TenantCode] || 'aplus',
       user: user || {},
     };
+    console.log('[ tenant context ] >', context);
 
     this.asyncStorage.run(context, () => {
       next();

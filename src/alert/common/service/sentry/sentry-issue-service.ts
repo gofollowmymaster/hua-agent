@@ -8,8 +8,8 @@ import {
   SentryStatus,
 } from '../../type/sentry-issue';
 
-import SentryApiHelper from './sentry-api-service';
 import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
+import HttpApiHelper from '@src/common/base/http-api-service';
 
 type UpdateIssueParams = {
   status?: IssueStatus;
@@ -26,13 +26,10 @@ type UpdateIssueOriginParams = {
   isBookmarked?: boolean;
 };
 @Injectable()
-export class SentryIssueService extends SentryApiHelper {
+export class SentryIssueService extends HttpApiHelper {
   prefix =
     'https://cloud.elnkpro.com:9000/api/0/organizations/aplus-frontend-team';
-  constructor(
-    private readonly httpService: HttpService,
-    private readonly config: NodeConfigService,
-  ) {
+  constructor(private readonly httpService: HttpService) {
     super();
   }
   dataAdapter(params: UpdateIssueParams): UpdateIssueOriginParams {

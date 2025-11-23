@@ -1,4 +1,5 @@
 export const RedisPrefix = 'frontend-node:';
+export const HttpDataCachePrefix = RedisPrefix + 'HttpData:';
 
 export const RedisWikiPrefix = RedisPrefix + '{tenant}:wiki:';
 export const RedisPrefixMtable = RedisPrefix + 'mtable:';
@@ -8,6 +9,7 @@ export const RedisPrefixIdempotent = RedisPrefix + 'idempotent:';
 export const SentryAlertPrefix = RedisPrefix + 'alert:sentry-integration:';
 export const FeishuApiPrefix = RedisPrefix + '{tenant}:feishu-api:';
 export const SentryApiPrefix = RedisPrefix + 'sentry-api:';
+export const AliDevopsApiPrefix = HttpDataCachePrefix + 'ali-devops-api:';
 export const AilyPrefix = RedisPrefix + '{tenant}:aily:';
 export const PushFeishuDocPrefix = RedisPrefix + 'push-feishu-doc:';
 
@@ -22,6 +24,7 @@ export enum RedisKeys {
   SENTRY_ALERT_COUNT_ISSUE = SentryAlertPrefix + 'issue-error-count:{issueId}',
   SENTRY_ALERT_COUNT_FREQUENCY = SentryAlertPrefix + 'error-frequency:{module}',
   FEISHU_API_CACHE = FeishuApiPrefix + '{apiName}',
-  SENTRY_API_CACHE = SentryApiPrefix + '{apiName}',
   PUSH_FEISHU_DOC_CACHE = PushFeishuDocPrefix + '{tag}',
+  ALI_DEVOPS_API_CACHE = AliDevopsApiPrefix + '{apiName}',
+  SENTRY_API_CACHE = SentryApiPrefix + '{apiName}',
 }

@@ -1,20 +1,29 @@
 import { Injectable, Scope } from '@nestjs/common';
-import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
+import { RedisKeys } from '../const/redis-key.enum';
 
 @Injectable({ scope: Scope.TRANSIENT })
-export default abstract class SentryApiHelper {
+export default abstract class HttpApiHelper {
+  protected readonly cacheKeytemplate: RedisKeys;
   protected readonly useCache: boolean;
   protected readonly ttl: number = 60 * 60 * 1;
   protected redis: Redis;
 
-  constructor(protected redisService?: RedisService) {
+  constructor(
+    protected redisService?: RedisService,
+    cacheKeytemplate?: RedisKeys,
+  ) {
     this.redis = redisService?.getClient();
+    this.cacheKeytemplate = cacheKeytemplate;
   }
   buildCacheKey(key: string) {
-    const cacheKey = RedisKeys.SENTRY_API_CACHE.replace('{apiName}', key);
+    const cacheKey = this.redisService.buildCacheKey(
+      this.cacheKeytemplate,
+      '{apiName}',
+      key,
+    );
     return cacheKey;
   }
 
@@ -42,7 +51,7 @@ export default abstract class SentryApiHelper {
 
       return data;
     } catch (err) {
-      sendExceptionToFeishu(err, 'Sentry Api 请求失败:' + requestName);
+      sendExceptionToFeishu(err, self.name + 'Api 请求失败:' + requestName);
     }
   }
 }

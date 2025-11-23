@@ -23,7 +23,7 @@ abstract class FeishuApiHelper {
       }
       return data;
     } catch (e) {
-      e.message = e.message + '  msg:' + e.response?.data?.msg;
+      e.message = `tenant:${this.userContext.tenant}  requestName:${requestName}   ${e.message}   msg:' ${e.response?.data?.msg}`;
       throw e;
     }
   }
