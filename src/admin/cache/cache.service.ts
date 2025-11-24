@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 
-import { BaseService } from '@src/common/base/BaseService';
 import { CacheClearDto, CacheGetDto, KeyType } from './dto/cache-clear.dto';
 import {
   RedisPrefix,
@@ -10,10 +9,9 @@ import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 
 @Injectable()
-export class CacheService extends BaseService {
+export class CacheService {
   private redis: Redis;
   constructor(protected redisService: RedisService) {
-    super();
     this.redis = redisService.getClient();
   }
 

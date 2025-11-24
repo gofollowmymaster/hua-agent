@@ -1,4 +1,3 @@
-import { ConfigService } from '@nestjs/config';
 import { BitTableFilter } from '@src/common/feishu/type/bitable';
 import dayjs from 'dayjs';
 import { Injectable } from '@nestjs/common';
@@ -8,6 +7,7 @@ import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import FeishuTable from '@src/common/feishu/table/feishu-table';
 import { wait } from '@utils/job';
 import { ErrorEndpoint } from '@src/alert/common/type/alert';
+import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
 
 const businessLines = ['商家运营', '仓储物流', '业财一体', '基础架构'];
 const statusColorMap = {
@@ -25,7 +25,6 @@ export default class IssueStatisticService {
   protected errorEndpoint: ErrorEndpoint;
   protected readonly tableViews = {};
   constructor(
-    protected readonly config: ConfigService,
     protected readonly feishuIssueTable: FeishuTable,
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly businessLineTable: FeishuBusinessLineTable,
@@ -39,8 +38,10 @@ export default class IssueStatisticService {
     // const { pageModuleName, environment } = alertInfo;
     if (this.environment == 'dev' || this.environment == 'development') {
       return {
-        groupId: this.config.getOrThrow('FeishuMsgDebugGroupId'),
-        frontendLeader: this.config.getOrThrow('DefaultAlertFeishuUserId'),
+        groupId: NodeConfigService.getOrThrow('FeishuMsgDebugGroupId'),
+        frontendLeader: NodeConfigService.getOrThrow(
+          'DefaultAlertFeishuUserId',
+        ),
       };
     }
 
@@ -48,7 +49,9 @@ export default class IssueStatisticService {
       // uat、test 环境使用的飞书群组
       return {
         groupId: 'oc_b69c0e3bf64478075363125e4fd32507',
-        frontendLeader: this.config.getOrThrow('DefaultAlertFeishuUserId'),
+        frontendLeader: NodeConfigService.getOrThrow(
+          'DefaultAlertFeishuUserId',
+        ),
       };
     }
 

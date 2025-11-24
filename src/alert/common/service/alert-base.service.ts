@@ -10,7 +10,6 @@ import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import { BaseService } from '@src/common/base/BaseService';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
-import { ConfigService } from '@nestjs/config';
 import { AlertEvent, Environment, ErrorLevel } from '../type/alert';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
@@ -22,13 +21,13 @@ import { firstValueFrom } from 'rxjs';
 import * as lark from '@larksuiteoapi/node-sdk';
 import { HttpService } from '@nestjs/axios';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
+import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
 
 @Injectable()
 export abstract class AlertBaseService extends BaseService {
   protected readonly redis: Redis;
   protected prisma: PrismaService;
   protected readonly logger: LoggerService;
-  protected readonly config: ConfigService;
   protected readonly messageHelper: FeishuMessageHelper;
   protected readonly feishuBusinessLineTable: FeishuBusinessLineTable;
   protected readonly redisService: RedisService;
@@ -206,9 +205,9 @@ export abstract class AlertBaseService extends BaseService {
     // const { pageModuleName, environment } = alertInfo;
     if (environment == 'dev' || environment == 'development') {
       return {
-        groupId: this.config.getOrThrow('FeishuMsgDebugGroupId'),
-        fUserId: this.config.getOrThrow('DefaultAlertFeishuUserId'),
-        bUserId: this.config.getOrThrow('DefaultAlertFeishuUserId'),
+        groupId: NodeConfigService.getOrThrow('FeishuMsgDebugGroupId'),
+        fUserId: NodeConfigService.getOrThrow('DefaultAlertFeishuUserId'),
+        bUserId: NodeConfigService.getOrThrow('DefaultAlertFeishuUserId'),
       };
     }
 
@@ -216,8 +215,8 @@ export abstract class AlertBaseService extends BaseService {
       // uat、test 环境使用的飞书群组
       return {
         groupId: 'oc_b69c0e3bf64478075363125e4fd32507',
-        fUserId: this.config.getOrThrow('DefaultAlertFeishuUserId'),
-        bUserId: this.config.getOrThrow('DefaultAlertFeishuUserId'),
+        fUserId: NodeConfigService.getOrThrow('DefaultAlertFeishuUserId'),
+        bUserId: NodeConfigService.getOrThrow('DefaultAlertFeishuUserId'),
       };
     }
 

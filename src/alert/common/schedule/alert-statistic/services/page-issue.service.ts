@@ -1,4 +1,3 @@
-import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
@@ -22,12 +21,11 @@ export default class PageIssueStatisticService extends IssueStatisticService {
       'https://q1njej8cpab.feishu.cn/share/base/view/shrcne8Q63wbWZSo2BJZGWpk0zf',
   };
   constructor(
-    protected readonly config: ConfigService,
     protected readonly feishuIssueTable: FeishuFrontendAlertIssueTable,
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly businessLineTable: FeishuBusinessLineTable,
   ) {
     // return this.statisticService.handleCron();
-    super(config, feishuIssueTable, messageHelper, businessLineTable);
+    super(feishuIssueTable, messageHelper, businessLineTable);
   }
 }

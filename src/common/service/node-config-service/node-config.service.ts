@@ -9,6 +9,13 @@ export class NodeConfigService {
   static get(configKey?: string) {
     return globalConfig[configKey];
   }
+  static getOrThrow(configKey?: string) {
+    const configValue = globalConfig[configKey];
+    if (!configValue) {
+      throw new Error(`${configKey} is not defined`);
+    }
+    return configValue;
+  }
   static getRobotConfig(clientName: string) {
     const robotConfig = globalConfig['robots']?.[clientName];
     if (robotConfig) {

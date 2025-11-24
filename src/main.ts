@@ -13,7 +13,6 @@ import timezone from 'dayjs/plugin/timezone'; // nodejs
 import dayjs from 'dayjs';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import { setGlobalConfig } from '@utils/app-config';
 
 declare const module: any;
 
@@ -22,7 +21,6 @@ dayjs.extend(timezone);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  setGlobalConfig(app);
 
   const httpAdapter = app.get(HttpAdapterHost);
   app.enableCors({

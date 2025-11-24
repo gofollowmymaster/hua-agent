@@ -1,4 +1,3 @@
-import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
@@ -25,12 +24,11 @@ export default class RequestStatisticService extends IssueStatisticService {
   };
 
   constructor(
-    protected readonly config: ConfigService,
     protected readonly feishuIssueTable: FeishuApiAlertIssueTable,
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly businessLineTable: FeishuBusinessLineTable,
   ) {
-    super(config, feishuIssueTable, messageHelper, businessLineTable);
+    super(feishuIssueTable, messageHelper, businessLineTable);
   }
   protected customFilter(item: Record<string, any>) {
     return !ignoreCodeList.includes(item.fields['业务状态码'][0].text);
