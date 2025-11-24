@@ -13,6 +13,7 @@ import timezone from 'dayjs/plugin/timezone'; // nodejs
 import dayjs from 'dayjs';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { setGlobalAppInstance } from '@utils/app-config';
 
 declare const module: any;
 
@@ -21,7 +22,7 @@ dayjs.extend(timezone);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  setGlobalAppInstance(app);
   const httpAdapter = app.get(HttpAdapterHost);
   app.enableCors({
     origin: true, // 或设置为 true 允许所有
