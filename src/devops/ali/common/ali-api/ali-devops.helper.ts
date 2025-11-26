@@ -1,17 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-// import {} from //   IssueStatusDetailsType,
-// //   SentryIssue,
-// //   SentryStatus,
-// '../../types/devops';
 
-// import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
 import HttpApiHelper from '@src/common/base/http-api-service';
 import Redis from 'ioredis';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
+import { AppWorkflowPublishType } from './interface';
+import { AppWorkflowType } from '../../types/devops';
 
 @Injectable()
 export class DevopsApiService extends HttpApiHelper {
@@ -19,10 +16,12 @@ export class DevopsApiService extends HttpApiHelper {
     'https://openapi-rdc.aliyuncs.com/oapi/v1/appstack/organizations/';
   private readonly organizationId: string;
   protected readonly redis: Redis;
-  protected readonly ttl: number = 60 * 60 * 24;
+  protected readonly ttl: number = 60 * 60 * 12;
+  protected readonly useCache: boolean = true;
+
   protected readonly headers = {
     'Content-Type': 'application/json',
-    'x-yunxiao-token': `${process.env.WORkFLOW_TOKEN}`,
+    'x-yunxiao-token': `pt-UyHozIREJBGyrqfmn5SKjTA1_985d1519-aa5f-4efc-9e30-2626e5d14f47`,
   };
   constructor(
     private readonly httpService: HttpService,
@@ -30,72 +29,141 @@ export class DevopsApiService extends HttpApiHelper {
   ) {
     super(redisService, RedisKeys.ALI_DEVOPS_API_CACHE);
     this.redis = redisService.getClient();
-    this.organizationId = NodeConfigService.get('AliyunOrganizationId');
+    this.organizationId = NodeConfigService.getOrThrow('AliyunOrganizationId');
   }
 
   async quaryAllApp() {
-    return this.requestWrapper(async () => {
-      const { data } = await firstValueFrom(
-        this.httpService.get(
-          `${this.prefix}/${this.organizationId}/apps:search?pagination=keyset&orderBy=id&perPage=100&sort=asc`,
-          {
-            headers: this.headers,
-          },
-        ),
-      );
-      return data;
-    }, 'quaryAllApp');
+    return this.readWrapper(
+      async () => {
+        console.log(
+          `${this.prefix}${this.organizationId}/apps:search?pagination=keyset&orderBy=id&perPage=100&sort=asc`,
+        );
+        const { data } = await firstValueFrom(
+          this.httpService.get(
+            `${this.prefix}${this.organizationId}/apps:search?pagination=keyset&orderBy=id&perPage=100&sort=asc`,
+            {
+              headers: this.headers,
+            },
+          ),
+        );
+        return data;
+      },
+      true,
+      'quaryAllApp',
+    );
   }
 
   /** 分页查找应用源详情 */
   async quaryAppSource(appName: string) {
-    return this.requestWrapper(async () => {
-      const { data } = await firstValueFrom(
-        this.httpService.get(
-          `${this.prefix}/${this.organizationId}/apps/${appName}/sources?pagination=keyset&orderBy=id&perPage=100&sort=asc`,
-          {
-            headers: this.headers,
-          },
-        ),
-      );
-      return data;
-    }, 'quaryAppSource');
+    return this.readWrapper(
+      async () => {
+        const { data } = await firstValueFrom(
+          this.httpService.get(
+            `${this.prefix}${this.organizationId}/apps/${appName}/sources?pagination=keyset&orderBy=id&perPage=100&sort=asc`,
+            {
+              headers: this.headers,
+            },
+          ),
+        );
+        return data;
+      },
+      true,
+      'quaryAppSource',
+    );
   }
   async quaryAppRelease(appName) {
-    return this.requestWrapper(async () => {
-      const { data } = await firstValueFrom(
-        this.httpService.get(
-          `${this.prefix}/${this.organizationId}/apps/${appName}`,
-          {
-            headers: this.headers,
-          },
-        ),
-      );
-      return data;
-    }, 'quaryAppRelease');
+    return this.readWrapper(
+      async () => {
+        const { data } = await firstValueFrom(
+          this.httpService.get(
+            `${this.prefix}${this.organizationId}/apps/${appName}`,
+            {
+              headers: this.headers,
+            },
+          ),
+        );
+        return data;
+      },
+      true,
+      'quaryAppRelease',
+    );
   }
-  async quaryAppReleaseWorkflow(appName: string) {
-    return this.requestWrapper(async () => {
-      const { data } = await firstValueFrom(
-        this.httpService.get(
-          `${this.prefix}/${this.organizationId}/apps/${appName}/releaseWorkflows`,
-          {
-            headers: this.headers,
-          },
-        ),
-      );
-      return data;
-    }, 'quaryAppReleaseWorkflow');
+  /** 查找应用下所有的研发流程 */
+  async quaryAppReleaseWorkflow(
+    appOption: AppWorkflowType,
+  ): Promise<AppWorkflowPublishType> {
+    return this.readWrapper(
+      async () => {
+        let { data } = await firstValueFrom(
+          this.httpService.get(
+            `${this.prefix}${this.organizationId}/apps/${appOption.appName}/releaseWorkflows`,
+            {
+              headers: this.headers,
+            },
+          ),
+        );
+        //只去第一个
+        data = this.handleWorkflowData(data[0], appOption);
+        return data;
+      },
+      true,
+      'quaryAppReleaseWorkflow',
+    );
   }
-  async executeAppReleaseWorkflow(pathParams, body) {
+  handleWorkflowData = (
+    appConfig: any,
+    appOption: AppWorkflowType,
+  ): AppWorkflowPublishType => {
+    const releaseStages = appConfig.releaseStages;
+    const handleWorkflowSource = releaseStages.find(
+      (workflowStage) => workflowStage.name === appOption.workflowName,
+    );
+
+    const pipelineConfig =
+      handleWorkflowSource.pipeline.pipeline.pipelineConfigVo ?? {};
+    const settings = JSON.parse(pipelineConfig.settings ?? '{}');
+    const globalParams = (settings?.globalParams ?? []).map((item: any) => {
+      if (item.metaData) {
+        item.metaData = JSON.parse(item.metaData);
+      }
+      return item;
+    });
+
+    const sources = JSON.parse(pipelineConfig.sources ?? '[]')[0];
+    const runParams = globalParams.reduce(
+      (prev, item) => {
+        if (item.runningConfig) {
+          prev[item.key] = item.value;
+        }
+        return prev;
+      },
+      {} as Record<string, string>,
+    );
+    return {
+      /** 应用名称 */
+      appName: appOption.appName,
+      /** 研发流程sn */
+      releaseWorkflowSn: appConfig.sn,
+      /** 研发阶段名称 */
+      workflowName: handleWorkflowSource.name,
+      /** 研发阶段sn */
+      releaseStageSn: handleWorkflowSource.sn,
+      /** 发起请求需要的params参数 */
+      runParams,
+      /** 源码库id 在请求参数中作为设置分支名称 */
+      sourcesID: sources.sign,
+      url: `https://devops.aliyun.com/appstack/app/${appOption.appName}/workflow/${appConfig.releaseWorkflowSn}/stage/${handleWorkflowSource.sn}/current`,
+    };
+  };
+  async executeAppReleaseWorkflow(pathParams, params) {
     const { appName, releaseWorkflowSn, releaseStageSn } = pathParams;
     return this.requestWrapper(async () => {
       const { data } = await firstValueFrom(
         this.httpService.post(
-          `${this.prefix}/${this.organizationId}/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}:execute`,
+          `${this.prefix}${this.organizationId}/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}:execute`,
 
           {
-            params: body,
+            params,
           },
           {
             headers: this.headers,
@@ -105,19 +173,24 @@ export class DevopsApiService extends HttpApiHelper {
       return data;
     }, 'executeAppReleaseWorkflow');
   }
-  async quaryAllAppTemplate() {
-    return this.requestWrapper(async () => {
-      const { data } = await firstValueFrom(
-        this.httpService.post(
-          `${this.prefix}/${this.organizationId}/appTemplates:search?pagination=keyset&orderBy=id&perPage=100&sort=asc`,
 
-          {
-            headers: this.headers,
-          },
-        ),
-      );
-      return data;
-    }, 'quaryAllAppTemplate');
+  async quaryAllAppTemplate() {
+    return this.readWrapper(
+      async () => {
+        const { data } = await firstValueFrom(
+          this.httpService.get(
+            `${this.prefix}${this.organizationId}/appTemplates:search?pagination=keyset&orderBy=id&perPage=100&sort=asc`,
+
+            {
+              headers: this.headers,
+            },
+          ),
+        );
+        return data;
+      },
+      true,
+      'quaryAllAppTemplate',
+    );
   }
 
   //

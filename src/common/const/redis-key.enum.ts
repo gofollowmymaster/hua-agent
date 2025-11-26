@@ -9,7 +9,8 @@ export const RedisPrefixIdempotent = RedisPrefix + 'idempotent:';
 export const SentryAlertPrefix = RedisPrefix + 'alert:sentry-integration:';
 export const FeishuApiPrefix = RedisPrefix + '{tenant}:feishu-api:';
 export const SentryApiPrefix = RedisPrefix + 'sentry-api:';
-export const AliDevopsApiPrefix = HttpDataCachePrefix + 'ali-devops-api:';
+export const AliDevopsApiPrefix =
+  HttpDataCachePrefix + '{tenant}:ali-devops-api:';
 export const AilyPrefix = RedisPrefix + '{tenant}:aily:';
 export const PushFeishuDocPrefix = RedisPrefix + 'push-feishu-doc:';
 

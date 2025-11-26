@@ -30,6 +30,7 @@ import { TenantMiddleware } from './common/middleware/tenant.middleware';
 import { ContextModule } from './common/service/context/context.module';
 import { DiscardMiddleware } from './common/middleware/discard.middleware';
 import { NodeConfigModule } from './common/service/node-config-service/config.module';
+import { DevopsModule } from './devops/devops.module';
 // import { BaseTableModule } from './common/table/base-table.module';
 
 const ModuleInUsed = process.env.MODULE_USED;
@@ -45,6 +46,7 @@ const modulesAll = [
   DemoPluginModule,
   AlertModule,
   FdCopilotModule,
+  DevopsModule,
 ];
 
 const modules = ModuleInUsed

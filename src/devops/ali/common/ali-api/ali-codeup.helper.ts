@@ -19,6 +19,7 @@ export class AliCodeUpApiService extends HttpApiHelper {
 
   protected readonly redis: Redis;
   protected readonly ttl: number = 60 * 60 * 24;
+  protected readonly useCache: boolean = true;
   protected readonly headers = {
     'Content-Type': 'application/json',
     'x-yunxiao-token': `${process.env.WORkFLOW_TOKEN}`,

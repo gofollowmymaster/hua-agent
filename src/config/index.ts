@@ -10,6 +10,9 @@ const globalConfig = Object.freeze({
   ...db,
   jwtSecret: process.env.JWT_SECRET,
   sentryIntegrationToken: process.env.SENTRY_API_TOKEN,
+
+  AliyunOrganizationId: '65f941491febde2b6c514822',
+
   feishuTables: {
     //报警表格相关
     AlertTableAppToken: process.env.FEISHU_ALERT_APP_TOKEN,

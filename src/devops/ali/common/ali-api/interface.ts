@@ -8,3 +8,89 @@ export type Playload = {
   /** 其他参数 分支名称等 */
   [key: string]: string | undefined;
 };
+
+export type PipelineglobalParams = {
+  description: string;
+  encrypted: boolean;
+  key: string;
+  masked: boolean;
+  runningConfig: boolean;
+  value: string;
+  metaData: Record<string, any>;
+};
+export type PipelineSetting = {
+  concurrencyConfig: {
+    concurrency: number;
+    enable: boolean;
+    jobConcurrency: number;
+    model: string;
+  };
+  globalParams: PipelineglobalParams[];
+};
+export type PipelineConfigVo = {
+  settings: string;
+};
+export type AppReleasePipeline = {
+  pipelineConfigVo: PipelineConfigVo;
+  creator: string;
+  gmtModified: number;
+  timezone: string;
+  groupId: number;
+  modifier: string;
+  pipelineSystemType: 'appDeployment';
+  siteFrom: 'teambition';
+  originPipelineId: number;
+  readOnly: 'N' | 'Y';
+  gmtCreate: number;
+  lastConfigId: number;
+  locale: 'zh_CN';
+  uuid: string;
+  lastInstId: number;
+  groupName: string;
+  isDeleted: 'N' | 'Y';
+  regionId: number;
+  name: string;
+  id: number;
+  clonePipeline: boolean;
+  status: 'ONLINE';
+};
+export type ReleaseStages = {
+  appName: string;
+  name: string;
+  order: string;
+
+  sn: string;
+  releaseWorkflowSn: string;
+  note: string;
+  labels: Record<string, string>[];
+  pipeline: {
+    pipeline: AppReleasePipeline;
+    engineSn: string;
+  };
+};
+export type AppReleaseWorkflow = {
+  appName: string;
+  name: string;
+  note: string;
+  order: string;
+
+  sn: `sn-${string}`;
+  type: 'CR' | 'APP_RELEASE';
+  releaseStages: ReleaseStages[];
+};
+
+export type AppWorkflowPublishType = {
+  /** 应用名称 */
+  appName: string;
+  /** 研发流程sn */
+  releaseWorkflowSn: string;
+  /** 研发阶段名称 */
+  workflowName: string;
+  /** 研发阶段sn */
+  releaseStageSn: string;
+  /** 发起请求需要的params参数 */
+  runParams: Record<string, string>;
+  /** 源码库id 在请求参数中作为设置分支名称 */
+  sourcesID: string;
+  url: string;
+};

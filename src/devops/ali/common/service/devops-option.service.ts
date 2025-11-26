@@ -1,0 +1,114 @@
+import { Injectable } from '@nestjs/common';
+import { AppWorkflowType } from '../../types/devops';
+import { DevopsApiService } from '../ali-api/ali-devops.helper';
+import { AliDevopsDto } from '../../dto/ali';
+
+@Injectable()
+export class DevopsOptionService {
+  private readonly optinos: Record<string, AppWorkflowType[]> = {
+    dev: [
+      {
+        appName: 'publish-admin-app',
+        workflowName: 'dev环境',
+        branch: 'dev-publish',
+      },
+      {
+        appName: 'publish-user-app',
+        workflowName: 'dev环境',
+        branch: 'dev-publish',
+      },
+    ],
+    'dev-merge': [
+      {
+        appName: 'publish-admin-app',
+        workflowName: 'dev-merge',
+        branch: 'dev-merge-publish',
+      },
+      {
+        appName: 'publish-user-app',
+        workflowName: 'dev-merge',
+        branch: 'dev-merge-publish',
+      },
+      {
+        appName: 'publish-admin-tenant-app',
+        workflowName: 'dev-merge环境',
+        branch: 'dev-merge',
+      },
+      {
+        appName: 'publish-user-tenant-app',
+        workflowName: 'dev-merge环境',
+        branch: 'dev-merge',
+      },
+    ],
+    test: [
+      {
+        appName: 'publish-admin-app',
+        workflowName: 'test环境',
+        branch: 'test-publish',
+      },
+      {
+        appName: 'publish-user-app',
+        workflowName: 'test环境',
+        branch: 'test-publish',
+      },
+    ],
+    'test-merge': [
+      {
+        appName: 'publish-admin-app',
+        workflowName: '服务商test环境-小往',
+        branch: 'test-merge-publish',
+      },
+      {
+        appName: 'publish-user-app',
+        workflowName: '服务商测试环境-小往',
+        branch: 'test-merge-publish',
+      },
+      {
+        appName: 'publish-admin-tenant-app',
+        workflowName: '服务商测试环境',
+        branch: 'test-merge',
+      },
+      {
+        appName: 'publish-user-tenant-app',
+        workflowName: '服务商测试环境',
+        branch: 'test-merge',
+      },
+    ],
+  };
+  constructor(private readonly devopsApiService: DevopsApiService) {}
+  /**
+   *
+   * @param env
+   * @param app
+   * @returns
+   */
+  getOptions(env: string, apps?: string[]) {
+    const options = this.optinos[env];
+    if (apps) {
+      return options.filter((item) => apps.includes(item.appName));
+    }
+    return options;
+  }
+
+  /**
+   * 检查APP是否存在
+   */
+  async checkApp(params: AliDevopsDto) {
+    const runAppList = this.getOptions(params.env, params.apps);
+    const apps = await this.devopsApiService.quaryAllApp();
+    const appNames = apps.data.map((item: any) => item.name);
+    const notExistList = runAppList.reduce((prev, item) => {
+      if (!appNames.includes(item.appName)) {
+        prev.push(item.appName);
+      }
+      return prev;
+    }, [] as string[]);
+
+    if (notExistList.length) {
+      throw new Error(
+        `应用：${notExistList.join(',')}不存在，请检查应用配置是否正确`,
+      );
+    }
+    return runAppList;
+  }
+}

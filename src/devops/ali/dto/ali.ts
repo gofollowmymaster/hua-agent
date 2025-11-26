@@ -5,13 +5,25 @@ export class AliDevopsDto {
   @IsNotEmpty()
   @ApiProperty({
     type: String,
-    description: '文档标识，作为文档的唯一标识符',
+    description: '研发流程环境',
   })
-  tag: string;
+  env: string;
+
+  @ApiProperty({
+    type: String,
+    description: '应用研发流程名',
+  })
+  apps?: string[];
   @IsNotEmpty()
   @ApiProperty({
     type: String,
-    description: '模块标识，将决定文档存在于哪一个知识库父节点',
+    description: '发布内容描述',
   })
-  module: string;
+  content?: string;
+
+  @ApiProperty({
+    type: String,
+    description: '操作人',
+  })
+  operator: string;
 }

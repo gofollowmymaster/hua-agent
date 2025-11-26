@@ -24,7 +24,8 @@ export type TenantRobots = keyof TenantConfig['robots'];
 export const tenantCodeMap = {
   B0004: 'aplus',
   CO3906: 'boat',
-  // B0006: 'yurex',
+  A: 'aplus',
+  C: 'boat',
 } as const;
 //服务商码
 export type TenantCode = (typeof tenantCodeMap)[keyof typeof tenantCodeMap];
