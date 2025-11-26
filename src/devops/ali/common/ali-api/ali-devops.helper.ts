@@ -7,7 +7,7 @@ import Redis from 'ioredis';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
-import { AppWorkflowPublishType } from './interface';
+import { AppReleaseWorkflow, AppWorkflowPublishType } from './interface';
 import { AppWorkflowType } from '../../types/devops';
 
 @Injectable()
@@ -33,82 +33,73 @@ export class DevopsApiService extends HttpApiHelper {
   }
 
   async quaryAllApp() {
+    const uri = `${this.organizationId}/apps:search?pagination=keyset&orderBy=id&perPage=100&sort=asc`;
+
     return this.readWrapper(
       async () => {
-        console.log(
-          `${this.prefix}${this.organizationId}/apps:search?pagination=keyset&orderBy=id&perPage=100&sort=asc`,
-        );
         const { data } = await firstValueFrom(
-          this.httpService.get(
-            `${this.prefix}${this.organizationId}/apps:search?pagination=keyset&orderBy=id&perPage=100&sort=asc`,
-            {
-              headers: this.headers,
-            },
-          ),
+          this.httpService.get(this.prefix + uri, {
+            headers: this.headers,
+          }),
         );
         return data;
       },
       true,
-      'quaryAllApp',
+      uri,
     );
   }
 
   /** 分页查找应用源详情 */
   async quaryAppSource(appName: string) {
+    const uri = `${this.organizationId}/apps/${appName}/sources?pagination=keyset&orderBy=id&perPage=100&sort=asc`;
     return this.readWrapper(
       async () => {
         const { data } = await firstValueFrom(
-          this.httpService.get(
-            `${this.prefix}${this.organizationId}/apps/${appName}/sources?pagination=keyset&orderBy=id&perPage=100&sort=asc`,
-            {
-              headers: this.headers,
-            },
-          ),
+          this.httpService.get(this.prefix + uri, {
+            headers: this.headers,
+          }),
         );
         return data;
       },
       true,
-      'quaryAppSource',
+      uri,
     );
   }
   async quaryAppRelease(appName) {
+    const uri = `${this.organizationId}/apps/${appName}`;
     return this.readWrapper(
       async () => {
         const { data } = await firstValueFrom(
-          this.httpService.get(
-            `${this.prefix}${this.organizationId}/apps/${appName}`,
-            {
-              headers: this.headers,
-            },
-          ),
+          this.httpService.get(this.prefix + uri, {
+            headers: this.headers,
+          }),
         );
         return data;
       },
       true,
-      'quaryAppRelease',
+      uri,
     );
   }
   /** 查找应用下所有的研发流程 */
   async quaryAppReleaseWorkflow(
     appOption: AppWorkflowType,
   ): Promise<AppWorkflowPublishType> {
-    return this.readWrapper(
+    const uri = `${this.organizationId}/apps/${appOption.appName}/releaseWorkflows`;
+    const info: AppReleaseWorkflow = await this.readWrapper(
       async () => {
-        let { data } = await firstValueFrom(
-          this.httpService.get(
-            `${this.prefix}${this.organizationId}/apps/${appOption.appName}/releaseWorkflows`,
-            {
-              headers: this.headers,
-            },
-          ),
+        const { data } = await firstValueFrom(
+          this.httpService.get(this.prefix + uri, {
+            headers: this.headers,
+          }),
         );
-        //只去第一个
-        data = this.handleWorkflowData(data[0], appOption);
+
         return data;
       },
       true,
-      'quaryAppReleaseWorkflow',
+      uri,
     );
+    //只去第一个
+    return this.handleWorkflowData(info[0], appOption);
   }
   handleWorkflowData = (
     appConfig: any,
@@ -118,7 +109,6 @@ export class DevopsApiService extends HttpApiHelper {
     const handleWorkflowSource = releaseStages.find(
       (workflowStage) => workflowStage.name === appOption.workflowName,
     );
-
     const pipelineConfig =
       handleWorkflowSource.pipeline.pipeline.pipelineConfigVo ?? {};
     const settings = JSON.parse(pipelineConfig.settings ?? '{}');
@@ -152,7 +142,7 @@ export class DevopsApiService extends HttpApiHelper {
       runParams,
       /** 源码库id 在请求参数中作为设置分支名称 */
       sourcesID: sources.sign,
-      url: `https://devops.aliyun.com/appstack/app/${appOption.appName}/workflow/${appConfig.releaseWorkflowSn}/stage/${handleWorkflowSource.sn}/current`,
+      url: `https://devops.aliyun.com/appstack/app/${appOption.appName}/workflow/${appConfig.sn}/stage/${handleWorkflowSource.sn}/current`,
     };
   };
   async executeAppReleaseWorkflow(pathParams, params) {

@@ -1,4 +1,4 @@
-import AiAlertClient from './aily-alert-client';
+import AiHeplerClient from './aily-alert-client';
 import AlertClient from './alert-client';
 import XiaoAClient from './xiao-a-client';
 import AilyAplusClient from './aplus-aily-client';
@@ -9,11 +9,11 @@ export const feishuAppClents = {
   XiaoAClient,
   AilyAplusClient,
   AuthClient,
-  AiAlertClient,
+  AiHeplerClient,
 };
 export enum FeishuApp {
   AlertClient = 'AlertClient',
-  AiAlertClient = 'AiAlertClient',
+  AiHeplerClient = 'AiHeplerClient',
   XiaoAClient = 'XiaoAClient',
   AilyAplusClient = 'AilyAplusClient',
   AuthClient = 'AuthClient',

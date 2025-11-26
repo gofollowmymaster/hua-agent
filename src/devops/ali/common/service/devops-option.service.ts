@@ -17,6 +17,16 @@ export class DevopsOptionService {
         workflowName: 'dev环境',
         branch: 'dev-publish',
       },
+      {
+        appName: 'global-console',
+        workflowName: 'dev环境',
+        branch: 'dev-publish',
+      },
+      {
+        appName: 'aplus-quickbi-manage',
+        workflowName: 'dev环境',
+        branch: 'feature/dev-publish',
+      },
     ],
     'dev-merge': [
       {
@@ -34,9 +44,30 @@ export class DevopsOptionService {
         workflowName: 'dev-merge环境',
         branch: 'dev-merge',
       },
+
       {
         appName: 'publish-user-tenant-app',
         workflowName: 'dev-merge环境',
+        branch: 'dev-merge',
+      },
+      {
+        appName: 'publish-admin-yurex-app',
+        workflowName: 'dev环境',
+        branch: 'dev-merge',
+      },
+      {
+        appName: 'publish-user-yurex-app',
+        workflowName: 'dev环境',
+        branch: 'dev-merge',
+      },
+      {
+        appName: 'global-console',
+        workflowName: 'dev-v2环境',
+        branch: 'dev-merge',
+      },
+      {
+        appName: 'aplus-quickbi-manage',
+        workflowName: 'dev-merge',
         branch: 'dev-merge',
       },
     ],
@@ -50,6 +81,16 @@ export class DevopsOptionService {
         appName: 'publish-user-app',
         workflowName: 'test环境',
         branch: 'test-publish',
+      },
+      {
+        appName: 'global-console',
+        workflowName: '服务器test环境',
+        branch: 'dev-publish',
+      },
+      {
+        appName: 'aplus-quickbi-manage',
+        workflowName: 'test环境',
+        branch: 'feature/test-publish',
       },
     ],
     'test-merge': [
@@ -71,6 +112,26 @@ export class DevopsOptionService {
       {
         appName: 'publish-user-tenant-app',
         workflowName: '服务商测试环境',
+        branch: 'test-merge',
+      },
+      {
+        appName: 'publish-admin-yurex-app',
+        workflowName: 'test环境',
+        branch: 'test-merge',
+      },
+      {
+        appName: 'publish-user-yurex-app',
+        workflowName: 'test环境',
+        branch: 'test-merge',
+      },
+      {
+        appName: 'global-console',
+        workflowName: 'test环境',
+        branch: 'test-merge',
+      },
+      {
+        appName: 'aplus-quickbi-manage',
+        workflowName: '服务商test环境',
         branch: 'test-merge',
       },
     ],

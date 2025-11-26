@@ -25,11 +25,12 @@ const globalConfig = Object.freeze({
     AplusNodeAdminAppToken: process.env.FEISHU_APLUS_NODE_ADMIN_APP_TOKEN,
     AplusNodeAdminMtableTableId:
       process.env.FEISHU_APLUS_NODE_ADMIN_MTABLE_TABLE_ID,
+    DevopsTableAppToken: 'Jz0abVIqeajmfesIkfRcwiannof',
   },
 
   robots: {
     //Aily智能报警提示相关
-    AiAlertClient: {
+    AiHeplerClient: {
       appId: process.env.FEISHU_AILY_ALERT_APP_ID,
       appSecret: process.env.FEISHU_AILY_ALERT_APP_SECRET,
     },

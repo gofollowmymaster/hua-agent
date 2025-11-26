@@ -4,8 +4,10 @@ export type PublishCardData = {
   workflowEnv: string;
   content: string;
   status: string;
-  testUser: string[];
-  operator: string;
+  testUser: string;
+  operator: {
+    id: string;
+  };
   links: Record<string, any>[];
 };
 

@@ -8,11 +8,12 @@ import { AliCodeUpApiService } from './ali/common/ali-api/ali-codeup.helper';
 import { DevopsOptionService } from './ali/common/service/devops-option.service';
 import { FeishuHelperModule } from '@src/common/feishu/hepler/helper.module';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
+import UserAliyunTable from './ali/common/table/user-token-table';
 
 @Module({
   imports: [
     HttpModule,
-    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AilyAplusClient)),
+    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AiHeplerClient)),
   ],
   providers: [
     LoggerService,
@@ -20,6 +21,7 @@ import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
     DevopsApiService,
     AliCodeUpApiService,
     DevopsOptionService,
+    UserAliyunTable,
   ],
   controllers: [AliController],
 })
