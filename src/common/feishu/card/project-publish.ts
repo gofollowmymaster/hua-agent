@@ -16,11 +16,10 @@ export enum PublishStatusEnum {
   // resolved = '部署中',
   success = '发布成功',
 }
-export type IssueStatus = keyof typeof PublishStatusEnum;
 
 export default class ProjectPublishCard extends FeishuCard {
   static readonly templateId = 'AAqhnloJKZiwk';
-  static readonly templateVersion = '1.0.0';
+  static readonly templateVersion = '1.0.1';
 
   /**
    * 构建飞书卡片消息

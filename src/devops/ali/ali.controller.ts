@@ -17,9 +17,13 @@ export class AliController {
   @ApiBody({ type: AliDevopsControllerDto })
   @UseGuards(SecretAuthGuard)
   async publish(@Body() params: AliDevopsControllerDto) {
-    if (params.appsStr && params.apps.length < 1) {
+    if (params.appsStr && params.apps?.length < 1) {
       params.apps = params.appsStr.split(',');
     }
-    return this.aliService.publish(params);
+    if (params.testUserStr && params.testUser?.length < 1) {
+      params.testUser = params.testUserStr.split(',');
+    }
+    const res = await this.aliService.publish(params);
+    return res.map((item) => {});
   }
 }

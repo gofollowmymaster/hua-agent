@@ -7,6 +7,8 @@ const globalConfig = Object.freeze({
   FeishuMsgDebugGroupId: 'oc_504fc5a30c33892570ffb5163b6bec93',
   //默认报警人 Ahua
   DefaultAlertFeishuUserId: '762a5468',
+  //运效通知群
+  AliDevopsFeishuGroupId: process.env.ALI_DEVOPS_NOTICE_GROUPID,
   ...db,
   jwtSecret: process.env.JWT_SECRET,
   sentryIntegrationToken: process.env.SENTRY_API_TOKEN,

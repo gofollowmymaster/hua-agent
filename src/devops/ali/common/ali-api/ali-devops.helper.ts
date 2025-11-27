@@ -166,6 +166,21 @@ export class DevopsApiService extends HttpApiHelper {
       return data;
     }, 'executeAppReleaseWorkflow');
   }
+  async getPipelineDetail(pathParams) {
+    const { appName, releaseWorkflowSn, releaseStageSn, pipelineRunId } =
+      pathParams;
+    return this.requestWrapper(async () => {
+      const { data } = await firstValueFrom(
+        this.httpService.get(
+          `${this.prefix}${this.organizationId}/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}/executions/${pipelineRunId}:getPipelineRun`,
+          {
+            headers: this.headers,
+          },
+        ),
+      );
+      return data;
+    }, 'getPipelineDetail');
+  }
 
   async quaryAllAppTemplate() {
     return this.readWrapper(

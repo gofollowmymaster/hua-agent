@@ -15,6 +15,12 @@ export class AliDevopsDto {
   })
   apps?: string[];
 
+  @ApiPropertyOptional({
+    type: String,
+    description: '需要提醒的人员',
+  })
+  testUser?: string[];
+
   @IsNotEmpty()
   @ApiProperty({
     type: String,
@@ -34,4 +40,9 @@ export class AliDevopsControllerDto extends AliDevopsDto {
     description: '应用研发流程名列表(字符串形式)',
   })
   appsStr?: string;
+  @ApiPropertyOptional({
+    type: String,
+    description: '需要提醒的人员(字符串形式)',
+  })
+  testUserStr?: string;
 }

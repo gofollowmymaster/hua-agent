@@ -39,6 +39,20 @@ class FeishuMessageHelper extends FeishuApiHelper {
       },
     });
   }
+  async createInteractToUser(
+    content: string,
+    receiveId: string,
+    receiveIdType: UserIdType,
+  ) {
+    return await this.createToUser(
+      {
+        receive_id: receiveId,
+        msg_type: 'interactive',
+        content,
+      },
+      receiveIdType,
+    );
+  }
   async createToGroup(msgParams: CreateMessageType['data']) {
     return await this.create({
       data: msgParams,

@@ -26,6 +26,7 @@ export async function addRetryJob(
           resolve(false);
         }
       } catch (error) {
+        console.log('[ 任务执行失败 ] >', error);
         clearInterval(intervalHandler);
         resolve(false);
       }

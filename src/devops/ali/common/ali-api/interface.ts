@@ -93,4 +93,11 @@ export type AppWorkflowPublishType = {
   /** 源码库id 在请求参数中作为设置分支名称 */
   sourcesID: string;
   url: string;
+  runResult?: 'SUCCESS' | 'FAIL' | 'RUNNING' | 'WAITING' | 'INIT';
+};
+
+export type executeAppReleaseWorkflowResponse = {
+  object: string;
+  pipelineRunId: string;
+  pipelineId: string;
 };

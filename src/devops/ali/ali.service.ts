@@ -8,6 +8,11 @@ import ProjectPublishCard from '@src/common/feishu/card/project-publish';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import { AppWorkflowPublishType } from './common/ali-api/interface';
 import UserAliyunTable from './common/table/user-token-table';
+import { addRetryJob } from '@utils/job';
+import { AppWorkflowType } from './types/devops';
+import TipCard from '@src/common/feishu/card/tip-card';
+import { filter } from 'rxjs';
+import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
 
 @Injectable()
 export class AliService {
@@ -32,61 +37,143 @@ export class AliService {
     this.devopsApiService.setAliyunToken(token);
 
     const resultList: AppWorkflowPublishType[] = [];
+    const queryJobs: Promise<any>[] = [];
     for (const appOption of appList) {
       try {
         const appReleaseWorkflow =
           await this.devopsApiService.quaryAppReleaseWorkflow(appOption);
-        await this.devopsApiService.executeAppReleaseWorkflow(
-          {
-            appName: appReleaseWorkflow.appName,
-            releaseWorkflowSn: appReleaseWorkflow.releaseWorkflowSn,
-            releaseStageSn: appReleaseWorkflow.releaseStageSn,
-          },
-          {
-            ...appReleaseWorkflow.runParams,
-            ...appOption.metaData,
-            [appReleaseWorkflow.sourcesID]: appOption.branch,
-          },
-        );
+        const executeRes =
+          await this.devopsApiService.executeAppReleaseWorkflow(
+            {
+              appName: appReleaseWorkflow.appName,
+              releaseWorkflowSn: appReleaseWorkflow.releaseWorkflowSn,
+              releaseStageSn: appReleaseWorkflow.releaseStageSn,
+            },
+            {
+              ...appReleaseWorkflow.runParams,
+              ...appOption.metaData,
+              [appReleaseWorkflow.sourcesID]: appOption.branch,
+            },
+          );
 
+        const job = addRetryJob(
+          async () =>
+            this.getPipelineDetail(
+              appReleaseWorkflow,
+              params,
+              executeRes.pipelineRunId,
+            ),
+          60 * 1000,
+          20,
+        );
         resultList.push(appReleaseWorkflow);
+        queryJobs.push(job);
       } catch (error) {
         throw new Error(
-          `应用：${appOption}发布失败，失败原因：${error.message}`,
+          `应用：${appOption.appName}发布失败，失败原因：${error.message}`,
         );
       }
-      setTimeout(
-        () => {
-          this.sendPushMsg(resultList, params);
-        },
-        4 * 60 * 1000,
-      );
+      Promise.all(queryJobs).then(() => {
+        this.sendPushResultMsg(resultList, params);
+      });
     }
 
     return resultList;
   }
-  async sendPushMsg(
-    appReleaseWorkflow: AppWorkflowPublishType[],
+  isTestAudit(stageInfo: any) {
+    return stageInfo.name === '人工卡点' || stageInfo.name.includes('测试');
+  }
+  async getPipelineDetail(
+    appReleaseWorkflow: AppWorkflowPublishType,
+    params: AliDevopsDto,
+    pipelineRunId: string,
+  ) {
+    const res = await this.devopsApiService.getPipelineDetail({
+      appName: appReleaseWorkflow.appName,
+      releaseWorkflowSn: appReleaseWorkflow.releaseWorkflowSn,
+      releaseStageSn: appReleaseWorkflow.releaseStageSn,
+      pipelineRunId: pipelineRunId,
+    });
+    console.log('[ res ] >', JSON.stringify(res.pipelineRun.stages));
+    const stages = res.pipelineRun.stages;
+    if (stages[stages.length - 1].stageInfo.status === 'SUCCESS') {
+      appReleaseWorkflow.runResult = 'SUCCESS';
+      return true;
+    } else {
+      const currentStage = stages.find((stage: any) =>
+        ['RUNNING', 'WAITING', 'FAIL'].includes(stage.stageInfo.status),
+      );
+      if (!currentStage) {
+        return true;
+      }
+      if (currentStage.stageInfo?.status === 'FAIL') {
+        appReleaseWorkflow.runResult = 'FAIL';
+        console.log(
+          `应用${appReleaseWorkflow.appName}-${appReleaseWorkflow.workflowName}在运行阶段->${currentStage.stageInfo.name} 执行失败`,
+        );
+        this.sendFailMsg(appReleaseWorkflow, params.operator);
+        return true;
+      } else if (currentStage.stageInfo?.status === 'WAITING') {
+        appReleaseWorkflow.runResult = 'WAITING';
+        const name = currentStage.jobs.find((job: any) => {
+          return job.status === 'WAITING';
+        }).name;
+        console.log('当前运行阶段->' + (name || currentStage.stageInfo.name));
+        return true;
+      } else {
+        appReleaseWorkflow.runResult = 'RUNNING';
+        console.log('当前运行阶段->' + currentStage.stageInfo.name);
+        return false;
+      }
+    }
+  }
+  async sendPushResultMsg(
+    appReleaseWorkflowList: AppWorkflowPublishType[],
     params: AliDevopsDto,
   ) {
+    // 全部失败 不推送消息
+    if (
+      appReleaseWorkflowList.filter((item) => item.runResult !== 'FAIL')
+        .length === 0
+    ) {
+      return;
+    }
+
+    const testUser = params.testUser?.reduce((prev, next) => {
+      return prev + ` <at user_id="${next}"></at>`;
+    }, '');
+    const status = '';
     const content = ProjectPublishCard.buildCardMsg({
       content: params.content,
-      links: appReleaseWorkflow.map((item) => {
+      links: appReleaseWorkflowList.map((item) => {
         return {
           project: item.appName,
           link: `[${item.appName}（${item.workflowName}）](${item.url})`,
+          status: item.runResult,
         };
       }),
       operator: {
         id: params.operator,
       },
       workflowEnv: params.env,
-      status: '',
-      testUser: '',
+      status,
+      testUser,
     });
     this.feishuMessageHelper.createInteractToGroup(
       content,
-      'oc_48ff8eeb73c84269ba80e96c7dfd7879',
+      NodeConfigService.get('AliDevopsFeishuGroupId'),
+    );
+  }
+  sendFailMsg(appReleaseWorkflow: AppWorkflowPublishType, operator: string) {
+    const content = TipCard.buildCardMsg({
+      title: '应用发布失败通知',
+      bgColor: 'red',
+      content: `应用:${appReleaseWorkflow.appName}运行失败！请及时处理！[${appReleaseWorkflow.appName}-${appReleaseWorkflow.workflowName}](${appReleaseWorkflow.url})`,
+    });
+    this.feishuMessageHelper.createInteractToUser(
+      content,
+      operator,
+      'union_id',
     );
   }
 }
