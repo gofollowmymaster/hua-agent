@@ -8,7 +8,6 @@ import ProjectPublishCard from '@src/common/feishu/card/project-publish';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import { AppWorkflowPublishType } from './common/ali-api/interface';
 import UserAliyunTable from './common/table/user-token-table';
-import { BitTableFilter } from '@src/common/feishu/type/bitable';
 
 @Injectable()
 export class AliService {
@@ -26,17 +25,12 @@ export class AliService {
 
   async publish(params: AliDevopsDto): Promise<any> {
     const appList = await this.devopsOptionService.checkApp(params);
-    const filter: BitTableFilter = {
-      conjunction: 'and',
-      conditions: [
-        {
-          field_name: '用户',
-          operator: 'is',
-          value: [params.operator],
-        },
-      ],
-    };
-    await this.userAliyunTable.search(filter);
+    const token = await this.userAliyunTable.getUserAliyunToken(
+      params.operator,
+    );
+
+    this.devopsApiService.setAliyunToken(token);
+
     const resultList: AppWorkflowPublishType[] = [];
     for (const appOption of appList) {
       try {
@@ -54,7 +48,7 @@ export class AliService {
             [appReleaseWorkflow.sourcesID]: appOption.branch,
           },
         );
-        // appReleaseWorkflow.
+
         resultList.push(appReleaseWorkflow);
       } catch (error) {
         throw new Error(

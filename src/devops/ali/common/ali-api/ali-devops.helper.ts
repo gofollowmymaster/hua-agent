@@ -21,7 +21,7 @@ export class DevopsApiService extends HttpApiHelper {
 
   protected readonly headers = {
     'Content-Type': 'application/json',
-    'x-yunxiao-token': `pt-UyHozIREJBGyrqfmn5SKjTA1_985d1519-aa5f-4efc-9e30-2626e5d14f47`,
+    'x-yunxiao-token': ``,
   };
   constructor(
     private readonly httpService: HttpService,
@@ -30,6 +30,9 @@ export class DevopsApiService extends HttpApiHelper {
     super(redisService, RedisKeys.ALI_DEVOPS_API_CACHE);
     this.redis = redisService.getClient();
     this.organizationId = NodeConfigService.getOrThrow('AliyunOrganizationId');
+  }
+  setAliyunToken(token: string) {
+    this.headers['x-yunxiao-token'] = token;
   }
 
   async quaryAllApp() {
