@@ -155,9 +155,10 @@ export class DevopsOptionService {
    * 检查APP是否存在
    */
   async checkApp(params: AliDevopsDto) {
-    const runAppList = this.getOptions(params.env, params.apps);
     const apps = await this.devopsApiService.quaryAllApp();
     const appNames = apps.data.map((item: any) => item.name);
+    const runAppList = this.getOptions(params.env, params.apps);
+
     const notExistList = runAppList.reduce((prev, item) => {
       if (!appNames.includes(item.appName)) {
         prev.push(item.appName);

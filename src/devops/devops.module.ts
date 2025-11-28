@@ -9,6 +9,7 @@ import { DevopsOptionService } from './ali/common/service/devops-option.service'
 import { FeishuHelperModule } from '@src/common/feishu/hepler/helper.module';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import UserAliyunTable from './ali/common/table/user-token-table';
+import { AliDevopsContext } from './ali/common/service/ali-devops.context';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import UserAliyunTable from './ali/common/table/user-token-table';
     AliCodeUpApiService,
     DevopsOptionService,
     UserAliyunTable,
+    AliDevopsContext,
   ],
   controllers: [AliController],
 })

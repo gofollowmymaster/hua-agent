@@ -23,7 +23,6 @@ export class AliController {
     if (params.testUserStr && params.testUser?.length < 1) {
       params.testUser = params.testUserStr.split(',');
     }
-    const res = await this.aliService.publish(params);
-    return res.map((item) => {});
+    return await this.aliService.publish(params);
   }
 }

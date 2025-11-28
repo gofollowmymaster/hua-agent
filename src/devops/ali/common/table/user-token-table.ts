@@ -6,7 +6,7 @@ import { NodeConfigService } from '@src/common/service/node-config-service/node-
 @Injectable()
 class UserAliyunTable extends FeishuTable {
   protected useCache = false;
-  protected ttl = 60 * 60; //默认缓存10分钟
+  protected ttl = 60 * 60; //缓存1小时
   constructor(readonly tableHelper: FeishuTableHelper) {
     super();
     this.appToken = NodeConfigService.getFeishuTableConfig(
@@ -29,11 +29,20 @@ class UserAliyunTable extends FeishuTable {
           operator: 'is',
           value: [operator],
         },
+        {
+          field_name: '状态',
+          operator: 'is',
+          value: ['true'],
+        },
       ],
     };
-    const info = await this.search(filter, {
-      user_id_type: 'union_id',
-    });
+    const info = await this.search(
+      filter,
+      {
+        user_id_type: 'union_id',
+      },
+      false,
+    );
     const user = info.items[0].fields;
     const token = user['云效token']?.[0]?.text;
     if (!user['状态'] || !token) {

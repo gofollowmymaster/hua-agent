@@ -101,3 +101,19 @@ export type executeAppReleaseWorkflowResponse = {
   pipelineRunId: string;
   pipelineId: string;
 };
+
+export type AppInfoItemType = {
+  creatorAccountId?: string;
+  creatorId: string;
+  name: string;
+  gmtCreate: string;
+  description: string;
+  appTemplateName: string;
+  appTemplateDisplayName: string;
+  tags?: string[];
+};
+
+export type AppInfoType = {
+  nextToken: string;
+  data: AppInfoItemType[];
+};

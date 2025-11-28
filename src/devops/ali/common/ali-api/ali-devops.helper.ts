@@ -7,8 +7,13 @@ import Redis from 'ioredis';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
-import { AppReleaseWorkflow, AppWorkflowPublishType } from './interface';
+import {
+  AppInfoType,
+  AppReleaseWorkflow,
+  AppWorkflowPublishType,
+} from './interface';
 import { AppWorkflowType } from '../../types/devops';
+import { AliDevopsContext } from '../service/ali-devops.context';
 
 @Injectable()
 export class DevopsApiService extends HttpApiHelper {
@@ -26,20 +31,24 @@ export class DevopsApiService extends HttpApiHelper {
   constructor(
     private readonly httpService: HttpService,
     protected readonly redisService: RedisService,
+    protected readonly devopsContext: AliDevopsContext,
   ) {
     super(redisService, RedisKeys.ALI_DEVOPS_API_CACHE);
     this.redis = redisService.getClient();
     this.organizationId = NodeConfigService.getOrThrow('AliyunOrganizationId');
   }
-  setAliyunToken(token: string) {
+  setAliyunToken(token?: string) {
+    token = token ?? this.devopsContext.token;
     this.headers['x-yunxiao-token'] = token;
   }
 
-  async quaryAllApp() {
+  async quaryAllApp(): Promise<AppInfoType> {
     const uri = `${this.organizationId}/apps:search?pagination=keyset&orderBy=id&perPage=100&sort=asc`;
 
     return this.readWrapper(
       async () => {
+        this.setAliyunToken();
+
         const { data } = await firstValueFrom(
           this.httpService.get(this.prefix + uri, {
             headers: this.headers,
@@ -57,6 +66,8 @@ export class DevopsApiService extends HttpApiHelper {
     const uri = `${this.organizationId}/apps/${appName}/sources?pagination=keyset&orderBy=id&perPage=100&sort=asc`;
     return this.readWrapper(
       async () => {
+        this.setAliyunToken();
+
         const { data } = await firstValueFrom(
           this.httpService.get(this.prefix + uri, {
             headers: this.headers,
@@ -72,6 +83,8 @@ export class DevopsApiService extends HttpApiHelper {
     const uri = `${this.organizationId}/apps/${appName}`;
     return this.readWrapper(
       async () => {
+        this.setAliyunToken();
+
         const { data } = await firstValueFrom(
           this.httpService.get(this.prefix + uri, {
             headers: this.headers,
@@ -90,6 +103,8 @@ export class DevopsApiService extends HttpApiHelper {
     const uri = `${this.organizationId}/apps/${appOption.appName}/releaseWorkflows`;
     const info: AppReleaseWorkflow = await this.readWrapper(
       async () => {
+        this.setAliyunToken();
+
         const { data } = await firstValueFrom(
           this.httpService.get(this.prefix + uri, {
             headers: this.headers,
@@ -150,7 +165,10 @@ export class DevopsApiService extends HttpApiHelper {
   };
   async executeAppReleaseWorkflow(pathParams, params) {
     const { appName, releaseWorkflowSn, releaseStageSn } = pathParams;
+
     return this.requestWrapper(async () => {
+      this.setAliyunToken();
+
       const { data } = await firstValueFrom(
         this.httpService.post(
           `${this.prefix}${this.organizationId}/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}:execute`,
@@ -169,7 +187,10 @@ export class DevopsApiService extends HttpApiHelper {
   async getPipelineDetail(pathParams) {
     const { appName, releaseWorkflowSn, releaseStageSn, pipelineRunId } =
       pathParams;
+
     return this.requestWrapper(async () => {
+      this.setAliyunToken();
+
       const { data } = await firstValueFrom(
         this.httpService.get(
           `${this.prefix}${this.organizationId}/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}/executions/${pipelineRunId}:getPipelineRun`,
@@ -185,6 +206,8 @@ export class DevopsApiService extends HttpApiHelper {
   async quaryAllAppTemplate() {
     return this.readWrapper(
       async () => {
+        this.setAliyunToken();
+
         const { data } = await firstValueFrom(
           this.httpService.get(
             `${this.prefix}${this.organizationId}/appTemplates:search?pagination=keyset&orderBy=id&perPage=100&sort=asc`,

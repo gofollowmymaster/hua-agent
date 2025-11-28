@@ -9,10 +9,9 @@ import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import { AppWorkflowPublishType } from './common/ali-api/interface';
 import UserAliyunTable from './common/table/user-token-table';
 import { addRetryJob } from '@utils/job';
-import { AppWorkflowType } from './types/devops';
 import TipCard from '@src/common/feishu/card/tip-card';
-import { filter } from 'rxjs';
 import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
+import { AliDevopsContext } from './common/service/ali-devops.context';
 
 @Injectable()
 export class AliService {
@@ -24,66 +23,74 @@ export class AliService {
     protected devopsOptionService: DevopsOptionService,
     protected feishuMessageHelper: FeishuMessageHelper,
     protected userAliyunTable: UserAliyunTable,
+    protected devopsContext: AliDevopsContext,
   ) {
     this.redis = redisService.getClient();
   }
 
-  async publish(params: AliDevopsDto): Promise<any> {
-    const appList = await this.devopsOptionService.checkApp(params);
+  async publish(params: AliDevopsDto) {
     const token = await this.userAliyunTable.getUserAliyunToken(
       params.operator,
     );
+    this.devopsContext.run({ token }, async () => {
+      // this.devopsApiService.setAliyunToken(token);
 
-    this.devopsApiService.setAliyunToken(token);
+      const appList = await this.devopsOptionService.checkApp(params);
 
-    const resultList: AppWorkflowPublishType[] = [];
-    const queryJobs: Promise<any>[] = [];
-    for (const appOption of appList) {
-      try {
-        const appReleaseWorkflow =
-          await this.devopsApiService.quaryAppReleaseWorkflow(appOption);
-        const executeRes =
-          await this.devopsApiService.executeAppReleaseWorkflow(
-            {
-              appName: appReleaseWorkflow.appName,
-              releaseWorkflowSn: appReleaseWorkflow.releaseWorkflowSn,
-              releaseStageSn: appReleaseWorkflow.releaseStageSn,
-            },
-            {
-              ...appReleaseWorkflow.runParams,
-              ...appOption.metaData,
-              [appReleaseWorkflow.sourcesID]: appOption.branch,
-            },
+      const resultList: AppWorkflowPublishType[] = [];
+      const queryJobs: Promise<any>[] = [];
+      for (const appOption of appList) {
+        try {
+          const appReleaseWorkflow =
+            await this.devopsApiService.quaryAppReleaseWorkflow(appOption);
+          const executeRes =
+            await this.devopsApiService.executeAppReleaseWorkflow(
+              {
+                appName: appReleaseWorkflow.appName,
+                releaseWorkflowSn: appReleaseWorkflow.releaseWorkflowSn,
+                releaseStageSn: appReleaseWorkflow.releaseStageSn,
+              },
+              {
+                ...appReleaseWorkflow.runParams,
+                ...appOption.metaData,
+                [appReleaseWorkflow.sourcesID]: appOption.branch,
+              },
+            );
+
+          const job = addRetryJob(
+            async () =>
+              this.checkPipelineDetail(
+                appReleaseWorkflow,
+                params,
+                executeRes.pipelineRunId,
+              ),
+            60 * 1000,
+            20,
           );
-
-        const job = addRetryJob(
-          async () =>
-            this.getPipelineDetail(
-              appReleaseWorkflow,
-              params,
-              executeRes.pipelineRunId,
-            ),
-          60 * 1000,
-          20,
-        );
-        resultList.push(appReleaseWorkflow);
-        queryJobs.push(job);
-      } catch (error) {
-        throw new Error(
-          `应用：${appOption.appName}发布失败，失败原因：${error.message}`,
-        );
+          resultList.push(appReleaseWorkflow);
+          queryJobs.push(job);
+        } catch (error) {
+          throw new Error(
+            `应用：${appOption.appName}发布失败，失败原因：${error.message}`,
+          );
+        }
       }
-      Promise.all(queryJobs).then(() => {
-        this.sendPushResultMsg(resultList, params);
-      });
-    }
+      Promise.all(queryJobs)
+        .then(() => {
+          this.sendPushResultMsg(resultList, params);
+        })
+        .catch((error) => {
+          console.error(
+            '查询流水线详情失败，失败原因：' + error.message,
+            error,
+          );
+        });
+    });
 
-    return resultList;
+    return '提交成功';
   }
-  isTestAudit(stageInfo: any) {
-    return stageInfo.name === '人工卡点' || stageInfo.name.includes('测试');
-  }
-  async getPipelineDetail(
+
+  async checkPipelineDetail(
     appReleaseWorkflow: AppWorkflowPublishType,
     params: AliDevopsDto,
     pipelineRunId: string,
