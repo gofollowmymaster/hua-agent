@@ -4,7 +4,7 @@ import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AliDevopsByFeishuDto, AliDevopsCommonDto } from './dto/ali';
 import { SecretAuthGuard } from '@src/common/guard/secret-auth';
 
-@Controller('sync')
+@Controller('devops')
 @ApiTags('阿里云效自动化')
 export class AliController {
   constructor(private aliService: AliService) {}
