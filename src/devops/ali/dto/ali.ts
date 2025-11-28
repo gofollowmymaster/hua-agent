@@ -9,18 +9,6 @@ export class AliDevopsDto {
   })
   env: string;
 
-  @ApiPropertyOptional({
-    type: [String],
-    description: '应用研发流程名列表(数组形式)',
-  })
-  apps?: string[];
-
-  @ApiPropertyOptional({
-    type: String,
-    description: '需要提醒的人员',
-  })
-  testUser?: string[];
-
   @IsNotEmpty()
   @ApiProperty({
     type: String,
@@ -33,16 +21,35 @@ export class AliDevopsDto {
     description: '操作人',
   })
   operator: string;
+  apps: string[];
+  testUser: string[];
 }
-export class AliDevopsControllerDto extends AliDevopsDto {
+export class AliDevopsCommonDto extends AliDevopsDto {
+  @IsNotEmpty()
+  @ApiPropertyOptional({
+    type: [String],
+    description: '应用研发流程名列表',
+  })
+  apps: string[];
+
+  @IsNotEmpty()
   @ApiPropertyOptional({
     type: String,
-    description: '应用研发流程名列表(字符串形式)',
+    description: '需要提醒的人员',
+  })
+  testUser: string[];
+}
+export class AliDevopsByFeishuDto extends AliDevopsDto {
+  @IsNotEmpty()
+  @ApiPropertyOptional({
+    type: String,
+    description: '应用研发流程名列表',
   })
   appsStr?: string;
+  @IsNotEmpty()
   @ApiPropertyOptional({
     type: String,
-    description: '需要提醒的人员(字符串形式)',
+    description: '需要提醒的人员',
   })
   testUserStr?: string;
 }

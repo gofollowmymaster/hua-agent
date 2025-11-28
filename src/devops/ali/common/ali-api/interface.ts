@@ -78,7 +78,7 @@ export type AppReleaseWorkflow = {
   type: 'CR' | 'APP_RELEASE';
   releaseStages: ReleaseStages[];
 };
-
+type PipelineStageType = 'SUCCESS' | 'FAIL' | 'RUNNING' | 'WAITING' | 'INIT';
 export type AppWorkflowPublishType = {
   /** 应用名称 */
   appName: string;
@@ -93,7 +93,7 @@ export type AppWorkflowPublishType = {
   /** 源码库id 在请求参数中作为设置分支名称 */
   sourcesID: string;
   url: string;
-  runResult?: 'SUCCESS' | 'FAIL' | 'RUNNING' | 'WAITING' | 'INIT';
+  status?: PipelineStageType;
 };
 
 export type executeAppReleaseWorkflowResponse = {
@@ -116,4 +116,34 @@ export type AppInfoItemType = {
 export type AppInfoType = {
   nextToken: string;
   data: AppInfoItemType[];
+};
+
+export type PipelineStageJob = {
+  id: number;
+  name: string;
+  status: PipelineStageType;
+  startTime?: number;
+  endTime?: number;
+  params: any;
+  actions: Record<string, any>[];
+  jobSign: string;
+  result: string;
+};
+export type PipelineStageInfo = {
+  startTime: number;
+  endTime?: number;
+  name: string;
+  status: PipelineStageType;
+  jobs: PipelineStageJob[];
+};
+export type PipelineStage = {
+  index: string;
+  name: string;
+  stageInfo: PipelineStageInfo;
+};
+
+export type PipelineDetail = {
+  pipelineRun: {
+    stages: PipelineStage[];
+  };
 };

@@ -11,6 +11,8 @@ import {
   AppInfoType,
   AppReleaseWorkflow,
   AppWorkflowPublishType,
+  PipelineDetail,
+  PipelineStage,
 } from './interface';
 import { AppWorkflowType } from '../../types/devops';
 import { AliDevopsContext } from '../service/ali-devops.context';
@@ -184,7 +186,7 @@ export class DevopsApiService extends HttpApiHelper {
       return data;
     }, 'executeAppReleaseWorkflow');
   }
-  async getPipelineDetail(pathParams) {
+  async getPipelineDetail(pathParams): Promise<PipelineDetail> {
     const { appName, releaseWorkflowSn, releaseStageSn, pipelineRunId } =
       pathParams;
 

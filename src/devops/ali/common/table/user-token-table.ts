@@ -41,7 +41,7 @@ class UserAliyunTable extends FeishuTable {
       {
         user_id_type: 'union_id',
       },
-      false,
+      true,
     );
     const user = info.items[0].fields;
     const token = user['云效token']?.[0]?.text;

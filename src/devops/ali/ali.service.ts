@@ -6,7 +6,10 @@ import { DevopsApiService } from './common/ali-api/ali-devops.helper';
 import { DevopsOptionService } from './common/service/devops-option.service';
 import ProjectPublishCard from '@src/common/feishu/card/project-publish';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
-import { AppWorkflowPublishType } from './common/ali-api/interface';
+import {
+  AppWorkflowPublishType,
+  PipelineStage,
+} from './common/ali-api/interface';
 import UserAliyunTable from './common/table/user-token-table';
 import { addRetryJob } from '@utils/job';
 import TipCard from '@src/common/feishu/card/tip-card';
@@ -32,9 +35,7 @@ export class AliService {
     const token = await this.userAliyunTable.getUserAliyunToken(
       params.operator,
     );
-    this.devopsContext.run({ token }, async () => {
-      // this.devopsApiService.setAliyunToken(token);
-
+    const res = this.devopsContext.run({ token }, async () => {
       const appList = await this.devopsOptionService.checkApp(params);
 
       const resultList: AppWorkflowPublishType[] = [];
@@ -56,7 +57,7 @@ export class AliService {
                 [appReleaseWorkflow.sourcesID]: appOption.branch,
               },
             );
-
+          appReleaseWorkflow.status = 'INIT';
           const job = addRetryJob(
             async () =>
               this.checkPipelineDetail(
@@ -85,9 +86,9 @@ export class AliService {
             error,
           );
         });
+      return resultList;
     });
-
-    return '提交成功';
+    return res;
   }
 
   async checkPipelineDetail(
@@ -102,9 +103,10 @@ export class AliService {
       pipelineRunId: pipelineRunId,
     });
     console.log('[ res ] >', JSON.stringify(res.pipelineRun.stages));
+    // this.userAliyunTable.
     const stages = res.pipelineRun.stages;
     if (stages[stages.length - 1].stageInfo.status === 'SUCCESS') {
-      appReleaseWorkflow.runResult = 'SUCCESS';
+      appReleaseWorkflow.status = 'SUCCESS';
       return true;
     } else {
       const currentStage = stages.find((stage: any) =>
@@ -114,21 +116,19 @@ export class AliService {
         return true;
       }
       if (currentStage.stageInfo?.status === 'FAIL') {
-        appReleaseWorkflow.runResult = 'FAIL';
-        console.log(
-          `应用${appReleaseWorkflow.appName}-${appReleaseWorkflow.workflowName}在运行阶段->${currentStage.stageInfo.name} 执行失败`,
-        );
-        this.sendFailMsg(appReleaseWorkflow, params.operator);
+        appReleaseWorkflow.status = 'FAIL';
+
+        this.sendFailMsg(appReleaseWorkflow, currentStage, params.operator);
         return true;
       } else if (currentStage.stageInfo?.status === 'WAITING') {
-        appReleaseWorkflow.runResult = 'WAITING';
-        const name = currentStage.jobs.find((job: any) => {
+        appReleaseWorkflow.status = 'WAITING';
+        const name = currentStage.stageInfo.jobs.find((job: any) => {
           return job.status === 'WAITING';
         }).name;
         console.log('当前运行阶段->' + (name || currentStage.stageInfo.name));
         return true;
       } else {
-        appReleaseWorkflow.runResult = 'RUNNING';
+        appReleaseWorkflow.status = 'RUNNING';
         console.log('当前运行阶段->' + currentStage.stageInfo.name);
         return false;
       }
@@ -140,8 +140,8 @@ export class AliService {
   ) {
     // 全部失败 不推送消息
     if (
-      appReleaseWorkflowList.filter((item) => item.runResult !== 'FAIL')
-        .length === 0
+      appReleaseWorkflowList.filter((item) => item.status !== 'FAIL').length ===
+      0
     ) {
       return;
     }
@@ -156,7 +156,7 @@ export class AliService {
         return {
           project: item.appName,
           link: `[${item.appName}（${item.workflowName}）](${item.url})`,
-          status: item.runResult,
+          status: item.status,
         };
       }),
       operator: {
@@ -171,11 +171,22 @@ export class AliService {
       NodeConfigService.get('AliDevopsFeishuGroupId'),
     );
   }
-  sendFailMsg(appReleaseWorkflow: AppWorkflowPublishType, operator: string) {
+  sendFailMsg(
+    appReleaseWorkflow: AppWorkflowPublishType,
+    currentStage: PipelineStage,
+    operator: string,
+  ) {
+    let stageName = currentStage.stageInfo.jobs.find((job) => {
+      return job.status === 'FAIL';
+    })?.name;
+    stageName = stageName || currentStage.stageInfo.name;
+    console.log(
+      `应用${appReleaseWorkflow.appName}-${appReleaseWorkflow.workflowName}在运行阶段->${stageName} 执行失败`,
+    );
     const content = TipCard.buildCardMsg({
       title: '应用发布失败通知',
       bgColor: 'red',
-      content: `应用:${appReleaseWorkflow.appName}运行失败！请及时处理！[${appReleaseWorkflow.appName}-${appReleaseWorkflow.workflowName}](${appReleaseWorkflow.url})`,
+      content: `应用:<text_tag color='blue'>${appReleaseWorkflow.appName}</text_tag>在**${stageName}**阶段运行失败！请及时处理！[${appReleaseWorkflow.appName}-${appReleaseWorkflow.workflowName}](${appReleaseWorkflow.url})`,
     });
     this.feishuMessageHelper.createInteractToUser(
       content,

@@ -10,8 +10,8 @@ export class AliDevopsContext {
   private readonly asyncLocalStorage =
     new AsyncLocalStorage<AliDevopsContextStore>();
 
-  run(context: AliDevopsContextStore, callback: () => void) {
-    this.asyncLocalStorage.run(context, callback);
+  run(context: AliDevopsContextStore, callback: () => any) {
+    return this.asyncLocalStorage.run(context, callback);
   }
 
   getStore(): AliDevopsContextStore | undefined {
