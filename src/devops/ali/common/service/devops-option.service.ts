@@ -147,6 +147,16 @@ export class DevopsOptionService {
         branch: 'uat-publish',
       },
       {
+        appName: 'publish-admin-tenant-app',
+        workflowName: 'uat环境',
+        branch: 'uat-merge',
+      },
+      {
+        appName: 'publish-user-tenant-app',
+        workflowName: 'uat环境',
+        branch: 'uat-merge',
+      },
+      {
         appName: 'global-console',
         workflowName: 'uat环境',
         branch: 'uat-publish',
