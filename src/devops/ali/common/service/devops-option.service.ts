@@ -135,10 +135,32 @@ export class DevopsOptionService {
         branch: 'test-merge',
       },
     ],
+    uat: [
+      {
+        appName: 'publish-admin-app',
+        workflowName: 'uat环境',
+        branch: 'uat-publish',
+      },
+      {
+        appName: 'publish-user-app',
+        workflowName: 'uat环境',
+        branch: 'uat-publish',
+      },
+      {
+        appName: 'global-console',
+        workflowName: 'uat环境',
+        branch: 'uat-publish',
+      },
+      {
+        appName: 'aplus-quickbi-manage',
+        workflowName: 'UAT环境',
+        branch: 'feature/uat-publish',
+      },
+    ],
   };
   constructor(private readonly devopsApiService: DevopsApiService) {}
   /**
-   *
+   * 获取配置的选项
    * @param env
    * @param app
    * @returns

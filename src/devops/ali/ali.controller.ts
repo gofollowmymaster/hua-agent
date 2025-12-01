@@ -18,8 +18,11 @@ export class AliController {
   @UseGuards(SecretAuthGuard)
   async publish(@Body() params: AliDevopsByFeishuDto) {
     try {
-      params.apps = params.appsStr.split(',');
-      params.testUser = params.testUserStr.split(',');
+      params.apps = params.appsStr?.split(',');
+      params.testUser = params.testUserStr?.split(',');
+      if (params.testUser && params.testUser.length > 5) {
+        params.testUser = params.testUser.slice(0, 5);
+      }
       const res = await this.aliService.publish(params);
       return {
         code: 200,

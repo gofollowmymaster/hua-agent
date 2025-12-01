@@ -15,6 +15,7 @@ import { addRetryJob } from '@utils/job';
 import TipCard from '@src/common/feishu/card/tip-card';
 import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
 import { AliDevopsContext } from './common/service/ali-devops.context';
+import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
 
 @Injectable()
 export class AliService {
@@ -27,6 +28,7 @@ export class AliService {
     protected feishuMessageHelper: FeishuMessageHelper,
     protected userAliyunTable: UserAliyunTable,
     protected devopsContext: AliDevopsContext,
+    protected feishuUserHelper: FeishuUserHelper,
   ) {
     this.redis = redisService.getClient();
   }
@@ -91,6 +93,13 @@ export class AliService {
     return res;
   }
 
+  /**
+   * 检查流水线运行情况
+   * @param appReleaseWorkflow
+   * @param params
+   * @param pipelineRunId
+   * @returns
+   */
   async checkPipelineDetail(
     appReleaseWorkflow: AppWorkflowPublishType,
     params: AliDevopsDto,
@@ -103,7 +112,6 @@ export class AliService {
       pipelineRunId: pipelineRunId,
     });
     console.log('[ res ] >', JSON.stringify(res.pipelineRun.stages));
-    // this.userAliyunTable.
     const stages = res.pipelineRun.stages;
     if (stages[stages.length - 1].stageInfo.status === 'SUCCESS') {
       appReleaseWorkflow.status = 'SUCCESS';
@@ -134,6 +142,13 @@ export class AliService {
       }
     }
   }
+
+  /**
+   * 发送运行结果到群
+   * @param appReleaseWorkflowList
+   * @param params
+   * @returns
+   */
   async sendPushResultMsg(
     appReleaseWorkflowList: AppWorkflowPublishType[],
     params: AliDevopsDto,
@@ -145,10 +160,16 @@ export class AliService {
     ) {
       return;
     }
+    let testUser: string = '';
+    for (const unionId of params.testUser) {
+      const userInfo = await this.feishuUserHelper.getUserInfo({
+        userId: unionId,
+        userIdType: 'union_id',
+      });
+      testUser = testUser + `<at id="${userInfo.user.user_id}"></at>`;
+    }
 
-    const testUser = params.testUser?.reduce((prev, next) => {
-      return prev + ` <at user_id="${next}"></at>`;
-    }, '');
+    console.log('[ testUser ] >', testUser);
     const status = '';
     const content = ProjectPublishCard.buildCardMsg({
       content: params.content,

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { ArrayMaxSize, IsNotEmpty } from 'class-validator';
 
 export class AliDevopsDto {
   @IsNotEmpty()
@@ -22,7 +22,7 @@ export class AliDevopsDto {
   })
   operator: string;
   apps: string[];
-  testUser: string[];
+  testUser?: string[];
 }
 export class AliDevopsCommonDto extends AliDevopsDto {
   @IsNotEmpty()
@@ -33,20 +33,19 @@ export class AliDevopsCommonDto extends AliDevopsDto {
   apps: string[];
 
   @IsNotEmpty()
+  @ArrayMaxSize(5, { message: '最多只能选择5个标签' })
   @ApiPropertyOptional({
     type: String,
     description: '需要提醒的人员',
   })
-  testUser: string[];
+  testUser?: string[];
 }
 export class AliDevopsByFeishuDto extends AliDevopsDto {
-  @IsNotEmpty()
   @ApiPropertyOptional({
     type: String,
     description: '应用研发流程名列表',
   })
   appsStr?: string;
-  @IsNotEmpty()
   @ApiPropertyOptional({
     type: String,
     description: '需要提醒的人员',
