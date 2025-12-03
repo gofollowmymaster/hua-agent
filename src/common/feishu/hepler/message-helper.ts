@@ -95,14 +95,18 @@ class FeishuMessageHelper extends FeishuApiHelper {
   ) {
     return await this.reply(content, messageId, msgType, true);
   }
-  async urgentPhone(userId: string[], messageId: string) {
+  async urgentPhone(
+    userId: string[],
+    messageId: string,
+    userIdType: UserIdType = 'user_id',
+  ) {
     return this.requestWrapper(async () => {
       return await this.client.im.message.urgentPhone({
         data: {
           user_id_list: [...userId],
         },
         params: {
-          user_id_type: 'user_id',
+          user_id_type: userIdType,
         },
         path: {
           message_id: messageId,

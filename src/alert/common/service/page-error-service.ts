@@ -134,6 +134,7 @@ export class PageErrorService extends ErrorBaseService {
   protected async afterCreateIssueCard() {
     //部分消息不需要AI辅助分析 比如：403
     if (
+      this.errorEvent.environment.indexOf('prod') < 0 ||
       [
         'request.onerror Network Error',
         'Object captured as exception with keys: code, message, method, payload, resData',

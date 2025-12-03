@@ -80,6 +80,7 @@ export class AliService {
       }
       Promise.all(queryJobs)
         .then(() => {
+          if (params.env.indexOf('dev') > -1) return;
           this.sendPushResultMsg(resultList, params);
         })
         .catch((error) => {
