@@ -3,6 +3,7 @@ import { AliService } from './ali.service';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AliDevopsByFeishuDto, AliDevopsCommonDto } from './dto/ali';
 import { SecretAuthGuard } from '@src/common/guard/secret-auth';
+import { sendCommonCardToFeishu } from '@src/common/feishu/utils';
 
 @Controller('devops')
 @ApiTags('阿里云效自动化')
@@ -35,6 +36,13 @@ export class AliController {
         })),
       };
     } catch (error) {
+      sendCommonCardToFeishu({
+        title: '应用发布异常',
+        project: process.env.PROJECT_NAME,
+        color: 'red',
+        message: error.message,
+        content: error.stack,
+      });
       return {
         code: 500,
         message: '失败',
