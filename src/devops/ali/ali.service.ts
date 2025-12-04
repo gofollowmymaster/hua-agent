@@ -16,9 +16,11 @@ import TipCard from '@src/common/feishu/card/tip-card';
 import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
 import { AliDevopsContext } from './common/service/ali-devops.context';
 import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
+import { BaseService } from '@src/common/base/BaseService';
+import { LoggerService } from '@src/common/service/logger/logger.service';
 
 @Injectable()
-export class AliService {
+export class AliService extends BaseService {
   protected readonly redis: Redis;
 
   constructor(
@@ -29,7 +31,9 @@ export class AliService {
     protected userAliyunTable: UserAliyunTable,
     protected devopsContext: AliDevopsContext,
     protected feishuUserHelper: FeishuUserHelper,
+    protected readonly logger: LoggerService,
   ) {
+    super();
     this.redis = redisService.getClient();
   }
 
@@ -84,10 +88,7 @@ export class AliService {
           this.sendPushResultMsg(resultList, params);
         })
         .catch((error) => {
-          console.error(
-            '查询流水线详情失败，失败原因：' + error.message,
-            error,
-          );
+          this.logger.error('查询流水线详情失败，失败原因：' + error.message);
         });
       return resultList;
     });
@@ -112,33 +113,37 @@ export class AliService {
       releaseStageSn: appReleaseWorkflow.releaseStageSn,
       pipelineRunId: pipelineRunId,
     });
-    console.log('[ res ] >', JSON.stringify(res.pipelineRun.stages));
+    this.logger.info('[ res ] >' + JSON.stringify(res.pipelineRun.stages));
     const stages = res.pipelineRun.stages;
+
     if (stages[stages.length - 1].stageInfo.status === 'SUCCESS') {
       appReleaseWorkflow.status = 'SUCCESS';
       return true;
     } else {
       const currentStage = stages.find((stage: any) =>
-        ['RUNNING', 'WAITING', 'FAIL'].includes(stage.stageInfo.status),
+        ['RUNNING', 'WAITING', 'FAIL', 'CANCELED'].includes(
+          stage.stageInfo.status,
+        ),
       );
       if (!currentStage) {
         return true;
       }
-      if (currentStage.stageInfo?.status === 'FAIL') {
-        appReleaseWorkflow.status = 'FAIL';
-
+      appReleaseWorkflow.status = currentStage.stageInfo?.status;
+      if (appReleaseWorkflow.status === 'FAIL') {
         this.sendFailMsg(appReleaseWorkflow, currentStage, params.operator);
         return true;
-      } else if (currentStage.stageInfo?.status === 'WAITING') {
-        appReleaseWorkflow.status = 'WAITING';
+      } else if (appReleaseWorkflow.status === 'WAITING') {
         const name = currentStage.stageInfo.jobs.find((job: any) => {
           return job.status === 'WAITING';
         }).name;
-        console.log('当前运行阶段->' + (name || currentStage.stageInfo.name));
+        this.logger.info(
+          '当前运行阶段->' + (name || currentStage.stageInfo.name),
+        );
+        return true;
+      } else if (appReleaseWorkflow.status === 'CANCELED') {
         return true;
       } else {
-        appReleaseWorkflow.status = 'RUNNING';
-        console.log('当前运行阶段->' + currentStage.stageInfo.name);
+        this.logger.info('当前运行阶段->' + currentStage.stageInfo.name);
         return false;
       }
     }
@@ -156,8 +161,9 @@ export class AliService {
   ) {
     // 全部失败 不推送消息
     if (
-      appReleaseWorkflowList.filter((item) => item.status !== 'FAIL').length ===
-      0
+      appReleaseWorkflowList.filter(
+        (item) => !['FAIL', 'CANCELED'].includes(item.status),
+      ).length === 0
     ) {
       return;
     }
@@ -170,7 +176,7 @@ export class AliService {
       testUser = testUser + `<at id="${userInfo.user.user_id}"></at>`;
     }
 
-    console.log('[ testUser ] >', testUser);
+    this.logger.info('[ testUser ] >' + testUser);
     const status = '';
     const content = ProjectPublishCard.buildCardMsg({
       content: params.content,
@@ -202,7 +208,7 @@ export class AliService {
       return job.status === 'FAIL';
     })?.name;
     stageName = stageName || currentStage.stageInfo.name;
-    console.log(
+    this.logger.info(
       `应用${appReleaseWorkflow.appName}-${appReleaseWorkflow.workflowName}在运行阶段->${stageName} 执行失败`,
     );
     const content = TipCard.buildCardMsg({

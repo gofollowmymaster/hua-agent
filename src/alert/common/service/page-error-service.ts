@@ -65,42 +65,40 @@ export class PageErrorService extends ErrorBaseService {
 
   protected async writeToFrontendIssueTable(alertInfo: PageAlertEvent) {
     let issueRecord;
-    try {
-      const { total, items: records } =
-        await this.feishuFrontendIssueTable.search(
-          {
-            conjunction: 'and',
-            conditions: [
-              {
-                field_name: 'IssueId',
-                operator: 'is',
-                value: [alertInfo.issueId],
-              },
-            ],
-          },
-          {},
-          false,
-        );
-      if (total == 0) {
-        const issue = this.alertFeishuAdapter.toFrontendAlertIssueTableData();
-        if (this.isIgnoreThisError()) {
-          issue['状态'] = IssueStatusEnum.ignoreCount100;
-        }
-
-        issueRecord = await this.feishuFrontendIssueTable.create(issue);
-      } else {
-        const { record_id: recordId, fields } = records[0];
-        issueRecord = await this.feishuFrontendIssueTable.update(recordId, {
-          错误次数: (fields['错误次数'] as number) + 1,
-          日错误次数: (fields['日错误次数'] as number) + 1,
-          状态: this.getStatusThenError(fields['状态'] as IssueStatusEnum),
-        });
+    // try {
+    const { total, items: records } =
+      await this.feishuFrontendIssueTable.search(
+        {
+          conjunction: 'and',
+          conditions: [
+            {
+              field_name: 'IssueId',
+              operator: 'is',
+              value: [alertInfo.issueId],
+            },
+          ],
+        },
+        {},
+        false,
+      );
+    if (total == 0) {
+      const issue = this.alertFeishuAdapter.toFrontendAlertIssueTableData();
+      if (this.isIgnoreThisError()) {
+        issue['状态'] = IssueStatusEnum.ignoreCount100;
       }
 
-      // issueRecord.record.record_url =record
-    } catch (err) {
-      sendExceptionToFeishu(err);
+      issueRecord = await this.feishuFrontendIssueTable.create(issue);
+    } else {
+      const { record_id: recordId, fields } = records[0];
+      issueRecord = await this.feishuFrontendIssueTable.update(recordId, {
+        错误次数: (fields['错误次数'] as number) + 1,
+        日错误次数: (fields['日错误次数'] as number) + 1,
+        状态: this.getStatusThenError(fields['状态'] as IssueStatusEnum),
+      });
     }
+    // } catch (err) {
+    //   sendExceptionToFeishu(err);
+    // }
 
     return issueRecord.record;
   }
