@@ -39,7 +39,7 @@ abstract class FeishuTable {
 
   async search(
     filter: BitTableFilter,
-    params: BitTableSearchPayloadParams = { user_id_type: 'user_id' },
+    params: BitTableSearchPayloadParams = {},
     useCache = true,
   ): Promise<BitTablePagination> {
     this.setTableOption();
