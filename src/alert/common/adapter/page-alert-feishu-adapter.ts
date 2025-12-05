@@ -25,6 +25,7 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
     this.appInfo = await this.feishuBusinessLineTable.getBusinessLineBySubapp(
       event.pageModuleName || 'others',
     );
+    console.log('[ this.appInfo ] >', this.appInfo);
 
     this.event = event;
   }

@@ -35,9 +35,9 @@ class FeishuBusinessLineTable extends FeishuTable {
         },
       ],
     });
+    console.log('[ getBusinessLineBySubapp ] >', res);
 
     if (res.items?.length < 1) {
-      console.log('[ res ] >', res);
       throw new FeishuApiException(`未找到对应的业务线: ${projectName}`, 501);
     }
     const frontendLeaderId = res.items[0].fields['前端leader']?.[0].id;
