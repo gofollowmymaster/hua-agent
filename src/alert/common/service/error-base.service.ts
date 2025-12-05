@@ -69,7 +69,6 @@ export abstract class ErrorBaseService extends AlertBaseService {
     );
     let issueCardData = (await this.redis.hgetall(key)) as UnresolvedCardData;
     //新issue 发送卡片消息
-
     if (!issueCardData.message_id) {
       issueCardData = this.alertFeishuAdapter.toAplusAlertCardeData();
       issueCardData.linkUrl = eventRecord.recordUrl;
@@ -100,6 +99,8 @@ export abstract class ErrorBaseService extends AlertBaseService {
 
     let messageText = `错误再次被触发，累计发生**${count}**次,[查看详情](${eventRecord.recordUrl}) `;
     const issueStatusNew = this.getStatusThenError(issueCardData.status);
+
+    // 如果是重新打开,需要更新卡片信息
     if (
       issueStatusNew === IssueStatusEnum.reopened &&
       issueCardData.status !== IssueStatusEnum.reopened
@@ -127,7 +128,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
         status: IssueStatusEnum.reopened,
       });
     }
-
+    // 回复信息
     await this.messageHelper.replyInThread(
       JSON.stringify({
         zh_cn: {

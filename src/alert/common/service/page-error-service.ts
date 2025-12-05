@@ -86,7 +86,7 @@ export class PageErrorService extends ErrorBaseService {
       if (this.isIgnoreThisError()) {
         issue['状态'] = IssueStatusEnum.ignoreCount100;
       }
-
+      console.log('[ issue ] >', issue);
       issueRecord = await this.feishuFrontendIssueTable.create(issue);
     } else {
       const { record_id: recordId, fields } = records[0];
