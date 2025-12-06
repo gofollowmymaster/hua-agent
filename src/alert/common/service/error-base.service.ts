@@ -68,8 +68,9 @@ export abstract class ErrorBaseService extends AlertBaseService {
       this.errorEvent.issueId,
     );
     let issueCardData = (await this.redis.hgetall(key)) as UnresolvedCardData;
+    console.log('[ issueCardData ] >', issueCardData);
     //新issue 发送卡片消息
-    if (!issueCardData.message_id) {
+    if (!issueCardData.messageId) {
       issueCardData = this.alertFeishuAdapter.toAplusAlertCardeData();
       issueCardData.linkUrl = eventRecord.recordUrl;
       const content = ErrorUnresolvedCard.buildCardMsg(issueCardData);
