@@ -9,12 +9,11 @@ export class AliDevopsDto {
   })
   env: string;
 
-  @IsNotEmpty()
   @ApiProperty({
     type: String,
     description: '发布内容描述',
   })
-  content: string;
+  content?: string;
 
   @ApiProperty({
     type: String,

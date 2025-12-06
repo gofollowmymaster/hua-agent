@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import dayjs from 'dayjs';
 import { Request } from 'express';
 
 @Injectable()
@@ -18,16 +19,20 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
     try {
-      const payload = await this.jwtService.verify(token);
-
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
+      const payload = await this.verify(token);
       request['user'] = payload;
     } catch (err) {
-      console.log('[ err ] >', err);
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(err.message);
     }
     return true;
+  }
+  private async verify(token: string) {
+    const payload = await this.jwtService.verify(token);
+    const loginTime = payload.loginTime;
+    if (loginTime < dayjs().subtract(7, 'day').valueOf() / 1000) {
+      throw new UnauthorizedException('登录已过期');
+    }
+    return payload;
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
