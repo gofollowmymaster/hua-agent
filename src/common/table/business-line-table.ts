@@ -14,7 +14,6 @@ class FeishuBusinessLineTable extends FeishuTable {
     this.appToken = NodeConfigService.getFeishuTableConfig(
       'AplusNodeAdminAppToken',
     );
-    console.log('[ this.appToken ] >', this.appToken);
     this.tableId = 'tblbjBv6z2RXX5Qp';
     this.tableHelper.setTableOption({
       appToken: this.appToken,
@@ -35,7 +34,6 @@ class FeishuBusinessLineTable extends FeishuTable {
         },
       ],
     });
-    console.log('[ getBusinessLineBySubapp ] >', res);
 
     if (res.items?.length < 1) {
       throw new FeishuApiException(`未找到对应的业务线: ${projectName}`, 501);

@@ -29,7 +29,7 @@ export class AuthGuard implements CanActivate {
   private async verify(token: string) {
     const payload = await this.jwtService.verify(token);
     const loginTime = payload.loginTime;
-    if (loginTime < dayjs().subtract(7, 'day').valueOf() / 1000) {
+    if (loginTime < dayjs().subtract(14, 'day').valueOf() / 1000) {
       throw new UnauthorizedException('登录已过期');
     }
     return payload;
