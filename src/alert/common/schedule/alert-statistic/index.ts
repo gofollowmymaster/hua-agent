@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Injectable } from '@nestjs/common';
+import { SchedulerRegistry } from '@nestjs/schedule';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import FeishuClient from '@src/common/feishu/clients/client';
 // import { sendCommonCardToFeishu } from '@src/common/feishu/utils';
@@ -10,31 +10,30 @@ import PageIssueStatisticService from './services/page-issue.service';
 import { ErrorEndpoint } from '../../type/alert';
 import { PushIssueCardToUserParams } from '../../type/sentry-issue';
 import { TenantContext } from '@src/common/service/context/tenant.context';
+import BaseSchedule from '@src/common/base/base.schedule';
 
 @Injectable()
-export default class AlertStatisticService {
+export default class AlertStatisticService extends BaseSchedule {
+  protected readonly cron = '0 45 17 * * *';
+  protected readonly jobName = 'Alert Statistic Per Day';
+
   private readonly redis: Redis;
   private readonly client: FeishuClient;
-  private readonly logger = new Logger(AlertStatisticService.name);
   constructor(
     protected readonly redisService: RedisService,
     protected readonly requestIssueService: RequestIssueStatisticService,
     protected readonly pageIssueService: PageIssueStatisticService,
     protected readonly tenantContext: TenantContext,
+    protected schedulerRegistry: SchedulerRegistry,
   ) {
+    super(tenantContext, schedulerRegistry);
     this.redis = redisService.getClient();
     this.client = ClientFactory.create(FeishuApp.AlertClient);
   }
 
-  @Cron('0 45 17 * * *')
-  async handleCron(force = false) {
-    this.logger.debug('AlertStatisticService Called ');
-    this.tenantContext.run({ tenantCode: 'aplus' }, () => {
-      //由于统计需要大量请求飞书接口，多环境
-      if (!force && process.env.NODE_ENV !== 'production') return;
-      this.pageIssueService.dayStatistic();
-      this.requestIssueService.dayStatistic();
-    });
+  async handle() {
+    this.pageIssueService.dayStatistic();
+    this.requestIssueService.dayStatistic();
   }
   async pushIssueCardToUser({
     businessLine,

@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Injectable } from '@nestjs/common';
+import { SchedulerRegistry } from '@nestjs/schedule';
 import FeishuClient from '@src/common/feishu/clients/client';
 
 // import { sendCommonCardToFeishu } from '@src/common/feishu/utils';
@@ -7,23 +7,28 @@ import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import { DevopsApiService } from '../../ali-api/ali-devops.helper';
 import { DevopsOptionService } from '../../service/devops-option.service';
+import BaseSchedule from '@src/common/base/base.schedule';
+import { TenantContext } from '@src/common/service/context/tenant.context';
 
 @Injectable()
-export default class CancelExecutionServer {
+export default class CancelExecutionServer extends BaseSchedule {
+  //每30分钟运行一次
+  protected readonly cron = '0 */30 * * * *';
+  protected readonly jobName = 'Cancel Excuteopn Devops';
   private readonly redis: Redis;
   private readonly client: FeishuClient;
-  private readonly logger = new Logger(CancelExecutionServer.name);
   constructor(
     protected readonly redisService: RedisService,
     protected readonly devopsApiService: DevopsApiService,
     protected readonly devopsOptionService: DevopsOptionService,
+    protected readonly tenantContext: TenantContext,
+    protected schedulerRegistry: SchedulerRegistry,
   ) {
+    super(tenantContext, schedulerRegistry);
     this.redis = redisService.getClient();
   }
 
-  @Cron('0 0 0 * * *')
-  async handleCron(force = false) {
-    if (!force && process.env.NODE_ENV !== 'production') return;
+  async handle() {
     const options = this.devopsOptionService.getOptionExcludDev();
     for (const env in options) {
       const apps = options[env];

@@ -49,7 +49,7 @@ export default abstract class BaseSchedule implements OnModuleInit {
       });
     }
   }
-  protected handleCron(force: boolean) {
+  protected handleCron(force: boolean = false) {
     if (!force && ['development', 'dev'].includes(process.env.NODE_ENV)) return;
     this.execute();
   }
