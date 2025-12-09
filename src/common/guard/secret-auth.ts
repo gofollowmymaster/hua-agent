@@ -47,13 +47,8 @@ export class SecretAuthGuard implements CanActivate {
   }
 
   private async verify(token: string) {
-    console.log('[ token ] >', token);
+    const { fields: appInfo } = await this.clientSecretTable.get(token);
 
-    const {
-      record: { fields: appInfo },
-    } = await this.clientSecretTable.get(token);
-
-    // Compare the generated signature with the provided signature
     if (!appInfo.是否启用) {
       throw new UnauthorizedException();
     }

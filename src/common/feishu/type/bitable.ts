@@ -33,11 +33,23 @@ export type BitTableFields = BitTableCreateParams[0]['data']['fields'];
 
 export type BitTableCreateOption = BitTableCreateParams[0]['params'];
 
+export type BitTableCreateReturn = Awaited<
+  ReturnType<lark.Client['bitable']['appTableRecord']['create']>
+>;
+export type BitTableCreateData = BitTableCreateReturn['data'];
+export type BitTableCreateRecord = BitTableCreateReturn['data']['record'];
+
+//获取单条记录
 export type BitTableGetParams = Parameters<
   lark.Client['bitable']['appTableRecord']['get']
 >;
 
 export type BitTableGetOption = BitTableGetParams[0]['params'];
+export type BitTableGetReturn = Awaited<
+  ReturnType<lark.Client['bitable']['appTableRecord']['get']>
+>;
+export type BitTableGetData = BitTableGetReturn['data'];
+export type BitTableGetRecord = BitTableGetReturn['data']['record'];
 
 // 批量更新
 // export type BitTableBatchUpdateReturn = Awaited<

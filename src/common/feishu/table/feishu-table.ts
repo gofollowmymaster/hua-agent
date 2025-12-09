@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import FeishuTableHelper from '../hepler/table-helper';
 import {
   BitTableCreateOption,
+  BitTableCreateRecord,
   BitTableFields,
   BitTableFilter,
   BitTableGetOption,
@@ -49,7 +50,8 @@ abstract class FeishuTable {
   async get(recordId: string, params: BitTableGetOption = {}, useCache = true) {
     this.setTableOption();
 
-    return await this.tableHelper.get(recordId, params, useCache);
+    const { record } = await this.tableHelper.get(recordId, params, useCache);
+    return record;
   }
   async update(recordId, field: BitTableFields, params?: BitTableCreateOption) {
     this.setTableOption();
@@ -63,10 +65,11 @@ abstract class FeishuTable {
     return await this.tableHelper.batchUpdate(records, params);
   }
 
-  async create(record: BitTableFields) {
+  async create(data: BitTableFields): Promise<BitTableCreateRecord> {
     this.setTableOption();
 
-    return await this.tableHelper.create(record);
+    const { record } = await this.tableHelper.create(data);
+    return record;
   }
 }
 export default FeishuTable;

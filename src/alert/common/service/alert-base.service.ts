@@ -43,7 +43,7 @@ export abstract class AlertBaseService extends BaseService {
    * 飞书消息发送
    * @param alertInfo
    */
-  async sendFeishuMsg(alertInfo: AlertEvent, message: string) {
+  private async sendFeishuMsg(alertInfo: AlertEvent, message: string) {
     //获取飞书用户userid（todo）群Id -> 消息加急
     const { groupId: feishuGroupId } = await this.getGroupAndUserByProject(
       alertInfo.pageModuleName,
@@ -86,7 +86,10 @@ export abstract class AlertBaseService extends BaseService {
    * @param groupMsgInfo
    * @param feishuUserId
    */
-  async messageAlert(groupMsgInfo: Record<string, any>, alertInfo: AlertEvent) {
+  private async messageAlert(
+    groupMsgInfo: Record<string, any>,
+    alertInfo: AlertEvent,
+  ) {
     const urgentType = isNeedSendAlertMsg(alertInfo.timestamp)
       ? 'Phone'
       : 'App';
@@ -116,7 +119,7 @@ export abstract class AlertBaseService extends BaseService {
    * @param msgInfo
    * @param userId
    */
-  async sendFsAlertMsgToUser(
+  private async sendFsAlertMsgToUser(
     msgInfo: Record<string, any>,
     userId: string,
     urgentType,
@@ -179,7 +182,7 @@ export abstract class AlertBaseService extends BaseService {
    * @param fMessageId
    * @returns
    */
-  async checkMsgIsRead(fMessageId: string, fUserId: string) {
+  private async checkMsgIsRead(fMessageId: string, fUserId: string) {
     // 查询消息是否已读
     const message = await this.prisma.alertMessage.findUnique({
       where: {
@@ -198,7 +201,7 @@ export abstract class AlertBaseService extends BaseService {
     return !!message.userAlerted[0].reactionTime;
   }
 
-  async getGroupAndUserByProject(
+  private async getGroupAndUserByProject(
     pageModuleName: string,
     environment: Environment,
   ) {
@@ -248,7 +251,7 @@ export abstract class AlertBaseService extends BaseService {
     return issueInfo;
   }
 
-  async updateIssueCardDataInCache(
+  protected async updateIssueCardDataInCache(
     issueId: string,
     issueInfo: Partial<UnresolvedCardData>,
   ) {
@@ -260,7 +263,7 @@ export abstract class AlertBaseService extends BaseService {
     this.redis.expire(key, 60 * 60 * 24 * 7);
   }
 
-  async updateByCard(message_id: string, data) {
+  protected async updateByCard(message_id: string, data) {
     const client = ClientFactory.create(FeishuApp.AlertClient);
     const appId = client.client.appId;
     const appSecret = client.client.appSecret;

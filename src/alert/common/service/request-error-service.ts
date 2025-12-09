@@ -63,17 +63,17 @@ export class RequestErrorService extends ErrorBaseService {
     this.writeToBackEndIssueTable(errorEvent);
     const backEndFields = this.alertFeishuAdapter.toApiAlertTableData();
     // 异步记录事件到多维表格
-    const { record: backEventRecord } =
-      await this.feishuApiTable.create(backEndFields);
-    const {
-      record: { record_url },
-    } = await this.feishuApiTable.get(backEventRecord.record_id, {
-      with_shared_url: true,
-    });
+    const backEventRecord = await this.feishuApiTable.create(backEndFields);
+    const { record_url } = await this.feishuApiTable.get(
+      backEventRecord.record_id,
+      {
+        with_shared_url: true,
+      },
+    );
 
     return {
       ...backEventRecord,
-      recordUrl: record_url,
+      record_url,
     };
   }
   protected async writeToBackEndIssueTable(

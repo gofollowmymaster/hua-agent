@@ -50,9 +50,9 @@ export class SignAuthGuard implements CanActivate {
     }
     let generatedSignature;
     try {
-      const {
-        record: { fields: appInfo },
-      } = await this.clientSecretTable.get(restData.appId);
+      const { fields: appInfo } = await this.clientSecretTable.get(
+        restData.appId,
+      );
       if (!appInfo.是否启用) {
         throw new UnauthorizedException();
       }

@@ -17,6 +17,7 @@ import FeishuApiAlertTable from '../table/api-alert-table';
 import FeishuApiAlertIssueTable from '../table/api-alert-issue-table';
 import FeishuFrontendAlertTable from '../table/frontend-alert-table';
 import FeishuFrontendAlertIssueTable from '../table/frontend-alert-issue-table';
+import { BitTableCreateRecord } from '@src/common/feishu/type/bitable';
 
 export abstract class ErrorBaseService extends AlertBaseService {
   protected errorEvent: AlertEvent;
@@ -38,7 +39,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
   isIgnoreThisError() {
     return this.errorEvent.level === 'info';
   }
-  protected abstract writeToTable(errorEvent: AlertEvent);
+  protected abstract writeToTable(errorEvent: AlertEvent): Promise<any>;
   abstract errorHookHandler(alertInfo: AlertEvent);
   abstract updateTable(issueId: string, recordNew: Record<string, any>);
   protected afterCreateIssueCard() {}
@@ -56,9 +57,9 @@ export abstract class ErrorBaseService extends AlertBaseService {
       ? IssueStatusEnum.reopened
       : currentStatus;
   }
-  protected async newIssueCard(eventRecord) {
+  protected async sendNewIssueCard(eventRecord: BitTableCreateRecord) {
     const issueCardData = this.alertFeishuAdapter.toAplusAlertCardeData();
-    issueCardData.linkUrl = eventRecord.recordUrl;
+    issueCardData.linkUrl = eventRecord.record_url;
     const content = ErrorUnresolvedCard.buildCardMsg(issueCardData);
     const groupMsgInfo = await this.sendFsAlertMsg(this.errorEvent, content);
     const issueInfo = {
@@ -71,10 +72,34 @@ export abstract class ErrorBaseService extends AlertBaseService {
       话题信息: JSON.stringify({
         messageId: groupMsgInfo.message_id,
         threadId: groupMsgInfo.thread_id,
-        linkUrl: eventRecord.recordUrl,
+        linkUrl: eventRecord.record_url,
       }),
     });
     this.afterCreateIssueCard();
+  }
+
+  protected async reopenIssueCard(issueCardData: UnresolvedCardData) {
+    //更新卡片信息  激活
+    this.updateByCard(issueCardData.messageId, {
+      content: JSON.stringify({
+        type: 'template',
+        data: {
+          template_id: ErrorUnresolvedCard.templateId,
+          template_version_name: ErrorUnresolvedCard.templateVersion,
+          template_variable: {
+            ...issueCardData,
+            status: IssueStatusEnum.reopened,
+            color: 'red',
+            statusOptions: ErrorUnresolvedCard.statusOptions(
+              IssueStatusEnum.unresolved,
+            ),
+          },
+        },
+      }),
+    });
+    await this.updateIssueCardDataInCache(this.errorEvent.issueId, {
+      status: IssueStatusEnum.reopened,
+    });
   }
   protected async errorHandler() {
     const eventRecord = await this.writeToTable(this.errorEvent);
@@ -90,16 +115,28 @@ export abstract class ErrorBaseService extends AlertBaseService {
     const issueCardData = (await this.redis.hgetall(key)) as UnresolvedCardData;
     //新issue 发送卡片消息
     if (!issueCardData.messageId) {
-      this.newIssueCard(eventRecord);
+      this.sendNewIssueCard(eventRecord);
       return;
     }
+
     const count = parseInt(issueCardData.count + '') + 1;
     // 如果issue在，修改数量并回复之前的错误
     await this.updateIssueCardDataInCache(this.errorEvent.issueId, {
       count,
     });
 
-    let messageText = `错误再次被触发，累计发生**${count}**次,[查看详情](${eventRecord.recordUrl}) `;
+    let messageText = `错误再次被触发，累计发生**${count}**次,[查看详情](${eventRecord.record_url}) `;
+
+    // 如果是重新打开,需要更新卡片信息
+    const issueStatusNew = this.getStatusThenError(issueCardData.status);
+
+    if (
+      issueStatusNew === IssueStatusEnum.reopened &&
+      issueCardData.status !== IssueStatusEnum.reopened
+    ) {
+      messageText = `<at user_id="${issueCardData.userId}"></at>错误被重新打开,请及时排查,[查看详情](${eventRecord.record_url}) `;
+      this.reopenIssueCard(issueCardData);
+    }
     // 回复信息
     await this.messageHelper.replyInThread(
       JSON.stringify({
@@ -117,37 +154,6 @@ export abstract class ErrorBaseService extends AlertBaseService {
       issueCardData.messageId,
       FeishuMsgType.Post,
     );
-
-    // 如果是重新打开,需要更新卡片信息
-    const issueStatusNew = this.getStatusThenError(issueCardData.status);
-
-    if (
-      issueStatusNew === IssueStatusEnum.reopened &&
-      issueCardData.status !== IssueStatusEnum.reopened
-    ) {
-      messageText = `<at user_id="${issueCardData.userId}"></at>错误被重新打开,请及时排查,[查看详情](${eventRecord.recordUrl}) `;
-      //更新卡片信息  激活
-      this.updateByCard(issueCardData.messageId, {
-        content: JSON.stringify({
-          type: 'template',
-          data: {
-            template_id: ErrorUnresolvedCard.templateId,
-            template_version_name: ErrorUnresolvedCard.templateVersion,
-            template_variable: {
-              ...issueCardData,
-              status: IssueStatusEnum.reopened,
-              color: 'red',
-              statusOptions: ErrorUnresolvedCard.statusOptions(
-                IssueStatusEnum.unresolved,
-              ),
-            },
-          },
-        }),
-      });
-      await this.updateIssueCardDataInCache(this.errorEvent.issueId, {
-        status: IssueStatusEnum.reopened,
-      });
-    }
   }
   async assignToHandler(eventData: AssignEvent) {
     const issueInfo = await this.checkIssueInCache(eventData.issueId);

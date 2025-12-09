@@ -1,9 +1,11 @@
 import FeishuClient from '../clients/client';
 import {
+  BitTableCreateData,
   BitTableCreateOption,
   BitTableFields,
   BitTableFilter,
   BitTableGetOption,
+  BitTableGetData,
   BitTableRecord,
   BitTableSearchPayloadParams,
 } from '../type/bitable';
@@ -99,7 +101,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
     record_id: string,
     params: BitTableGetOption = {},
     useCache = true,
-  ) {
+  ): Promise<BitTableGetData> {
     return this.readWrapper(
       async () =>
         await this.client.bitable.appTableRecord.get({
@@ -111,11 +113,11 @@ class FeishuTableHelper extends FeishuDataApiHelper {
           params,
         }),
       useCache,
-      'get:' + record_id,
+      'mtable-get:' + record_id,
     );
   }
 
-  async create(records: BitTableFields) {
+  async create(records: BitTableFields): Promise<BitTableCreateData> {
     return this.requestWrapper(
       async () =>
         await this.client.bitable.appTableRecord.create({

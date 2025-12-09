@@ -6,7 +6,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
-// import { FeishuEventCallbackDto } from './dto/feishu-event.dto';
 import { SentryWebhookService } from './webhook.service';
 import { ApiBody, ApiHeaders, ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
@@ -129,10 +128,10 @@ export class SentryWebhookController {
 
   async error(params: SentryHookErrorDto) {
     const alertError = params.data.error;
-    if (await this.sentryIssueService.isIssueIgnored(alertError.issue_id)) {
-      console.log('issue is ignored');
-      return;
-    }
+    // if (await this.sentryIssueService.isIssueIgnored(alertError.issue_id)) {
+    //   console.log('issue is ignored');
+    //   return;
+    // }
 
     const requestData = alertError.extra?.__serialized__;
     const serverModuleName = getModuleNameByUrl(requestData?.url);

@@ -49,22 +49,22 @@ export class PageErrorService extends ErrorBaseService {
     // 异步记录事件到多维表格
     const frontEndFields = this.alertFeishuAdapter.toFrontendAlertTableData();
 
-    const { record: frontEventRecord } =
+    const frontEventRecord =
       await this.feishuFrontendTable.create(frontEndFields);
-    const {
-      record: { record_url: recordUrl },
-    } = await this.feishuFrontendTable.get(frontEventRecord.record_id, {
-      with_shared_url: true,
-    });
+    const { record_url } = await this.feishuFrontendTable.get(
+      frontEventRecord.record_id,
+      {
+        with_shared_url: true,
+      },
+    );
 
     return {
       ...frontEventRecord,
-      recordUrl,
+      record_url,
     };
   }
 
   protected async writeToFrontendIssueTable(alertInfo: PageAlertEvent) {
-    let issueRecord;
     // try {
     const { total, items: records } =
       await this.feishuFrontendIssueTable.search(
@@ -87,10 +87,10 @@ export class PageErrorService extends ErrorBaseService {
         issue['状态'] = IssueStatusEnum.ignoreCount100;
       }
       console.log('[ issue ] >', issue);
-      issueRecord = await this.feishuFrontendIssueTable.create(issue);
+      await this.feishuFrontendIssueTable.create(issue);
     } else {
       const { record_id: recordId, fields } = records[0];
-      issueRecord = await this.feishuFrontendIssueTable.update(recordId, {
+      await this.feishuFrontendIssueTable.update(recordId, {
         错误次数: (fields['错误次数'] as number) + 1,
         日错误次数: (fields['日错误次数'] as number) + 1,
         状态: this.getStatusThenError(fields['状态'] as IssueStatusEnum),
@@ -99,10 +99,7 @@ export class PageErrorService extends ErrorBaseService {
     // } catch (err) {
     //   sendExceptionToFeishu(err);
     // }
-
-    return issueRecord.record;
   }
-  // get
 
   async updateTable(issue_id: string, recordNew: Record<string, any>) {
     const table = this.feishuFrontendIssueTable;

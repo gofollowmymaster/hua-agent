@@ -44,7 +44,7 @@ export class CommonErrorService extends ErrorBaseService {
     }
   }
 
-  protected async writeToTable(errorEvent: AlertEvent) {
+  protected async writeToTable(errorEvent: AlertEvent): Promise<void> {
     console.log('[ errorEvent ] >', errorEvent);
   }
 
