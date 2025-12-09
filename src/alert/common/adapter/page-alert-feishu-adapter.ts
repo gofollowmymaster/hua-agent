@@ -11,6 +11,7 @@ import {
 } from '@src/common/feishu/card/error-unresolve-card';
 import dayjs from 'dayjs';
 import BaseAlertFeishuAdapter from './base-alert-feishu-adapter';
+import { AlertContext } from '../service/alert-event.context';
 
 @Injectable({ scope: Scope.REQUEST })
 export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
@@ -18,6 +19,7 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
   private appInfo: any;
   constructor(
     private readonly feishuBusinessLineTable: FeishuBusinessLineTable,
+    protected readonly alertContext: AlertContext,
   ) {
     super();
   }
@@ -29,7 +31,8 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
     this.event = event;
   }
 
-  toFrontendAlertTableData(): FrontendAlertTableDto {
+  async toFrontendAlertTableData(): Promise<FrontendAlertTableDto> {
+    await this.setEvent(this.alertContext.event as PageAlertEvent);
     return {
       标题: this.event.title,
       链接信息: this.event.webUrl,
@@ -47,7 +50,9 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       RawData: JSON.stringify(this.event.rawData),
     };
   }
-  toFrontendAlertIssueTableData(): FrontendAlertIssueTableDto {
+  async toFrontendAlertIssueTableData(): Promise<FrontendAlertIssueTableDto> {
+    await this.setEvent(this.alertContext.event as PageAlertEvent);
+
     return {
       标题: this.event.title,
       // 链接信息: this.event.webUrl,
@@ -67,7 +72,9 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       状态: IssueStatusEnum.unresolved,
     };
   }
-  toAplusAlertCardeData(): UnresolvedCardData {
+  async toAplusAlertCardeData(): Promise<UnresolvedCardData> {
+    await this.setEvent(this.alertContext.event as PageAlertEvent);
+
     return {
       userId: this.appInfo.frontendLeaderId,
       title: this.event.level == 'fatal' ? '高危报警' : '异常报警',

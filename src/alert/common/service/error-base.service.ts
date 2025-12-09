@@ -13,42 +13,44 @@ import ErrorUnresolvedCard, {
 } from '@src/common/feishu/card/error-unresolve-card';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import BaseAlertFeishuAdapter from '../adapter/base-alert-feishu-adapter';
-import FeishuApiAlertTable from '../table/api-alert-table';
-import FeishuApiAlertIssueTable from '../table/api-alert-issue-table';
-import FeishuFrontendAlertTable from '../table/frontend-alert-table';
-import FeishuFrontendAlertIssueTable from '../table/frontend-alert-issue-table';
 import { BitTableCreateRecord } from '@src/common/feishu/type/bitable';
+import { firstValueFrom } from 'rxjs';
+import { MsgAlertService } from './msg-alert.service';
+import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
+import { FeishuApp } from '@src/common/feishu/clients';
+import { getAppAccessToken } from '@src/common/feishu/utils';
+import { HttpService } from '@nestjs/axios';
+import { AlertContext } from './alert-event.context';
 
 export abstract class ErrorBaseService extends AlertBaseService {
-  protected errorEvent: AlertEvent;
   protected readonly alertFeishuAdapter: BaseAlertFeishuAdapter;
 
-  protected readonly feishuApiTable: FeishuApiAlertTable;
-  protected readonly feishuApiIssueTable: FeishuApiAlertIssueTable;
-  protected readonly feishuFrontendTable: FeishuFrontendAlertTable;
-  protected readonly feishuFrontendIssueTable: FeishuFrontendAlertIssueTable;
+  protected readonly msgAlertService: MsgAlertService;
+  protected readonly feishuUserHelper: FeishuUserHelper;
+  protected readonly httpService: HttpService;
+  protected readonly alertContext: AlertContext;
 
   constructor(protected readonly redisService: RedisService) {
     super(redisService);
   }
-  async setErrorEvent(errorEvent: AlertEvent) {
-    await this.alertFeishuAdapter.setEvent(errorEvent);
 
-    this.errorEvent = errorEvent;
+  protected isIgnoreThisError() {
+    return this.alertContext.event.level === 'info';
   }
-  isIgnoreThisError() {
-    return this.errorEvent.level === 'info';
-  }
-  protected abstract writeToTable(errorEvent: AlertEvent): Promise<any>;
+  protected abstract writeToTable(): Promise<any>;
   abstract errorHookHandler(alertInfo: AlertEvent);
   abstract updateTable(issueId: string, recordNew: Record<string, any>);
   protected afterCreateIssueCard() {}
+
+  async sendFsAlertMsg(alertInfo: AlertEvent, message: string) {
+    return await this.msgAlertService.sendFsAlertMsg(alertInfo, message);
+  }
   /**
-   * 新的错误发生时，获取issue的新状态
+   * 新的错误发生时，获取issue的新状态（重新打开）
    * @param currentStatus
    * @returns
    */
-  getStatusThenError(currentStatus: IssueStatusEnum) {
+  protected getStatusThenError(currentStatus: IssueStatusEnum) {
     return [
       IssueStatusEnum.closed,
       IssueStatusEnum.resolved,
@@ -57,17 +59,23 @@ export abstract class ErrorBaseService extends AlertBaseService {
       ? IssueStatusEnum.reopened
       : currentStatus;
   }
-  protected async sendNewIssueCard(eventRecord: BitTableCreateRecord) {
-    const issueCardData = this.alertFeishuAdapter.toAplusAlertCardeData();
+  private async sendNewIssueCard(eventRecord: BitTableCreateRecord) {
+    const issueCardData = await this.alertFeishuAdapter.toAplusAlertCardeData();
     issueCardData.linkUrl = eventRecord.record_url;
     const content = ErrorUnresolvedCard.buildCardMsg(issueCardData);
-    const groupMsgInfo = await this.sendFsAlertMsg(this.errorEvent, content);
+    const groupMsgInfo = await this.msgAlertService.sendFsAlertMsg(
+      this.alertContext.event,
+      content,
+    );
     const issueInfo = {
       ...issueCardData,
       messageId: groupMsgInfo.message_id,
       threadId: groupMsgInfo.thread_id,
     };
-    await this.updateIssueCardDataInCache(this.errorEvent.issueId, issueInfo);
+    await this.updateIssueCardDataInCache(
+      this.alertContext.event.issueId,
+      issueInfo,
+    );
     this.updateTable(issueInfo.issueId, {
       话题信息: JSON.stringify({
         messageId: groupMsgInfo.message_id,
@@ -78,7 +86,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
     this.afterCreateIssueCard();
   }
 
-  protected async reopenIssueCard(issueCardData: UnresolvedCardData) {
+  private async reopenIssueCard(issueCardData: UnresolvedCardData) {
     //更新卡片信息  激活
     this.updateByCard(issueCardData.messageId, {
       content: JSON.stringify({
@@ -97,20 +105,23 @@ export abstract class ErrorBaseService extends AlertBaseService {
         },
       }),
     });
-    await this.updateIssueCardDataInCache(this.errorEvent.issueId, {
+    await this.updateIssueCardDataInCache(this.alertContext.event.issueId, {
       status: IssueStatusEnum.reopened,
     });
   }
   protected async errorHandler() {
-    const eventRecord = await this.writeToTable(this.errorEvent);
+    const eventRecord = await this.writeToTable();
     if (this.isIgnoreThisError()) {
-      this.logger.info('[ ignore this error ] >', this.errorEvent.issueId);
+      this.logger.info(
+        '[ ignore this error ] >',
+        this.alertContext.event.issueId,
+      );
       return;
     }
 
     const key = RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace(
       '{issueId}',
-      this.errorEvent.issueId,
+      this.alertContext.event.issueId,
     );
     const issueCardData = (await this.redis.hgetall(key)) as UnresolvedCardData;
     //新issue 发送卡片消息
@@ -121,7 +132,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
 
     const count = parseInt(issueCardData.count + '') + 1;
     // 如果issue在，修改数量并回复之前的错误
-    await this.updateIssueCardDataInCache(this.errorEvent.issueId, {
+    await this.updateIssueCardDataInCache(this.alertContext.event.issueId, {
       count,
     });
 
@@ -264,5 +275,18 @@ export abstract class ErrorBaseService extends AlertBaseService {
       错误原因: eventData.reason,
       解决方案: eventData.solution,
     });
+  }
+  protected async updateByCard(message_id: string, data) {
+    const accessToken = await getAppAccessToken(FeishuApp.AlertClient);
+    const resData = await firstValueFrom(
+      this.httpService.patch(
+        'https://open.feishu.cn/open-apis/im/v1/messages/' + message_id,
+        data,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        },
+      ),
+    );
+    console.log('[ resData ] >', resData);
   }
 }

@@ -1,20 +1,16 @@
 import { PrismaService } from '@src/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
-import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import FeishuApiAlertTable from '../table/api-alert-table';
 import FeishuApiAlertIssueTable from '../table/api-alert-issue-table';
-import FeishuFrontendAlertTable from '../table/frontend-alert-table';
-import FeishuFrontendAlertIssueTable from '../table/frontend-alert-issue-table';
-import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { RedisService } from '@src/common/service/redis/redis.service';
-import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
-import { HttpService } from '@nestjs/axios';
-import { AlertEvent, RequestAlertEvent } from '../type/alert';
+import { RequestAlertEvent } from '../type/alert';
 import { ErrorBaseService } from './error-base.service';
 import RequestAlertFeishuAdapter from '../adapter/request-alert-feishu-adapter';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { Injectable } from '@nestjs/common';
 import { IssueStatusEnum } from '@src/common/feishu/card/error-unresolve-card';
+import { MsgAlertService } from './msg-alert.service';
+import { AlertContext } from './alert-event.context';
 export const ignoreCodeList = [
   '401',
   '10002',
@@ -33,35 +29,33 @@ export class RequestErrorService extends ErrorBaseService {
   constructor(
     protected prisma: PrismaService,
     protected readonly logger: LoggerService,
-    protected readonly messageHelper: FeishuMessageHelper,
     protected readonly feishuApiTable: FeishuApiAlertTable,
     protected readonly feishuApiIssueTable: FeishuApiAlertIssueTable,
-    protected readonly feishuFrontendTable: FeishuFrontendAlertTable,
-    protected readonly feishuFrontendIssueTable: FeishuFrontendAlertIssueTable,
-    protected readonly feishuBusinessLineTable: FeishuBusinessLineTable,
     protected readonly redisService: RedisService,
     protected readonly alertFeishuAdapter: RequestAlertFeishuAdapter,
-    protected readonly feishuUserHelper: FeishuUserHelper,
-    protected readonly httpService: HttpService,
+    protected readonly msgAlertService: MsgAlertService,
+    protected readonly alertContext: AlertContext,
   ) {
     super(redisService);
   }
 
   isIgnoreThisError() {
     return (
-      this.ignoreCodeList.includes(this.errorEvent.requestData.code + '') ||
-      super.isIgnoreThisError()
+      this.ignoreCodeList.includes(
+        this.alertContext.event.requestData.code + '',
+      ) || super.isIgnoreThisError()
     );
   }
   async errorHookHandler(errorEvent: RequestAlertEvent) {
-    await this.setErrorEvent(errorEvent);
-
-    this.errorHandler();
+    this.alertContext.run({ errorEvent }, async () => {
+      return this.errorHandler();
+    });
   }
 
-  protected async writeToTable(errorEvent: RequestAlertEvent) {
-    this.writeToBackEndIssueTable(errorEvent);
-    const backEndFields = this.alertFeishuAdapter.toApiAlertTableData();
+  protected async writeToTable() {
+    this.writeToBackEndIssueTable();
+
+    const backEndFields = await this.alertFeishuAdapter.toApiAlertTableData();
     // 异步记录事件到多维表格
     const backEventRecord = await this.feishuApiTable.create(backEndFields);
     const { record_url } = await this.feishuApiTable.get(
@@ -76,9 +70,7 @@ export class RequestErrorService extends ErrorBaseService {
       record_url,
     };
   }
-  protected async writeToBackEndIssueTable(
-    alertInfo: AlertEvent,
-  ): Promise<void> {
+  protected async writeToBackEndIssueTable(): Promise<void> {
     try {
       //查询issue
       const issueRes = await this.feishuApiIssueTable.search(
@@ -88,7 +80,7 @@ export class RequestErrorService extends ErrorBaseService {
             {
               field_name: 'IssueId',
               operator: 'is',
-              value: [alertInfo.issueId],
+              value: [this.alertContext.event.issueId],
             },
           ],
         },
@@ -96,7 +88,7 @@ export class RequestErrorService extends ErrorBaseService {
         false,
       );
       if (issueRes.total == 0) {
-        const issue = this.alertFeishuAdapter.toApiAlertIssueTableData();
+        const issue = await this.alertFeishuAdapter.toApiAlertIssueTableData();
         if (this.isIgnoreThisError()) {
           issue['状态'] = IssueStatusEnum.ignoreCount100;
         }

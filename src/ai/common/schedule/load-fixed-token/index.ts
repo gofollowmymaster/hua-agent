@@ -1,38 +1,49 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import * as lark from '@larksuiteoapi/node-sdk';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { sendCommonCardToFeishu } from '@src/common/feishu/utils';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
+import BaseSchedule from '@src/common/base/base.schedule';
+import { TenantContext } from '@src/common/service/context/tenant.context';
 
 export type FeishuAuthType = Awaited<
   ReturnType<lark.Client['authen']['refreshAccessToken']['create']>
 >['data'];
 
 @Injectable()
-export default class FixedTokenService {
+export default class FixedTokenService extends BaseSchedule {
+  //每30分钟运行一次
+  protected readonly cron = '0 */30 * * * *';
+  protected readonly jobName = 'Sync Wiki Nodes';
+
   private client: lark.Client;
-  private readonly logger = new Logger(FixedTokenService.name);
   private readonly redis: Redis;
-  constructor(protected redisService: RedisService) {
+  constructor(
+    protected redisService: RedisService,
+    protected readonly tenantContext: TenantContext,
+    protected schedulerRegistry: SchedulerRegistry,
+  ) {
+    super(tenantContext, schedulerRegistry);
     this.redis = redisService.getClient();
   }
-
-  //每30分钟运行一次
-  @Cron('0 */30 * * * *')
-  async handleCron(force = false) {
-    this.logger.debug('FixedTokenService Called ');
+  handleCron(force: boolean) {
+    if (!force && ['development', 'dev'].includes(process.env.NODE_ENV)) return;
+    this.execute();
+  }
+  async handle(force = false) {
     if (!force && ['development', 'dev'].includes(process.env.NODE_ENV)) return;
     const authClient = ClientFactory.create(FeishuApp.AilyAplusClient);
     this.client = authClient.client;
     this.loadToken();
   }
   async loadToken() {
-    const tokenInCached: FeishuAuthType = await this.redis.hgetall(
-      this.redisService.buildCacheKey(RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED),
+    const cacheKey = this.redisService.buildCacheKey(
+      RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED,
     );
+    const tokenInCached: FeishuAuthType = await this.redis.hgetall(cacheKey);
     this.logger.log('[ cachedinfo ] >' + JSON.stringify(tokenInCached));
 
     if (!tokenInCached?.refresh_token) {
@@ -46,23 +57,13 @@ export default class FixedTokenService {
         refresh_token: tokenInCached.refresh_token,
       },
     });
-
     this.logger.log('[ refreshAccessToken ] >' + JSON.stringify(res));
-
     if (res.code !== 0) {
       this.sendAlertMsg(res.msg);
       return;
     }
-
-    await this.redis.hset(
-      this.redisService.buildCacheKey(RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED),
-      res.data,
-    );
-
-    this.redis.expire(
-      this.redisService.buildCacheKey(RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED),
-      60 * 60 * 24,
-    );
+    await this.redis.hset(cacheKey, res.data);
+    this.redis.expire(cacheKey, 60 * 60 * 24);
   }
 
   sendAlertMsg(errorMessage: string) {

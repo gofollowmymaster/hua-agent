@@ -9,6 +9,7 @@ import RequestIssueStatisticService from './services/request-issue.service';
 import PageIssueStatisticService from './services/page-issue.service';
 import { ErrorEndpoint } from '../../type/alert';
 import { PushIssueCardToUserParams } from '../../type/sentry-issue';
+import { TenantContext } from '@src/common/service/context/tenant.context';
 
 @Injectable()
 export default class AlertStatisticService {
@@ -19,6 +20,7 @@ export default class AlertStatisticService {
     protected readonly redisService: RedisService,
     protected readonly requestIssueService: RequestIssueStatisticService,
     protected readonly pageIssueService: PageIssueStatisticService,
+    protected readonly tenantContext: TenantContext,
   ) {
     this.redis = redisService.getClient();
     this.client = ClientFactory.create(FeishuApp.AlertClient);
@@ -27,13 +29,12 @@ export default class AlertStatisticService {
   @Cron('0 45 17 * * *')
   async handleCron(force = false) {
     this.logger.debug('AlertStatisticService Called ');
-
-    //由于统计需要大量请求飞书接口，多环境
-    if (!force && process.env.NODE_ENV !== 'production') return;
-    this.pageIssueService.dayStatistic();
-    this.requestIssueService.dayStatistic();
-
-    return;
+    this.tenantContext.run({ tenantCode: 'aplus' }, () => {
+      //由于统计需要大量请求飞书接口，多环境
+      if (!force && process.env.NODE_ENV !== 'production') return;
+      this.pageIssueService.dayStatistic();
+      this.requestIssueService.dayStatistic();
+    });
   }
   async pushIssueCardToUser({
     businessLine,

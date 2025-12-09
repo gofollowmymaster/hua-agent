@@ -54,6 +54,7 @@ export class AilyService {
       RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED,
     );
     await this.redis.hset(usedKey, userInfo);
+    return true;
   }
 
   async bindSession(params: BindSessionCodeDto) {

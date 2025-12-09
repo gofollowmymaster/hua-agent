@@ -1,5 +1,4 @@
 import { ApiAlertIssueTableDto, ApiAlertTableDto } from '../type/alert-table';
-import { apiModuleBuMap } from '../../alert-message/app-user-map';
 import { RequestData } from '@src/alert/common/type/alert';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { Injectable, Scope } from '@nestjs/common';
@@ -10,6 +9,16 @@ import {
 } from '@src/common/feishu/card/error-unresolve-card';
 import dayjs from 'dayjs';
 import BaseAlertFeishuAdapter from './base-alert-feishu-adapter';
+import { AlertContext } from '../service/alert-event.context';
+
+export const apiModuleBuMap = {
+  im: '基础架构',
+  'download-center': '基础架构',
+  wms: '仓储物流',
+  bms: '业财一体',
+  ad: '商家运营',
+  'data-compare': '基础架构',
+};
 
 @Injectable({ scope: Scope.REQUEST })
 export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
@@ -18,6 +27,7 @@ export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
   protected appInfo: any;
   constructor(
     private readonly feishuBusinessLineTable: FeishuBusinessLineTable,
+    protected readonly alertContext: AlertContext,
   ) {
     super();
   }
@@ -30,7 +40,9 @@ export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
     this.event = event;
   }
 
-  toApiAlertTableData(): ApiAlertTableDto {
+  async toApiAlertTableData(): Promise<ApiAlertTableDto> {
+    await this.setEvent(this.alertContext.event as RequestAlertEvent);
+
     const bu = apiModuleBuMap[this.event.serverModuleName] || this.appInfo.bu;
     return {
       接口地址: this.requestData.url,
@@ -49,7 +61,8 @@ export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
     };
   }
 
-  toApiAlertIssueTableData(): ApiAlertIssueTableDto {
+  async toApiAlertIssueTableData(): Promise<ApiAlertIssueTableDto> {
+    await this.setEvent(this.alertContext.event as RequestAlertEvent);
     const bu = apiModuleBuMap[this.event.pageModuleName] || this.appInfo.bu;
     return {
       接口地址: this.requestData.url,
@@ -71,7 +84,9 @@ export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
     };
   }
 
-  toAplusAlertCardeData(): UnresolvedCardData {
+  async toAplusAlertCardeData(): Promise<UnresolvedCardData> {
+    await this.setEvent(this.alertContext.event as RequestAlertEvent);
+
     return {
       userId: this.appInfo.backendLeaderId,
       title: this.event.level == 'fatal' ? '高危报警' : '异常报警',

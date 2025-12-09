@@ -182,7 +182,6 @@ export class SentryWebhookService {
     service: ErrorBaseService,
     errorEvent: AlertEvent,
   ) {
-    // await this.alertFeishuAdapter.setEvent(errorEvent);
     const key = RedisKeys.SENTRY_ALERT_COUNT_FREQUENCY.replace(
       '{module}',
       this.buildhighFrequencyKey(errorEvent),

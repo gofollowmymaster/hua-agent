@@ -1,53 +1,46 @@
 import { PrismaService } from '@src/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
-import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
-import FeishuApiAlertTable from '../table/api-alert-table';
-import FeishuApiAlertIssueTable from '../table/api-alert-issue-table';
 import FeishuFrontendAlertTable from '../table/frontend-alert-table';
 import FeishuFrontendAlertIssueTable from '../table/frontend-alert-issue-table';
-import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { RedisService } from '@src/common/service/redis/redis.service';
-import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
-import { HttpService } from '@nestjs/axios';
 import { PageAlertEvent } from '../type/alert';
 import PageAlertFeishuAdapter from '../adapter/page-alert-feishu-adapter';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { ErrorBaseService } from './error-base.service';
 import { Injectable } from '@nestjs/common';
 import { IssueStatusEnum } from '@src/common/feishu/card/error-unresolve-card';
-import FeishuAilyHelper from '@src/common/feishu/hepler/feishu-aily-helper';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import { useAilyAlertSkill } from '../utils';
+import { MsgAlertService } from './msg-alert.service';
+import { AlertContext } from './alert-event.context';
 
 @Injectable()
 export class PageErrorService extends ErrorBaseService {
   constructor(
     protected prisma: PrismaService,
     protected readonly logger: LoggerService,
-    protected readonly messageHelper: FeishuMessageHelper,
-    protected readonly feishuApiTable: FeishuApiAlertTable,
-    protected readonly feishuApiIssueTable: FeishuApiAlertIssueTable,
     protected readonly feishuFrontendTable: FeishuFrontendAlertTable,
     protected readonly feishuFrontendIssueTable: FeishuFrontendAlertIssueTable,
-    protected readonly feishuBusinessLineTable: FeishuBusinessLineTable,
     protected readonly redisService: RedisService,
     protected readonly alertFeishuAdapter: PageAlertFeishuAdapter,
-    protected readonly feishuUserHelper: FeishuUserHelper,
-    protected readonly httpService: HttpService,
-    protected readonly feishuAilyHelper: FeishuAilyHelper,
+    protected readonly msgAlertService: MsgAlertService,
+    protected readonly alertContext: AlertContext,
   ) {
     super(redisService);
   }
 
   async errorHookHandler(errorEvent: PageAlertEvent) {
-    await this.setErrorEvent(errorEvent);
-    this.errorHandler();
+    // console.log('[ errorEvent ] >', errorEvent);
+    this.alertContext.run({ errorEvent }, async () => {
+      return this.errorHandler();
+    });
   }
 
-  protected async writeToTable(errorEvent: PageAlertEvent) {
-    this.writeToFrontendIssueTable(errorEvent);
+  protected async writeToTable() {
+    this.writeToFrontendIssueTable();
     // 异步记录事件到多维表格
-    const frontEndFields = this.alertFeishuAdapter.toFrontendAlertTableData();
+    const frontEndFields =
+      await this.alertFeishuAdapter.toFrontendAlertTableData();
 
     const frontEventRecord =
       await this.feishuFrontendTable.create(frontEndFields);
@@ -64,7 +57,7 @@ export class PageErrorService extends ErrorBaseService {
     };
   }
 
-  protected async writeToFrontendIssueTable(alertInfo: PageAlertEvent) {
+  protected async writeToFrontendIssueTable() {
     // try {
     const { total, items: records } =
       await this.feishuFrontendIssueTable.search(
@@ -74,7 +67,7 @@ export class PageErrorService extends ErrorBaseService {
             {
               field_name: 'IssueId',
               operator: 'is',
-              value: [alertInfo.issueId],
+              value: [this.alertContext.event.issueId],
             },
           ],
         },
@@ -82,7 +75,10 @@ export class PageErrorService extends ErrorBaseService {
         false,
       );
     if (total == 0) {
-      const issue = this.alertFeishuAdapter.toFrontendAlertIssueTableData();
+      console.log('[ this.alertContext.event ] >', this.alertContext.event);
+
+      const issue =
+        await this.alertFeishuAdapter.toFrontendAlertIssueTableData();
       if (this.isIgnoreThisError()) {
         issue['状态'] = IssueStatusEnum.ignoreCount100;
       }
@@ -127,22 +123,23 @@ export class PageErrorService extends ErrorBaseService {
   }
 
   protected async afterCreateIssueCard() {
+    const errorEvent = this.alertContext.event;
     //部分消息不需要AI辅助分析 比如：403
     if (
-      this.errorEvent.environment.indexOf('prod') < 0 ||
+      errorEvent.environment.indexOf('prod') < 0 ||
       [
         'request.onerror Network Error',
         'Object captured as exception with keys: code, message, method, payload, resData',
-      ].includes(this.errorEvent.message) ||
+      ].includes(errorEvent.message) ||
       process.env.NODE_ENV !== 'production'
     )
       return;
     const answer = await useAilyAlertSkill(
-      this.errorEvent.message || this.errorEvent.title,
+      errorEvent.message || errorEvent.title,
     );
     if (answer.length < 20) return;
     const message = '辅助分析：\n' + answer;
-    const issueInfo = await this.checkIssueInCache(this.errorEvent.issueId);
+    const issueInfo = await this.checkIssueInCache(errorEvent.issueId);
     this.messageHelper.replyInThread(
       JSON.stringify({
         zh_cn: {

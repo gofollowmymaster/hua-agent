@@ -1,4 +1,4 @@
-import { ClientFactory, FeishuApp } from './clients';
+import { ClientFactory, FeishuApp, FeishuAppClentsType } from './clients';
 import FeishuMessageHelper from './hepler/message-helper';
 import { CommonAlertCard, CommonCardData } from './card/alert-card';
 import dayjs from 'dayjs';
@@ -6,6 +6,8 @@ import { getGlobalAppInstance } from '@utils/app-config';
 import { throttle } from 'lodash';
 import { TenantContext } from '../service/context/tenant.context';
 import { NodeConfigService } from '../service/node-config-service/node-config.service';
+import * as lark from '@larksuiteoapi/node-sdk';
+
 /**
  * 使用预配置的 Feishu 客户端向 Feishu 群组发送异常通知。
  *
@@ -62,3 +64,27 @@ export const sendExceptionToFeishu: (
   leading: true,
   trailing: false,
 });
+
+export const getAppAccessToken = async (AppName: FeishuAppClentsType) => {
+  const client = ClientFactory.create(AppName);
+  const appId = client.client.appId;
+  const appSecret = client.client.appSecret;
+  const res = await client.client.auth.v3.appAccessToken.internal(
+    {
+      data: {
+        app_id: appId,
+        app_secret: appSecret,
+      },
+    },
+    lark.withTenantToken(''),
+  );
+  let app_access_token;
+
+  if (res && 'app_access_token' in res) {
+    app_access_token = res.app_access_token;
+    // 使用 app_access_token
+  } else {
+    throw new Error('Failed to get app_access_token');
+  }
+  return app_access_token;
+};

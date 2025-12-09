@@ -21,6 +21,7 @@ import { firstValueFrom } from 'rxjs';
 import { logger } from '@src/common/middleware/logger.middleware';
 import { ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@src/common/guard/auth';
+import { getAppAccessToken } from '@src/common/feishu/utils';
 @Injectable()
 export class RobotService {
   constructor(
@@ -135,30 +136,7 @@ export class RobotService {
   })
   @UseGuards(AuthGuard)
   async getTicket(params: FeishuTicketDto) {
-    const feishuClient = ClientFactory.create(params.appName);
-    // console.log('[ feishuClient ] >', feishuClient.client);
-    const appId = feishuClient.client.appId;
-    const appSecret = feishuClient.client.appSecret;
-    console.log('[ appId ] >', appId, appSecret);
-    const res = await feishuClient.client.auth.v3.appAccessToken.internal(
-      {
-        data: {
-          app_id: appId,
-          app_secret: appSecret,
-        },
-      },
-      lark.withTenantToken(''),
-    );
-    let app_access_token;
-
-    if (res && 'app_access_token' in res) {
-      app_access_token = res.app_access_token;
-      // 使用 app_access_token
-    } else {
-      console.log('[ res ] >', res);
-      throw new Error('Failed to get app_access_token');
-    }
-    console.log('[ app_access_token ] >', app_access_token);
+    const appAccessToken = await getAppAccessToken(params.appName);
     const {
       data: { data },
     } = await firstValueFrom(
@@ -166,7 +144,7 @@ export class RobotService {
         'https://open.feishu.cn/open-apis/jssdk/ticket/get',
         {},
         {
-          headers: { Authorization: `Bearer ${app_access_token}` },
+          headers: { Authorization: `Bearer ${appAccessToken}` },
         },
       ),
     );

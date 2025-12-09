@@ -3,7 +3,7 @@ import { TenantCode } from '@src/config/tenant';
 import { UserContext } from '@src/type/global';
 import { AsyncLocalStorage } from 'async_hooks';
 
-export interface RequestContext {
+export interface TenantContextType {
   user?: UserContext;
   tenantCode: TenantCode;
   spaceIds?: string[];
@@ -12,13 +12,14 @@ export interface RequestContext {
 
 @Injectable()
 export class TenantContext {
-  private readonly asyncLocalStorage = new AsyncLocalStorage<RequestContext>();
+  private readonly asyncLocalStorage =
+    new AsyncLocalStorage<TenantContextType>();
 
-  run(context: RequestContext, callback: () => void) {
+  run(context: TenantContextType, callback: () => void) {
     this.asyncLocalStorage.run(context, callback);
   }
 
-  getStore(): RequestContext | undefined {
+  getStore(): TenantContextType | undefined {
     return this.asyncLocalStorage.getStore();
   }
 

@@ -7,6 +7,7 @@ import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import RequestIssueStatisticService from './services/request-issue.service';
 import PageIssueStatisticService from './services/page-issue.service';
+import { TenantContext } from '@src/common/service/context/tenant.context';
 
 @Injectable()
 export default class ClearAlertPerDayService {
@@ -17,6 +18,7 @@ export default class ClearAlertPerDayService {
     protected readonly redisService: RedisService,
     protected readonly requestIssueService: RequestIssueStatisticService,
     protected readonly pageIssueService: PageIssueStatisticService,
+    protected readonly tenantContext: TenantContext,
   ) {
     this.redis = redisService.getClient();
     this.client = ClientFactory.create(FeishuApp.AlertClient);
@@ -25,9 +27,10 @@ export default class ClearAlertPerDayService {
   @Cron('0 0 0 * * *')
   async handleCron(force = false) {
     if (!force && process.env.NODE_ENV !== 'production') return;
-
-    this.pageIssueService.clear();
-    this.requestIssueService.clear();
+    this.tenantContext.run({ tenantCode: 'aplus' }, () => {
+      this.pageIssueService.clear();
+      this.requestIssueService.clear();
+    });
 
     return;
   }
