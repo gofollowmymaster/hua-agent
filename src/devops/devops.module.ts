@@ -10,6 +10,7 @@ import { FeishuHelperModule } from '@src/common/feishu/hepler/helper.module';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import UserAliyunTable from './ali/common/table/user-token-table';
 import { AliDevopsContext } from './ali/common/service/ali-devops.context';
+import CancelExecutionServer from './ali/common/schedule/cancel-execution';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AliDevopsContext } from './ali/common/service/ali-devops.context';
     DevopsOptionService,
     UserAliyunTable,
     AliDevopsContext,
+    CancelExecutionServer,
   ],
   controllers: [AliController],
 })

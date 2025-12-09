@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AppWorkflowType } from '../../types/devops';
 import { DevopsApiService } from '../ali-api/ali-devops.helper';
 import { AliDevopsDto } from '../../dto/ali';
+import { cloneDeep } from 'lodash';
 
 @Injectable()
 export class DevopsOptionService {
@@ -180,6 +181,13 @@ export class DevopsOptionService {
     if (apps) {
       return options.filter((item) => apps.includes(item.appName));
     }
+    return options;
+  }
+
+  getOptionExcludDev() {
+    const options = cloneDeep(this.optinos);
+    delete options.dev;
+    delete options['dev-merge'];
     return options;
   }
 

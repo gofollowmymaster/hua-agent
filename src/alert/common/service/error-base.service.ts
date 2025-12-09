@@ -56,6 +56,26 @@ export abstract class ErrorBaseService extends AlertBaseService {
       ? IssueStatusEnum.reopened
       : currentStatus;
   }
+  protected async newIssueCard(eventRecord) {
+    const issueCardData = this.alertFeishuAdapter.toAplusAlertCardeData();
+    issueCardData.linkUrl = eventRecord.recordUrl;
+    const content = ErrorUnresolvedCard.buildCardMsg(issueCardData);
+    const groupMsgInfo = await this.sendFsAlertMsg(this.errorEvent, content);
+    const issueInfo = {
+      ...issueCardData,
+      messageId: groupMsgInfo.message_id,
+      threadId: groupMsgInfo.thread_id,
+    };
+    await this.updateIssueCardDataInCache(this.errorEvent.issueId, issueInfo);
+    this.updateTable(issueInfo.issueId, {
+      话题信息: JSON.stringify({
+        messageId: groupMsgInfo.message_id,
+        threadId: groupMsgInfo.thread_id,
+        linkUrl: eventRecord.recordUrl,
+      }),
+    });
+    this.afterCreateIssueCard();
+  }
   protected async errorHandler() {
     const eventRecord = await this.writeToTable(this.errorEvent);
     if (this.isIgnoreThisError()) {
@@ -67,28 +87,10 @@ export abstract class ErrorBaseService extends AlertBaseService {
       '{issueId}',
       this.errorEvent.issueId,
     );
-    let issueCardData = (await this.redis.hgetall(key)) as UnresolvedCardData;
+    const issueCardData = (await this.redis.hgetall(key)) as UnresolvedCardData;
     //新issue 发送卡片消息
     if (!issueCardData.messageId) {
-      issueCardData = this.alertFeishuAdapter.toAplusAlertCardeData();
-      issueCardData.linkUrl = eventRecord.recordUrl;
-      const content = ErrorUnresolvedCard.buildCardMsg(issueCardData);
-      const groupMsgInfo = await this.sendFsAlertMsg(this.errorEvent, content);
-      const issueInfo = {
-        ...issueCardData,
-        messageId: groupMsgInfo.message_id,
-        threadId: groupMsgInfo.thread_id,
-      };
-      await this.updateIssueCardDataInCache(this.errorEvent.issueId, issueInfo);
-      this.updateTable(issueInfo.issueId, {
-        话题信息: JSON.stringify({
-          messageId: groupMsgInfo.message_id,
-          threadId: groupMsgInfo.thread_id,
-          linkUrl: eventRecord.recordUrl,
-        }),
-      });
-      this.afterCreateIssueCard();
-
+      this.newIssueCard(eventRecord);
       return;
     }
     const count = parseInt(issueCardData.count + '') + 1;
@@ -98,9 +100,27 @@ export abstract class ErrorBaseService extends AlertBaseService {
     });
 
     let messageText = `错误再次被触发，累计发生**${count}**次,[查看详情](${eventRecord.recordUrl}) `;
-    const issueStatusNew = this.getStatusThenError(issueCardData.status);
+    // 回复信息
+    await this.messageHelper.replyInThread(
+      JSON.stringify({
+        zh_cn: {
+          content: [
+            [
+              {
+                tag: 'md',
+                text: messageText,
+              },
+            ],
+          ],
+        },
+      }),
+      issueCardData.messageId,
+      FeishuMsgType.Post,
+    );
 
     // 如果是重新打开,需要更新卡片信息
+    const issueStatusNew = this.getStatusThenError(issueCardData.status);
+
     if (
       issueStatusNew === IssueStatusEnum.reopened &&
       issueCardData.status !== IssueStatusEnum.reopened
@@ -128,23 +148,6 @@ export abstract class ErrorBaseService extends AlertBaseService {
         status: IssueStatusEnum.reopened,
       });
     }
-    // 回复信息
-    await this.messageHelper.replyInThread(
-      JSON.stringify({
-        zh_cn: {
-          content: [
-            [
-              {
-                tag: 'md',
-                text: messageText,
-              },
-            ],
-          ],
-        },
-      }),
-      issueCardData.messageId,
-      FeishuMsgType.Post,
-    );
   }
   async assignToHandler(eventData: AssignEvent) {
     const issueInfo = await this.checkIssueInCache(eventData.issueId);

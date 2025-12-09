@@ -12,9 +12,8 @@ import {
   AppReleaseWorkflow,
   AppWorkflowPublishType,
   PipelineDetail,
-  PipelineStage,
 } from './interface';
-import { AppWorkflowType } from '../../types/devops';
+// import { AppWorkflowType } from '../../types/devops';
 import { AliDevopsContext } from '../service/ali-devops.context';
 
 @Injectable()
@@ -99,9 +98,10 @@ export class DevopsApiService extends HttpApiHelper {
     );
   }
   /** 查找应用下所有的研发流程 */
-  async quaryAppReleaseWorkflow(
-    appOption: AppWorkflowType,
-  ): Promise<AppWorkflowPublishType> {
+  async quaryAppReleaseWorkflow(appOption: {
+    appName: string;
+    workflowName: string;
+  }): Promise<AppWorkflowPublishType> {
     const uri = `${this.organizationId}/apps/${appOption.appName}/releaseWorkflows`;
     const info: AppReleaseWorkflow = await this.readWrapper(
       async () => {
@@ -112,7 +112,6 @@ export class DevopsApiService extends HttpApiHelper {
             headers: this.headers,
           }),
         );
-
         return data;
       },
       true,
@@ -123,7 +122,10 @@ export class DevopsApiService extends HttpApiHelper {
   }
   handleWorkflowData = (
     appConfig: any,
-    appOption: AppWorkflowType,
+    appOption: {
+      appName: string;
+      workflowName: string;
+    },
   ): AppWorkflowPublishType => {
     const releaseStages = appConfig.releaseStages;
     const handleWorkflowSource = releaseStages.find(
@@ -203,6 +205,24 @@ export class DevopsApiService extends HttpApiHelper {
       );
       return data;
     }, 'getPipelineDetail');
+  }
+
+  async listAppReleaseStageRuns(pathParams) {
+    return this.requestWrapper(async () => {
+      const { appName, releaseWorkflowSn, releaseStageSn } = pathParams;
+
+      this.setAliyunToken();
+
+      const { data } = await firstValueFrom(
+        this.httpService.get(
+          `${this.prefix}${this.organizationId}/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}/executions?pagination=keyset&orderBy=id&perPage=100&sort=asc`,
+          {
+            headers: this.headers,
+          },
+        ),
+      );
+      return data;
+    }, 'ListAppReleaseStageRuns');
   }
 
   async quaryAllAppTemplate() {

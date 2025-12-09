@@ -61,6 +61,7 @@ export class AliService extends BaseService {
                 ...appReleaseWorkflow.runParams,
                 ...appOption.metaData,
                 [appReleaseWorkflow.sourcesID]: appOption.branch,
+                FLOW_INST_RUNNING_COMMENT: params.content,
               },
             );
           appReleaseWorkflow.status = 'INIT';
