@@ -6,7 +6,7 @@ import HttpApiHelper from '@src/common/base/http-api-service';
 import Redis from 'ioredis';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
-import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
+import { NodeConfigService } from '@src/config/node-config.service';
 import {
   AppInfoType,
   AppReleaseWorkflow,

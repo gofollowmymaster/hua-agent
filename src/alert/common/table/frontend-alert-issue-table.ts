@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import FeishuTableHelper from '@src/common/feishu/hepler/table-helper';
 import FeishuTable from '@src/common/feishu/table/feishu-table';
-import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
+import { NodeConfigService } from '@src/config/node-config.service';
 @Injectable()
 class FeishuFrontendAlertIssueTable extends FeishuTable {
   constructor(readonly tableHelper: FeishuTableHelper) {

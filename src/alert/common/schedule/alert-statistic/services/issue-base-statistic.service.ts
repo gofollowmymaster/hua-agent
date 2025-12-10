@@ -7,7 +7,7 @@ import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import FeishuTable from '@src/common/feishu/table/feishu-table';
 import { wait } from '@utils/job';
 import { ErrorEndpoint } from '@src/alert/common/type/alert';
-import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
+import { NodeConfigService } from '@src/config/node-config.service';
 
 const businessLines = ['商家运营', '仓储物流', '业财一体', '基础架构'];
 const statusColorMap = {
