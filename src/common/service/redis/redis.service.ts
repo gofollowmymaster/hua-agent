@@ -128,7 +128,6 @@ export class RedisService {
       for (const key of keys) {
         try {
           const batchValues = await this.redis[method](key);
-          console.log('[ batchValues ] >', batchValues);
           values[key] = batchValues;
         } catch (e) {
           this.logger.error(e.message);

@@ -1,5 +1,4 @@
 import { Injectable, UseGuards } from '@nestjs/common';
-import * as lark from '@larksuiteoapi/node-sdk';
 import {
   SearchParamsDto,
   MessageFromRobotDto,
@@ -15,13 +14,12 @@ import { feishuSenceService } from './logic/feishu.sence.service';
 import { removeAtXiaoA } from './logic';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import { ReceiveIdType } from '@src/common/feishu/type/im';
-import { ClientFactory } from '@src/common/feishu/clients';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { logger } from '@src/common/middleware/logger.middleware';
 import { ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@src/common/guard/auth';
 import { getAppAccessToken } from '@src/common/feishu/utils';
+import { logger } from '@src/common/service/logger/logger.config';
 @Injectable()
 export class RobotService {
   constructor(
