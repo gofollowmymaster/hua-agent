@@ -23,7 +23,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { records } from '@utils/actionTable/interface';
+import { records } from '@src/common/utils/actionTable/interface';
 import { AplusResponse } from '@src/type/global';
 @ApiTags('飞书机器人快捷操作')
 // @ApiHeaders([

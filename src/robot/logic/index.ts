@@ -1,4 +1,4 @@
-import { searchTableRecord } from '../../utils/actionTable/searchTableRecord';
+import { searchTableRecord } from '../../common/utils/actionTable/searchTableRecord';
 import { customResponse } from '../dto/post-message-from-robot.dto';
 const dayjs = require('dayjs');
 //是否有当前问题

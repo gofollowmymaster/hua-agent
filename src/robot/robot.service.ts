@@ -5,11 +5,11 @@ import {
   FeishuMessageSenderDto,
   FeishuTicketDto,
 } from './dto/post-message-from-robot.dto';
-import { listTableRecord } from '@utils/actionTable/listTableRecord';
-import { addTableRecord } from '@utils/actionTable/addTableRecord';
-import { searchTableRecord } from '@utils/actionTable/searchTableRecord';
-import { updateTableRecord } from '@utils/actionTable/updateTableRecord';
-import { deleteTableRecord } from '@utils/actionTable/deleteTableRecord';
+import { listTableRecord } from '@src/common/utils/actionTable/listTableRecord';
+import { addTableRecord } from '@src/common/utils/actionTable/addTableRecord';
+import { searchTableRecord } from '@src/common/utils/actionTable/searchTableRecord';
+import { updateTableRecord } from '@src/common/utils/actionTable/updateTableRecord';
+import { deleteTableRecord } from '@src/common/utils/actionTable/deleteTableRecord';
 import { feishuSenceService } from './logic/feishu.sence.service';
 import { removeAtXiaoA } from './logic';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';

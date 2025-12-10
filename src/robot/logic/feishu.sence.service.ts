@@ -10,9 +10,9 @@ import {
 } from '.';
 import { FromFeishuLogger } from '../logUtils';
 import { Injectable } from '@nestjs/common';
-import { addTableRecord } from '../../utils/actionTable/addTableRecord';
-import { listTableField } from '../../utils/actionTable/listTableField';
-import { updateTableRecord } from '../../utils/actionTable/updateTableRecord';
+import { addTableRecord } from '../../common/utils/actionTable/addTableRecord';
+import { listTableField } from '../../common/utils/actionTable/listTableField';
+import { updateTableRecord } from '../../common/utils/actionTable/updateTableRecord';
 import { ErrorMessages, ErrorMessagesCode } from './errEnum';
 import { logger } from '@src/common/service/logger/logger.config';
 const dayjs = require('dayjs');
