@@ -4,7 +4,6 @@ import { join } from 'path';
 import { PrismaService } from './prisma.service';
 import { RobotModule } from './robot/robot.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { LoggerModule } from './common/service/logger/logger.module';
 import configuration from './config';
 import { CacheModule } from '@nestjs/cache-manager';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
@@ -22,17 +21,11 @@ import { RedisModule } from './common/service/redis/redis.module';
 import { GlobalExceptionHandlerModule } from './common/service/global-exception-hander/global-exception.module';
 import { FdCopilotModule } from './fd-copilot/fd-copilot.module';
 import { TenantMiddleware } from './common/middleware/tenant.middleware';
-import { ContextModule } from './common/service/context/context.module';
 import { DiscardMiddleware } from './common/middleware/discard.middleware';
-import { NodeConfigModule } from './common/service/node-config-service/config.module';
 import { DevopsModule } from './devops/devops.module';
+import { GlobalServiceModule } from './common/service/service.module';
 
 const modulesAll = [
-  // SubappModule,
-  // VersionModule,
-  // VerifyModule,
-  // MockServerModule,
-
   RobotModule,
   AiModule,
   AdminModule,
@@ -45,7 +38,7 @@ const modulesAll = [
 
 @Module({
   imports: [
-    ContextModule,
+    GlobalServiceModule,
 
     ConfigModule.forRoot({
       // envFilePath: envFilePath,
@@ -77,11 +70,9 @@ const modulesAll = [
       global: true,
       secret: configuration['jwtSecret'],
     }),
-    NodeConfigModule,
     RedisModule,
     ScheduleModule.forRoot(),
     GlobalExceptionHandlerModule,
-    LoggerModule,
     ...modulesAll,
   ],
   providers: [PrismaService],
