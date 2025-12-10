@@ -6,7 +6,7 @@ import {
 } from './common/filter/http-exception/http-exception.filter';
 import { AllExceptionsFilter } from './common/filter/all-exception/all-exception.filter';
 import { AplusExceptionsFilter } from './common/filter/aplus-exception/aplus-exception.filter';
-import { TransformInterceptor } from './common/interceptor/transform/transform.interceptor';
+import { TransformInterceptor } from './common/interceptor/transform.interceptor';
 import * as bodyParser from 'body-parser';
 import utc from 'dayjs/plugin/utc'; // nodejs
 import timezone from 'dayjs/plugin/timezone'; // nodejs
@@ -14,6 +14,7 @@ import dayjs from 'dayjs';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { setGlobalAppInstance } from '@utils/app-config';
+import { LoggingInterceptor } from './common/interceptor/logger.interceptor';
 
 declare const module: any;
 
@@ -36,7 +37,10 @@ async function bootstrap() {
     new HttpExceptionFilter(),
     new UniqueConstraintExceptionFilter(),
   );
-  app.useGlobalInterceptors(new TransformInterceptor());
+  app.useGlobalInterceptors(
+    new TransformInterceptor(),
+    new LoggingInterceptor(),
+  );
   app.useGlobalPipes(
     new ValidationPipe({
       stopAtFirstError: true,

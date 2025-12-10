@@ -25,7 +25,6 @@ export default class PageIssueStatisticService extends IssueStatisticService {
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly businessLineTable: FeishuBusinessLineTable,
   ) {
-    // return this.statisticService.handleCron();
     super(feishuIssueTable, messageHelper, businessLineTable);
   }
 }

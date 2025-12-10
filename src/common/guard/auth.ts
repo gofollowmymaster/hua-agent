@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { UserContext } from '@src/type/global';
 import dayjs from 'dayjs';
 import { Request } from 'express';
 
@@ -26,7 +27,7 @@ export class AuthGuard implements CanActivate {
     }
     return true;
   }
-  private async verify(token: string) {
+  private async verify(token: string): Promise<UserContext> {
     const payload = await this.jwtService.verify(token);
     const loginTime = payload.loginTime;
     if (loginTime < dayjs().subtract(14, 'day').valueOf() / 1000) {

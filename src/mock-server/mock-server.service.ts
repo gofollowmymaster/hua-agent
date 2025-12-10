@@ -3,7 +3,7 @@ import { MockServerCreate, MockServerGet } from './dto/mock-server.dto';
 import { ErrorMessagesCode, ErrorMessages } from './errEnum';
 import { getGateWayName, getMockServerFilePath } from '@utils/mockserverUtils';
 import fs from 'fs-extra';
-import { logger } from '@src/common/middleware/logger.middleware';
+import { logger } from '@src/common/service/logger/logger.config';
 //录制操作
 //1.查看createParams的url 比如url是/catalog/aplus/newermodel/page
 //2.根据url获取网关名称 比如获取到的网关名称是catalog

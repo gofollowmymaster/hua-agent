@@ -15,24 +15,18 @@ export class TenantMiddleware implements NestMiddleware {
     // 从不同来源获取租户ID
     const user = await this.extractTokenFromHeader(req);
 
-    // if (!tenantCodeMap[user.supplierCode]) {
-    //   throw new Error('服务商不存在：' + user.supplierCode);
-    // }
     // 设置租户上下文 默认为小往
     const context = {
       tenantCode: tenantCodeMap[user.supplierCode as TenantCode] || 'aplus',
       user: user || {},
     };
-    console.log('[ tenant context ] >', context);
 
     this.asyncStorage.run(context, () => {
       next();
     });
   }
 
-  private async extractTokenFromHeader(
-    request: Request,
-  ): Promise<UserContext | undefined> {
+  private async extractTokenFromHeader(request: Request): Promise<UserContext> {
     if (request.headers.supplier) {
       return {
         supplierCode: request.headers.supplier as string,

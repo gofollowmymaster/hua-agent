@@ -1,4 +1,4 @@
-import { logger } from '@src/common/middleware/logger.middleware';
+import { logger } from '@src/common/service/logger/logger.config';
 import type { MessageFromRobotType } from '../dto/post-message-from-robot.dto';
 export function FromFeishuLogger() {
   return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
