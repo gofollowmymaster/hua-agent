@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { MockServerCreate, MockServerGet } from './dto/mock-server.dto';
 import { ErrorMessagesCode, ErrorMessages } from './errEnum';
-import { getGateWayName, getMockServerFilePath } from '@utils/mockserverUtils';
+import {
+  getGateWayName,
+  getMockServerFilePath,
+} from '@src/common/utils/mockserverUtils';
 import fs from 'fs-extra';
 import { logger } from '@src/common/service/logger/logger.config';
 //录制操作
