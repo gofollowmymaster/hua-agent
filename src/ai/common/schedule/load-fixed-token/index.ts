@@ -32,10 +32,7 @@ export default class FixedTokenService extends BaseSchedule {
   protected initContext() {
     this.tenantContextDatas = [{ tenantCode: 'aplus' }];
   }
-  handleCron(force: boolean) {
-    if (!force && ['development', 'dev'].includes(process.env.NODE_ENV)) return;
-    this.execute();
-  }
+
   async handle(force = false) {
     if (!force && ['development', 'dev'].includes(process.env.NODE_ENV)) return;
     const authClient = ClientFactory.create(FeishuApp.AilyAplusClient);

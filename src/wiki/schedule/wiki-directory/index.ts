@@ -37,10 +37,7 @@ export default class WikiDirectoryService extends BaseSchedule {
       });
     }
   }
-  // handleCron(force: boolean) {
-  //   if (!force && ['development', 'dev'].includes(process.env.NODE_ENV)) return;
-  //   this.execute();
-  // }
+
   protected async handle(tenantData: TenantContextType) {
     for (const spaceId of tenantData.spaceIds) {
       try {

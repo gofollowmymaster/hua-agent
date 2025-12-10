@@ -41,6 +41,6 @@ export class AlertMsgController {
   @Post('triggerSyncFeishuUser')
   @UseGuards(SecretAuthGuard)
   async triggerSyncFeishuUser() {
-    return this.syncFeishuUser.handleCron();
+    return this.syncFeishuUser.handleCron(true);
   }
 }

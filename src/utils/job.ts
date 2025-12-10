@@ -20,15 +20,15 @@ export async function addRetryJob(
           clearInterval(intervalHandler);
           resolve(true);
         }
-        //5分钟后还没有读取消息，通知leader
+        //重试次数超过最大次数
         if (num >= time) {
           clearInterval(intervalHandler);
-          resolve(false);
+          reject(false);
         }
       } catch (error) {
         console.log('[ 任务执行失败 ] >', error);
         clearInterval(intervalHandler);
-        resolve(false);
+        reject(false);
       }
     }, seconds);
   });
