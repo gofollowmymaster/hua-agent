@@ -3,7 +3,7 @@ import { FeishuAppClentsType } from '.';
 import { getGlobalAppInstance } from '@utils/app-config';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import { FeishuAppConfig, TenantCode } from '@src/config/tenant';
-import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
+import { NodeConfigService } from '@src/config/node-config.service';
 class FeishuClient {
   private clientContainer: Record<string, lark.Client> = {};
 

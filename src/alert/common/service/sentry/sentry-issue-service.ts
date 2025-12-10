@@ -8,7 +8,7 @@ import {
   SentryStatus,
 } from '../../type/sentry-issue';
 
-import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
+import { NodeConfigService } from '@src/config/node-config.service';
 import HttpApiHelper from '@src/common/base/http-api-service';
 
 type UpdateIssueParams = {

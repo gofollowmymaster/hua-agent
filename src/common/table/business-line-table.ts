@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import FeishuTableHelper from '@src/common/feishu/hepler/table-helper';
 import FeishuTable from '@src/common/feishu/table/feishu-table';
 import { FeishuApiException } from '../exception/feishu-api-exception';
-import { NodeConfigService } from '../service/node-config-service/node-config.service';
+import { NodeConfigService } from '../../config/node-config.service';
 @Injectable()
 class FeishuBusinessLineTable extends FeishuTable {
   // protected readonly tableHelper: FeishuTableHelper;

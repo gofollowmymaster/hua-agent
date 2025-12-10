@@ -18,12 +18,12 @@ import { AdminModule } from './admin/admin.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AlertModule } from './alert/alert.module';
 import { RedisModule } from './common/service/redis/redis.module';
-import { GlobalExceptionHandlerModule } from './common/service/global-exception-hander/global-exception.module';
 import { FdCopilotModule } from './fd-copilot/fd-copilot.module';
 import { TenantMiddleware } from './common/middleware/tenant.middleware';
 import { DiscardMiddleware } from './common/middleware/discard.middleware';
 import { DevopsModule } from './devops/devops.module';
 import { GlobalServiceModule } from './common/service/service.module';
+import { GlobalExceptionHandlerModule } from './common/filter/global-exception-hander/global-exception.module';
 
 const modulesAll = [
   RobotModule,

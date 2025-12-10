@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { SentryProject } from '../../type/sentry-project';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
-import { NodeConfigService } from '@src/common/service/node-config-service/node-config.service';
+import { NodeConfigService } from '@src/config/node-config.service';
 import HttpApiHelper from '@src/common/base/http-api-service';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 

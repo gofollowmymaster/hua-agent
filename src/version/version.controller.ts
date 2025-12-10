@@ -1,6 +1,5 @@
 import { Controller, Post, Body, Param, Delete, Put } from '@nestjs/common';
 import { VersionService } from './version.service';
-import { HeaderTagsService } from '../header-tags/header-tags.service';
 import { Version as VersionModel } from '@prisma/client';
 import { CreateVersionDto } from './dto/version.dto';
 import { PrismaService } from '../prisma.service';

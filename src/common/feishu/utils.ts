@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import { getGlobalAppInstance } from '@utils/app-config';
 import { throttle } from 'lodash';
 import { TenantContext } from '../service/context/tenant.context';
-import { NodeConfigService } from '../service/node-config-service/node-config.service';
+import { NodeConfigService } from '../../config/node-config.service';
 import * as lark from '@larksuiteoapi/node-sdk';
 
 /**
