@@ -5,7 +5,7 @@ import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import ErrorStatisticCard from '@src/common/feishu/card/error-statistic-card';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import FeishuTable from '@src/common/feishu/table/feishu-table';
-import { wait } from '@utils/job';
+import { wait } from '@src/common/utils/job';
 import { ErrorEndpoint } from '@src/alert/common/type/alert';
 import { NodeConfigService } from '@src/config/node-config.service';
 

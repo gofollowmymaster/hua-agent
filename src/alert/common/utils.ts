@@ -1,7 +1,7 @@
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import FeishuAilyHelper from '@src/common/feishu/hepler/feishu-aily-helper';
 import { TenantContext } from '@src/common/service/context/tenant.context';
-import { getGlobalAppInstance } from '@utils/app-config';
+import { getGlobalAppInstance } from '@src/common/utils/app-config';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween'; // nodejs
 const { isWorkday } = require('chinese-workday');

@@ -11,7 +11,7 @@ import {
   PipelineStage,
 } from './common/ali-api/interface';
 import UserAliyunTable from './common/table/user-token-table';
-import { addRetryJob } from '@utils/job';
+import { addRetryJob } from '@src/common/utils/job';
 import TipCard from '@src/common/feishu/card/tip-card';
 import { NodeConfigService } from '@src/config/node-config.service';
 import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';

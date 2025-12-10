@@ -13,7 +13,7 @@ import timezone from 'dayjs/plugin/timezone'; // nodejs
 import dayjs from 'dayjs';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import { setGlobalAppInstance } from '@utils/app-config';
+import { setGlobalAppInstance } from '@src/common/utils/app-config';
 import { LoggingInterceptor } from './common/interceptor/logger.interceptor';
 
 declare const module: any;

@@ -7,7 +7,7 @@ import FeishuWikiHelper from '@src/common/feishu/hepler/feishu-wiki-helper';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import { getParentWikiToken, spaceId } from '@src/fd-copilot/sync/config';
 import { FeishuPushDto } from '@src/fd-copilot/sync/dto/sync';
-import { wait } from '@utils/job';
+import { wait } from '@src/common/utils/job';
 import { Job } from 'bullmq';
 import { createHash } from 'crypto';
 import Redis from 'ioredis';
