@@ -13,6 +13,8 @@ import { FeishuMsgType } from '@src/common/feishu/type/im';
 import { useAilyAlertSkill } from '../utils';
 import { MsgAlertService } from './msg-alert.service';
 import { AlertContext } from './alert-event.context';
+import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
 
 @Injectable()
 export class PageErrorService extends ErrorBaseService {
@@ -25,6 +27,8 @@ export class PageErrorService extends ErrorBaseService {
     protected readonly alertFeishuAdapter: PageAlertFeishuAdapter,
     protected readonly msgAlertService: MsgAlertService,
     protected readonly alertContext: AlertContext,
+    protected readonly messageHelper: FeishuMessageHelper,
+    protected readonly feishuUserHelper: FeishuUserHelper,
   ) {
     super(redisService);
   }

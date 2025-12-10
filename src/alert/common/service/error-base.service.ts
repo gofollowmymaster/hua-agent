@@ -21,14 +21,15 @@ import { FeishuApp } from '@src/common/feishu/clients';
 import { getAppAccessToken } from '@src/common/feishu/utils';
 import { HttpService } from '@nestjs/axios';
 import { AlertContext } from './alert-event.context';
+import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 
 export abstract class ErrorBaseService extends AlertBaseService {
   protected readonly alertFeishuAdapter: BaseAlertFeishuAdapter;
-
   protected readonly msgAlertService: MsgAlertService;
   protected readonly feishuUserHelper: FeishuUserHelper;
   protected readonly httpService: HttpService;
   protected readonly alertContext: AlertContext;
+  protected readonly messageHelper: FeishuMessageHelper;
 
   constructor(protected readonly redisService: RedisService) {
     super(redisService);

@@ -11,6 +11,8 @@ import { Injectable } from '@nestjs/common';
 import { IssueStatusEnum } from '@src/common/feishu/card/error-unresolve-card';
 import { MsgAlertService } from './msg-alert.service';
 import { AlertContext } from './alert-event.context';
+import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
 export const ignoreCodeList = [
   '401',
   '10002',
@@ -35,6 +37,8 @@ export class RequestErrorService extends ErrorBaseService {
     protected readonly alertFeishuAdapter: RequestAlertFeishuAdapter,
     protected readonly msgAlertService: MsgAlertService,
     protected readonly alertContext: AlertContext,
+    protected readonly messageHelper: FeishuMessageHelper,
+    protected readonly feishuUserHelper: FeishuUserHelper,
   ) {
     super(redisService);
   }
