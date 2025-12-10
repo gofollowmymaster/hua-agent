@@ -13,8 +13,10 @@ import { TenantContext } from '@src/common/service/context/tenant.context';
 @Injectable()
 export default class CancelExecutionServer extends BaseSchedule {
   //每30分钟运行一次
-  protected readonly cron = '0 */30 * * * *';
+  protected readonly cron = '0 0 0 * * *';
   protected readonly jobName = 'Cancel Excuteopn Devops';
+  protected readonly isPause = true;
+
   private readonly redis: Redis;
   private readonly client: FeishuClient;
   constructor(
