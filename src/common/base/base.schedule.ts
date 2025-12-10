@@ -15,7 +15,7 @@ export default abstract class BaseSchedule implements OnModuleInit {
   protected readonly jobName: string;
 
   protected readonly logger = new Logger(this.constructor.name);
-  protected readonly tenantContextDatas: TenantContextType[] = [];
+  protected tenantContextDatas: TenantContextType[] = [];
 
   constructor(
     protected readonly tenantContext: TenantContext,
@@ -39,6 +39,7 @@ export default abstract class BaseSchedule implements OnModuleInit {
       this.execute();
     });
     this.schedulerRegistry.addCronJob(this.jobName, job);
+    job.start();
   }
   protected initContext() {
     const tenantConfig = globalConfig['tenantConfig'];
@@ -49,7 +50,7 @@ export default abstract class BaseSchedule implements OnModuleInit {
       });
     }
   }
-  protected handleCron(force: boolean = false) {
+  handleCron(force: boolean = false) {
     if (!force && ['development', 'dev'].includes(process.env.NODE_ENV)) return;
     this.execute();
   }
@@ -57,6 +58,7 @@ export default abstract class BaseSchedule implements OnModuleInit {
     this.logger.debug(this.constructor.name + ' Called ');
     this.tenantContextDatas.forEach((tenantData) => {
       this.tenantContext.run(tenantData, async () => {
+        console.log('[ tenantData ] >', tenantData);
         this.handle(tenantData);
       });
     });

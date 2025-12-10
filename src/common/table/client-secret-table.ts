@@ -14,11 +14,6 @@ class ClientSecretTable extends FeishuTable {
     );
     this.tableId = 'tblM4JUNtLKnrewV';
 
-    console.log(
-      '[ this.tableHelper.setTableOption ] >',
-      this.tableHelper.setTableOption,
-    );
-
     this.tableHelper.setTableOption({
       appToken: this.appToken,
       tableId: this.tableId,

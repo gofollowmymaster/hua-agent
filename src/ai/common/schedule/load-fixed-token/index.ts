@@ -29,6 +29,9 @@ export default class FixedTokenService extends BaseSchedule {
     super(tenantContext, schedulerRegistry);
     this.redis = redisService.getClient();
   }
+  protected initContext() {
+    this.tenantContextDatas = [{ tenantCode: 'aplus' }];
+  }
   handleCron(force: boolean) {
     if (!force && ['development', 'dev'].includes(process.env.NODE_ENV)) return;
     this.execute();
