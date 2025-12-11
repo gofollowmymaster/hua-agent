@@ -12,7 +12,7 @@ import { updateTableRecord } from '@src/common/utils/actionTable/updateTableReco
 import { deleteTableRecord } from '@src/common/utils/actionTable/deleteTableRecord';
 import { feishuSenceService } from './logic/feishu.sence.service';
 import { removeAtXiaoA } from './logic';
-import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import { ReceiveIdType } from '@src/common/feishu/type/im';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';

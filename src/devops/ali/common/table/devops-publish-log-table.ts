@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import FeishuTableHelper from '@src/common/feishu/hepler/table-helper';
+import FeishuTableHelper from '@src/common/feishu/helper/table-helper';
 import FeishuTable from '@src/common/feishu/table/feishu-table';
-import { BitTableFilter } from '@src/common/feishu/type/bitable';
 import { NodeConfigService } from '@src/config/node-config.service';
 @Injectable()
 class DevopsPublishLogTable extends FeishuTable {

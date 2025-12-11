@@ -6,7 +6,7 @@ import { AliService } from './ali/ali.service';
 import { DevopsApiService } from './ali/common/ali-api/ali-devops.helper';
 import { AliCodeUpApiService } from './ali/common/ali-api/ali-codeup.helper';
 import { DevopsOptionService } from './ali/common/service/devops-option.service';
-import { FeishuHelperModule } from '@src/common/feishu/hepler/helper.module';
+import { FeishuHelperModule } from '@src/common/feishu/helper/helper.module';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import UserAliyunTable from './ali/common/table/user-token-table';
 import { AliDevopsContext } from './ali/common/service/ali-devops.context';
@@ -15,7 +15,7 @@ import CancelExecutionServer from './ali/common/schedule/cancel-execution';
 @Module({
   imports: [
     HttpModule,
-    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AiHeplerClient)),
+    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AiHelperClient)),
   ],
   providers: [
     LoggerService,

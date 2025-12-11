@@ -1,7 +1,7 @@
 import { BitTableFilter } from '@src/common/feishu/type/bitable';
 import dayjs from 'dayjs';
 import { Injectable } from '@nestjs/common';
-import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import ErrorStatisticCard from '@src/common/feishu/card/error-statistic-card';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import FeishuTable from '@src/common/feishu/table/feishu-table';
@@ -64,14 +64,14 @@ export default class IssueStatisticService {
     };
   }
   async getIssuesToday(businessLine: string) {
-    const towdayStart = dayjs().startOf('day').valueOf();
+    const todayStart = dayjs().startOf('day').valueOf();
     const filter: BitTableFilter = {
       conjunction: 'and',
       conditions: [
         {
           field_name: '最后更新时间',
           operator: 'isGreater',
-          value: ['ExactDate', towdayStart + ''],
+          value: ['ExactDate', todayStart + ''],
         },
         {
           field_name: '日错误次数',
@@ -159,7 +159,7 @@ export default class IssueStatisticService {
     period: string,
   ) {
     period = period.slice(0, 10);
-    const towdayStart = dayjs(period).startOf('day').valueOf();
+    const todayStart = dayjs(period).startOf('day').valueOf();
 
     const filter: BitTableFilter = {
       conjunction: 'and',
@@ -167,7 +167,7 @@ export default class IssueStatisticService {
         {
           field_name: '最后更新时间',
           operator: 'isGreater',
-          value: ['ExactDate', towdayStart + ''],
+          value: ['ExactDate', todayStart + ''],
         },
 
         {

@@ -14,12 +14,12 @@ import {
 } from '../common/type/alert';
 import dayjs from 'dayjs';
 import CommonAlertCard from '@src/common/feishu/card/alert-card';
-import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import {
   FeishuMessageCreateReturnBody,
   FeishuMsgType,
 } from '@src/common/feishu/type/im';
-import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
+import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { PageErrorService } from '../common/service/page-error-service';
 import { RequestErrorService } from '../common/service/request-error-service';
 import { ErrorBaseService } from '../common/service/error-base.service';
@@ -125,7 +125,7 @@ export class SentryWebhookService {
 
     //按前端业务模块3min 内超过10次告警，发送额外致命错误
     const isTooManyWarning = await this.redisService.limiter(
-      this.buildhighFrequencyKey(eventData),
+      this.buildHighFrequencyKey(eventData),
       10,
       60 * 5,
     );
@@ -169,7 +169,7 @@ export class SentryWebhookService {
     sendExceptionToFeishu(new Error(JSON.stringify(params)));
   }
 
-  buildhighFrequencyKey(errorEvent: AlertEvent) {
+  buildHighFrequencyKey(errorEvent: AlertEvent) {
     return errorEvent.errorEndpoint == ErrorEndpoint.Page
       ? `${errorEvent.errorEndpoint}:${errorEvent.pageModuleName}`
       : `${errorEvent.errorEndpoint}:${errorEvent.serverModuleName}`;
@@ -184,7 +184,7 @@ export class SentryWebhookService {
   ) {
     const key = RedisKeys.SENTRY_ALERT_COUNT_FREQUENCY.replace(
       '{module}',
-      this.buildhighFrequencyKey(errorEvent),
+      this.buildHighFrequencyKey(errorEvent),
     );
     const msgInfo: FeishuMessageCreateReturnBody =
       await this.redis.hgetall(key);

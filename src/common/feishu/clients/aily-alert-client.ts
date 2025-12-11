@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import FeishuClient from './client';
-import { FeishuAppClentsType } from '.';
+import { FeishuAppClientsType } from '.';
 @Injectable()
-class AiHeplerClient extends FeishuClient {
+class AiHelperClient extends FeishuClient {
   constructor() {
-    super(AiHeplerClient.name as FeishuAppClentsType);
+    super(AiHelperClient.name as FeishuAppClientsType);
   }
 }
 
-export default AiHeplerClient;
+export default AiHelperClient;

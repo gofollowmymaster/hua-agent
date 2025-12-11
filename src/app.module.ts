@@ -23,7 +23,7 @@ import { TenantMiddleware } from './common/middleware/tenant.middleware';
 import { DiscardMiddleware } from './common/middleware/discard.middleware';
 import { DevopsModule } from './devops/devops.module';
 import { GlobalServiceModule } from './common/service/service.module';
-import { GlobalExceptionHandlerModule } from './common/filter/global-exception-hander/global-exception.module';
+import { GlobalExceptionHandlerModule } from './common/filter/global-exception-handler/global-exception.module';
 
 const modulesAll = [
   RobotModule,
@@ -78,7 +78,7 @@ const modulesAll = [
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(TenantMiddleware).forRoutes('*'); //服务商上下文中间件放在最前面
+    consumer.apply(TenantMiddleware).forRoutes('*'); //服务商上下文中间件放在最前面，后续任何消息发送才可行
     consumer.apply(LoggerMiddleware).forRoutes('*'); // 你可以指定特定的路由
     consumer.apply(DiscardMiddleware).forRoutes('*'); // 你可以指定特定的路由
   }

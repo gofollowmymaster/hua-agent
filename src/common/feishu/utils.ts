@@ -1,5 +1,5 @@
-import { ClientFactory, FeishuApp, FeishuAppClentsType } from './clients';
-import FeishuMessageHelper from './hepler/message-helper';
+import { ClientFactory, FeishuApp, FeishuAppClientsType } from './clients';
+import FeishuMessageHelper from './helper/message-helper';
 import { CommonAlertCard, CommonCardData } from './card/alert-card';
 import dayjs from 'dayjs';
 import { getGlobalAppInstance } from '@src/common/utils/app-config';
@@ -65,7 +65,7 @@ export const sendExceptionToFeishu: (
   trailing: false,
 });
 
-export const getAppAccessToken = async (AppName: FeishuAppClentsType) => {
+export const getAppAccessToken = async (AppName: FeishuAppClientsType) => {
   const client = ClientFactory.create(AppName);
   const appId = client.client.appId;
   const appSecret = client.client.appSecret;

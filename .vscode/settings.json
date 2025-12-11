@@ -79,8 +79,7 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit",
-    "source.fixAll.stylelint": "explicit"
+    "source.fixAll.eslint": "explicit"
   },
 
   "explorer.fileNesting.enabled": true,
@@ -91,7 +90,7 @@
     "*.env": "$(capture).env.*",
     "CHANGELOG.md": "CHANGELOG*",
     "package.json": "pnpm-lock.yaml,pnpm-workspace.yaml,Dockerfile,ecosystem.config.js,webpack-hmr.config.js,nest-cli.json,LICENSE,.gitattributes,.gitignore,.gitpod.yml,CNAME,README*,.npmrc",
-    ".eslintrc.js": ".prettierrc,.prettierignore,.stylelintignore,.commitlintrc.*,.prettierrc.*,.stylelintrc.*"
+    ".eslintrc.js": ".prettierrc,.prettierignore,.commitlintrc.*,.prettierrc.*"
   },
   "terminal.integrated.scrollback": 10000,
   "files.autoSave": "off",
@@ -99,5 +98,6 @@
     "editor.defaultFormatter": "vscode.json-language-features"
   },
   "gitlens.proxy": {},
-  "references.preferredLocation": "view"
+  "references.preferredLocation": "view",
+  "cSpell.words": ["aplus", "bullmq", "feishu", "larksuiteoapi"]
 }

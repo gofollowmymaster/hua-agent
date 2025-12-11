@@ -1,4 +1,4 @@
-export type Playload = {
+export type Payload = {
   /** 环境名称 */
   APP_ENV_NAME: string;
   /** 标签头 */
@@ -9,7 +9,7 @@ export type Playload = {
   [key: string]: string | undefined;
 };
 
-export type PipelineglobalParams = {
+export type PipelineGlobalParams = {
   description: string;
   encrypted: boolean;
   key: string;
@@ -25,7 +25,7 @@ export type PipelineSetting = {
     jobConcurrency: number;
     model: string;
   };
-  globalParams: PipelineglobalParams[];
+  globalParams: PipelineGlobalParams[];
 };
 export type PipelineConfigVo = {
   settings: string;

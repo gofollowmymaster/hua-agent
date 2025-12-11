@@ -3,7 +3,7 @@ import { WikiController } from './wiki.controller';
 import { WikiService } from './wiki.service';
 import { PrismaService } from '@src/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
-import { FeishuHelperModule } from '@src/common/feishu/hepler/helper.module';
+import { FeishuHelperModule } from '@src/common/feishu/helper/helper.module';
 
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import WikiDirectoryService from './schedule/wiki-directory';

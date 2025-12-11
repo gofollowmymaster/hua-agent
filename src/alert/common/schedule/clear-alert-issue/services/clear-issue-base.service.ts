@@ -1,7 +1,7 @@
 import { BitTableFilter } from '@src/common/feishu/type/bitable';
 import dayjs from 'dayjs';
 import { Injectable } from '@nestjs/common';
-import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import FeishuTable from '@src/common/feishu/table/feishu-table';
 
@@ -18,7 +18,7 @@ export default class ClearAlertPerDayBaseService {
   ) {}
 
   async clear() {
-    const towdayStart =
+    const todayStart =
       dayjs().subtract(1, 'D').startOf('day').valueOf() - 60 * 1000;
     const filter: BitTableFilter = {
       conjunction: 'and',
@@ -26,7 +26,7 @@ export default class ClearAlertPerDayBaseService {
         {
           field_name: '最后更新时间',
           operator: 'isGreater',
-          value: ['ExactDate', towdayStart + ''],
+          value: ['ExactDate', todayStart + ''],
         },
         {
           field_name: '日错误次数',

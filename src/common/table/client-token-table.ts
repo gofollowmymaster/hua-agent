@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import FeishuTableHelper from '@src/common/feishu/hepler/table-helper';
+import FeishuTableHelper from '@src/common/feishu/helper/table-helper';
 import FeishuTable from '@src/common/feishu/table/feishu-table';
 import { NodeConfigService } from '../../config/node-config.service';
 @Injectable()

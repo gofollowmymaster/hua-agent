@@ -43,7 +43,7 @@ export class DevopsApiService extends HttpApiHelper {
     this.headers['x-yunxiao-token'] = token;
   }
 
-  async quaryAllApp(): Promise<AppInfoType> {
+  async queryAllApp(): Promise<AppInfoType> {
     const uri = `${this.organizationId}/apps:search?pagination=keyset&orderBy=id&perPage=100&sort=asc`;
 
     return this.readWrapper(
@@ -63,7 +63,7 @@ export class DevopsApiService extends HttpApiHelper {
   }
 
   /** 分页查找应用源详情 */
-  async quaryAppSource(appName: string) {
+  async queryAppSource(appName: string) {
     const uri = `${this.organizationId}/apps/${appName}/sources?pagination=keyset&orderBy=id&perPage=100&sort=asc`;
     return this.readWrapper(
       async () => {
@@ -80,7 +80,7 @@ export class DevopsApiService extends HttpApiHelper {
       uri,
     );
   }
-  async quaryAppRelease(appName) {
+  async queryAppRelease(appName) {
     const uri = `${this.organizationId}/apps/${appName}`;
     return this.readWrapper(
       async () => {
@@ -98,7 +98,7 @@ export class DevopsApiService extends HttpApiHelper {
     );
   }
   /** 查找应用下所有的研发流程 */
-  async quaryAppReleaseWorkflow(appOption: {
+  async queryAppReleaseWorkflow(appOption: {
     appName: string;
     workflowName: string;
   }): Promise<AppWorkflowPublishType> {
@@ -225,7 +225,7 @@ export class DevopsApiService extends HttpApiHelper {
     }, 'ListAppReleaseStageRuns');
   }
 
-  async quaryAllAppTemplate() {
+  async queryAllAppTemplate() {
     return this.readWrapper(
       async () => {
         this.setAliyunToken();
@@ -242,7 +242,7 @@ export class DevopsApiService extends HttpApiHelper {
         return data;
       },
       true,
-      'quaryAllAppTemplate',
+      'queryAllAppTemplate',
     );
   }
 

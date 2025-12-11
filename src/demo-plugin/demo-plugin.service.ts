@@ -6,7 +6,7 @@ import { buildUUID } from '@src/common/utils/uuid';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 
 import dayjs from 'dayjs';
-import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import { BitTableFilter } from '@src/common/feishu/type/bitable';
 
 //过期时间
@@ -53,7 +53,6 @@ export class DemoPluginService {
         const { fields: info, record_id } = records[0];
         const current = dayjs().valueOf();
         // 未启用状态为第一次使用，则启用返回有效
-        console.log('[ rechdIziTu ] >', data.MId, info['状态']);
         if (info['状态'] == '未启用') {
           await this.demoPluginMidTable.update(record_id, {
             申请日期: current,

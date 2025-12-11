@@ -5,7 +5,7 @@ import { LogOperatorService } from './log-operator/log-operator.service';
 import { LogOperatorController } from './log-operator/log-operator.controller';
 import { HttpModule } from '@nestjs/axios';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
-import { FeishuHelperModule } from '@src/common/feishu/hepler/helper.module';
+import { FeishuHelperModule } from '@src/common/feishu/helper/helper.module';
 import AilyLogOperatorTable from './log-operator/adapter/aily-log-operator-table';
 import { PrismaService } from '@src/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';

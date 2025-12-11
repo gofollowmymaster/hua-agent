@@ -1,5 +1,5 @@
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
-import FeishuAilyHelper from '@src/common/feishu/hepler/feishu-aily-helper';
+import FeishuAilyHelper from '@src/common/feishu/helper/feishu-aily-helper';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import { getGlobalAppInstance } from '@src/common/utils/app-config';
 import dayjs from 'dayjs';
@@ -68,7 +68,7 @@ export const isNeedSendAlertMsg = (time: number = dayjs().valueOf()) => {
  * @returns
  */
 export const useAilyAlertSkill = async (message: string) => {
-  const client = ClientFactory.create(FeishuApp.AiHeplerClient);
+  const client = ClientFactory.create(FeishuApp.AiHelperClient);
   const userContext = getGlobalAppInstance(TenantContext);
 
   const feishuAilyHelper = new FeishuAilyHelper(client, userContext);

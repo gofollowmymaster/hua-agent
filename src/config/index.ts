@@ -21,7 +21,7 @@ const globalConfig = Object.freeze({
     AlertApiTableId: process.env.FEISHU_ALERT_API_TABLE_ID,
     AlertFrontendAppId: process.env.FEISHU_ALERT_FRONTEND_TABLE_ID,
     AlertFrontendIssueTableAppId:
-      process.env.FEISHU_ALERT_FRONTEND_ISUUE_TABLE_ID,
+      process.env.FEISHU_ALERT_FRONTEND_ISSUE_TABLE_ID,
     AlertApiIssueTableId: process.env.FEISHU_ALERT_API_ISSUE_TABLE_ID,
     //Aplus Node-Server 管理表格
     AplusNodeAdminAppToken: process.env.FEISHU_APLUS_NODE_ADMIN_APP_TOKEN,
@@ -32,7 +32,7 @@ const globalConfig = Object.freeze({
 
   robots: {
     //Aily智能报警提示相关
-    AiHeplerClient: {
+    AiHelperClient: {
       appId: process.env.FEISHU_AILY_ALERT_APP_ID,
       appSecret: process.env.FEISHU_AILY_ALERT_APP_SECRET,
     },

@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger';
 import type { records } from '../../common/utils/actionTable/interface';
 import { FeishuMsgType, ReceiveIdType } from '@src/common/feishu/type/im';
-import { FeishuApp, FeishuAppClentsType } from '@src/common/feishu/clients';
+import { FeishuApp, FeishuAppClientsType } from '@src/common/feishu/clients';
 /**
  * 
   参考一下数据帮我生成一个包含支持nestjs/swagger的类{
@@ -148,5 +148,5 @@ export class FeishuTicketDto {
     enum: FeishuApp,
     description: '飞书应用名称',
   })
-  appName: FeishuAppClentsType;
+  appName: FeishuAppClientsType;
 }

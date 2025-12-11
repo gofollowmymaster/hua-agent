@@ -32,7 +32,7 @@ export class AliCodeUpApiService extends HttpApiHelper {
     this.redis = redisService.getClient();
   }
 
-  async quaryAllCodeupRepositories(organizationId: string) {
+  async queryAllCodeupRepositories(organizationId: string) {
     return this.requestWrapper(async () => {
       const { data } = await firstValueFrom(
         this.httpService.get(
@@ -43,7 +43,7 @@ export class AliCodeUpApiService extends HttpApiHelper {
         ),
       );
       return data;
-    }, 'quaryAllApp');
+    }, 'queryAllApp');
   }
   //
 }

@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { createHash } from 'crypto';
 import ClientSecretTable from '../table/client-secret-table';
-import FeishuTableHelper from '../feishu/hepler/table-helper';
+import FeishuTableHelper from '../feishu/helper/table-helper';
 import { ClientFactory, FeishuApp } from '../feishu/clients';
 import { RedisService } from '../service/redis/redis.service';
 import { TenantContext } from '../service/context/tenant.context';

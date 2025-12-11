@@ -1,4 +1,4 @@
-import { IssueStatusEnum } from '@src/common/feishu/card/error-unresolve-card';
+import { IssueStatusEnum } from '@src/common/feishu/card/error-unresolved-card';
 
 export type ApiAlertTableDto = {
   接口地址: string;

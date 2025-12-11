@@ -1,4 +1,4 @@
-import ErrorUnresolveCard from './error-unresolve-card';
+import ErrorUnresolveCard from './error-unresolved-card';
 import CommonAlertCard from './alert-card';
 
 const alertCards = {

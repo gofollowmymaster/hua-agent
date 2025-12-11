@@ -8,11 +8,11 @@ import { ErrorBaseService } from './error-base.service';
 import RequestAlertFeishuAdapter from '../adapter/request-alert-feishu-adapter';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { Injectable } from '@nestjs/common';
-import { IssueStatusEnum } from '@src/common/feishu/card/error-unresolve-card';
+import { IssueStatusEnum } from '@src/common/feishu/card/error-unresolved-card';
 import { MsgAlertService } from './msg-alert.service';
 import { AlertContext } from './alert-event.context';
-import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
-import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
+import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
+import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 export const ignoreCodeList = [
   '401',
   '10002',

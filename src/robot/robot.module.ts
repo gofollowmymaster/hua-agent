@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { RobotController } from './robot.controller';
 import { RobotService } from './robot.service';
 import { feishuSenceService } from './logic/feishu.sence.service';
-import { FeishuHelperModule } from '@src/common/feishu/hepler/helper.module';
+import { FeishuHelperModule } from '@src/common/feishu/helper/helper.module';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import { HttpModule } from '@nestjs/axios';
 

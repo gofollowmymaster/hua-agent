@@ -7,8 +7,8 @@ import {
 } from '@src/alert/common/type/feishu-event';
 import { useAilyAlertSkill } from '@src/alert/common/utils';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
-import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolve-card';
-import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolved-card';
+import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import { BitTableFilter } from '@src/common/feishu/type/bitable';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import { LoggerService } from '@src/common/service/logger/logger.service';
@@ -52,7 +52,7 @@ export class FeishuReceiveCallback {
   }
   async handle(event: ReceiveEventParams) {
     const {
-      message: { content: msgContent, message_type, chat_type, mentions },
+      message: { content: msgContent, message_type, chat_type },
     } = event;
     if (message_type !== 'text') return;
     const { text: content } = JSON.parse(msgContent);

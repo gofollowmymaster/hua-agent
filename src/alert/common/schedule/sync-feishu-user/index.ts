@@ -1,11 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron, SchedulerRegistry } from '@nestjs/schedule';
+import { Injectable } from '@nestjs/common';
+import { SchedulerRegistry } from '@nestjs/schedule';
 import BaseSchedule from '@src/common/base/base.schedule';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import FeishuClient from '@src/common/feishu/clients/client';
-import FeishuDepartmentHelper from '@src/common/feishu/hepler/feishu-department-helper';
-import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
-import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import FeishuDepartmentHelper from '@src/common/feishu/helper/feishu-department-helper';
+import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 // import { sendCommonCardToFeishu } from '@src/common/feishu/utils';
 import { RedisService } from '@src/common/service/redis/redis.service';

@@ -10,18 +10,18 @@ import { RedisKeys } from '@src/common/const/redis-key.enum';
 import ErrorUnresolvedCard, {
   IssueStatusEnum,
   UnresolvedCardData,
-} from '@src/common/feishu/card/error-unresolve-card';
+} from '@src/common/feishu/card/error-unresolved-card';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import BaseAlertFeishuAdapter from '../adapter/base-alert-feishu-adapter';
 import { BitTableCreateRecord } from '@src/common/feishu/type/bitable';
 import { firstValueFrom } from 'rxjs';
 import { MsgAlertService } from './msg-alert.service';
-import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
+import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { FeishuApp } from '@src/common/feishu/clients';
 import { getAppAccessToken } from '@src/common/feishu/utils';
 import { HttpService } from '@nestjs/axios';
 import { AlertContext } from './alert-event.context';
-import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 
 export abstract class ErrorBaseService extends AlertBaseService {
   protected readonly alertFeishuAdapter: BaseAlertFeishuAdapter;
@@ -61,7 +61,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
       : currentStatus;
   }
   private async sendNewIssueCard(eventRecord: BitTableCreateRecord) {
-    const issueCardData = await this.alertFeishuAdapter.toAplusAlertCardeData();
+    const issueCardData = await this.alertFeishuAdapter.toAplusAlertCardData();
     issueCardData.linkUrl = eventRecord.record_url;
     const content = ErrorUnresolvedCard.buildCardMsg(issueCardData);
     const groupMsgInfo = await this.msgAlertService.sendFsAlertMsg(

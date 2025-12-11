@@ -1,6 +1,6 @@
 import { AlertEvent } from '@src/alert/common/type/alert';
 // import { CommonCardData } from '@src/common/feishu/card/alert-card';
-import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolve-card';
+import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolved-card';
 import { AlertContext } from '../service/alert-event.context';
 
 export default abstract class BaseAlertFeishuAdapter {
@@ -20,5 +20,5 @@ export default abstract class BaseAlertFeishuAdapter {
   //     timestamp: this.event.timestamp,
   //   };
   // }
-  abstract toAplusAlertCardeData(): Promise<UnresolvedCardData>;
+  abstract toAplusAlertCardData(): Promise<UnresolvedCardData>;
 }

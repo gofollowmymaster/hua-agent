@@ -1,5 +1,5 @@
 import { FeishuCard } from './feishu-card';
-import { IssueStatusEnum } from './error-unresolve-card';
+import { IssueStatusEnum } from './error-unresolved-card';
 
 export type ResolvedCardData = {
   project: string;

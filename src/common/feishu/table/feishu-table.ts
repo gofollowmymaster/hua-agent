@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import FeishuTableHelper from '../hepler/table-helper';
+import FeishuTableHelper from '../helper/table-helper';
 import {
   BitTableCreateOption,
   BitTableCreateRecord,

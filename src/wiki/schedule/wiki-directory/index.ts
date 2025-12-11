@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
-import FeishuWikiHelper from '@src/common/feishu/hepler/feishu-wiki-helper';
+import FeishuWikiHelper from '@src/common/feishu/helper/feishu-wiki-helper';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import globalConfig from '@src/config';
 import {

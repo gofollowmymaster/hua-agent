@@ -8,11 +8,11 @@ import ErrorClosedCard from '@src/common/feishu/card/error-closed-card';
 import {
   IssueStatusEnum,
   UnresolvedCardData,
-} from '@src/common/feishu/card/error-unresolve-card';
+} from '@src/common/feishu/card/error-unresolved-card';
 
 const CloseHandler: CustomCallbackHandleType = async (
   event,
-  handerService,
+  handlerService,
 ): Promise<CardCallbackReturnType<UnresolvedCardData>> => {
   const {
     operator: { open_id },
@@ -21,7 +21,7 @@ const CloseHandler: CustomCallbackHandleType = async (
       form_value: { reason, solution },
     },
   } = event;
-  const service = await handerService.getServiceByIssueId(issueId);
+  const service = await handlerService.getServiceByIssueId(issueId);
 
   service.closeIssueHandler({
     issueId,
