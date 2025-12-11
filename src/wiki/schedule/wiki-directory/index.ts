@@ -1,6 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { Cache } from 'cache-manager';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Injectable } from '@nestjs/common';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import FeishuWikiHelper from '@src/common/feishu/helper/feishu-wiki-helper';
 import { RedisService } from '@src/common/service/redis/redis.service';
@@ -12,20 +10,22 @@ import {
 import { TenantCode } from '@src/config/tenant';
 import BaseSchedule from '../../../common/base/base.schedule';
 import { SchedulerRegistry } from '@nestjs/schedule';
+import Redis from 'ioredis';
 
 @Injectable()
 export default class WikiDirectoryService extends BaseSchedule {
   protected readonly cron = '0 0 16 * * *';
   protected readonly jobName = 'Sync Wiki Nodes';
+  protected redis: Redis;
 
   constructor(
-    @Inject(CACHE_MANAGER) protected cache: Cache,
     private readonly feishuWikiHelper: FeishuWikiHelper,
     private readonly redisService: RedisService,
     protected readonly tenantContext: TenantContext,
     protected schedulerRegistry: SchedulerRegistry,
   ) {
     super(tenantContext, schedulerRegistry);
+    this.redis = redisService.getClient();
   }
   protected initContext() {
     const tenantConfig = globalConfig['tenantConfig'];
@@ -47,7 +47,7 @@ export default class WikiDirectoryService extends BaseSchedule {
           '{spaceId}',
           spaceId,
         );
-        this.cache.set(key, wikiTree, 0);
+        this.redis.set(key, JSON.stringify(wikiTree));
       } catch (error) {
         this.logger.error(error);
         this.sendAlertMsg(
@@ -64,7 +64,7 @@ export default class WikiDirectoryService extends BaseSchedule {
       '{spaceId}',
       spaceId,
     );
-    this.cache.set(key, wikiTree, 0);
+    this.redis.set(key, JSON.stringify(wikiTree));
     return wikiTree;
   }
 }

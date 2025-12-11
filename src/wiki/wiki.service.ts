@@ -1,21 +1,22 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 
-import { Cache } from 'cache-manager';
-
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import WikiDirectoryService from './schedule/wiki-directory';
 import { RedisService } from '@src/common/service/redis/redis.service';
+import Redis from 'ioredis';
 
 @Injectable()
 export class WikiService {
+  private readonly redis: Redis;
+
   constructor(
     private readonly logger: LoggerService,
-    @Inject(CACHE_MANAGER) protected cache: Cache,
     private wikiDirectoryService: WikiDirectoryService,
     private readonly redisService: RedisService,
-  ) {}
+  ) {
+    this.redis = redisService.getClient();
+  }
 
   async tree(spaceId: string) {
     const key = this.redisService.buildCacheKey(
@@ -23,7 +24,7 @@ export class WikiService {
       '{spaceId}',
       spaceId,
     );
-    let tree = await this.cache.get(key);
+    let tree = JSON.parse(await this.redis.get(key));
 
     if (!tree) {
       tree = await this.wikiDirectoryService.loadWikiNodeTree(spaceId);

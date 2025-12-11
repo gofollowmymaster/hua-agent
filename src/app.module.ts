@@ -4,7 +4,6 @@ import { join } from 'path';
 import { RobotModule } from './robot/robot.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import configuration from './config';
-import { CacheModule } from '@nestjs/cache-manager';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
 import { ConfigModule } from '@nestjs/config';
 import { createKeyv } from '@keyv/redis';
@@ -43,19 +42,6 @@ const modulesAll = [
       load: [() => configuration],
     }),
 
-    CacheModule.register({
-      isGlobal: true,
-      stores: [
-        createKeyv({
-          socket: {
-            host: configuration['DB_REDIS_HOST'],
-            port: configuration['DB_REDIS_PORT'],
-          },
-          database: configuration['DB_REDIS_DB'], //目标库,
-          password: configuration['DB_REDIS_PASSWORD'],
-        }),
-      ],
-    }),
     // 静态资源服务
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'mockServer'),

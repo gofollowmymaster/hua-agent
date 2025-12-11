@@ -14,7 +14,6 @@ import { TenantCode } from '@src/config/tenant';
 @Injectable()
 abstract class FeishuTable {
   protected readonly tableHelper: FeishuTableHelper;
-  // @Inject(CACHE_MANAGER) protected cacheManager: Cache;
   protected appToken: string | Record<TenantCode, string> = '';
   protected tableId: string | Record<TenantCode, string> = '';
   protected useCache = false;
