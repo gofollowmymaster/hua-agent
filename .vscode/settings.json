@@ -98,6 +98,5 @@
     "editor.defaultFormatter": "vscode.json-language-features"
   },
   "gitlens.proxy": {},
-  "references.preferredLocation": "view",
-  "cSpell.words": ["aplus", "bullmq", "feishu", "larksuiteoapi"]
+  "references.preferredLocation": "view"
 }
