@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { GenerateMidDto, VerifyMidDto } from './dto/generate-mid.dto';
 import DemoPluginMidTable from './table/demo-plugin-mid-table';
 
-import { buildUUID } from 'src/utils/uuid';
+import { buildUUID } from '@src/common/utils/uuid';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 
 import dayjs from 'dayjs';

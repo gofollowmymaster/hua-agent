@@ -11,6 +11,18 @@ import { ClientFactory, FeishuApp } from '../feishu/clients';
 import { RedisService } from '../service/redis/redis.service';
 import { TenantContext } from '../service/context/tenant.context';
 
+const generateSign = (data: Record<string, string>, secretKey: string) => {
+  const sortedKeys = Object.keys(data).sort();
+  const concatenatedString = sortedKeys
+    .map((key) => `${key}=${data[key]}`)
+    .join('&');
+
+  // Append the secret key
+  const stringToHash = concatenatedString + secretKey;
+
+  // Generate MD5 hash
+  return createHash('md5').update(stringToHash).digest('hex');
+};
 @Injectable()
 export class SignAuthGuard implements CanActivate {
   private clientSecretTable: ClientSecretTable;
@@ -56,18 +68,10 @@ export class SignAuthGuard implements CanActivate {
       if (!appInfo.是否启用) {
         throw new UnauthorizedException();
       }
-      const secretKey = appInfo?.AppSecret; // Replace with your actual secret key
-      // Sort keys and construct the string
-      const sortedKeys = Object.keys(restData).sort();
-      const concatenatedString = sortedKeys
-        .map((key) => `${key}=${restData[key]}`)
-        .join('&');
-
-      // Append the secret key
-      const stringToHash = concatenatedString + secretKey;
+      const secretKey = appInfo?.AppSecret as string; // Replace with your actual secret key
 
       // Generate MD5 hash
-      generatedSignature = createHash('md5').update(stringToHash).digest('hex');
+      generatedSignature = generateSign(restData, secretKey);
     } catch (error) {
       console.log('[ error ] >', error);
       throw new UnauthorizedException();

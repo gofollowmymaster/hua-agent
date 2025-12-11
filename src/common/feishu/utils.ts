@@ -2,7 +2,7 @@ import { ClientFactory, FeishuApp, FeishuAppClentsType } from './clients';
 import FeishuMessageHelper from './hepler/message-helper';
 import { CommonAlertCard, CommonCardData } from './card/alert-card';
 import dayjs from 'dayjs';
-import { getGlobalAppInstance } from '@utils/app-config';
+import { getGlobalAppInstance } from '@src/common/utils/app-config';
 import { throttle } from 'lodash';
 import { TenantContext } from '../service/context/tenant.context';
 import { NodeConfigService } from '../../config/node-config.service';

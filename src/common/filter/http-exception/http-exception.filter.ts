@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
-import { isObject } from '@utils/is';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
+import { isObject } from 'lodash';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {

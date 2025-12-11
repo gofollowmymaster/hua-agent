@@ -2,7 +2,7 @@ import { AlertEvent, Environment, ErrorLevel } from '../type/alert';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import { NodeConfigService } from '@src/config/node-config.service';
 import { isNeedSendAlertMsg } from '../utils';
-import { addRetryJob } from '@utils/job';
+import { addRetryJob } from '@src/common/utils/job';
 import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { PrismaService } from '@src/prisma.service';
