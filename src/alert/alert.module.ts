@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AlertMsgController } from './alert-message/alert-message.controller';
-import { PrismaService } from '@src/prisma.service';
+import { PrismaService } from '@src/common/service/prisma/prisma.service';
 import { FeishuHelperModule } from '@src/common/feishu/helper/helper.module';
 
 // import { FeishuTableModule } from '@src/common/feishu/table/table.module';

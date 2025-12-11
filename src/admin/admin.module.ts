@@ -3,7 +3,7 @@ import { MtableController } from './mtable/mtable.controller';
 import { HttpModule } from '@nestjs/axios';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import { FeishuHelperModule } from '@src/common/feishu/helper/helper.module';
-import { PrismaService } from '@src/prisma.service';
+import { PrismaService } from '@src/common/service/prisma/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import AdminMtableTable from './mtable/table/mtable-table';
 import { MtableService } from './mtable/mtable.service';

@@ -8,7 +8,7 @@ import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 // import { sendCommonCardToFeishu } from '@src/common/feishu/utils';
 import { RedisService } from '@src/common/service/redis/redis.service';
-import { PrismaService } from '@src/prisma.service';
+import { PrismaService } from '@src/common/service/prisma/prisma.service';
 import Redis from 'ioredis';
 
 @Injectable()

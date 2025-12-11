@@ -1,4 +1,4 @@
-import { PrismaService } from '@src/prisma.service';
+import { PrismaService } from '@src/common/service/prisma/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import FeishuApiAlertTable from '../table/api-alert-table';
 import FeishuApiAlertIssueTable from '../table/api-alert-issue-table';

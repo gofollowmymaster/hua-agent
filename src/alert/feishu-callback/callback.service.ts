@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { FeishuCallbackDto } from './dto/feishu-callback.dto';
 import EventHandler from './handler';
-import { PrismaService } from '@src/prisma.service';
+import { PrismaService } from '@src/common/service/prisma/prisma.service';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import Redis from 'ioredis';

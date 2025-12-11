@@ -5,7 +5,7 @@ import { isNeedSendAlertMsg } from '../utils';
 import { addRetryJob } from '@src/common/utils/job';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import { LoggerService } from '@src/common/service/logger/logger.service';
-import { PrismaService } from '@src/prisma.service';
+import { PrismaService } from '@src/common/service/prisma/prisma.service';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { Injectable } from '@nestjs/common';
 

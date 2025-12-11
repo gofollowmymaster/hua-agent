@@ -1,7 +1,6 @@
 import { Module, MiddlewareConsumer } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { PrismaService } from './prisma.service';
 import { RobotModule } from './robot/robot.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import configuration from './config';
@@ -17,7 +16,6 @@ import { AiModule } from './ai/ai.module';
 import { AdminModule } from './admin/admin.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AlertModule } from './alert/alert.module';
-import { RedisModule } from './common/service/redis/redis.module';
 import { FdCopilotModule } from './fd-copilot/fd-copilot.module';
 import { TenantMiddleware } from './common/middleware/tenant.middleware';
 import { DiscardMiddleware } from './common/middleware/discard.middleware';
@@ -69,12 +67,10 @@ const modulesAll = [
       global: true,
       secret: configuration['jwtSecret'],
     }),
-    RedisModule,
     ScheduleModule.forRoot(),
     GlobalExceptionHandlerModule,
     ...modulesAll,
   ],
-  providers: [PrismaService],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
