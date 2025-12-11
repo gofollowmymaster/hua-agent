@@ -37,11 +37,7 @@ export class DemoPluginController {
   })
   @Post('verify')
   // @UseGuards(AuthGuard)
-  async verifyMid(
-    @Body()
-    params: VerifyMidDto,
-    // @Res() response,
-  ) {
+  async verifyMid(@Body() params: VerifyMidDto) {
     // 查找是否存在 MId
     const isValid = await this.demoPluginService.verify(params);
 
