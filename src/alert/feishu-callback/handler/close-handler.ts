@@ -8,7 +8,7 @@ import ErrorClosedCard from '@src/common/feishu/card/error-closed-card';
 import {
   IssueStatusEnum,
   UnresolvedCardData,
-} from '@src/common/feishu/card/error-unresolve-card';
+} from '@src/common/feishu/card/error-unresolved-card';
 
 const CloseHandler: CustomCallbackHandleType = async (
   event,

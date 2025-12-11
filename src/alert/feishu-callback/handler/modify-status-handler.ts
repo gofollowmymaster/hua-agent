@@ -3,7 +3,7 @@ import ErrorUnresolvedCard, {
   IssueStatus,
   IssueStatusEnum,
   UnresolvedCardData,
-} from '@src/common/feishu/card/error-unresolve-card';
+} from '@src/common/feishu/card/error-unresolved-card';
 import ErrorResolvedCard from '@src/common/feishu/card/error-resolved-card';
 import { ModifyStatusEvent } from '@src/alert/common/type/alert';
 import {

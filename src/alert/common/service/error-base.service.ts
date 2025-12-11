@@ -10,7 +10,7 @@ import { RedisKeys } from '@src/common/const/redis-key.enum';
 import ErrorUnresolvedCard, {
   IssueStatusEnum,
   UnresolvedCardData,
-} from '@src/common/feishu/card/error-unresolve-card';
+} from '@src/common/feishu/card/error-unresolved-card';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import BaseAlertFeishuAdapter from '../adapter/base-alert-feishu-adapter';
 import { BitTableCreateRecord } from '@src/common/feishu/type/bitable';

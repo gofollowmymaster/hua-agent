@@ -8,7 +8,7 @@ import { PageAlertEvent } from '@src/alert/common/type/alert';
 import {
   IssueStatusEnum,
   UnresolvedCardData,
-} from '@src/common/feishu/card/error-unresolve-card';
+} from '@src/common/feishu/card/error-unresolved-card';
 import dayjs from 'dayjs';
 import BaseAlertFeishuAdapter from './base-alert-feishu-adapter';
 import { AlertContext } from '../service/alert-event.context';

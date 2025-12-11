@@ -18,7 +18,7 @@ export default class ClearAlertPerDayBaseService {
   ) {}
 
   async clear() {
-    const towdayStart =
+    const todayStart =
       dayjs().subtract(1, 'D').startOf('day').valueOf() - 60 * 1000;
     const filter: BitTableFilter = {
       conjunction: 'and',
@@ -26,7 +26,7 @@ export default class ClearAlertPerDayBaseService {
         {
           field_name: '最后更新时间',
           operator: 'isGreater',
-          value: ['ExactDate', towdayStart + ''],
+          value: ['ExactDate', todayStart + ''],
         },
         {
           field_name: '日错误次数',

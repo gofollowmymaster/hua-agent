@@ -1,6 +1,6 @@
 import { CardCallbackReturnType } from '@src/common/feishu/type/card';
 import { CustomCallbackHandleType } from '.';
-import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolve-card';
+import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolved-card';
 
 const AssignToHandler: CustomCallbackHandleType = async (
   event,

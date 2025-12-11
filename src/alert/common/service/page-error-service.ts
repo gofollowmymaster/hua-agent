@@ -8,7 +8,7 @@ import PageAlertFeishuAdapter from '../adapter/page-alert-feishu-adapter';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { ErrorBaseService } from './error-base.service';
 import { Injectable } from '@nestjs/common';
-import { IssueStatusEnum } from '@src/common/feishu/card/error-unresolve-card';
+import { IssueStatusEnum } from '@src/common/feishu/card/error-unresolved-card';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import { useAilyAlertSkill } from '../utils';
 import { MsgAlertService } from './msg-alert.service';
