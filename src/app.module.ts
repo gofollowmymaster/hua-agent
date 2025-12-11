@@ -41,7 +41,6 @@ const modulesAll = [
     GlobalServiceModule,
 
     ConfigModule.forRoot({
-      // envFilePath: envFilePath,
       isGlobal: true,
       load: [() => configuration],
     }),
@@ -79,9 +78,9 @@ const modulesAll = [
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
+    consumer.apply(TenantMiddleware).forRoutes('*'); //服务商上下文中间件放在最前面
     consumer.apply(LoggerMiddleware).forRoutes('*'); // 你可以指定特定的路由
     consumer.apply(DiscardMiddleware).forRoutes('*'); // 你可以指定特定的路由
-    consumer.apply(TenantMiddleware).forRoutes('*');
   }
 
   constructor() {}
