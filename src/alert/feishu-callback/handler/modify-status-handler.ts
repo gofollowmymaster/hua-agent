@@ -13,7 +13,7 @@ import {
 
 const ModifyStatusHandler: CustomCallbackHandleType = async (
   event,
-  handerService,
+  handlerService,
 ): Promise<CardCallbackReturnType<UnresolvedCardData>> => {
   const {
     operator: { open_id },
@@ -24,7 +24,7 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
     // token,
     // context: { open_message_id, open_chat_id },
   } = event;
-  const service = await handerService.getServiceByIssueId(issueId);
+  const service = await handlerService.getServiceByIssueId(issueId);
 
   const issueCardData = await service.checkIssueInCache(issueId);
   service.modifyStatusHandler({
@@ -53,7 +53,7 @@ const ModifyStatusHandler: CustomCallbackHandleType = async (
     ) {
       //修改sentry
 
-      handerService.sentryService.updateIssue(
+      handlerService.sentryService.updateIssue(
         {
           status: issueStatus as IssueStatus,
         },

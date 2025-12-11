@@ -52,7 +52,7 @@ export class FeishuReceiveCallback {
   }
   async handle(event: ReceiveEventParams) {
     const {
-      message: { content: msgContent, message_type, chat_type, mentions },
+      message: { content: msgContent, message_type, chat_type },
     } = event;
     if (message_type !== 'text') return;
     const { text: content } = JSON.parse(msgContent);

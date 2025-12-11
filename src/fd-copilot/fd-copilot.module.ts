@@ -12,7 +12,7 @@ import { SyncDocumentProcessor } from './common/processor/push-document';
 @Module({
   imports: [
     HttpModule,
-    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AiHeplerClient)),
+    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AiHelperClient)),
     // 配置 Bull 与 Redis 的连接
     BullModule.forRoot({
       connection: {

@@ -1,5 +1,5 @@
 import * as lark from '@larksuiteoapi/node-sdk';
-import { FeishuAppClentsType } from '.';
+import { FeishuAppClientsType } from '.';
 import { getGlobalAppInstance } from '@src/common/utils/app-config';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import { FeishuAppConfig, TenantCode } from '@src/config/tenant';
@@ -7,7 +7,7 @@ import { NodeConfigService } from '@src/config/node-config.service';
 class FeishuClient {
   private clientContainer: Record<string, lark.Client> = {};
 
-  constructor(clientName: FeishuAppClentsType) {
+  constructor(clientName: FeishuAppClientsType) {
     const robotConfigs = NodeConfigService.getRobotConfig(clientName);
 
     Object.keys(robotConfigs).forEach((tenant) => {

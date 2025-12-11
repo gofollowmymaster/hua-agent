@@ -20,5 +20,5 @@ export default abstract class BaseAlertFeishuAdapter {
   //     timestamp: this.event.timestamp,
   //   };
   // }
-  abstract toAplusAlertCardeData(): Promise<UnresolvedCardData>;
+  abstract toAplusAlertCardData(): Promise<UnresolvedCardData>;
 }

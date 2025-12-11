@@ -84,7 +84,7 @@ export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
     };
   }
 
-  async toAplusAlertCardeData(): Promise<UnresolvedCardData> {
+  async toAplusAlertCardData(): Promise<UnresolvedCardData> {
     await this.setEvent(this.alertContext.event as RequestAlertEvent);
 
     return {

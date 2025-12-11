@@ -125,7 +125,7 @@ export class SentryWebhookService {
 
     //按前端业务模块3min 内超过10次告警，发送额外致命错误
     const isTooManyWarning = await this.redisService.limiter(
-      this.buildhighFrequencyKey(eventData),
+      this.buildHighFrequencyKey(eventData),
       10,
       60 * 5,
     );
@@ -169,7 +169,7 @@ export class SentryWebhookService {
     sendExceptionToFeishu(new Error(JSON.stringify(params)));
   }
 
-  buildhighFrequencyKey(errorEvent: AlertEvent) {
+  buildHighFrequencyKey(errorEvent: AlertEvent) {
     return errorEvent.errorEndpoint == ErrorEndpoint.Page
       ? `${errorEvent.errorEndpoint}:${errorEvent.pageModuleName}`
       : `${errorEvent.errorEndpoint}:${errorEvent.serverModuleName}`;
@@ -184,7 +184,7 @@ export class SentryWebhookService {
   ) {
     const key = RedisKeys.SENTRY_ALERT_COUNT_FREQUENCY.replace(
       '{module}',
-      this.buildhighFrequencyKey(errorEvent),
+      this.buildHighFrequencyKey(errorEvent),
     );
     const msgInfo: FeishuMessageCreateReturnBody =
       await this.redis.hgetall(key);

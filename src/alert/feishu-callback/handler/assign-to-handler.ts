@@ -4,7 +4,7 @@ import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolved-car
 
 const AssignToHandler: CustomCallbackHandleType = async (
   event,
-  handerService,
+  handlerService,
 ): Promise<CardCallbackReturnType<UnresolvedCardData>> => {
   const {
     operator: { open_id },
@@ -13,14 +13,14 @@ const AssignToHandler: CustomCallbackHandleType = async (
       option: assignToUserId,
     },
   } = event;
-  const service = await handerService.getServiceByIssueId(issueId);
+  const service = await handlerService.getServiceByIssueId(issueId);
   service.assignToHandler({
     issueId,
     operator: open_id,
     assignTo: assignToUserId,
   });
 
-  const userInfo = await handerService.feishuUserHelper.getUserInfo({
+  const userInfo = await handlerService.feishuUserHelper.getUserInfo({
     userId: assignToUserId,
     userIdType: 'open_id',
   });
@@ -29,7 +29,7 @@ const AssignToHandler: CustomCallbackHandleType = async (
     user: { enterprise_email },
   } = userInfo;
 
-  handerService.sentryService.updateIssue(
+  handlerService.sentryService.updateIssue(
     {
       assignedTo: enterprise_email,
     },

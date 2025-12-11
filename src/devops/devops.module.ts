@@ -15,7 +15,7 @@ import CancelExecutionServer from './ali/common/schedule/cancel-execution';
 @Module({
   imports: [
     HttpModule,
-    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AiHeplerClient)),
+    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AiHelperClient)),
   ],
   providers: [
     LoggerService,

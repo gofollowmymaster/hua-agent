@@ -72,7 +72,7 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       状态: IssueStatusEnum.unresolved,
     };
   }
-  async toAplusAlertCardeData(): Promise<UnresolvedCardData> {
+  async toAplusAlertCardData(): Promise<UnresolvedCardData> {
     await this.setEvent(this.alertContext.event as PageAlertEvent);
 
     return {

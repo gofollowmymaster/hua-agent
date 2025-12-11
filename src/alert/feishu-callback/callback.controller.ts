@@ -9,7 +9,7 @@ import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 @Controller('feishu-callback')
 export class FeishuCallbackController {
   constructor(
-    private readonly feishucallbackService: FeishuCallbackService,
+    private readonly feishuCallbackService: FeishuCallbackService,
     private readonly logger: LoggerService,
   ) {}
 
@@ -26,7 +26,7 @@ export class FeishuCallbackController {
       return { challenge: callbackInfo.challenge };
     }
     try {
-      return await this.feishucallbackService.handle(callbackInfo);
+      return await this.feishuCallbackService.handle(callbackInfo);
     } catch (error) {
       const msg = `修改失败:` + error.message;
       return {

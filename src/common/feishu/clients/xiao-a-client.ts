@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import FeishuClient from './client';
-import { FeishuAppClentsType } from '.';
+import { FeishuAppClientsType } from '.';
 
 @Injectable()
 class XiaoAClient extends FeishuClient {
   constructor() {
-    super(XiaoAClient.name as FeishuAppClentsType);
+    super(XiaoAClient.name as FeishuAppClientsType);
   }
 }
 

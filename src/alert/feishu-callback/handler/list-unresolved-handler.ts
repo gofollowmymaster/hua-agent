@@ -4,7 +4,7 @@ import { CustomCallbackHandleType } from '.';
 
 const listUnresolvedHandler: CustomCallbackHandleType = async (
   event,
-  handerService,
+  handlerService,
 ): Promise<CardCallbackReturnType> => {
   const {
     operator: { open_id },
@@ -12,7 +12,7 @@ const listUnresolvedHandler: CustomCallbackHandleType = async (
       value: { period, errorEndpoint, businessLine },
     },
   } = event;
-  const service = await handerService.alertStatisticService;
+  const service = await handlerService.alertStatisticService;
   //   service.
   service.pushIssueCardToUser({
     businessLine,

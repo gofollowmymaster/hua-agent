@@ -32,7 +32,7 @@ const globalConfig = Object.freeze({
 
   robots: {
     //Aily智能报警提示相关
-    AiHeplerClient: {
+    AiHelperClient: {
       appId: process.env.FEISHU_AILY_ALERT_APP_ID,
       appSecret: process.env.FEISHU_AILY_ALERT_APP_SECRET,
     },

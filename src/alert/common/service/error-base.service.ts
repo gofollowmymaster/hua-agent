@@ -61,7 +61,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
       : currentStatus;
   }
   private async sendNewIssueCard(eventRecord: BitTableCreateRecord) {
-    const issueCardData = await this.alertFeishuAdapter.toAplusAlertCardeData();
+    const issueCardData = await this.alertFeishuAdapter.toAplusAlertCardData();
     issueCardData.linkUrl = eventRecord.record_url;
     const content = ErrorUnresolvedCard.buildCardMsg(issueCardData);
     const groupMsgInfo = await this.msgAlertService.sendFsAlertMsg(

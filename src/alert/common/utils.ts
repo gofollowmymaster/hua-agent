@@ -68,7 +68,7 @@ export const isNeedSendAlertMsg = (time: number = dayjs().valueOf()) => {
  * @returns
  */
 export const useAilyAlertSkill = async (message: string) => {
-  const client = ClientFactory.create(FeishuApp.AiHeplerClient);
+  const client = ClientFactory.create(FeishuApp.AiHelperClient);
   const userContext = getGlobalAppInstance(TenantContext);
 
   const feishuAilyHelper = new FeishuAilyHelper(client, userContext);
