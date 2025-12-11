@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AlertMsgController } from './alert-message/alert-message.controller';
 import { PrismaService } from '@src/prisma.service';
-import { FeishuHelperModule } from '@src/common/feishu/hepler/helper.module';
+import { FeishuHelperModule } from '@src/common/feishu/helper/helper.module';
 
 // import { FeishuTableModule } from '@src/common/feishu/table/table.module';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';

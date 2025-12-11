@@ -23,7 +23,7 @@ import { TenantMiddleware } from './common/middleware/tenant.middleware';
 import { DiscardMiddleware } from './common/middleware/discard.middleware';
 import { DevopsModule } from './devops/devops.module';
 import { GlobalServiceModule } from './common/service/service.module';
-import { GlobalExceptionHandlerModule } from './common/filter/global-exception-hander/global-exception.module';
+import { GlobalExceptionHandlerModule } from './common/filter/global-exception-handler/global-exception.module';
 
 const modulesAll = [
   RobotModule,

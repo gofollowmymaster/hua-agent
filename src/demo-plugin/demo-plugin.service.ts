@@ -6,7 +6,7 @@ import { buildUUID } from '@src/common/utils/uuid';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 
 import dayjs from 'dayjs';
-import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import { BitTableFilter } from '@src/common/feishu/type/bitable';
 
 //过期时间

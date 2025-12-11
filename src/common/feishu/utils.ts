@@ -1,5 +1,5 @@
 import { ClientFactory, FeishuApp, FeishuAppClentsType } from './clients';
-import FeishuMessageHelper from './hepler/message-helper';
+import FeishuMessageHelper from './helper/message-helper';
 import { CommonAlertCard, CommonCardData } from './card/alert-card';
 import dayjs from 'dayjs';
 import { getGlobalAppInstance } from '@src/common/utils/app-config';

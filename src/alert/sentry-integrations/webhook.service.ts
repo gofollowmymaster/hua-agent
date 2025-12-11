@@ -14,12 +14,12 @@ import {
 } from '../common/type/alert';
 import dayjs from 'dayjs';
 import CommonAlertCard from '@src/common/feishu/card/alert-card';
-import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import {
   FeishuMessageCreateReturnBody,
   FeishuMsgType,
 } from '@src/common/feishu/type/im';
-import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
+import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { PageErrorService } from '../common/service/page-error-service';
 import { RequestErrorService } from '../common/service/request-error-service';
 import { ErrorBaseService } from '../common/service/error-base.service';

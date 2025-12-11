@@ -5,7 +5,7 @@ import { AliDevopsDto } from './dto/ali';
 import { DevopsApiService } from './common/ali-api/ali-devops.helper';
 import { DevopsOptionService } from './common/service/devops-option.service';
 import ProjectPublishCard from '@src/common/feishu/card/project-publish';
-import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import {
   AppWorkflowPublishType,
   PipelineStage,
@@ -14,7 +14,7 @@ import UserAliyunTable from './common/table/user-token-table';
 import { addRetryJob } from '@src/common/utils/job';
 import TipCard from '@src/common/feishu/card/tip-card';
 import { NodeConfigService } from '@src/config/node-config.service';
-import FeishuUserHelper from '@src/common/feishu/hepler/feishu-user-helper';
+import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { BaseService } from '@src/common/base/BaseService';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { AliDevopsContext } from './common/service/ali-devops.context';

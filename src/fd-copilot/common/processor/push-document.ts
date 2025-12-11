@@ -1,9 +1,9 @@
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 
 import { RedisKeys } from '@src/common/const/redis-key.enum';
-import FeishuDocxHelper from '@src/common/feishu/hepler/feishu-docx-helper';
-import FeishuFileHelper from '@src/common/feishu/hepler/feishu-file-helper';
-import FeishuWikiHelper from '@src/common/feishu/hepler/feishu-wiki-helper';
+import FeishuDocxHelper from '@src/common/feishu/helper/feishu-docx-helper';
+import FeishuFileHelper from '@src/common/feishu/helper/feishu-file-helper';
+import FeishuWikiHelper from '@src/common/feishu/helper/feishu-wiki-helper';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import { getParentWikiToken, spaceId } from '@src/fd-copilot/sync/config';
 import { FeishuPushDto } from '@src/fd-copilot/sync/dto/sync';

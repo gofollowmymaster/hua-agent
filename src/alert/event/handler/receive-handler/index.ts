@@ -8,7 +8,7 @@ import {
 import { useAilyAlertSkill } from '@src/alert/common/utils';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolve-card';
-import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import { BitTableFilter } from '@src/common/feishu/type/bitable';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import { LoggerService } from '@src/common/service/logger/logger.service';

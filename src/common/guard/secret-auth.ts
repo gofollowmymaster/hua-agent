@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import ClientSecretTable from '../table/client-secret-table';
-import FeishuTableHelper from '../feishu/hepler/table-helper';
+import FeishuTableHelper from '../feishu/helper/table-helper';
 import { ClientFactory, FeishuApp } from '../feishu/clients';
 import { Request } from 'express';
 import { RedisService } from '../service/redis/redis.service';

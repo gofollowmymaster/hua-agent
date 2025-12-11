@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import IssueStatisticService from './issue-base-statistic.service';
 import FeishuApiAlertIssueTable from '@src/alert/common/table/api-alert-issue-table';

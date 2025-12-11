@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { PrismaService } from '@src/prisma.service';
-import FeishuMessageHelper from '@src/common/feishu/hepler/message-helper';
+import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import FeishuApiAlertIssueTable from '../common/table/api-alert-issue-table';
 import FeishuFrontendAlertIssueTable from '../common/table/frontend-alert-issue-table';
 import { RedisService } from '@src/common/service/redis/redis.service';
