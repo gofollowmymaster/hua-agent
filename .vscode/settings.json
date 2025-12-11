@@ -85,8 +85,7 @@
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.expand": false,
   "explorer.fileNesting.patterns": {
-    "*.ts": "$(capture).test.ts, $(capture).test.tsx",
-    "*.tsx": "$(capture).test.ts, $(capture).test.tsx",
+    "*.ts": "$(capture).spec.ts",
     "*.env": "$(capture).env.*",
     "CHANGELOG.md": "CHANGELOG*",
     "package.json": "pnpm-lock.yaml,pnpm-workspace.yaml,Dockerfile,ecosystem.config.js,webpack-hmr.config.js,nest-cli.json,LICENSE,.gitattributes,.gitignore,.gitpod.yml,CNAME,README*,.npmrc",
