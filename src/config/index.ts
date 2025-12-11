@@ -21,7 +21,7 @@ const globalConfig = Object.freeze({
     AlertApiTableId: process.env.FEISHU_ALERT_API_TABLE_ID,
     AlertFrontendAppId: process.env.FEISHU_ALERT_FRONTEND_TABLE_ID,
     AlertFrontendIssueTableAppId:
-      process.env.FEISHU_ALERT_FRONTEND_ISUUE_TABLE_ID,
+      process.env.FEISHU_ALERT_FRONTEND_ISSUE_TABLE_ID,
     AlertApiIssueTableId: process.env.FEISHU_ALERT_API_ISSUE_TABLE_ID,
     //Aplus Node-Server 管理表格
     AplusNodeAdminAppToken: process.env.FEISHU_APLUS_NODE_ADMIN_APP_TOKEN,

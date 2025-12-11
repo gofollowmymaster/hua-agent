@@ -14,7 +14,7 @@ import { TenantContext } from '@src/common/service/context/tenant.context';
 export default class CancelExecutionServer extends BaseSchedule {
   //每30分钟运行一次
   protected readonly cron = '0 0 0 * * *';
-  protected readonly jobName = 'Cancel Excuteopn Devops';
+  protected readonly jobName = 'Cancel Execute Devops';
   protected readonly isPause = true;
 
   private readonly redis: Redis;
@@ -31,13 +31,13 @@ export default class CancelExecutionServer extends BaseSchedule {
   }
 
   async handle() {
-    const options = this.devopsOptionService.getOptionExcludDev();
+    const options = this.devopsOptionService.getOptionExcludeDev();
     for (const env in options) {
       const apps = options[env];
       for (const appOption of apps) {
         //查询流水线信息
         const { appName, releaseWorkflowSn, releaseStageSn } =
-          await this.devopsApiService.quaryAppReleaseWorkflow({
+          await this.devopsApiService.queryAppReleaseWorkflow({
             appName: appOption.appName,
             workflowName: appOption.workflowName,
           });

@@ -166,7 +166,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
             records,
           },
         }),
-      'mtable-batchupdate',
+      'mtable-batch-update',
     );
   }
 

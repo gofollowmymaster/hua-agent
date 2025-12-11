@@ -24,19 +24,19 @@ export class SyncDocumentProcessor extends WorkerHost {
     super();
     this.redis = redisService.getClient();
   }
-  async contenthandler(params: FeishuPushDto) {
-    const documconstent = await this.feishuDocxHelper.convertDocument({
+  async contentHandler(params: FeishuPushDto) {
+    const document = await this.feishuDocxHelper.convertDocument({
       content_type: 'markdown',
       content: params.content,
     });
-    documconstent.blocks = documconstent.blocks.map((block) => {
+    document.blocks = document.blocks.map((block) => {
       if (block.block_type === 31) {
         delete block.table.property.merge_info;
       }
       return block;
     });
 
-    return documconstent;
+    return document;
   }
 
   async createDocument(params: FeishuPushDto) {
@@ -93,12 +93,12 @@ export class SyncDocumentProcessor extends WorkerHost {
         );
       }
       //2. 转换文档内容
-      const documconstent = await this.contenthandler(params);
+      const document = await this.contentHandler(params);
       //3. 上传文档内容
       await this.feishuDocxHelper.createBlocks(
         {
-          children_id: documconstent.first_level_block_ids,
-          descendants: documconstent.blocks,
+          children_id: document.first_level_block_ids,
+          descendants: document.blocks,
         },
         {
           document_id: documentId,
@@ -107,7 +107,7 @@ export class SyncDocumentProcessor extends WorkerHost {
       );
       await this.redis.hmset(key, {
         documentId,
-        blocksNum: documconstent.first_level_block_ids.length,
+        blocksNum: document.first_level_block_ids.length,
         hash: contentHash,
       });
     } catch (error) {

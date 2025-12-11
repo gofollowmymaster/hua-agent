@@ -6,7 +6,7 @@ import { cloneDeep } from 'lodash';
 
 @Injectable()
 export class DevopsOptionService {
-  private readonly optinos: Record<string, AppWorkflowType[]> = {
+  private readonly options: Record<string, AppWorkflowType[]> = {
     dev: [
       {
         appName: 'publish-admin-app',
@@ -177,15 +177,15 @@ export class DevopsOptionService {
    * @returns
    */
   getOptions(env: string, apps?: string[]) {
-    const options = this.optinos[env];
+    const options = this.options[env];
     if (apps) {
       return options.filter((item) => apps.includes(item.appName));
     }
     return options;
   }
 
-  getOptionExcludDev() {
-    const options = cloneDeep(this.optinos);
+  getOptionExcludeDev() {
+    const options = cloneDeep(this.options);
     delete options.dev;
     delete options['dev-merge'];
     return options;
@@ -195,7 +195,7 @@ export class DevopsOptionService {
    * 检查APP是否存在
    */
   async checkApp(params: AliDevopsDto) {
-    const apps = await this.devopsApiService.quaryAllApp();
+    const apps = await this.devopsApiService.queryAllApp();
     const appNames = apps.data.map((item: any) => item.name);
     const runAppList = this.getOptions(params.env, params.apps);
 

@@ -49,7 +49,7 @@ export class AliService extends BaseService {
       for (const appOption of appList) {
         try {
           const appReleaseWorkflow =
-            await this.devopsApiService.quaryAppReleaseWorkflow(appOption);
+            await this.devopsApiService.queryAppReleaseWorkflow(appOption);
           const executeRes =
             await this.devopsApiService.executeAppReleaseWorkflow(
               {
