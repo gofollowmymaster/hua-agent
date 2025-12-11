@@ -30,7 +30,7 @@ export class RequestAlertEvent extends AlertEvent {
 export enum ErrorLevel {
   FATAL = 'fatal',
   ERROR = 'error',
-  WARING = 'waring',
+  WARNING = 'warning',
   INFO = 'info',
 }
 export enum Environment {
