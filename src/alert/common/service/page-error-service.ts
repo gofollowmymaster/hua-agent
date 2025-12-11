@@ -15,6 +15,7 @@ import { MsgAlertService } from './msg-alert.service';
 import { AlertContext } from './alert-event.context';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class PageErrorService extends ErrorBaseService {
@@ -29,6 +30,7 @@ export class PageErrorService extends ErrorBaseService {
     protected readonly alertContext: AlertContext,
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly feishuUserHelper: FeishuUserHelper,
+    protected readonly httpService: HttpService,
   ) {
     super(redisService);
   }

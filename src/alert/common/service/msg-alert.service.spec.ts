@@ -6,7 +6,6 @@ import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { AlertEvent, ErrorLevel } from '../type/alert';
-// user.service.spec.ts
 
 describe('MsgAlertService', () => {
   let service: MsgAlertService;
@@ -51,7 +50,7 @@ describe('MsgAlertService', () => {
   describe('sendFsAlertMsg', () => {
     it('should throw error when message_id is empty', async () => {
       const alertInfo: AlertEvent = {
-        pageModuleName: 'test-module',
+        pageModuleName: 'subapp-wms',
         environment: 'dev',
         level: ErrorLevel.WARNING,
         timestamp: Date.now(),
