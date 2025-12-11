@@ -11,7 +11,7 @@ export class DiscardMiddleware implements NestMiddleware {
         'header-tags',
         'mock-server',
         'subapp',
-        'aplus-frontend-verify',
+        // 'aplus-frontend-verify',
       ].includes(req.originalUrl.split('/')[1])
     ) {
       sendExceptionToFeishu(
