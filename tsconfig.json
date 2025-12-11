@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "resolveJsonModule": true,
     "module": "commonjs",
     "target": "ES2021",
     "declaration": true,
@@ -20,16 +19,12 @@
     "noFallthroughCasesInSwitch": false,
     "esModuleInterop": true,
     "paths": {
+      "@utils/*": ["src/utils/*"],
       "@src/*": ["src/*"],
       "@mockServer/*": ["mockServer/*"]
     },
     "typeRoots": ["node_modules/@types", "./type"]
   },
-  "include": [
-    "src/**/*.ts",
-    "type/**/*.ts",
-    "ecosystem.config.js",
-    "jest.config.ts"
-  ],
+  "include": ["src/**/*.ts", "type/**/*.ts", "ecosystem.config.js"],
   "exclude": ["node_modules", "dist"]
 }
