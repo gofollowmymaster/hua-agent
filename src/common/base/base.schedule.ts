@@ -13,7 +13,7 @@ import { TenantCode } from '@src/config/tenant';
 export default abstract class BaseSchedule implements OnModuleInit {
   protected readonly cron: string = '';
   protected readonly jobName: string;
-  protected readonly isPause: boolean = false;
+  protected readonly isOpen: boolean = true;
 
   protected readonly logger = new Logger(this.constructor.name);
   protected tenantContextDatas: TenantContextType[] = [];
@@ -25,7 +25,7 @@ export default abstract class BaseSchedule implements OnModuleInit {
     this.initContext();
   }
   onModuleInit() {
-    if (this.isPause) return;
+    if (!this.isOpen) return;
     if (!this.cron) {
       throw Error('定时任务没有配置执行周期');
     }

@@ -15,7 +15,7 @@ export default class CancelExecutionServer extends BaseSchedule {
   //每30分钟运行一次
   protected readonly cron = '0 0 0 * * *';
   protected readonly jobName = 'Cancel Execute Devops';
-  protected readonly isPause = true;
+  protected readonly isOpen = false;
 
   private readonly redis: Redis;
   private readonly client: FeishuClient;
