@@ -24,7 +24,7 @@ export class WikiService {
       '{spaceId}',
       spaceId,
     );
-    let tree = JSON.parse(await this.redis.get(key));
+    let tree = JSON.parse(await this.redis.get(key))?.value;
 
     if (!tree) {
       tree = await this.wikiDirectoryService.loadWikiNodeTree(spaceId);

@@ -6,7 +6,6 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import configuration from './config';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
 import { ConfigModule } from '@nestjs/config';
-import { createKeyv } from '@keyv/redis';
 
 import { WikiModule } from './wiki/wiki.module';
 import { DemoPluginModule } from './demo-plugin/demo-plugin.module';
