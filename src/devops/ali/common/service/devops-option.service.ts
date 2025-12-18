@@ -83,7 +83,7 @@ export class DevopsOptionService {
       },
       {
         appName: 'global-console',
-        workflowName: '服务器test环境',
+        workflowName: '服务商test环境',
         branch: 'test-publish',
       },
       {
