@@ -1,16 +1,9 @@
-import {
-  Body,
-  Controller,
-  Post,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 
 import { CacheService } from './cache.service';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CacheClearDto, CacheGetDto } from './dto/cache-clear.dto';
 import { SecretAuthGuard } from '@src/common/guard/secret-auth';
-import { LoggingInterceptor } from '@src/common/interceptor/logger.interceptor';
 
 @ApiTags('缓存管理')
 @Controller('admin/cache')
@@ -38,7 +31,6 @@ export class CacheController {
     summary: '获取缓存信息',
     description: '根据指定key获取缓存信息',
   })
-  // @UseInterceptors(LoggingInterceptor)
   @UseGuards(SecretAuthGuard)
   @ApiBody({
     type: CacheGetDto,

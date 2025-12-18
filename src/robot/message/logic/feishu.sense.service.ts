@@ -1,28 +1,29 @@
 import type {
   customResponse,
   MessageFromRobotType,
-} from '../dto/post-message-from-robot.dto';
+} from '../../dto/post-message-from-robot.dto';
 import {
   hasCurrentQuestion,
   returnMessage,
   computedPayloadFields,
   computedPayloadRelateToFields,
 } from '.';
-import { FromFeishuLogger } from '../logUtils';
+import { FromFeishuLogger } from '../../logUtils';
 import { Injectable } from '@nestjs/common';
-import { addTableRecord } from '../../common/utils/actionTable/addTableRecord';
-import { listTableField } from '../../common/utils/actionTable/listTableField';
-import { updateTableRecord } from '../../common/utils/actionTable/updateTableRecord';
+
+import { listTableField } from '@src/common/utils/actionTable/listTableField';
+import { updateTableRecord } from '@src/common/utils/actionTable/updateTableRecord';
 import { ErrorMessages, ErrorMessagesCode } from './errEnum';
 import { logger } from '@src/common/service/logger/logger.config';
+import { addTableRecord } from '@src/common/utils/actionTable/addTableRecord';
 const dayjs = require('dayjs');
 
 @Injectable()
-export class feishuSenceService {
+export class FeishuSenseService {
   // 场景 1 @小A 这是一个问题 但消息内容上无引用内容 则认为为这是一个需要记录的问题
   // 场景 2 使用引用消息 @小A 但是@小A后无内容 则同样认为为这是一个需要记录的问题
   @FromFeishuLogger()
-  async runSenceOne(
+  async runSenseOne(
     MessageFromRobot: MessageFromRobotType,
     headers: { appToken: string; tableId: string },
   ): Promise<customResponse> {
@@ -89,7 +90,7 @@ export class feishuSenceService {
   // 场景 3 使用引用消息 @小A 但是@小A后有内容
   //则认为为这是一个需要记录的回复（“引用消息”就作为本次回复内容，需要去表里面查找是否有对应的问题）
   @FromFeishuLogger()
-  async runSenceTwo(
+  async runSenseTwo(
     MessageFromRobot: MessageFromRobotType,
     headers: { appToken: string; tableId: string },
   ): Promise<customResponse> {

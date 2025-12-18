@@ -37,7 +37,7 @@ export class SecretAuthGuard implements CanActivate {
     try {
       await this.verify(token);
     } catch (err) {
-      throw new UnauthorizedException(err.message);
+      throw new UnauthorizedException('无效的认证密钥');
     }
     return true;
   }
@@ -50,7 +50,7 @@ export class SecretAuthGuard implements CanActivate {
     const { fields: appInfo } = await this.clientSecretTable.get(token);
 
     if (!appInfo.是否启用) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('认证密钥已失效');
     }
     return true;
   }

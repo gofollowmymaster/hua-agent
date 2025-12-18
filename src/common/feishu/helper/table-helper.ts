@@ -8,6 +8,7 @@ import {
   BitTableGetData,
   BitTableRecord,
   BitTableSearchPayloadParams,
+  BitTableBatchDeleteReturnData,
 } from '../type/bitable';
 import { FEISHU_CLIENT_ID } from './constants';
 import { Inject, Injectable } from '@nestjs/common';
@@ -20,8 +21,8 @@ import { TenantCode } from '@src/config/tenant';
 export type TableHelperOptions = {
   appToken: string | Record<TenantCode, string>;
   tableId: string | Record<TenantCode, string>;
-  useCache: boolean;
-  ttl: number;
+  useCache?: boolean;
+  ttl?: number;
 };
 @Injectable()
 class FeishuTableHelper extends FeishuDataApiHelper {
@@ -40,8 +41,8 @@ class FeishuTableHelper extends FeishuDataApiHelper {
   setTableOption({ appToken, tableId, useCache, ttl }: TableHelperOptions) {
     this.appTokenInfo = appToken;
     this.tableIdInfo = tableId;
-    this.useCache = useCache;
-    this.ttl = ttl;
+    this.useCache = useCache ?? false;
+    this.ttl = ttl || this.ttl;
   }
   get appToken() {
     return typeof this.appTokenInfo === 'string'
@@ -181,6 +182,23 @@ class FeishuTableHelper extends FeishuDataApiHelper {
           },
         }),
       'mtable-delete',
+    );
+  }
+  async batchDelete(
+    recordIds: string[],
+  ): Promise<BitTableBatchDeleteReturnData> {
+    return this.requestWrapper(
+      async () =>
+        await this.client.bitable.appTableRecord.batchDelete({
+          path: {
+            app_token: this.appToken,
+            table_id: this.tableId,
+          },
+          data: {
+            records: recordIds,
+          },
+        }),
+      'mtable-batch-delete',
     );
   }
 }

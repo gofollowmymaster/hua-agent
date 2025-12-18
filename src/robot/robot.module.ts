@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
-import { RobotController } from './robot.controller';
-import { RobotService } from './robot.service';
-import { feishuSenceService } from './logic/feishu.sence.service';
 import { FeishuHelperModule } from '@src/common/feishu/helper/helper.module';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import { HttpModule } from '@nestjs/axios';
+import { TableController } from './table/table.controller';
+import { MessageController } from './message/message.controller';
+import { TableService } from './table/table.service';
+import { MessageService } from './message/message.service';
+import { FeishuSenseService } from './message/logic/feishu.sense.service';
 
 @Module({
   imports: [
@@ -12,8 +14,7 @@ import { HttpModule } from '@nestjs/axios';
     HttpModule,
   ],
 
-  controllers: [RobotController],
-  providers: [RobotService, feishuSenceService],
-  exports: [RobotService],
+  controllers: [TableController, MessageController],
+  providers: [TableService, MessageService, FeishuSenseService],
 })
 export class RobotModule {}

@@ -1,16 +1,11 @@
 import { Injectable, UseGuards } from '@nestjs/common';
 import {
-  SearchParamsDto,
   MessageFromRobotDto,
   FeishuMessageSenderDto,
   FeishuTicketDto,
-} from './dto/post-message-from-robot.dto';
-import { listTableRecord } from '@src/common/utils/actionTable/listTableRecord';
-import { addTableRecord } from '@src/common/utils/actionTable/addTableRecord';
-import { searchTableRecord } from '@src/common/utils/actionTable/searchTableRecord';
-import { updateTableRecord } from '@src/common/utils/actionTable/updateTableRecord';
-import { deleteTableRecord } from '@src/common/utils/actionTable/deleteTableRecord';
-import { feishuSenceService } from './logic/feishu.sence.service';
+} from './post-message-from-robot.dto';
+
+import { FeishuSenseService } from './logic/feishu.sense.service';
 import { removeAtXiaoA } from './logic';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import { ReceiveIdType } from '@src/common/feishu/type/im';
@@ -20,62 +15,18 @@ import { ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@src/common/guard/auth';
 import { getAppAccessToken } from '@src/common/feishu/utils';
 import { logger } from '@src/common/service/logger/logger.config';
+import { TableHeaderType } from '../dto/table-action.dto';
 @Injectable()
-export class RobotService {
+export class MessageService {
   constructor(
-    private readonly feishuSence: feishuSenceService,
+    private readonly feishuSense: FeishuSenseService,
     private readonly messageHelper: FeishuMessageHelper,
     private readonly httpService: HttpService,
   ) {}
-  async getList(headers: { appToken: string; tableId: string }) {
-    const { appToken, tableId } = headers;
-    const res = await listTableRecord(appToken, tableId);
-    return res;
-  }
-
-  async createRecord(
-    SearchParams: Partial<SearchParamsDto>,
-    headers: { appToken: string; tableId: string },
-  ) {
-    const { records } = SearchParams;
-    const { appToken, tableId } = headers;
-    const res = await addTableRecord(appToken, tableId, records);
-    return res;
-  }
-
-  async searchRecord(
-    SearchParams: Partial<SearchParamsDto>,
-    headers: { appToken: string; tableId: string },
-  ) {
-    const { data } = SearchParams;
-    const { appToken, tableId } = headers;
-    const res = await searchTableRecord(appToken, tableId, data);
-    return res;
-  }
-
-  async updateRecord(
-    SearchParams: Partial<SearchParamsDto>,
-    headers: { appToken: string; tableId: string },
-  ) {
-    const { record_id, records } = SearchParams;
-    const { appToken, tableId } = headers;
-    const res = await updateTableRecord(appToken, tableId, record_id, records);
-    return res;
-  }
-
-  async deleteRecord(
-    SearchParams: Partial<SearchParamsDto>,
-    headers: { appToken: string; tableId: string },
-  ) {
-    const { record_id } = SearchParams;
-    const { appToken, tableId } = headers;
-    const res = await deleteTableRecord(appToken, tableId, record_id);
-    return res;
-  }
 
   async feishuFlowMessage(
     MessageFromRobot: MessageFromRobotDto,
-    headers: { appToken: string; tableId: string },
+    headers: TableHeaderType,
   ) {
     logger.warn(
       '【feishuFlowMessage】请求入参格式: ',
@@ -89,7 +40,7 @@ export class RobotService {
       (originalContent !== '' && replyContent == '') ||
       (originalContent == '' && replyContent !== '')
     ) {
-      const res = await this.feishuSence.runSenceOne(MessageFromRobot, headers);
+      const res = await this.feishuSense.runSenseOne(MessageFromRobot, headers);
       logger.info('res-------', res);
       return res;
     }
@@ -98,7 +49,7 @@ export class RobotService {
       MessageFromRobot.replyContent = removeAtXiaoA(
         MessageFromRobot.replyContent,
       );
-      const res = await this.feishuSence.runSenceTwo(MessageFromRobot, headers);
+      const res = await this.feishuSense.runSenseTwo(MessageFromRobot, headers);
       logger.info('res-------', res);
       return res;
     }

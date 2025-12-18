@@ -150,3 +150,11 @@ export class FeishuTicketDto {
   })
   appName: FeishuAppClientsType;
 }
+
+export class BatchDeleteParamsDto {
+  @ApiProperty({
+    type: Array,
+    description: '需要删除的记录ID集合',
+  })
+  recordIds: string[];
+}

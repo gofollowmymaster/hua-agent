@@ -51,6 +51,16 @@ export type BitTableGetReturn = Awaited<
 export type BitTableGetData = BitTableGetReturn['data'];
 export type BitTableGetRecord = BitTableGetReturn['data']['record'];
 
+//批量删除
+
+export type BitTableBatchDeleteParams = Parameters<
+  lark.Client['bitable']['appTableRecord']['batchDelete']
+>;
+export type BitTableBatchDeleteReturn = Awaited<
+  ReturnType<lark.Client['bitable']['appTableRecord']['batchDelete']>
+>;
+export type BitTableBatchDeleteReturnData = BitTableBatchDeleteReturn['data'];
+
 // 批量更新
 // export type BitTableBatchUpdateReturn = Awaited<
 //   ReturnType<lark.Client['bitable']['appTableRecord']['batchUpdate']>
