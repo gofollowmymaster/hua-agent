@@ -39,6 +39,7 @@ import { SecretAuthGuard } from '@src/common/guard/secret-auth';
     description: '多维表格tableId',
   },
 ])
+@UseGuards(SecretAuthGuard)
 @Controller('robot')
 export class TableController {
   constructor(private readonly tableService: TableService) {}
@@ -54,7 +55,6 @@ export class TableController {
     summary: '列出表格记录',
     description: '列出表格记录',
   })
-  @UseGuards(SecretAuthGuard)
   @ApiOkResponse({ type: AplusResponse<records[]> })
   @Post('getRecord')
   async getList(
@@ -74,7 +74,6 @@ export class TableController {
     summary: '创建表格记录',
     description: '创建表格记录',
   })
-  @UseGuards(SecretAuthGuard)
   @ApiBody({ type: TableRecords })
   @ApiCreatedResponse({ type: AplusResponse<records> })
   @Post('createRecord')
@@ -96,7 +95,6 @@ export class TableController {
     summary: '查询表格记录',
     description: '查询表格记录',
   })
-  @UseGuards(SecretAuthGuard)
   @ApiOkResponse({ type: AplusResponse<records[]> })
   @Post('searchRecord')
   async searchRecord(
@@ -121,7 +119,6 @@ export class TableController {
   @ApiBody({
     type: TableRecordsOrId,
   })
-  @UseGuards(SecretAuthGuard)
   @ApiOkResponse({ type: AplusResponse<records[]> })
   @Post('updateRecord')
   async updateRecord(
@@ -145,7 +142,6 @@ export class TableController {
   })
   @ApiBody({ type: TableRecordId })
   @ApiOkResponse({ type: AplusResponse<records> })
-  @UseGuards(SecretAuthGuard)
   @Post('deleteRecord')
   async deleteRecord(
     @Headers('appToken') appToken: string,
@@ -167,7 +163,6 @@ export class TableController {
   })
   @ApiBody({ type: BatchDeleteParamsDto })
   @ApiOkResponse({ type: AplusResponse<records> })
-  @UseGuards(SecretAuthGuard)
   @Post('batch-delete')
   async batchDeleteRecord(
     @Headers('appToken') appToken: string,
