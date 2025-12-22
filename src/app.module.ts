@@ -46,7 +46,7 @@ const modulesAll = [
       rootPath: join(__dirname, '..', 'mockServer'),
     }),
     DevtoolsModule.register({
-      http: process.env.NODE_ENV !== 'production',
+      http: ['production', 'prod'].includes(process.env.NODE_ENV),
       port: 3001,
     }),
     JwtModule.register({
