@@ -47,6 +47,7 @@ const modulesAll = [
     }),
     DevtoolsModule.register({
       http: process.env.NODE_ENV !== 'production',
+      port: 3001,
     }),
     JwtModule.register({
       global: true,

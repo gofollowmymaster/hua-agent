@@ -60,9 +60,7 @@
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.1",
-    "@keyv/redis": "^4.4.0",
-    "winston": "^3.17.0",
-    "@nestjs/cache-manager": "^3.0.1"
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

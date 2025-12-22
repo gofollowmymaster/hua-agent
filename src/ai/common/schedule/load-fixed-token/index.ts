@@ -17,7 +17,7 @@ export type FeishuAuthType = Awaited<
 export default class FixedTokenService extends BaseSchedule {
   //每30分钟运行一次
   protected readonly cron = '0 */30 * * * *';
-  protected readonly jobName = 'Sync Wiki Nodes';
+  protected readonly jobName = 'Refresh Fixed Token';
 
   private client: lark.Client;
   private readonly redis: Redis;

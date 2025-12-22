@@ -29,6 +29,7 @@ export default class WikiDirectoryService extends BaseSchedule {
   ) {
     super(tenantContext, schedulerRegistry);
     this.redis = redisService.getClient();
+    console.log('[ cron ] >', this.cron, this.isOpen);
   }
   protected initContext() {
     const tenantConfig = globalConfig['tenantConfig'];
