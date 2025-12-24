@@ -97,5 +97,6 @@
     "editor.defaultFormatter": "vscode.json-language-features"
   },
   "gitlens.proxy": {},
-  "references.preferredLocation": "view"
+  "references.preferredLocation": "view",
+  "cSpell.words": ["apptoken", "robotname", "tableid"]
 }

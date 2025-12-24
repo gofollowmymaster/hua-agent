@@ -31,6 +31,6 @@ export class TenantContext {
     return this.user?.userId;
   }
   get tenant(): TenantCode | undefined {
-    return this.getStore().tenantCode;
+    return this.getStore()?.tenantCode;
   }
 }

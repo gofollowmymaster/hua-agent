@@ -5,6 +5,7 @@ import { RedisKeys } from '@src/common/const/redis-key.enum';
 import WikiDirectoryService from './schedule/wiki-directory';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
+import { WikiTreeDto } from './dto/wiki.dto';
 
 @Injectable()
 export class WikiService {
@@ -18,7 +19,7 @@ export class WikiService {
     this.redis = redisService.getClient();
   }
 
-  async tree(spaceId: string) {
+  async tree({ spaceId, force = false }: WikiTreeDto) {
     const key = this.redisService.buildCacheKey(
       RedisKeys.WIKI_DIRECTORY,
       '{spaceId}',
@@ -26,7 +27,7 @@ export class WikiService {
     );
     let tree = JSON.parse(await this.redis.get(key))?.value;
 
-    if (!tree) {
+    if (!tree || force) {
       tree = await this.wikiDirectoryService.loadWikiNodeTree(spaceId);
     }
 

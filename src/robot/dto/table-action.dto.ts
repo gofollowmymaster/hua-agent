@@ -1,31 +1,22 @@
-import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger';
-import type { records } from '../../common/utils/actionTable/interface';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { FeishuApp } from '@src/common/feishu/clients';
+import { BitTableFilter } from '@src/common/feishu/type/bitable';
+import { IsNotEmpty, IsNotEmptyObject } from 'class-validator';
 
-export type TableHeaderType = { appToken: string; tableId: string };
+export type TableHeaderType = {
+  appToken: string;
+  tableId: string;
+  robotName?: FeishuApp;
+  [key: string]: string;
+};
 
 export class SearchParamsDto {
   @ApiPropertyOptional({
     type: Object,
-    description: '记录数据',
+    description: '过滤条件',
   })
-  records?: records;
-  @ApiPropertyOptional({
-    type: Object,
-    description: '其他数据',
-  })
-  data?: object;
-  @ApiPropertyOptional({
-    type: String,
-    description: '记录id',
-  })
-  record_id?: string;
+  filter: BitTableFilter;
 }
-export class TableRecords extends PickType(SearchParamsDto, ['records']) {}
-export class TableRecordId extends PickType(SearchParamsDto, ['record_id']) {}
-export class TableRecordsOrId extends PickType(SearchParamsDto, [
-  'records',
-  'record_id',
-]) {}
 
 export class BatchDeleteParamsDto {
   @ApiProperty({
@@ -33,4 +24,35 @@ export class BatchDeleteParamsDto {
     description: '需要删除的记录ID集合',
   })
   recordIds: string[];
+}
+
+export class DeleteRecordParamsDto {
+  @IsNotEmpty()
+  @ApiProperty({
+    type: String,
+    description: '需要删除的记录ID',
+  })
+  recordId: string;
+}
+export class UpdateRecordParamsDto {
+  @IsNotEmpty()
+  @ApiProperty({
+    type: String,
+    description: '需要修改的记录ID',
+  })
+  recordId: string;
+  @IsNotEmpty()
+  @ApiProperty({
+    type: Object,
+    description: '记录内容',
+  })
+  data: Record<string, string>;
+}
+export class CreateRecordParamsDto {
+  @IsNotEmptyObject()
+  @ApiProperty({
+    type: Object,
+    description: '记录内容',
+  })
+  data: Record<string, string>;
 }

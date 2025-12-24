@@ -45,6 +45,7 @@ const globalConfig = Object.freeze({
 
   //服务商特性配置
   tenantConfig,
+  defaultTenant: 'aplus',
 } as const);
 
 export default globalConfig;

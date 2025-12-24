@@ -1,76 +1,129 @@
 import { Injectable } from '@nestjs/common';
 
-import { listTableRecord } from '@src/common/utils/actionTable/listTableRecord';
-import { addTableRecord } from '@src/common/utils/actionTable/addTableRecord';
-import { searchTableRecord } from '@src/common/utils/actionTable/searchTableRecord';
-import { updateTableRecord } from '@src/common/utils/actionTable/updateTableRecord';
-import { deleteTableRecord } from '@src/common/utils/actionTable/deleteTableRecord';
 import FeishuTableHelper from '@src/common/feishu/helper/table-helper';
 import {
   BatchDeleteParamsDto,
+  CreateRecordParamsDto,
+  DeleteRecordParamsDto,
   SearchParamsDto,
   TableHeaderType,
+  UpdateRecordParamsDto,
 } from '../dto/table-action.dto';
+import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
+import { TenantContext } from '@src/common/service/context/tenant.context';
+import { RedisService } from '@src/common/service/redis/redis.service';
+type TableHelperMap = Record<FeishuApp, FeishuTableHelper>;
 @Injectable()
 export class TableService {
-  constructor(private readonly tableHelper: FeishuTableHelper) {}
-  async getList(headers: TableHeaderType) {
-    const { appToken, tableId } = headers;
-    const res = await listTableRecord(appToken, tableId);
+  private readonly tableHelperMap: TableHelperMap = {} as TableHelperMap;
+  constructor(
+    private readonly userContext: TenantContext,
+    private readonly redisServer: RedisService,
+  ) {}
+  getTableHelper(robotName: FeishuApp = FeishuApp.XiaoAClient) {
+    if (!this.tableHelperMap[robotName]) {
+      this.tableHelperMap[robotName] = new FeishuTableHelper(
+        ClientFactory.create(robotName),
+        this.userContext,
+        this.redisServer,
+      );
+    }
+    return this.tableHelperMap[robotName];
+  }
+  async getList({
+    appToken,
+    tableId,
+    robotName = FeishuApp.XiaoAClient,
+  }: TableHeaderType) {
+    const tableHelper = this.getTableHelper(robotName);
+
+    const res = await tableHelper
+      .setTableOption({
+        appToken,
+        tableId,
+        useCache: false,
+      })
+      .list();
     return res;
   }
 
   async createRecord(
-    SearchParams: Partial<SearchParamsDto>,
-    headers: TableHeaderType,
+    SearchParams: CreateRecordParamsDto,
+    { appToken, tableId, robotName }: TableHeaderType,
   ) {
-    const { records } = SearchParams;
-    const { appToken, tableId } = headers;
-    const res = await addTableRecord(appToken, tableId, records);
+    const { data } = SearchParams;
+
+    const tableHelper = this.getTableHelper(robotName);
+
+    const res = await tableHelper
+      .setTableOption({
+        appToken,
+        tableId,
+      })
+      .create(data);
     return res;
   }
 
   async searchRecord(
     SearchParams: Partial<SearchParamsDto>,
-    headers: TableHeaderType,
+    { appToken, tableId, robotName }: TableHeaderType,
   ) {
-    const { data } = SearchParams;
-    const { appToken, tableId } = headers;
-    const res = await searchTableRecord(appToken, tableId, data);
+    const { filter } = SearchParams;
+    const tableHelper = this.getTableHelper(robotName);
+
+    const res = await tableHelper
+      .setTableOption({
+        appToken,
+        tableId,
+        useCache: false,
+      })
+      .search(filter);
     return res;
   }
 
   async updateRecord(
-    SearchParams: Partial<SearchParamsDto>,
-    headers: TableHeaderType,
+    params: UpdateRecordParamsDto,
+    { appToken, tableId, robotName }: TableHeaderType,
   ) {
-    const { record_id, records } = SearchParams;
-    const { appToken, tableId } = headers;
-    const res = await updateTableRecord(appToken, tableId, record_id, records);
+    const { recordId, data } = params;
+    const tableHelper = this.getTableHelper(robotName);
+
+    const res = await tableHelper
+      .setTableOption({
+        appToken,
+        tableId,
+      })
+      .update(recordId, data);
     return res;
   }
 
   async deleteRecord(
-    SearchParams: Partial<SearchParamsDto>,
-    headers: TableHeaderType,
+    SearchParams: DeleteRecordParamsDto,
+    { appToken, tableId, robotName }: TableHeaderType,
   ) {
-    const { record_id } = SearchParams;
-    const { appToken, tableId } = headers;
-    const res = await deleteTableRecord(appToken, tableId, record_id);
+    const { recordId } = SearchParams;
+    const tableHelper = this.getTableHelper(robotName);
+
+    const res = await tableHelper
+      .setTableOption({
+        appToken,
+        tableId,
+      })
+      .delete(recordId);
     return res;
   }
   async batchDeleteRecord(
     params: BatchDeleteParamsDto,
-    headers: TableHeaderType,
+    { appToken, tableId, robotName }: TableHeaderType,
   ) {
     const { recordIds } = params;
-    const { appToken, tableId } = headers;
-    this.tableHelper.setTableOption({
+    const tableHelper = this.getTableHelper(robotName);
+
+    tableHelper.setTableOption({
       appToken,
       tableId,
-      useCache: false,
     });
-    const res = await this.tableHelper.batchDelete(recordIds);
+    const res = await tableHelper.batchDelete(recordIds);
     return res;
   }
 }

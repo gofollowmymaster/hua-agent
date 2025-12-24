@@ -43,6 +43,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
     this.tableIdInfo = tableId;
     this.useCache = useCache ?? false;
     this.ttl = ttl || this.ttl;
+    return this;
   }
   get appToken() {
     return typeof this.appTokenInfo === 'string'

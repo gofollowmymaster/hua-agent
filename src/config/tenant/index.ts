@@ -20,6 +20,7 @@ export type TenantConfig = {
   AilyLogOperatorTableId?: string;
 };
 export type TenantRobots = keyof TenantConfig['robots'];
+export type TenantConfigKey = keyof TenantConfig;
 
 export const tenantCodeMap = {
   CO3906: 'boat',

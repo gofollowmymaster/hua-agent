@@ -11,11 +11,11 @@ import { TableService } from './table.service';
 
 import {
   BatchDeleteParamsDto,
+  CreateRecordParamsDto,
+  DeleteRecordParamsDto,
   SearchParamsDto,
   TableHeaderType,
-  TableRecordId,
-  TableRecords,
-  TableRecordsOrId,
+  UpdateRecordParamsDto,
 } from '../dto/table-action.dto';
 import {
   ApiBody,
@@ -28,27 +28,48 @@ import {
 import { records } from '@src/common/utils/actionTable/interface';
 import { AplusResponse } from '@src/type/global';
 import { SecretAuthGuard } from '@src/common/guard/secret-auth';
+import { FeishuApp } from '@src/common/feishu/clients';
 @ApiTags('飞书多维表格快捷操作')
 @ApiHeaders([
   {
     name: 'appToken',
+    required: true,
     description: '多维表格appToken',
   },
   {
     name: 'tableId',
+    required: true,
     description: '多维表格tableId',
+  },
+  {
+    name: 'robotName',
+    enum: FeishuApp,
+    description: '飞书机器人',
   },
 ])
 @UseGuards(SecretAuthGuard)
 @Controller('robot')
 export class TableController {
   constructor(private readonly tableService: TableService) {}
-  checkHeader({ appToken, tableId }: TableHeaderType) {
+  checkHeader(header: TableHeaderType) {
+    const {
+      apptoken: appToken,
+      tableid: tableId,
+      robotname: robotName = FeishuApp.XiaoAClient,
+    } = header;
+    //获取的header都是小写需要转换成驼峰
+    header.appToken = appToken;
+    header.tableId = tableId;
+    header.robotName = robotName as FeishuApp;
     if (!appToken || !tableId) {
       throw new HttpException(
         'headers中需要填写appToken和tableId',
         HttpStatus.BAD_REQUEST,
       );
+    }
+
+    if (robotName && !FeishuApp[robotName]) {
+      throw new HttpException('非法的机器人', HttpStatus.BAD_REQUEST);
     }
   }
   @ApiOperation({
@@ -57,14 +78,7 @@ export class TableController {
   })
   @ApiOkResponse({ type: AplusResponse<records[]> })
   @Post('getRecord')
-  async getList(
-    @Headers('appToken') appToken: string,
-    @Headers('tableId') tableId: string,
-  ) {
-    const header = {
-      appToken,
-      tableId,
-    };
+  async getList(@Headers() header: TableHeaderType) {
     this.checkHeader(header);
 
     const res = await this.tableService.getList(header);
@@ -74,38 +88,29 @@ export class TableController {
     summary: '创建表格记录',
     description: '创建表格记录',
   })
-  @ApiBody({ type: TableRecords })
+  @ApiBody({ type: CreateRecordParamsDto })
   @ApiCreatedResponse({ type: AplusResponse<records> })
   @Post('createRecord')
   async createRecord(
-    @Headers('appToken') appToken: string,
-    @Headers('tableId') tableId: string,
-    @Body() SearchParams: Pick<SearchParamsDto, 'records'>,
+    @Headers() header: TableHeaderType,
+    @Body() params: CreateRecordParamsDto,
   ) {
-    const header = {
-      appToken,
-      tableId,
-    };
     this.checkHeader(header);
 
-    const res = await this.tableService.createRecord(SearchParams, header);
+    const res = await this.tableService.createRecord(params, header);
     return res;
   }
   @ApiOperation({
     summary: '查询表格记录',
     description: '查询表格记录',
   })
+  @ApiBody({ type: SearchParamsDto })
   @ApiOkResponse({ type: AplusResponse<records[]> })
   @Post('searchRecord')
   async searchRecord(
-    @Headers('appToken') appToken: string,
-    @Headers('tableId') tableId: string,
-    @Body() SearchParams: Pick<SearchParamsDto, 'data'>,
+    @Headers() header: TableHeaderType,
+    @Body() SearchParams: SearchParamsDto,
   ) {
-    const header = {
-      appToken,
-      tableId,
-    };
     this.checkHeader(header);
 
     const res = await this.tableService.searchRecord(SearchParams, header);
@@ -117,22 +122,17 @@ export class TableController {
     description: '修改表格记录',
   })
   @ApiBody({
-    type: TableRecordsOrId,
+    type: UpdateRecordParamsDto,
   })
   @ApiOkResponse({ type: AplusResponse<records[]> })
   @Post('updateRecord')
   async updateRecord(
-    @Headers('appToken') appToken: string,
-    @Headers('tableId') tableId: string,
-    @Body() SearchParams: Pick<SearchParamsDto, 'record_id' | 'records'>,
+    @Headers() header: TableHeaderType,
+    @Body() params: UpdateRecordParamsDto,
   ) {
-    const header = {
-      appToken,
-      tableId,
-    };
     this.checkHeader(header);
 
-    const res = await this.tableService.updateRecord(SearchParams, header);
+    const res = await this.tableService.updateRecord(params, header);
     return res;
   }
 
@@ -140,18 +140,13 @@ export class TableController {
     summary: '删除表格记录',
     description: '删除表格记录',
   })
-  @ApiBody({ type: TableRecordId })
+  @ApiBody({ type: DeleteRecordParamsDto })
   @ApiOkResponse({ type: AplusResponse<records> })
   @Post('deleteRecord')
   async deleteRecord(
-    @Headers('appToken') appToken: string,
-    @Headers('tableId') tableId: string,
-    @Body() SearchParams: Pick<SearchParamsDto, 'record_id'>,
+    @Headers() header: TableHeaderType,
+    @Body() SearchParams: DeleteRecordParamsDto,
   ) {
-    const header = {
-      appToken,
-      tableId,
-    };
     this.checkHeader(header);
     const res = await this.tableService.deleteRecord(SearchParams, header);
     return res;
@@ -165,14 +160,9 @@ export class TableController {
   @ApiOkResponse({ type: AplusResponse<records> })
   @Post('batch-delete')
   async batchDeleteRecord(
-    @Headers('appToken') appToken: string,
-    @Headers('tableId') tableId: string,
+    @Headers() header: TableHeaderType,
     @Body() params: BatchDeleteParamsDto,
   ) {
-    const header = {
-      appToken,
-      tableId,
-    };
     this.checkHeader(header);
     const res = await this.tableService.batchDeleteRecord(params, header);
     return res;

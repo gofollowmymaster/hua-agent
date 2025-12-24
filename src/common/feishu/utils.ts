@@ -33,7 +33,7 @@ export const sendExceptionToFeishuOrigin = (
 
 export const sendCommonCardToFeishu = (options: CommonCardData) => {
   const userContext = getGlobalAppInstance(TenantContext);
-  const messagerHelper = new FeishuMessageHelper(
+  const messageHelper = new FeishuMessageHelper(
     ClientFactory.create(FeishuApp.AlertClient),
     userContext,
   );
@@ -51,7 +51,7 @@ export const sendCommonCardToFeishu = (options: CommonCardData) => {
     linkUrl: `https://sls.console.aliyun.com/lognext/project/k8s-log-c893ce02efe464e778e67c48016348406/logsearch/elnkpro-prod-log?encode%3Dbase64%26queryString%3DIF9jb250YWluZXJfbmFtZV86IGFwbHVzLXNxbC1zZXJ2aWNlLXByb2Q%3D%26filterInfo%3DeyJmamNvZGUiOiIoKSIsImZxIjoiIn0%3D%26queryTimeType%3D99%26startTime%3D${errorTime.subtract(60, 's').valueOf() / 1000}%26endTime%3D${errorTime.add(60, 's').valueOf() / 1000}`,
   });
 
-  messagerHelper.createInteractToGroup(
+  messageHelper.createInteractToGroup(
     content,
     NodeConfigService.get('DefaultAlertFeishuGroupId'),
   );
