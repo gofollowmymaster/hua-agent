@@ -55,7 +55,7 @@ export class TenantMiddleware implements NestMiddleware {
     let payload;
     if (type == 'Bearer') {
       payload = await this.jwtService.decode(headerToken);
-    } else {
+    } else if (headerToken) {
       try {
         const { fields: appInfo } =
           await this.clientSecretTable.get(headerToken);

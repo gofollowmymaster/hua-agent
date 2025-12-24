@@ -8,6 +8,7 @@ import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import BaseSchedule from '@src/common/base/base.schedule';
 import { TenantContext } from '@src/common/service/context/tenant.context';
+import { NodeConfigService } from '@src/config/node-config.service';
 
 export type FeishuAuthType = Awaited<
   ReturnType<lark.Client['authen']['refreshAccessToken']['create']>
@@ -30,7 +31,9 @@ export default class FixedTokenService extends BaseSchedule {
     this.redis = redisService.getClient();
   }
   protected initContext() {
-    this.tenantContextDatas = [{ tenantCode: 'aplus' }];
+    this.tenantContextDatas = [
+      { tenantCode: NodeConfigService.get('defaultTenant') },
+    ];
   }
 
   async handle(force = false) {
