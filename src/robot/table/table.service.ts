@@ -21,6 +21,7 @@ export class TableService {
     private readonly redisServer: RedisService,
   ) {}
   getTableHelper(robotName: FeishuApp = FeishuApp.XiaoAClient) {
+    if (!robotName) robotName = FeishuApp.XiaoAClient;
     if (!this.tableHelperMap[robotName]) {
       this.tableHelperMap[robotName] = new FeishuTableHelper(
         ClientFactory.create(robotName),
@@ -30,11 +31,7 @@ export class TableService {
     }
     return this.tableHelperMap[robotName];
   }
-  async getList({
-    appToken,
-    tableId,
-    robotName = FeishuApp.XiaoAClient,
-  }: TableHeaderType) {
+  async getList({ appToken, tableId, robotName }: TableHeaderType) {
     const tableHelper = this.getTableHelper(robotName);
 
     const res = await tableHelper

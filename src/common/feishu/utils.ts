@@ -26,7 +26,7 @@ export const sendExceptionToFeishuOrigin = (
     project: process.env.PROJECT_NAME,
     color: 'red',
     message: exception.message || '内部错误',
-    content: reqContext || exception.stack,
+    content: reqContext + exception.stack,
   };
   sendCommonCardToFeishu(options);
 };
