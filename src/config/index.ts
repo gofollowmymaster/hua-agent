@@ -41,6 +41,11 @@ const globalConfig = Object.freeze({
       appId: process.env.FEISHU_ALERT_APP_APPID,
       appSecret: process.env.FEISHU_ALERT_APP_APPSECRET,
     },
+    //小郎
+    XiaoLClient: {
+      appId: 'cli_a86495e1f4fa500b',
+      appSecret: 'YkaB6aMhGbvurRFyWOymqhpXoQw5BiM8',
+    },
   },
 
   //服务商特性配置

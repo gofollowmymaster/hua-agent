@@ -54,5 +54,5 @@ export class CreateRecordParamsDto {
     type: Object,
     description: '记录内容',
   })
-  data: Record<string, string>;
+  records: Record<string, string>;
 }

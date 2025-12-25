@@ -51,7 +51,7 @@ export class TableService {
     SearchParams: CreateRecordParamsDto,
     { appToken, tableId, robotName }: TableHeaderType,
   ) {
-    const { data } = SearchParams;
+    const { records } = SearchParams;
 
     const tableHelper = this.getTableHelper(robotName);
 
@@ -60,7 +60,7 @@ export class TableService {
         appToken,
         tableId,
       })
-      .create(data);
+      .create(records);
     return res;
   }
 

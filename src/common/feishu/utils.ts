@@ -60,7 +60,7 @@ export const sendCommonCardToFeishu = (options: CommonCardData) => {
 export const sendExceptionToFeishu: (
   exception: Error,
   reqContext?: string,
-) => void = throttle(sendExceptionToFeishuOrigin, 200, {
+) => void = throttle(sendExceptionToFeishuOrigin, 400, {
   leading: true,
   trailing: false,
 });

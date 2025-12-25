@@ -23,7 +23,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
     console.log(' HttpExceptionFilter    ', exception.message);
 
-    if (status >= 300 && ![400, 401].includes(status)) {
+    if (status >= 300) {
       sendExceptionToFeishu(exception, request.url);
     }
     response.status(200).json({
