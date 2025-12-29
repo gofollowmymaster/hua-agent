@@ -23,12 +23,23 @@ export class AliController {
   @ApiBody({ type: AliDevopsByFeishuDto })
   @UseGuards(SecretAuthGuard)
   async publish(@Body() params: AliDevopsByFeishuDto) {
+    params.apps = params.appsStr?.split(',');
+    params.testUser = params.testUserStr?.split(',');
+    if (params.testUser && params.testUser.length > 5) {
+      params.testUser = params.testUser.slice(0, 5);
+    }
+    return this.publishV2(params);
+  }
+  @Post('publish-v2')
+  @ApiOperation({
+    summary: '通用应用交付',
+    description: '应用交付',
+  })
+  @ApiBody({ type: AliDevopsCommonDto })
+  @UseGuards(SecretAuthGuard)
+  async publishV2(@Body() params: AliDevopsCommonDto) {
     try {
-      params.apps = params.appsStr?.split(',');
-      params.testUser = params.testUserStr?.split(',');
-      if (params.testUser && params.testUser.length > 5) {
-        params.testUser = params.testUser.slice(0, 5);
-      }
+      console.log('[ params ] >', params);
       const res = await this.aliService.publish(params);
       return {
         code: 200,
@@ -54,16 +65,6 @@ export class AliController {
         data: [],
       };
     }
-  }
-  @Post('publish-v2')
-  @ApiOperation({
-    summary: '通用应用交付',
-    description: '应用交付',
-  })
-  @ApiBody({ type: AliDevopsCommonDto })
-  @UseGuards(SecretAuthGuard)
-  async publishV2(@Body() params: AliDevopsCommonDto) {
-    return await this.aliService.publish(params);
   }
 
   @Post('cancel-runs')

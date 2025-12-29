@@ -1,5 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ArrayMinSize, IsNotEmpty } from 'class-validator';
+import {
+  ArrayMaxSize,
+  arrayMaxSize,
+  ArrayMinSize,
+  IsNotEmpty,
+} from 'class-validator';
 
 export class AliDevopsDto {
   @IsNotEmpty()
@@ -31,8 +36,6 @@ export class AliDevopsCommonDto extends AliDevopsDto {
   })
   apps: string[];
 
-  @IsNotEmpty()
-  @ArrayMinSize(5, { message: '最多只能选择5个人员' })
   @ApiPropertyOptional({
     type: Array<string>,
     description: '需要提醒的人员',
