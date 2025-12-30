@@ -78,7 +78,6 @@ export class RedisService {
     let res;
     try {
       res = await handle();
-      console.log('[ res ] >', res);
       this.redis.setex(key, expireTime, 'handled');
     } catch (error) {
       this.redis.setex(key, expireTime, 'failed');
@@ -124,7 +123,7 @@ export class RedisService {
 
       cursor = reply[0];
       const keys = reply[1];
-      console.log('[ keys ] >', keys);
+      this.logger.info('[ keys ] >', keys);
       for (const key of keys) {
         try {
           const batchValues = await this.redis[method](key);
@@ -160,11 +159,11 @@ export class RedisService {
       if (keys.length > 0) {
         const count = await this.redis.del(...keys);
         deletedCount += count;
-        console.log(`Deleted ${count} keys in this batch`);
+        this.logger.info(`Deleted ${count} keys in this batch`);
       }
     } while (cursor !== '0');
 
-    console.log(`Total deleted: ${deletedCount}`);
+    this.logger.info(`Total deleted: ${deletedCount}`);
     return deletedCount;
   }
 }

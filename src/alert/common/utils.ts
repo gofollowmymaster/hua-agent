@@ -15,10 +15,6 @@ export function getModuleNameByUrl(url: string = '') {
 }
 
 const isHoliday = (day: number = dayjs().valueOf()) => {
-  console.log(
-    `[ dayTimeBetween('2025-01-22', '2025-02-05', day) ] >`,
-    dayTimeBetween('2025-01-22', '2025-02-05', day),
-  );
   return !isWorkday(day) || dayTimeBetween('2025-01-22', '2025-02-05', day);
 };
 
@@ -72,7 +68,6 @@ export const useAilyAlertSkill = async (message: string) => {
   const userContext = getGlobalAppInstance(TenantContext);
 
   const feishuAilyHelper = new FeishuAilyHelper(client, userContext);
-  console.log('[ message ] >', message);
   const res = await feishuAilyHelper.useAilySkill(
     {
       app_id: 'spring_7886bc2b6f__c',

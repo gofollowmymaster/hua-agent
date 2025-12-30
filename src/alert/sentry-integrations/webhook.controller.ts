@@ -129,7 +129,6 @@ export class SentryWebhookController {
   async error(params: SentryHookErrorDto) {
     const alertError = params.data.error;
     // if (await this.sentryIssueService.isIssueIgnored(alertError.issue_id)) {
-    //   console.log('issue is ignored');
     //   return;
     // }
 

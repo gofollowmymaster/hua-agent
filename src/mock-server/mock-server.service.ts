@@ -33,7 +33,6 @@ export class MockServerService {
     if (isFileExist) {
       try {
         const sourceJson = await fs.readJson(path);
-        console.log(sourceJson);
         const newJson = { ...sourceJson, [url]: response };
         await fs.writeJson(path, newJson, { spaces: '\t' });
       } catch (e) {

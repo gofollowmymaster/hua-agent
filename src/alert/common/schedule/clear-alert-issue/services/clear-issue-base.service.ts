@@ -52,11 +52,8 @@ export default class ClearAlertPerDayBaseService {
         日错误次数: 0,
       };
     });
-    console.log('[ list ] >', list);
     if (list.length < 1) return;
 
     const res = await this.feishuIssueTable.batchUpdate(list);
-    console.log('[ res ] >', res);
-    // console.log('[ requestIssueList ] >', JSON.stringify(requestIssueList));
   }
 }

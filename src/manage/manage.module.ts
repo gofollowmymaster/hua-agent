@@ -1,0 +1,18 @@
+import { Module } from '@nestjs/common';
+import { SupplierDiffController } from './supplier-diff/supplier-diff.controller';
+import { SupplierDiffService } from './supplier-diff/supplier-diff.service';
+import { LoggerService } from '@src/common/service/logger/logger.service';
+import { FeishuHelperModule } from '@src/common/feishu/helper/helper.module';
+
+import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
+import SupplierDiffTable from './common/table/supplier-diff.table';
+
+@Module({
+  imports: [
+    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.XiaoAClient)),
+  ],
+  controllers: [SupplierDiffController],
+  providers: [SupplierDiffService, LoggerService, SupplierDiffTable],
+  exports: [SupplierDiffService],
+})
+export class ManageModule {}

@@ -288,6 +288,5 @@ export abstract class ErrorBaseService extends AlertBaseService {
         },
       ),
     );
-    console.log('[ resData ] >', resData);
   }
 }

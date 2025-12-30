@@ -13,7 +13,6 @@ import FeishuFileHelper from './feishu-file-helper';
 @Module({})
 export class FeishuHelperModule {
   static forRoot(client: FeishuClient): DynamicModule {
-    // console.log('[ clientName ] >', clientName);
     return {
       module: FeishuHelperModule,
       providers: [

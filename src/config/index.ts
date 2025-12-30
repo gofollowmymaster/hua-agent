@@ -28,6 +28,7 @@ const globalConfig = Object.freeze({
     AplusNodeAdminMtableTableId:
       process.env.FEISHU_APLUS_NODE_ADMIN_MTABLE_TABLE_ID,
     DevopsTableAppToken: 'Jz0abVIqeajmfesIkfRcwiannof',
+    SupplierDiffAppToken: 'LqNWwbucYidDFekHsvvcIy5WnrV',
   },
 
   robots: {

@@ -28,7 +28,6 @@ export class MsgAlertService {
       alertInfo.pageModuleName,
       alertInfo.environment,
     );
-    console.log('[ this.messageHelper ] >', this.messageHelper);
     // 发送群消息
     const groupMsgInfo = await this.messageHelper.createInteractToGroup(
       message,

@@ -39,7 +39,6 @@ export class AliController {
   @UseGuards(SecretAuthGuard)
   async publishV2(@Body() params: AliDevopsCommonDto) {
     try {
-      console.log('[ params ] >', params);
       const res = await this.aliService.publish(params);
       return {
         code: 200,

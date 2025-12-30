@@ -104,12 +104,10 @@ export class SentryWebhookService {
   }
 
   async assignTo(eventData: IssueEvent) {
-    // const
-    const userInfo = await this.feishuUserHelper.getUserIdByEmailOrPhone({
-      emails: [eventData.assignedTo.email, eventData.operator.email],
-      userIdType: 'open_id',
-    });
-    console.log('[ userInfo ] >', userInfo);
+    // const userInfo = await this.feishuUserHelper.getUserIdByEmailOrPhone({
+    //   emails: [eventData.assignedTo.email, eventData.operator.email],
+    //   userIdType: 'open_id',
+    // });
 
     const service = await this.getServiceByIssueId(eventData.issueId);
 

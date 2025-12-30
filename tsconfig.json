@@ -25,6 +25,11 @@
     },
     "typeRoots": ["node_modules/@types", "./type"]
   },
-  "include": ["src/**/*.ts", "type/**/*.ts", "ecosystem.config.js"],
+  "include": [
+    "src/**/*.ts",
+    "type/**/*.ts",
+    "ecosystem.config.js",
+    "src/manage/supplier-diff/supplier-diff.service.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

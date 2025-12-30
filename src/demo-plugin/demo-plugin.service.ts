@@ -67,7 +67,6 @@ export class DemoPluginService {
         if (applyTime + EXPIRED_TIME > current) {
           //todo 即将过期提醒
           const userId = info['使用人']?.[0]?.id;
-          console.log('[ userId ] >', userId);
           if (current - applyTime < 1000 * 60 * 60 && userId) {
             // this.messageHelper.createToUser({
             //   receive_id: userId,
@@ -89,10 +88,8 @@ export class DemoPluginService {
         }
       }
     } catch (error) {
-      console.log('[ error ] >', error);
       sendExceptionToFeishu(error);
     }
-    console.log('[ info  fin ] >');
     return isValid;
   }
 }

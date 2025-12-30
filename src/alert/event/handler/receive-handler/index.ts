@@ -183,7 +183,6 @@ export class FeishuReceiveCallback {
 
     const issue = await this.getIssueInfo(issueId);
     if (!issue) {
-      console.log('[ issue ] >', issue);
       return;
     }
     const answer = await useAilyAlertSkill(

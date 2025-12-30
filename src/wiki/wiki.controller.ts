@@ -7,7 +7,6 @@ import { WikiTreeDto } from './dto/wiki.dto';
 import { SecretAuthGuard } from '@src/common/guard/secret-auth';
 import { NodeConfigService } from '@src/config/node-config.service';
 import { TenantContext } from '@src/common/service/context/tenant.context';
-import { sendCommonCardToFeishu } from '@src/common/feishu/utils';
 
 @ApiTags('wiki相关接口')
 @Controller('wiki')

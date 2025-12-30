@@ -61,7 +61,6 @@ export default abstract class BaseSchedule implements OnModuleInit {
     this.logger.debug(this.constructor.name + ' Called ');
     this.tenantContextDatas.forEach((tenantData) => {
       this.tenantContext.run(tenantData, async () => {
-        console.log('[ tenantData ] >', tenantData);
         this.handle(tenantData);
       });
     });
