@@ -4,7 +4,6 @@ import { getGlobalAppInstance } from '@src/common/utils/app-config';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import { FeishuAppConfig, TenantCode } from '@src/config/tenant';
 import { NodeConfigService } from '@src/config/node-config.service';
-import { sendExceptionToFeishu } from '../utils';
 class FeishuClient {
   private clientContainer: Record<string, lark.Client> = {};
 
@@ -14,7 +13,7 @@ class FeishuClient {
     Object.keys(robotConfigs).forEach((tenant) => {
       try {
         if (!robotConfigs[tenant]) {
-          console.warn('服务商：' + tenant + '没有配置机器人：' + clientName);
+          console.log('服务商：' + tenant + '没有配置机器人：' + clientName);
           return;
         }
         this.clientContainer[tenant] = this.create(
@@ -22,10 +21,7 @@ class FeishuClient {
           clientName,
         );
       } catch (e) {
-        sendExceptionToFeishu(
-          e,
-          `初始化服务商${tenant}的${clientName}机器人失败`,
-        );
+        console.log(e);
       }
     });
   }

@@ -33,8 +33,17 @@ export class SupplierDiffService {
         },
       ],
     };
-    console.log('[ filter ] >', businessLine, appCode);
-    const list = this.SupplierDiffTable.search(filter);
+    const { items } = await this.SupplierDiffTable.search(filter);
+    const list = items.map(({ fields, record_id }) => {
+      return {
+        code: record_id,
+        desc: fields['用途说明']?.[0]?.text || '',
+        type: fields['类型']?.[0]?.text || '',
+        aplus: fields['aplus']?.[0]?.text || '',
+        yurex: fields['yurex']?.[0]?.text || '',
+        cloudboat: fields['cloudboat']?.[0]?.text || '',
+      };
+    });
     return list;
   }
 }
