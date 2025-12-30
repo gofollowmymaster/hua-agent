@@ -43,7 +43,7 @@ export class AliController {
       return {
         code: 200,
         message: '运行中',
-        data: res.map((item) => ({
+        body: res.map((item) => ({
           appName: item.appName,
           workflowName: item.workflowName,
           url: item.url,
@@ -61,7 +61,7 @@ export class AliController {
       return {
         code: 500,
         message: '失败',
-        data: [],
+        body: [],
       };
     }
   }

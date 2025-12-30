@@ -38,7 +38,7 @@ export class SupplierDiffService {
       return {
         code: record_id,
         desc: fields['用途说明']?.[0]?.text || '',
-        type: fields['类型']?.[0]?.text || '',
+        type: fields['类型'],
         aplus: fields['aplus']?.[0]?.text || '',
         yurex: fields['yurex']?.[0]?.text || '',
         cloudboat: fields['cloudboat']?.[0]?.text || '',
