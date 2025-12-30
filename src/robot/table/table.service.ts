@@ -74,7 +74,7 @@ export class TableService {
         tableId,
         useCache: false,
       })
-      .search(filter);
+      .search({ filter });
     return res;
   }
 

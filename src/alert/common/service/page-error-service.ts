@@ -16,6 +16,7 @@ import { AlertContext } from './alert-event.context';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { HttpService } from '@nestjs/axios';
+import { BitTableFilter } from '@src/common/feishu/type/bitable';
 
 @Injectable()
 export class PageErrorService extends ErrorBaseService {
@@ -64,21 +65,18 @@ export class PageErrorService extends ErrorBaseService {
 
   protected async writeToFrontendIssueTable() {
     // try {
-    const { total, items: records } =
-      await this.feishuFrontendIssueTable.search(
+    const filter: BitTableFilter = {
+      conjunction: 'and',
+      conditions: [
         {
-          conjunction: 'and',
-          conditions: [
-            {
-              field_name: 'IssueId',
-              operator: 'is',
-              value: [this.alertContext.event.issueId],
-            },
-          ],
+          field_name: 'IssueId',
+          operator: 'is',
+          value: [this.alertContext.event.issueId],
         },
-        {},
-        false,
-      );
+      ],
+    };
+    const { total, items: records } =
+      await this.feishuFrontendIssueTable.search({ filter }, {}, false);
     if (total == 0) {
       const issue =
         await this.alertFeishuAdapter.toFrontendAlertIssueTableData();
@@ -101,20 +99,17 @@ export class PageErrorService extends ErrorBaseService {
 
   async updateTable(issue_id: string, recordNew: Record<string, any>) {
     const table = this.feishuFrontendIssueTable;
-    const issueRes = await table.search(
-      {
-        conjunction: 'and',
-        conditions: [
-          {
-            field_name: 'IssueId',
-            operator: 'is',
-            value: [issue_id],
-          },
-        ],
-      },
-      {},
-      false,
-    );
+    const filter: BitTableFilter = {
+      conjunction: 'and',
+      conditions: [
+        {
+          field_name: 'IssueId',
+          operator: 'is',
+          value: [issue_id],
+        },
+      ],
+    };
+    const issueRes = await table.search({ filter }, {}, false);
     if (issueRes.total == 0) {
       sendExceptionToFeishu(new Error('修改卡片消息时未找到issue:' + issue_id));
     } else {

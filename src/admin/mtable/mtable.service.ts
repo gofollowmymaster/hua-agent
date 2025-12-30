@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import AdminMtableTable from './table/mtable-table';
 import { BaseService } from '@src/common/base/BaseService';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
+import { BitTableFilter } from '@src/common/feishu/type/bitable';
 
 @Injectable()
 export class MtableService extends BaseService {
@@ -14,7 +15,7 @@ export class MtableService extends BaseService {
   }
 
   async list() {
-    return await this.adminMtableTable.search({
+    const filter: BitTableFilter = {
       conjunction: 'and',
       conditions: [
         {
@@ -23,7 +24,8 @@ export class MtableService extends BaseService {
           value: [process.env.NODE_ENV],
         },
       ],
-    });
+    };
+    return await this.adminMtableTable.search({ filter });
   }
   async aplusBussnessList() {
     const list = await this.feishuBusinessLineTable.list();

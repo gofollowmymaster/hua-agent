@@ -8,6 +8,7 @@ import {
   BitTableGetOption,
   BitTablePagination,
   BitTableRecord,
+  BitTableSearchPayloadData,
   BitTableSearchPayloadParams,
 } from '../type/bitable';
 import { TenantCode } from '@src/config/tenant';
@@ -36,13 +37,13 @@ abstract class FeishuTable {
   }
 
   async search(
-    filter: BitTableFilter,
+    data: BitTableSearchPayloadData,
     params: BitTableSearchPayloadParams = {},
     useCache = true,
   ): Promise<BitTablePagination> {
     this.setTableOption();
 
-    const res = await this.tableHelper.search(filter, params, useCache);
+    const res = await this.tableHelper.search(data, params, useCache);
     return res;
   }
 

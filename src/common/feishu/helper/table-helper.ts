@@ -9,6 +9,7 @@ import {
   BitTableRecord,
   BitTableSearchPayloadParams,
   BitTableBatchDeleteReturnData,
+  BitTableSearchPayloadData,
 } from '../type/bitable';
 import { FEISHU_CLIENT_ID } from './constants';
 import { Inject, Injectable } from '@nestjs/common';
@@ -78,11 +79,12 @@ class FeishuTableHelper extends FeishuDataApiHelper {
     );
   }
   async search(
-    filter: BitTableFilter,
+    data: BitTableSearchPayloadData,
     params: BitTableSearchPayloadParams = {},
     useCache = true,
   ) {
-    const cacheKey = 'search:' + JSON.stringify(filter).replaceAll(':', '');
+    const cacheKey =
+      'search:' + JSON.stringify(data?.filter).replaceAll(':', '');
     return this.readWrapper(
       async () =>
         await this.client.bitable.appTableRecord.search({
@@ -91,9 +93,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
             table_id: this.tableId,
           },
           params,
-          data: {
-            filter,
-          },
+          data,
         }),
       useCache,
       cacheKey,

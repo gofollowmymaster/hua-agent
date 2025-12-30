@@ -75,10 +75,10 @@ export class FeishuReceiveCallback {
         },
       ],
     };
-    let issues = await this.feishuApiAlertIssueTable.search(filter);
+    let issues = await this.feishuApiAlertIssueTable.search({ filter });
     if (issues.items.length > 0) return issues.items[0];
 
-    issues = await this.feishuFrontendAlertIssueTable.search(filter);
+    issues = await this.feishuFrontendAlertIssueTable.search({ filter });
     if (issues.items.length > 0) return issues.items[0];
   }
   //推送Issue卡片给用户

@@ -144,7 +144,7 @@ export default class IssueStatisticService {
 
   async getIssues(filter: BitTableFilter) {
     const { items: requestIssueList } = await this.feishuIssueTable.search(
-      filter,
+      { filter },
       {
         page_size: 100,
       },

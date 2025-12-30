@@ -3,6 +3,7 @@ import FeishuTableHelper from '@src/common/feishu/helper/table-helper';
 import FeishuTable from '@src/common/feishu/table/feishu-table';
 import { FeishuApiException } from '../exception/feishu-api-exception';
 import { NodeConfigService } from '../../config/node-config.service';
+import { BitTableFilter } from '../feishu/type/bitable';
 @Injectable()
 class FeishuBusinessLineTable extends FeishuTable {
   // protected readonly tableHelper: FeishuTableHelper;
@@ -24,7 +25,7 @@ class FeishuBusinessLineTable extends FeishuTable {
   }
 
   async getBusinessLineBySubapp(projectName: string) {
-    const res = await this.search({
+    const filter: BitTableFilter = {
       conjunction: 'and',
       conditions: [
         {
@@ -33,7 +34,8 @@ class FeishuBusinessLineTable extends FeishuTable {
           value: [projectName],
         },
       ],
-    });
+    };
+    const res = await this.search({ filter });
 
     if (res.items?.length < 1) {
       throw new FeishuApiException(`未找到对应的业务线: ${projectName}`, 501);

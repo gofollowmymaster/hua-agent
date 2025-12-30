@@ -33,7 +33,9 @@ export class SupplierDiffService {
         },
       ],
     };
-    const { items } = await this.SupplierDiffTable.search(filter);
+    const { items } = await this.SupplierDiffTable.search({
+      filter,
+    });
     const list = items.map(({ fields, record_id }) => {
       return {
         code: record_id,

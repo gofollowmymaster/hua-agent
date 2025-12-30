@@ -37,7 +37,7 @@ class UserAliyunTable extends FeishuTable {
       ],
     };
     const info = await this.search(
-      filter,
+      { filter },
       {
         user_id_type: 'union_id',
       },

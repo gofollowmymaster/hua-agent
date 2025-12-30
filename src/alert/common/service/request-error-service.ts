@@ -14,6 +14,7 @@ import { AlertContext } from './alert-event.context';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { HttpService } from '@nestjs/axios';
+import { BitTableFilter } from '@src/common/feishu/type/bitable';
 export const ignoreCodeList = [
   '401',
   '10002',
@@ -79,17 +80,18 @@ export class RequestErrorService extends ErrorBaseService {
   protected async writeToBackEndIssueTable(): Promise<void> {
     try {
       //查询issue
+      const filter: BitTableFilter = {
+        conjunction: 'and',
+        conditions: [
+          {
+            field_name: 'IssueId',
+            operator: 'is',
+            value: [this.alertContext.event.issueId],
+          },
+        ],
+      };
       const issueRes = await this.feishuApiIssueTable.search(
-        {
-          conjunction: 'and',
-          conditions: [
-            {
-              field_name: 'IssueId',
-              operator: 'is',
-              value: [this.alertContext.event.issueId],
-            },
-          ],
-        },
+        { filter },
         {},
         false,
       );
@@ -114,20 +116,17 @@ export class RequestErrorService extends ErrorBaseService {
   }
   async updateTable(issue_id: string, recordNew: Record<string, any>) {
     const table = this.feishuApiIssueTable;
-    const issueRes = await table.search(
-      {
-        conjunction: 'and',
-        conditions: [
-          {
-            field_name: 'IssueId',
-            operator: 'is',
-            value: [issue_id],
-          },
-        ],
-      },
-      {},
-      false,
-    );
+    const filter: BitTableFilter = {
+      conjunction: 'and',
+      conditions: [
+        {
+          field_name: 'IssueId',
+          operator: 'is',
+          value: [issue_id],
+        },
+      ],
+    };
+    const issueRes = await table.search({ filter }, {}, false);
     if (issueRes.total == 0) {
       sendExceptionToFeishu(new Error('修改卡片消息时未找到issue:' + issue_id));
     } else {
