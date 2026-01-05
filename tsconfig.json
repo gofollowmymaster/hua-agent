@@ -27,6 +27,7 @@
   },
   "include": [
     "src/**/*.ts",
+    "scripts/**/*.ts",
     "type/**/*.ts",
     "ecosystem.config.js",
     "src/manage/supplier-diff/supplier-diff.service.ts"

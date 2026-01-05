@@ -1,12 +1,13 @@
 import aplus from './aplus';
 import boat from './boat';
-// import yurex from './yurex';
+import yurex from './yurex';
 export type FeishuAppConfig = {
   appId: string;
   appSecret: string;
 };
 export type TenantConfig = {
   FeishuWikiSpaceIds: string[];
+  hostTag: string;
   robots: {
     XiaoAClient: FeishuAppConfig;
     AuthClient?: FeishuAppConfig;
@@ -26,12 +27,13 @@ export const tenantCodeMap = {
   CO3906: 'boat',
   A: 'aplus',
   C: 'boat',
+  D: 'yurex',
 } as const;
 //服务商码
 export type TenantCode = (typeof tenantCodeMap)[keyof typeof tenantCodeMap];
 const tenantConfig: Readonly<Record<TenantCode, Readonly<TenantConfig>>> = {
   aplus,
   boat,
-  // yurex,
+  yurex,
 };
 export default tenantConfig;

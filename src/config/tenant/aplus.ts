@@ -1,5 +1,6 @@
 export default {
   FeishuWikiSpaceIds: ['7382766506582736900'],
+  hostTag: 'aplnk',
   robots: {
     XiaoAClient: {
       appId: 'cli_a7b9fe27a3f8d00e',

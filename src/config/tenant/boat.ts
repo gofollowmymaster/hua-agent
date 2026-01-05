@@ -1,5 +1,7 @@
 export default {
   FeishuWikiSpaceIds: ['7549126549107195906'],
+  hostTag: 'boat',
+
   feishuTables: {
     //Aplus智能体表格相关
     AilyLogTableAppToken: 'A6qfbapjtafVLYsn9xic6mYNnfT',

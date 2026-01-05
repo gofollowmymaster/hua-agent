@@ -1,8 +1,7 @@
 import { Controller, Post } from '@nestjs/common';
 
 import { MtableService } from './mtable.service';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 @ApiTags('多维表格管理中心')
 @Controller('admin/mtable')
 export class MtableController {
@@ -11,10 +10,6 @@ export class MtableController {
   @ApiOperation({
     summary: '列出所有多维表格',
     description: '列出Aplus Node server使用到的所有多维表格',
-  })
-  @ApiOkResponse({
-    description: 'success',
-    type: String,
   })
   @Post('list')
   async list() {
@@ -27,8 +22,8 @@ export class MtableController {
     description: '飞书业务线列表信息',
   })
   @Post('business-line')
-  async aplusBussnessList() {
+  async aplusBusinessList() {
     // 添加到多维表格
-    return await this.mtableService.aplusBussnessList();
+    return await this.mtableService.aplusBusinessList();
   }
 }

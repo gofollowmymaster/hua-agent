@@ -27,7 +27,7 @@ export class MtableService extends BaseService {
     };
     return await this.adminMtableTable.search({ filter });
   }
-  async aplusBussnessList() {
+  async aplusBusinessList() {
     const list = await this.feishuBusinessLineTable.list();
 
     return list;

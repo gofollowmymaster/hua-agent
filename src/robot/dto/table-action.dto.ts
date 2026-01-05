@@ -19,6 +19,7 @@ export class SearchParamsDto {
 }
 
 export class BatchDeleteParamsDto {
+  @IsNotEmpty({ message: '参数recordIds不能为空' })
   @ApiProperty({
     type: Array,
     description: '需要删除的记录ID集合',

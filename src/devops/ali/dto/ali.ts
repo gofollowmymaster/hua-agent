@@ -1,10 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  ArrayMaxSize,
-  arrayMaxSize,
-  ArrayMinSize,
-  IsNotEmpty,
-} from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
 export class AliDevopsDto {
   @IsNotEmpty()

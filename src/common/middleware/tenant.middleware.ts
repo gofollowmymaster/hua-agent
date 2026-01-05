@@ -1,4 +1,8 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NestMiddleware,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response, NextFunction } from 'express';
 import { TenantContext } from '../service/context/tenant.context';
@@ -39,9 +43,43 @@ export class TenantMiddleware implements NestMiddleware {
         NodeConfigService.get('defaultTenant'),
       user: user || {},
     };
+
+    const host = req.headers.host;
+    const hostTag = NodeConfigService.getTenantConfigItem(
+      context.tenantCode,
+      'hostTag',
+    ) as string;
+    //  域名与服务商token要匹配，避免拿着aplus的token请求boat的网关
+    if (host.indexOf(hostTag) == -1) {
+      throw new BadRequestException('非法请求');
+    }
     this.asyncStorage.run(context, () => {
       next();
     });
+  }
+  private async fixedTokenHandle(headerToken: string) {
+    let payload;
+    try {
+      const { fields: appInfo } = await this.clientSecretTable.get(headerToken);
+
+      payload = {
+        supplierCode: appInfo.服务商,
+      };
+    } catch (e) {
+      sendExceptionToFeishu(e);
+      payload = {};
+    }
+    return payload;
+  }
+  private async jwtTokenHandle(headerToken: string) {
+    let payload;
+    try {
+      payload = await this.jwtService.decode(headerToken);
+    } catch (e) {
+      sendExceptionToFeishu(e);
+      payload = {};
+    }
+    return payload;
   }
 
   private async extractTokenFromHeader(request: Request): Promise<UserContext> {
@@ -54,19 +92,9 @@ export class TenantMiddleware implements NestMiddleware {
     const headerToken = type === 'Bearer' ? token : type;
     let payload;
     if (type == 'Bearer') {
-      payload = await this.jwtService.decode(headerToken);
+      payload = this.jwtTokenHandle(headerToken);
     } else if (headerToken) {
-      try {
-        const { fields: appInfo } =
-          await this.clientSecretTable.get(headerToken);
-
-        payload = {
-          supplierCode: appInfo.服务商,
-        };
-      } catch (e) {
-        sendExceptionToFeishu(e);
-        payload = {};
-      }
+      payload = this.fixedTokenHandle(headerToken);
     }
     return payload || {};
   }

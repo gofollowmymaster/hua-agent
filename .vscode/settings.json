@@ -98,5 +98,13 @@
   },
   "gitlens.proxy": {},
   "references.preferredLocation": "view",
-  "cSpell.words": ["apptoken", "cloudboat", "robotname", "tableid"]
+  "cSpell.words": [
+    "aplnk",
+    "apptoken",
+    "cloudboat",
+    "rekog",
+    "robotname",
+    "streamable",
+    "tableid"
+  ]
 }

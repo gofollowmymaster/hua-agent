@@ -6,13 +6,9 @@ import { sendExceptionToFeishu } from '../feishu/utils';
 export class DiscardMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     if (
-      [
-        'version',
-        'header-tags',
-        'mock-server',
-        'subapp',
-        'aplus-frontend-verify',
-      ].includes(req.originalUrl.split('/')[1])
+      ['mock-server', 'aplus-frontend-verify'].includes(
+        req.originalUrl.split('/')[1],
+      )
     ) {
       sendExceptionToFeishu(
         new Error('当前访问废弃的功能'),

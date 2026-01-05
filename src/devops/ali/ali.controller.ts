@@ -6,6 +6,7 @@ import { SecretAuthGuard } from '@src/common/guard/secret-auth';
 import { sendCommonCardToFeishu } from '@src/common/feishu/utils';
 import CancelExecutionServer from './common/schedule/cancel-execution';
 import { AliDevopsContext } from './common/service/ali-devops.context';
+
 @Controller('devops')
 @ApiTags('阿里云效自动化')
 export class AliController {
