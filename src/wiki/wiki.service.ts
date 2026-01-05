@@ -27,10 +27,11 @@ export class WikiService {
     );
     const data = (await this.redis.get(key)) || '';
     let tree;
+
     if (!data || force) {
       tree = await this.wikiDirectoryService.loadWikiNodeTree(spaceId);
     } else {
-      tree = JSON.parse(data)?.value;
+      tree = JSON.parse(data);
     }
 
     return {

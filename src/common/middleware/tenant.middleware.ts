@@ -44,17 +44,16 @@ export class TenantMiddleware implements NestMiddleware {
       user: user || {},
     };
 
-    const host = req.headers.host;
-    const hostTag = NodeConfigService.getTenantConfigItem(
-      context.tenantCode,
-      'hostTag',
-    ) as string;
-    //  域名与服务商token要匹配，避免拿着aplus的token请求boat的网关
-    if (process.env.NODE_ENV !== 'dev' && host.indexOf(hostTag) == -1) {
-      console.log('[ host ] >', host, user);
-      throw new BadRequestException('非法请求');
-    }
     this.asyncStorage.run(context, () => {
+      const host = req.headers.host;
+      const hostTag = NodeConfigService.getTenantConfigItem(
+        context.tenantCode,
+        'hostTag',
+      ) as string;
+      //  域名与服务商token要匹配，避免拿着aplus的token请求boat的网关
+      if (process.env.NODE_ENV !== 'dev' && host.indexOf(hostTag) == -1) {
+        sendExceptionToFeishu(new BadRequestException('非法请求'));
+      }
       next();
     });
   }
