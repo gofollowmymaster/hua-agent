@@ -21,8 +21,6 @@ import { DevopsModule } from './devops/devops.module';
 import { GlobalServiceModule } from './common/service/service.module';
 import { GlobalExceptionHandlerModule } from './common/filter/global-exception-handler/global-exception.module';
 import { ManageModule } from './manage/manage.module';
-import { McpModule } from '@rekog/mcp-nest';
-import { randomUUID } from 'crypto';
 
 const modulesAll = [
   ManageModule,
@@ -39,15 +37,7 @@ const modulesAll = [
 @Module({
   imports: [
     GlobalServiceModule,
-    McpModule.forRoot({
-      name: 'my-mcp-server',
-      version: '1.0.0',
-      streamableHttp: {
-        enableJsonResponse: false,
-        sessionIdGenerator: () => randomUUID(),
-        statelessMode: false, // Enables session management
-      },
-    }),
+
     ConfigModule.forRoot({
       isGlobal: true,
       load: [() => configuration],
