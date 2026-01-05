@@ -25,10 +25,12 @@ export class WikiService {
       '{spaceId}',
       spaceId,
     );
-    let tree = JSON.parse(await this.redis.get(key))?.value;
-
-    if (!tree || force) {
+    const data = (await this.redis.get(key)) || '';
+    let tree;
+    if (!data || force) {
       tree = await this.wikiDirectoryService.loadWikiNodeTree(spaceId);
+    } else {
+      tree = JSON.parse(data)?.value;
     }
 
     return {

@@ -4,8 +4,8 @@ export default {
   feishuTables: {},
   robots: {
     XiaoAClient: {
-      appId: 'cli_a85a4dc1c9259013',
-      appSecret: 'wmea3GufO6ADkITtv0CjkexcZmpCAsWi',
+      appId: 'cli_a7b9fe27a3f8d00e',
+      appSecret: 'I7EAE1RyP9ClVfee2btuidKZarf8JHez',
     },
   },
 };

@@ -49,11 +49,10 @@ export class TenantMiddleware implements NestMiddleware {
       context.tenantCode,
       'hostTag',
     ) as string;
-    console.log('[ host ] >', req.headers);
     //  域名与服务商token要匹配，避免拿着aplus的token请求boat的网关
-    if (host.indexOf(hostTag) == -1) {
-      console.log('[ host ] >', host, hostTag);
-      // throw new BadRequestException('非法请求');
+    if (process.env.NODE_ENV !== 'dev' && host.indexOf(hostTag) == -1) {
+      console.log('[ host ] >', host, user);
+      throw new BadRequestException('非法请求');
     }
     this.asyncStorage.run(context, () => {
       next();
