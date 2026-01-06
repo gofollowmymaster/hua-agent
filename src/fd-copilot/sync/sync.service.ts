@@ -6,6 +6,9 @@ import { FeishuPushDto } from './dto/sync';
 import { createHash } from 'crypto';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+import FeishuDocxHelper from '@src/common/feishu/helper/feishu-docx-helper';
+import FeishuWikiHelper from '@src/common/feishu/helper/feishu-wiki-helper';
+import FeishuFileHelper from '@src/common/feishu/helper/feishu-file-helper';
 
 @Injectable()
 export class SyncService {
@@ -13,6 +16,8 @@ export class SyncService {
   constructor(
     protected redisService: RedisService,
     @InjectQueue('sync-document') private syncDocumentQueue: Queue,
+    protected feishuDocxHelper: FeishuDocxHelper,
+    protected feishuFileHelper: FeishuFileHelper,
   ) {
     this.redis = redisService.getClient();
   }
@@ -31,5 +36,8 @@ export class SyncService {
     }
     const res = await this.syncDocumentQueue.add('syncDocument', params);
     return { msg: 'ok', data: res.id };
+  }
+  async getDocumentContent(params: any) {
+    return this.feishuDocxHelper.rawContent(params.documentId);
   }
 }

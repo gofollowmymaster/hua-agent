@@ -115,6 +115,16 @@ export class DevopsOptionService {
         branch: 'uat-publish',
       },
       {
+        appName: 'publish-admin-yurex-app',
+        workflowName: 'uat环境',
+        branch: 'uat-publish',
+      },
+      {
+        appName: 'publish-user-yurex-app',
+        workflowName: 'uat环境',
+        branch: 'uat-publish',
+      },
+      {
         appName: 'global-console',
         workflowName: 'uat环境',
         branch: 'uat-publish',

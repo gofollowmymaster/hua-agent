@@ -27,3 +27,12 @@ export class FeishuPushDto {
   })
   content: string;
 }
+
+export class FeishuDocumentContentDto {
+  @IsNotEmpty()
+  @ApiProperty({
+    type: String,
+    description: '飞书文档id',
+  })
+  documentId: string;
+}

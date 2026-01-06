@@ -70,6 +70,18 @@ class FeishuDocxHelper extends FeishuDataApiHelper {
       'deleteBlock',
     );
   }
+  async rawContent(documentId, lang: 0 | 1 = 0) {
+    return await this.requestWrapper(() =>
+      this.client.docx.v1.document.rawContent({
+        params: {
+          lang,
+        },
+        path: {
+          document_id: documentId,
+        },
+      }),
+    );
+  }
 }
 
 export default FeishuDocxHelper;
