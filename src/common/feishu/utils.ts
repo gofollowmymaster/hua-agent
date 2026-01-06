@@ -20,7 +20,6 @@ export const sendExceptionToFeishuOrigin = (
   exception: Error,
   reqContext: string = '',
 ) => {
-  console.log('[ exception ] >', exception);
   //构建消息内容
   const options = {
     title: `Node Server异常报警【${exception.name}】`,
