@@ -54,7 +54,7 @@ export class TenantMiddleware implements NestMiddleware {
       //  域名与服务商token要匹配，避免拿着aplus的token请求boat的网关
       if (process.env.NODE_ENV !== 'dev' && host.indexOf(hostTag) == -1) {
         logger.info(
-          `请求开始【${req.method} - ${req.originalUrl}】 请求头:【${JSON.stringify(req.headers)}】请求体参数:【${JSON.stringify(req.body)}】时间:【${dayjs().format('YYYY-MM-DD HH:mm:ss')}】`,
+          `请求开始【${req.method} - ${req.originalUrl}】 请求头:【${JSON.stringify(req.headers)}】请求体参数:【${JSON.stringify(req.body)}】 `,
         );
         sendExceptionToFeishu(new BadRequestException('非法请求'));
       }
