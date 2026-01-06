@@ -57,7 +57,7 @@ export class TenantMiddleware implements NestMiddleware {
       next();
     });
   }
-  private async fixedTokenHandle(headerToken: string) {
+  private async fixedTokenHandle(headerToken: string): Promise<UserContext> {
     let payload;
     try {
       const { fields: appInfo } = await this.clientSecretTable.get(headerToken);
@@ -71,7 +71,7 @@ export class TenantMiddleware implements NestMiddleware {
     }
     return payload;
   }
-  private async jwtTokenHandle(headerToken: string) {
+  private async jwtTokenHandle(headerToken: string): Promise<UserContext> {
     let payload;
     try {
       payload = await this.jwtService.decode(headerToken);
@@ -92,9 +92,14 @@ export class TenantMiddleware implements NestMiddleware {
     const headerToken = type === 'Bearer' ? token : type;
     let payload;
     if (type == 'Bearer') {
-      payload = this.jwtTokenHandle(headerToken);
+      payload = await this.jwtTokenHandle(headerToken);
     } else if (headerToken) {
-      payload = this.fixedTokenHandle(headerToken);
+      console.log(
+        '[ headerToken ] >',
+        request.headers.authorization,
+        headerToken,
+      );
+      payload = await this.fixedTokenHandle(headerToken);
     }
     return payload || {};
   }
