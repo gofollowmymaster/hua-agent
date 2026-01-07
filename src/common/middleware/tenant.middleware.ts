@@ -43,6 +43,7 @@ export class TenantMiddleware implements NestMiddleware {
         tenantCodeMap[user.supplierCode as TenantCode] ||
         NodeConfigService.get('defaultTenant'),
       user: user || {},
+      request: req,
     };
 
     this.asyncStorage.run(context, () => {

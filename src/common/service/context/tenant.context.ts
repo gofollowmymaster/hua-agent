@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { TenantCode } from '@src/config/tenant';
 import { UserContext } from '@src/type/global';
 import { AsyncLocalStorage } from 'async_hooks';
+import { Request } from 'express';
 
 export interface TenantContextType {
   user?: UserContext;
   tenantCode: TenantCode;
   spaceIds?: string[];
-  // timestamp: number;
+  request?: Request;
 }
 
 @Injectable()
@@ -32,5 +33,8 @@ export class TenantContext {
   }
   get tenant(): TenantCode | undefined {
     return this.getStore()?.tenantCode;
+  }
+  get request(): Request | undefined {
+    return this.getStore()?.request;
   }
 }

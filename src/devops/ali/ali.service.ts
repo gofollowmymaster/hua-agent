@@ -18,6 +18,7 @@ import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { BaseService } from '@src/common/base/BaseService';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { AliDevopsContext } from './common/service/ali-devops.context';
+// import { RedisKeys } from '@src/common/const/redis-key.enum';
 
 @Injectable()
 export class AliService extends BaseService {
@@ -64,6 +65,12 @@ export class AliService extends BaseService {
                 FLOW_INST_RUNNING_COMMENT: params.content,
               },
             );
+          // const key = RedisKeys.PUSH_FEISHU_DOC_CACHE.replace(
+          //   '{tag}',
+          //   params.module + ':' + params.tag,
+          // );
+
+          // const { hash } = await this.redis.sadd(key, executeRes);
           appReleaseWorkflow.status = 'INIT';
           const job = addRetryJob(
             async () =>
