@@ -4,7 +4,7 @@ import FeishuFrontendAlertIssueTable from '@src/alert/common/table/frontend-aler
 import {
   ChatType,
   ReceiveEventParams,
-} from '@src/alert/common/type/feishu-event';
+} from '@src/common/feishu/type/feishu-event';
 import { useAilyAlertSkill } from '@src/alert/common/utils';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolved-card';

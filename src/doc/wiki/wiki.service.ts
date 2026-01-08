@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 
 import { RedisKeys } from '@src/common/const/redis-key.enum';
-import WikiDirectoryService from './schedule/wiki-directory';
+import WikiDirectoryService from '../schedule/wiki-directory';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import { WikiTreeDto } from './dto/wiki.dto';

@@ -9,7 +9,7 @@ import Redis from 'ioredis';
 import {
   EventHandlerParameters,
   ReceiveEventParams,
-} from '../common/type/feishu-event';
+} from '../../common/feishu/type/feishu-event';
 import { FeishuReceiveCallback } from './handler/receive-handler';
 
 @Injectable()

@@ -7,7 +7,7 @@ import configuration from './config';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
 import { ConfigModule } from '@nestjs/config';
 
-import { WikiModule } from './wiki/wiki.module';
+import { WikiModule } from './doc/wiki/wiki.module';
 import { DemoPluginModule } from './demo-plugin/demo-plugin.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AiModule } from './ai/ai.module';
@@ -21,6 +21,7 @@ import { DevopsModule } from './devops/devops.module';
 import { GlobalServiceModule } from './common/service/service.module';
 import { GlobalExceptionHandlerModule } from './common/filter/global-exception-handler/global-exception.module';
 import { ManageModule } from './manage/manage.module';
+import { DocModule } from './doc/doc.module';
 
 const modulesAll = [
   ManageModule,
@@ -28,6 +29,7 @@ const modulesAll = [
   AiModule,
   AdminModule,
   WikiModule,
+  DocModule,
   DemoPluginModule,
   AlertModule,
   FdCopilotModule,

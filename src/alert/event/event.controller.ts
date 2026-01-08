@@ -9,7 +9,7 @@ import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import {
   EventHandlerParameters,
   ReceiveEventParams,
-} from '../common/type/feishu-event';
+} from '@src/common/feishu/type/feishu-event';
 
 @ApiTags('飞书事件回调')
 @Controller('feishu-event')

@@ -6,7 +6,7 @@ import { LoggerService } from '@src/common/service/logger/logger.service';
 import { FeishuHelperModule } from '@src/common/feishu/helper/helper.module';
 
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
-import WikiDirectoryService from './schedule/wiki-directory';
+import WikiDirectoryService from '../schedule/wiki-directory';
 
 @Module({
   imports: [

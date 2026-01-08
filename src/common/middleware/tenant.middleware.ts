@@ -52,8 +52,12 @@ export class TenantMiddleware implements NestMiddleware {
         context.tenantCode,
         'hostTag',
       ) as string;
-      //  域名与服务商token要匹配，避免拿着aplus的token请求boat的网关
-      if (process.env.NODE_ENV !== 'dev' && host.indexOf(hostTag) == -1) {
+      //  域名与服务商token要匹配，避免拿着aplus的token请求boat的网关，并排除没有token的情况
+      if (
+        process.env.NODE_ENV !== 'dev' &&
+        host.indexOf(hostTag) == -1 &&
+        user.supplierCode
+      ) {
         logger.info(
           `请求开始【${req.method} - ${req.originalUrl}】 请求头:【${JSON.stringify(req.headers)}】请求体参数:【${JSON.stringify(req.body)}】 `,
         );
