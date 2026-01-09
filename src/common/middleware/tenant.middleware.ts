@@ -67,17 +67,13 @@ export class TenantMiddleware implements NestMiddleware {
     });
   }
   private async fixedTokenHandle(headerToken: string): Promise<UserContext> {
-    let payload;
-    try {
-      const { fields: appInfo } = await this.clientSecretTable.get(headerToken);
+    console.log('[ headerToken ] >', headerToken);
+    const { fields: appInfo } = await this.clientSecretTable.get(headerToken);
 
-      payload = {
-        supplierCode: appInfo.服务商,
-      };
-    } catch (e) {
-      sendExceptionToFeishu(e);
-      payload = {};
-    }
+    const payload: UserContext = {
+      supplierCode: appInfo.服务商 as string,
+    };
+
     return payload;
   }
   private async jwtTokenHandle(headerToken: string): Promise<UserContext> {
@@ -103,11 +99,6 @@ export class TenantMiddleware implements NestMiddleware {
     if (type == 'Bearer') {
       payload = await this.jwtTokenHandle(headerToken);
     } else if (headerToken) {
-      console.log(
-        '[ headerToken ] >',
-        request.headers.authorization,
-        headerToken,
-      );
       payload = await this.fixedTokenHandle(headerToken);
     }
     return payload || {};

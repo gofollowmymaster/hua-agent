@@ -16,16 +16,6 @@ import {
 import { records } from '@src/common/utils/actionTable/interface';
 import { AplusResponse } from '@src/type/global';
 @ApiTags('飞书机器人快捷操作')
-@ApiHeaders([
-  {
-    name: 'appToken',
-    description: '多维表格appToken',
-  },
-  {
-    name: 'tableId',
-    description: '多维表格appToken',
-  },
-])
 @Controller('robot')
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}

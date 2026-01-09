@@ -18,7 +18,7 @@ export default class WikiDirectoryService extends BaseSchedule {
     process.env.NODE_ENV,
   );
   protected readonly cron = process.env.WIKI_CRON || '0 0 16 * * *';
-  protected readonly jobName = 'Sync Wiki Nodes';
+  protected readonly jobName = 'Sync-Wiki-Nodes';
   protected redis: Redis;
 
   constructor(

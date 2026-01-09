@@ -3,7 +3,7 @@ import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { WikiService } from './wiki.service';
 import { AuthGuard } from '@src/common/guard/auth';
-import { WikiTreeDto } from './dto/wiki.dto';
+import { WikiSearchDto, WikiTreeDto } from './dto/wiki.dto';
 import { SecretAuthGuard } from '@src/common/guard/secret-auth';
 import { NodeConfigService } from '@src/config/node-config.service';
 import { TenantContext } from '@src/common/service/context/tenant.context';
@@ -56,5 +56,15 @@ export class WikiController {
       )?.[0];
     }
     return await this.wikiService.tree(params);
+  }
+  @ApiOperation({
+    summary: '按关键词搜索知识空间',
+    description: '按关键词搜索知识空间',
+  })
+  @UseGuards(SecretAuthGuard)
+  @Post('/search')
+  @ApiBody({ type: WikiSearchDto })
+  async search(@Body() params: WikiSearchDto) {
+    return await this.wikiService.search(params);
   }
 }

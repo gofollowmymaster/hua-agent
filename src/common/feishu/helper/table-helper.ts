@@ -3,7 +3,6 @@ import {
   BitTableCreateData,
   BitTableCreateOption,
   BitTableFields,
-  BitTableFilter,
   BitTableGetOption,
   BitTableGetData,
   BitTableRecord,

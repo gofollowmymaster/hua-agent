@@ -4,7 +4,6 @@ import {
   BitTableCreateOption,
   BitTableCreateRecord,
   BitTableFields,
-  BitTableFilter,
   BitTableGetOption,
   BitTablePagination,
   BitTableRecord,

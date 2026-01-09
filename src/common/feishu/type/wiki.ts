@@ -26,3 +26,10 @@ export type WikiMoveDocsToWikiParams = Parameters<
 export type WikiMoveDocsToWikiReturn = Awaited<
   ReturnType<lark.Client['wiki']['v2']['spaceNode']['moveDocsToWiki']>
 >['data'];
+
+export type WikiSearchParams = Parameters<
+  lark.Client['wiki']['v1']['node']['search']
+>['0'];
+
+export type WikiSearchData = WikiSearchParams['data'];
+export type WikiSearchPageParams = WikiSearchParams['params'];

@@ -31,10 +31,11 @@ abstract class FeishuDataApiHelper extends FeishuApiHelper {
     if (this.useCache && useCache) {
       const cacheKey = this.buildCacheKey(key);
       let res = await this.redis?.get(cacheKey);
-
+      console.log('[ res ] >', cacheKey, res);
       if (res) return JSON.parse(res);
 
       res = await this.requestWrapper(handler, key.split(':')[0]);
+      console.log('[ cacheKey ] >', cacheKey, this.ttl);
 
       this.redis.setex(cacheKey, this.ttl, JSON.stringify(res));
       return res;

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import globalConfig from '@src/config';
-import { TenantCode, TenantConfigKey } from '@src/config/tenant';
+import { TenantCode, TenantConfigKey, tenantCodeMap } from '@src/config/tenant';
 @Injectable()
 export class NodeConfigService {
   static get(configKey?: string) {
@@ -44,5 +44,11 @@ export class NodeConfigService {
   }
   static getTenantConfigItem(tenant: TenantCode, configKey: TenantConfigKey) {
     return globalConfig['tenantConfig'][tenant][configKey];
+  }
+  static getTenantConfigItemAll(configKey: TenantConfigKey) {
+    return Object.keys(globalConfig['tenantConfig']).reduce((prev, next) => {
+      prev[next] = globalConfig['tenantConfig'][next]?.[configKey];
+      return prev;
+    }, {});
   }
 }

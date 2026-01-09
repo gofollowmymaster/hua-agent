@@ -8,6 +8,8 @@ import {
   WikiDirectoryListReturn,
   WikiMoveDocsToWikiParams,
   WikiMoveDocsToWikiReturn,
+  WikiSearchData,
+  WikiSearchPageParams,
   WikiTreeItem,
 } from '../type/wiki';
 import { createHash } from 'crypto';
@@ -35,6 +37,24 @@ class FeishuWikiHelper extends FeishuDataApiHelper {
           space_id: spaceId,
         },
       }),
+    );
+  }
+  async search(
+    data: WikiSearchData,
+    pageParams?: WikiSearchPageParams,
+    useCache = false,
+  ): Promise<WikiDirectoryListReturn> {
+    return await this.readWrapper(
+      async () =>
+        await this.client.wiki.v1.node.search({
+          data,
+          params: {
+            page_size: 100,
+            ...pageParams,
+          },
+        }),
+      useCache,
+      `wiki-search:${JSON.stringify(data)}`,
     );
   }
   async list(

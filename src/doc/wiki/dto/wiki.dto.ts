@@ -12,3 +12,20 @@ export class WikiTreeDto {
   })
   force: boolean;
 }
+export class WikiSearchDto {
+  @ApiProperty({
+    type: String,
+    description: '飞书知识空间ID',
+  })
+  spaceId: string;
+  @ApiProperty({
+    type: String,
+    description: '搜索关键词',
+  })
+  query: string;
+  @ApiProperty({
+    type: String,
+    description: '子节点Id',
+  })
+  nodeId?: string;
+}

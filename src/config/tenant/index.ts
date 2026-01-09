@@ -24,7 +24,6 @@ export type TenantRobots = keyof TenantConfig['robots'];
 export type TenantConfigKey = keyof TenantConfig;
 
 export const tenantCodeMap = {
-  CO3906: 'boat',
   A: 'aplus',
   C: 'boat',
   D: 'yurex',

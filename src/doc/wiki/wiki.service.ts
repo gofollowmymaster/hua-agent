@@ -5,7 +5,9 @@ import { RedisKeys } from '@src/common/const/redis-key.enum';
 import WikiDirectoryService from '../schedule/wiki-directory';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
-import { WikiTreeDto } from './dto/wiki.dto';
+import { WikiSearchDto, WikiTreeDto } from './dto/wiki.dto';
+import FeishuWikiHelper from '@src/common/feishu/helper/feishu-wiki-helper';
+import { toSnakeCase } from '@src/common/utils/data';
 
 @Injectable()
 export class WikiService {
@@ -14,6 +16,7 @@ export class WikiService {
   constructor(
     private readonly logger: LoggerService,
     private wikiDirectoryService: WikiDirectoryService,
+    private readonly feishuWikiHelper: FeishuWikiHelper,
     private readonly redisService: RedisService,
   ) {
     this.redis = redisService.getClient();
@@ -37,5 +40,9 @@ export class WikiService {
     return {
       data: tree,
     };
+  }
+  async search(params: WikiSearchDto) {
+    const res = this.feishuWikiHelper.search(toSnakeCase(params));
+    return res;
   }
 }

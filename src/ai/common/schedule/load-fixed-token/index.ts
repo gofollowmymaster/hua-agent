@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron, SchedulerRegistry } from '@nestjs/schedule';
+import { Injectable } from '@nestjs/common';
+import { SchedulerRegistry } from '@nestjs/schedule';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import * as lark from '@larksuiteoapi/node-sdk';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
@@ -8,7 +8,7 @@ import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import BaseSchedule from '@src/common/base/base.schedule';
 import { TenantContext } from '@src/common/service/context/tenant.context';
-import { NodeConfigService } from '@src/config/node-config.service';
+// import { NodeConfigService } from '@src/config/node-config.service';
 
 export type FeishuAuthType = Awaited<
   ReturnType<lark.Client['authen']['refreshAccessToken']['create']>
@@ -30,11 +30,6 @@ export default class FixedTokenService extends BaseSchedule {
     super(tenantContext, schedulerRegistry);
     this.redis = redisService.getClient();
   }
-  protected initContext() {
-    this.tenantContextDatas = [
-      { tenantCode: NodeConfigService.get('defaultTenant') },
-    ];
-  }
 
   async handle(force = false) {
     if (!force && ['development', 'dev'].includes(process.env.NODE_ENV)) return;
@@ -47,7 +42,7 @@ export default class FixedTokenService extends BaseSchedule {
       RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED,
     );
     const tokenInCached: FeishuAuthType = await this.redis.hgetall(cacheKey);
-    this.logger.log('[ cachedinfo ] >' + JSON.stringify(tokenInCached));
+    this.logger.log('[ cachedInfo ] >' + JSON.stringify(tokenInCached));
 
     if (!tokenInCached?.refresh_token) {
       this.sendAlertMsg('token in cache is null');

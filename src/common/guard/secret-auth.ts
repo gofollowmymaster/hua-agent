@@ -35,9 +35,9 @@ export class SecretAuthGuard implements CanActivate {
     }
 
     try {
-      await this.verify(token);
+      await this.verify(token, request.originalUrl);
     } catch (err) {
-      throw new UnauthorizedException('无效的认证密钥');
+      throw new UnauthorizedException(err.message || '无效的认证密钥');
     }
     return true;
   }
@@ -46,11 +46,18 @@ export class SecretAuthGuard implements CanActivate {
     return token;
   }
 
-  private async verify(token: string) {
+  private async verify(token: string, path: string) {
     const { fields: appInfo } = await this.clientSecretTable.get(token);
 
     if (!appInfo.是否启用) {
       throw new UnauthorizedException('认证密钥已失效');
+    }
+    const module = path.split('/').filter(Boolean)[0];
+    const modules = (appInfo.使用范围 || []) as Array<string>;
+    console.log('[ path ] >', modules, module);
+
+    if (!modules.includes(module)) {
+      throw new UnauthorizedException('没有访问当前模块权限');
     }
     return true;
   }
