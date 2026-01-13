@@ -15,13 +15,17 @@ export class AilyService {
   }
 
   async getToken(): Promise<FeishuAuthType> {
-    const cacheKey = this.redisService.buildCacheKey(
+    const cacheKey = this.redisService.buildCacheKeyWithTemplates(
       RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED,
+      {
+        module: 'aily',
+      },
     );
     const cachedInfo: FeishuAuthType = await this.redis.hgetall(cacheKey);
     return cachedInfo;
   }
   async getTokenByCode(code: string): Promise<FeishuAuthType> {
+    console.log('[ res ] >');
     const client = ClientFactory.create(FeishuApp.AilyAplusClient);
     const res = await client.client.authen.accessToken.create({
       data: {
@@ -29,6 +33,7 @@ export class AilyService {
         code: code,
       },
     });
+    console.log('[ res ] >', res);
 
     if (res.code !== 0) {
       throw new FeishuApiException(res.msg);

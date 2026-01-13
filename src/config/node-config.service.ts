@@ -34,7 +34,10 @@ export class NodeConfigService {
   static getFeishuTableConfig(configKey: string): Record<TenantCode, string> {
     const value = globalConfig['feishuTables'][configKey] as string;
     if (value) {
-      return { aplus: value } as Record<TenantCode, string>;
+      return Object.values(tenantCodeMap).reduce((prev, tenant) => {
+        prev[tenant] = value;
+        return prev;
+      }, {}) as Record<TenantCode, string>;
     }
     const tenantConfigs = globalConfig['tenantConfig'];
     const tenantConfigValues = {} as Record<TenantCode, string>;
