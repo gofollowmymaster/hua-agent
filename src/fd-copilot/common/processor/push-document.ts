@@ -1,4 +1,4 @@
-import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
+import { Processor } from '@nestjs/bullmq';
 
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import FeishuDocxHelper from '@src/common/feishu/helper/feishu-docx-helper';
@@ -8,20 +8,23 @@ import { RedisService } from '@src/common/service/redis/redis.service';
 import { getParentWikiToken, spaceId } from '@src/fd-copilot/sync/config';
 import { FeishuPushDto } from '@src/fd-copilot/sync/dto/sync';
 import { wait } from '@src/common/utils/job';
-import { Job } from 'bullmq';
 import { createHash } from 'crypto';
 import Redis from 'ioredis';
+import BaseProcessor from '@src/common/base/base.processor';
+import { TenantContext } from '@src/common/service/context/tenant.context';
+import { ProcessorBody } from '@src/type/global';
 
 @Processor('sync-document')
-export class SyncDocumentProcessor extends WorkerHost {
+export class SyncDocumentProcessor extends BaseProcessor {
   protected readonly redis: Redis;
   constructor(
     protected redisService: RedisService,
     protected feishuDocxHelper: FeishuDocxHelper,
     protected feishuWikiHelper: FeishuWikiHelper,
     protected feishuFileHelper: FeishuFileHelper,
+    protected readonly tenantContext: TenantContext,
   ) {
-    super();
+    super(tenantContext);
     this.redis = redisService.getClient();
   }
   async contentHandler(params: FeishuPushDto) {
@@ -67,8 +70,7 @@ export class SyncDocumentProcessor extends WorkerHost {
     }
   }
 
-  async process(job: Job<FeishuPushDto>): Promise<any> {
-    const params = job.data;
+  async handle(params: FeishuPushDto & ProcessorBody): Promise<any> {
     const key = RedisKeys.PUSH_FEISHU_DOC_CACHE.replace(
       '{tag}',
       params.module + ':' + params.tag,
@@ -114,21 +116,5 @@ export class SyncDocumentProcessor extends WorkerHost {
       throw new Error('同步文档失败：' + documentId + ' ' + error.message);
     }
     await wait(1000);
-  }
-
-  @OnWorkerEvent('active')
-  onJobActive(job: Job) {
-    console.log(
-      `Processing job ${job.id} of type ${job.name} with data ${JSON.stringify(job.data)}`,
-    );
-  }
-  @OnWorkerEvent('completed')
-  onJobCompleted(job: Job) {
-    console.log(`Job ${job.id} completed with result:`, job.returnvalue);
-  }
-
-  @OnWorkerEvent('failed')
-  onJobFailed(job: Job, error: Error) {
-    console.error(`Job ${job.id} failed with error:`, error.message);
   }
 }

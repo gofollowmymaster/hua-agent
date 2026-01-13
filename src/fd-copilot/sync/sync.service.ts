@@ -8,6 +8,7 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import FeishuDocxHelper from '@src/common/feishu/helper/feishu-docx-helper';
 import FeishuFileHelper from '@src/common/feishu/helper/feishu-file-helper';
+import { TenantContext } from '@src/common/service/context/tenant.context';
 
 @Injectable()
 export class SyncService {
@@ -17,6 +18,7 @@ export class SyncService {
     @InjectQueue('sync-document') private syncDocumentQueue: Queue,
     protected feishuDocxHelper: FeishuDocxHelper,
     protected feishuFileHelper: FeishuFileHelper,
+    protected readonly tenantContext: TenantContext,
   ) {
     this.redis = redisService.getClient();
   }
@@ -33,7 +35,10 @@ export class SyncService {
     if (contentHash == hash) {
       throw new HttpException('文档内容未改变', 200);
     }
-    const res = await this.syncDocumentQueue.add('syncDocument', params);
+    const res = await this.syncDocumentQueue.add('syncDocument', {
+      ...params,
+      tenantCode: this.tenantContext.tenant,
+    });
     return { msg: 'ok', data: res.id };
   }
   async getDocumentContent(params: any) {

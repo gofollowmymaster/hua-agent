@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { TenantCode } from '@src/config/tenant';
 
 export class AplusResponse<T> {
   @ApiProperty({
@@ -48,4 +49,9 @@ export type UserContext = {
   scope?: 'WEB' | 'APP';
   tenantId?: number;
   username?: string;
+};
+
+export type ProcessorBody = {
+  tenantCode: TenantCode;
+  [key: string]: any;
 };

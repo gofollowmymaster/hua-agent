@@ -86,20 +86,4 @@ export class CheckDocumentProcessor extends BaseProcessor {
       await wait(1000);
     }
   }
-
-  @OnWorkerEvent('active')
-  onJobActive(job: Job) {
-    console.log(
-      `Processing job ${job.id} of type ${job.name} with data ${JSON.stringify(job.data)}`,
-    );
-  }
-  @OnWorkerEvent('completed')
-  onJobCompleted(job: Job) {
-    console.log(`Job ${job.id} completed with result:`, job.returnvalue);
-  }
-
-  @OnWorkerEvent('failed')
-  onJobFailed(job: Job, error: Error) {
-    console.error(`Job ${job.id} failed with error:`, error.message);
-  }
 }

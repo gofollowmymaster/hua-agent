@@ -89,7 +89,7 @@ export class WikiController {
     summary: '获取链接黑名单列表',
     description: '获取链接黑名单列表',
   })
-  @UseGuards(SecretAuthGuard)
+  @UseGuards(AuthGuard)
   @Post('/blacklist')
   @ApiBody({ type: WikiBlackListDto })
   @ApiOkResponse({
