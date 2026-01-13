@@ -7,8 +7,10 @@ const globalConfig = Object.freeze({
   FeishuMsgDebugGroupId: 'oc_504fc5a30c33892570ffb5163b6bec93',
   //默认报警人 Ahua
   DefaultAlertFeishuUserId: '762a5468',
-  //运效通知群
+  //云效通知群
   AliDevopsFeishuGroupId: process.env.ALI_DEVOPS_NOTICE_GROUPID,
+  //wiki黑名单检测通知群
+  WikiBlackListCheckoutGroupId: process.env.WIKI_CHECK_NOTICE_GROUPID,
   ...db,
   jwtSecret: process.env.JWT_SECRET,
   sentryIntegrationToken: process.env.SENTRY_API_TOKEN,
@@ -29,6 +31,7 @@ const globalConfig = Object.freeze({
       process.env.FEISHU_APLUS_NODE_ADMIN_MTABLE_TABLE_ID,
     DevopsTableAppToken: 'Jz0abVIqeajmfesIkfRcwiannof',
     SupplierDiffAppToken: 'HHtzbuGuua3mRvszTI8cYKBVnId',
+    BlackListTableAppToken: 'Jy9AbAbsdaMTYVs6H23cOMQRnro',
   },
 
   robots: {
@@ -38,7 +41,7 @@ const globalConfig = Object.freeze({
       appSecret: process.env.FEISHU_AILY_ALERT_APP_SECRET,
     },
     //报警机器人相关
-    FeishuAlertClient: {
+    AlertClient: {
       appId: process.env.FEISHU_ALERT_APP_APPID,
       appSecret: process.env.FEISHU_ALERT_APP_APPSECRET,
     },

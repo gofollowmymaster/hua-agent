@@ -9,17 +9,16 @@ import {
 } from './dto/aily';
 import { AplusResponse } from '@src/type/global';
 import { SignAuthGuard } from '@src/common/guard/sign-auth';
-import FixedTokenService, {
-  FeishuAuthType,
-} from '../common/schedule/load-fixed-token';
 import { AuthGuard } from '@src/common/guard/auth';
 import { SecretAuthGuard } from '@src/common/guard/secret-auth';
+import { FeishuAuthType } from '@src/common/feishu/type/auth';
+import WikiFixedTokenService from '@src/common/service/fixed-user-token/wiki-fixed-user-token';
 
 @Controller('aily')
 export class AilyController {
   constructor(
-    private authService: AilyService,
-    private fixedTokenService: FixedTokenService,
+    private ailyService: AilyService,
+    private fixedTokenService: WikiFixedTokenService,
   ) {}
 
   @Post('getToken')
@@ -31,7 +30,7 @@ export class AilyController {
   @ApiOkResponse({ type: AplusResponse<FeishuAuthType> })
   @UseGuards(SignAuthGuard)
   async getToken() {
-    const feishuUser = await this.authService.getToken();
+    const feishuUser = await this.ailyService.getToken();
     if (!feishuUser) {
       throw new Error('获取飞书用户信息失败');
     }
@@ -47,7 +46,7 @@ export class AilyController {
   @ApiOkResponse({ type: AplusResponse<FeishuAuthType> })
   @UseGuards(SecretAuthGuard)
   async getTokenByCode(@Body() params: FeishuGenerateTokenDto) {
-    return this.authService.getTokenByCode(params.code);
+    return this.ailyService.getTokenByCode(params.code);
   }
 
   @Post('useTokenByCode')
@@ -59,7 +58,7 @@ export class AilyController {
   @ApiOkResponse({ type: AplusResponse<FeishuAuthType> })
   @UseGuards(SecretAuthGuard)
   async useTokenByCode(@Body() params: FeishuGenerateTokenDto) {
-    return this.authService.useTokenByCode(params.code);
+    return this.ailyService.useTokenByCode(params.code);
   }
 
   @Post('bindSession')
@@ -71,7 +70,7 @@ export class AilyController {
   @ApiOkResponse({ type: AplusResponse<FeishuAuthType> })
   @UseGuards(AuthGuard)
   async bindSession(@Body() params: BindSessionCodeDto) {
-    return this.authService.bindSession(params);
+    return this.ailyService.bindSession(params);
   }
 
   @Post('verifySession')
@@ -83,7 +82,7 @@ export class AilyController {
   @ApiOkResponse({ type: AplusResponse<FeishuAuthType> })
   @UseGuards(SignAuthGuard)
   async verifySession(@Body() params: BindSessionCodeDto) {
-    return this.authService.verifySession(params);
+    return this.ailyService.verifySession(params);
   }
 
   @Post('triggerRefreshToken')

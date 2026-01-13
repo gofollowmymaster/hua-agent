@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { tenantCodeMap } from '@src/config/tenant';
 
 export class WikiTreeDto {
   @ApiProperty({
@@ -12,6 +13,7 @@ export class WikiTreeDto {
   })
   force: boolean;
 }
+
 export class WikiSearchDto {
   @ApiProperty({
     type: String,
@@ -28,4 +30,54 @@ export class WikiSearchDto {
     description: '子节点Id',
   })
   nodeId?: string;
+}
+
+export class WikiBatchSearchDto {
+  @ApiProperty({
+    enum: tenantCodeMap,
+    description: '服务商编码',
+  })
+  supplierCode: tenantCodeMap;
+}
+
+export enum BlackListType {
+  text = '文本',
+  link = '链接',
+}
+export class WikiBlackListDto {
+  @ApiProperty({
+    type: Array<BlackListType>,
+
+    description: '类型,枚举值：文本，链接',
+  })
+  type: Array<BlackListType>;
+  @ApiProperty({
+    enum: tenantCodeMap,
+    description: '服务商',
+  })
+  supplierCode: tenantCodeMap;
+}
+export class WikiBlackListResponseDto {
+  @ApiProperty({ example: 1, description: 'ID' })
+  id: string;
+  @ApiProperty({
+    type: Array<BlackListType>,
+    description: '类型,枚举值：文本，链接',
+  })
+  type: Array<BlackListType>;
+  @ApiProperty({
+    enum: tenantCodeMap,
+    description: '服务商',
+  })
+  supplierCode: tenantCodeMap;
+  @ApiProperty({
+    type: String,
+    description: '关键字',
+  })
+  keyword: string;
+  @ApiProperty({
+    type: Boolean,
+    description: '是否需要严格比对',
+  })
+  rawSearch: boolean;
 }

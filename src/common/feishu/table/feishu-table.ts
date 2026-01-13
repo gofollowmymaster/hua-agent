@@ -3,6 +3,7 @@ import FeishuTableHelper from '../helper/table-helper';
 import {
   BitTableCreateOption,
   BitTableCreateRecord,
+  BitTableDataList,
   BitTableFields,
   BitTableGetOption,
   BitTablePagination,
@@ -11,6 +12,8 @@ import {
   BitTableSearchPayloadParams,
 } from '../type/bitable';
 import { TenantCode } from '@src/config/tenant';
+import { transformTableField } from '@src/common/utils/bt-table';
+import { BitTableList } from '@src/type/global';
 @Injectable()
 abstract class FeishuTable {
   protected readonly tableHelper: FeishuTableHelper;
@@ -26,6 +29,15 @@ abstract class FeishuTable {
       useCache: this.useCache,
       ttl: this.ttl,
     });
+  }
+  flatItemField(data: BitTableDataList[0]) {
+    const res = {
+      id: data.record_id,
+    };
+    Object.keys(data.fields).forEach((field) => {
+      res[field] = transformTableField(data.fields[field]);
+    });
+    return res;
   }
   async list(
     params: BitTableSearchPayloadParams = {},
@@ -44,6 +56,21 @@ abstract class FeishuTable {
 
     const res = await this.tableHelper.search(data, params, useCache);
     return res;
+  }
+  async searchTransformed(
+    data: BitTableSearchPayloadData,
+    params: BitTableSearchPayloadParams = {},
+    useCache = true,
+  ): Promise<BitTableList<any>> {
+    const res = await this.search(data, params, useCache);
+    const list = res.items.map((item) => {
+      return this.flatItemField(item);
+    });
+    return {
+      list,
+      total: res.total,
+      hasMore: res.has_more,
+    };
   }
 
   async get(recordId: string, params: BitTableGetOption = {}, useCache = true) {

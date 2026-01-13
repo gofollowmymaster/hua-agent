@@ -10,7 +10,7 @@ import AilyLogOperatorTable from './log-operator/adapter/aily-log-operator-table
 import { PrismaService } from '@src/common/service/prisma/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import LogOperatorAdapter from './log-operator/adapter/log-operator-adapter';
-import FixedTokenService from './common/schedule/load-fixed-token';
+import WikiFixedTokenService from '@src/common/service/fixed-user-token/wiki-fixed-user-token';
 
 @Module({
   imports: [
@@ -24,7 +24,7 @@ import FixedTokenService from './common/schedule/load-fixed-token';
     PrismaService,
     LoggerService,
     LogOperatorAdapter,
-    FixedTokenService,
+    WikiFixedTokenService,
   ],
   controllers: [AilyController, LogOperatorController],
 })

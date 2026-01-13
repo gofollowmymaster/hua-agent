@@ -23,11 +23,11 @@ export type TenantConfig = {
 export type TenantRobots = keyof TenantConfig['robots'];
 export type TenantConfigKey = keyof TenantConfig;
 
-export const tenantCodeMap = {
-  A: 'aplus',
-  C: 'boat',
-  D: 'yurex',
-} as const;
+export enum tenantCodeMap {
+  A = 'aplus',
+  C = 'boat',
+  D = 'yurex',
+}
 //服务商码
 export type TenantCode = (typeof tenantCodeMap)[keyof typeof tenantCodeMap];
 const tenantConfig: Readonly<Record<TenantCode, Readonly<TenantConfig>>> = {

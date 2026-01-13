@@ -5,7 +5,7 @@ import { FeishuApiException } from '@src/common/exception/feishu-api-exception';
 import { BindSessionCodeDto } from './dto/aily';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
-import { FeishuAuthType } from '../common/schedule/load-fixed-token';
+import { FeishuAuthType } from '@src/common/feishu/type/auth';
 
 @Injectable()
 export class AilyService {
@@ -18,8 +18,8 @@ export class AilyService {
     const cacheKey = this.redisService.buildCacheKey(
       RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED,
     );
-    const cachedinfo: FeishuAuthType = await this.redis.hgetall(cacheKey);
-    return cachedinfo;
+    const cachedInfo: FeishuAuthType = await this.redis.hgetall(cacheKey);
+    return cachedInfo;
   }
   async getTokenByCode(code: string): Promise<FeishuAuthType> {
     const client = ClientFactory.create(FeishuApp.AilyAplusClient);
@@ -33,25 +33,32 @@ export class AilyService {
     if (res.code !== 0) {
       throw new FeishuApiException(res.msg);
     }
-    const key = this.redisService.buildCacheKey(
+    const key = this.redisService.buildCacheKeyWithTemplates(
       RedisKeys.FEISHU_FIXED_ACCESS_TOKEN,
-      '{code}',
-      code,
+      {
+        module: 'aily',
+        code: code,
+      },
     );
     await this.redis.hset(key, res.data);
     this.redis.expire(key, 60 * 60 * 24);
     return res.data;
   }
   async useTokenByCode(code: string) {
-    const codeKey = this.redisService.buildCacheKey(
+    const codeKey = this.redisService.buildCacheKeyWithTemplates(
       RedisKeys.FEISHU_FIXED_ACCESS_TOKEN,
-      '{code}',
-      code,
+      {
+        module: 'aily',
+        code: code,
+      },
     );
 
     const userInfo = await this.redis.hgetall(codeKey);
-    const usedKey = this.redisService.buildCacheKey(
+    const usedKey = this.redisService.buildCacheKeyWithTemplates(
       RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED,
+      {
+        module: 'aily',
+      },
     );
     await this.redis.hset(usedKey, userInfo);
     return true;

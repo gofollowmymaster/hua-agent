@@ -8,17 +8,14 @@ import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import BaseSchedule from '@src/common/base/base.schedule';
 import { TenantContext } from '@src/common/service/context/tenant.context';
-// import { NodeConfigService } from '@src/config/node-config.service';
-
-export type FeishuAuthType = Awaited<
-  ReturnType<lark.Client['authen']['refreshAccessToken']['create']>
->['data'];
+import { FeishuAuthType } from '@src/common/feishu/type/auth';
 
 @Injectable()
 export default class FixedTokenService extends BaseSchedule {
   //每30分钟运行一次
-  protected readonly cron = '0 */30 * * * *';
-  protected readonly jobName = 'Refresh Fixed Token';
+  protected readonly cron: string;
+  protected readonly jobName: string;
+  protected readonly projectModule: string;
 
   private client: lark.Client;
   private readonly redis: Redis;
@@ -38,13 +35,16 @@ export default class FixedTokenService extends BaseSchedule {
     this.loadToken();
   }
   async loadToken() {
-    const cacheKey = this.redisService.buildCacheKey(
+    const cacheKey = this.redisService.buildCacheKeyWithTemplates(
       RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED,
+      {
+        module: this.projectModule,
+      },
     );
     const tokenInCached: FeishuAuthType = await this.redis.hgetall(cacheKey);
-    this.logger.log('[ cachedInfo ] >' + JSON.stringify(tokenInCached));
 
     if (!tokenInCached?.refresh_token) {
+      console.log('[ tokenInCached ] >', cacheKey, tokenInCached);
       this.sendAlertMsg('token in cache is null');
       return;
     }

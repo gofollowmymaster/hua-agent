@@ -7,7 +7,6 @@ import { createHash } from 'crypto';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import FeishuDocxHelper from '@src/common/feishu/helper/feishu-docx-helper';
-import FeishuWikiHelper from '@src/common/feishu/helper/feishu-wiki-helper';
 import FeishuFileHelper from '@src/common/feishu/helper/feishu-file-helper';
 
 @Injectable()

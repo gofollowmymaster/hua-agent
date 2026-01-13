@@ -38,6 +38,7 @@ export type BitTableCreateReturn = Awaited<
 >;
 export type BitTableCreateData = BitTableCreateReturn['data'];
 export type BitTableCreateRecord = BitTableCreateReturn['data']['record'];
+export type BitTableCreateRecordField = BitTableCreateRecord['fields'][0];
 
 //获取单条记录
 export type BitTableGetParams = Parameters<

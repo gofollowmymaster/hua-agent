@@ -16,7 +16,10 @@ export class NodeConfigService {
   static getRobotConfig(clientName: string) {
     const robotConfig = globalConfig['robots']?.[clientName];
     if (robotConfig) {
-      return { aplus: robotConfig };
+      return Object.values(tenantCodeMap).reduce((prev, tenant) => {
+        prev[tenant] = robotConfig;
+        return prev;
+      }, {});
     }
     const tenantConfigs = globalConfig['tenantConfig'];
     const tenantRobotConfigs = {};

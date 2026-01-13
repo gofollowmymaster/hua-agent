@@ -36,6 +36,21 @@ export class RedisService {
     if (!template) return cacheKey;
     return cacheKey.replace(template, value);
   }
+  buildCacheKeyWithTemplates(
+    keyTemplate: RedisKeys,
+    templateMap: Record<string, string>,
+  ) {
+    let cacheKey = keyTemplate.replace('{tenant}', this.tenantContext.tenant);
+    const templates = Object.keys(templateMap);
+    if (templates.length < 1) return cacheKey;
+    templates.forEach((template) => {
+      cacheKey = cacheKey.replace(
+        new RegExp(`{${template}}`),
+        templateMap[template],
+      );
+    });
+    return cacheKey;
+  }
 
   /**
    * 检查是否超过限流阈值

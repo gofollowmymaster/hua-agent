@@ -4,6 +4,7 @@ import { RedisService } from './redis/redis.service';
 import { LoggerService } from './logger/logger.service';
 import { TenantContext } from './context/tenant.context';
 import { PrismaService } from './prisma/prisma.service';
+import WikiFixedTokenService from './fixed-user-token/wiki-fixed-user-token';
 @Global()
 @Module({
   providers: [
@@ -12,6 +13,7 @@ import { PrismaService } from './prisma/prisma.service';
     LoggerService,
     TenantContext,
     PrismaService,
+    WikiFixedTokenService,
   ],
   exports: [
     RedisProvider,
@@ -19,6 +21,7 @@ import { PrismaService } from './prisma/prisma.service';
     LoggerService,
     TenantContext,
     PrismaService,
+    WikiFixedTokenService,
   ],
 })
 export class GlobalServiceModule {}

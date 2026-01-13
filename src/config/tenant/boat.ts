@@ -20,8 +20,8 @@ export default {
     //机器人Aplus智能体相关
 
     AilyAplusClient: {
-      appId: 'cli_a85889cedeffd00d',
-      appSecret: 'YEYPIiiqQCDunnB25vosUfWXNiNTgRee',
+      appId: 'cli_a6d55e522f71900e',
+      appSecret: 'JQnGCO6eQtXFTEuZP0ZFCcJwZYKQ31e3',
     },
   },
 };

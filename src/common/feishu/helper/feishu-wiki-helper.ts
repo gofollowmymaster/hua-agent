@@ -9,7 +9,9 @@ import {
   WikiMoveDocsToWikiParams,
   WikiMoveDocsToWikiReturn,
   WikiSearchData,
+  WikiSearchOptions,
   WikiSearchPageParams,
+  WikiSearchReturn,
   WikiTreeItem,
 } from '../type/wiki';
 import { createHash } from 'crypto';
@@ -41,18 +43,23 @@ class FeishuWikiHelper extends FeishuDataApiHelper {
   }
   async search(
     data: WikiSearchData,
-    pageParams?: WikiSearchPageParams,
+    options: WikiSearchOptions,
+    pageParams: WikiSearchPageParams = {},
     useCache = false,
-  ): Promise<WikiDirectoryListReturn> {
+  ): Promise<WikiSearchReturn> {
     return await this.readWrapper(
       async () =>
-        await this.client.wiki.v1.node.search({
-          data,
-          params: {
-            page_size: 100,
-            ...pageParams,
+        await this.client.wiki.v1.node.search(
+          {
+            data,
+            params: {
+              page_size: 20,
+              page_token: '',
+              ...pageParams,
+            },
           },
-        }),
+          options,
+        ),
       useCache,
       `wiki-search:${JSON.stringify(data)}`,
     );

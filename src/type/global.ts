@@ -17,6 +17,23 @@ export class AplusResponse<T> {
   })
   body: T;
 }
+export class BitTableList<T> {
+  @ApiProperty({
+    type: Number,
+    description: '总计',
+  })
+  total: number;
+  @ApiProperty({
+    type: Boolean,
+    description: '是否还有数据',
+  })
+  hasMore: boolean;
+  @ApiProperty({
+    type: Array<T>,
+    description: '列表数据',
+  })
+  list: T;
+}
 
 export type UserContext = {
   supplierName?: string;

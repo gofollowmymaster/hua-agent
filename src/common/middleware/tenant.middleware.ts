@@ -67,7 +67,6 @@ export class TenantMiddleware implements NestMiddleware {
     });
   }
   private async fixedTokenHandle(headerToken: string): Promise<UserContext> {
-    console.log('[ headerToken ] >', headerToken);
     const { fields: appInfo } = await this.clientSecretTable.get(headerToken);
 
     const payload: UserContext = {

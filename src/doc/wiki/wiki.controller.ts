@@ -3,10 +3,17 @@ import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { WikiService } from './wiki.service';
 import { AuthGuard } from '@src/common/guard/auth';
-import { WikiSearchDto, WikiTreeDto } from './dto/wiki.dto';
+import {
+  WikiBatchSearchDto,
+  WikiBlackListDto,
+  WikiBlackListResponseDto,
+  WikiSearchDto,
+  WikiTreeDto,
+} from './dto/wiki.dto';
 import { SecretAuthGuard } from '@src/common/guard/secret-auth';
 import { NodeConfigService } from '@src/config/node-config.service';
 import { TenantContext } from '@src/common/service/context/tenant.context';
+import { AplusResponse, BitTableList } from '@src/type/global';
 
 @ApiTags('wiki相关接口')
 @Controller('wiki')
@@ -66,5 +73,30 @@ export class WikiController {
   @ApiBody({ type: WikiSearchDto })
   async search(@Body() params: WikiSearchDto) {
     return await this.wikiService.search(params);
+  }
+
+  @ApiOperation({
+    summary: '批量按关键词搜索知识空间',
+    description: '一次性在指定知识空间中搜索所有黑名单关键词',
+  })
+  @UseGuards(SecretAuthGuard)
+  @Post('/batchSearch')
+  @ApiBody({ type: WikiBatchSearchDto })
+  async batchSearch(@Body() params: WikiBatchSearchDto) {
+    return await this.wikiService.batchSearch(params);
+  }
+
+  @ApiOperation({
+    summary: '获取链接黑名单列表',
+    description: '获取链接黑名单列表',
+  })
+  @UseGuards(SecretAuthGuard)
+  @Post('/blacklist')
+  @ApiBody({ type: WikiBlackListDto })
+  @ApiOkResponse({
+    type: AplusResponse<BitTableList<WikiBlackListResponseDto>>,
+  })
+  async blacklist(@Body() params: WikiBlackListDto) {
+    return await this.wikiService.blacklist(params);
   }
 }

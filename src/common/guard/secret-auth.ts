@@ -54,7 +54,6 @@ export class SecretAuthGuard implements CanActivate {
     }
     const module = path.split('/').filter(Boolean)[0];
     const modules = (appInfo.使用范围 || []) as Array<string>;
-    console.log('[ path ] >', modules, module);
 
     if (!modules.includes(module)) {
       throw new UnauthorizedException('没有访问当前模块权限');
