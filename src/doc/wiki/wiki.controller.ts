@@ -20,7 +20,6 @@ import { AplusResponse, BitTableList } from '@src/type/global';
 export class WikiController {
   constructor(
     private readonly wikiService: WikiService,
-
     private readonly tenantContext: TenantContext,
   ) {}
 
@@ -97,6 +96,9 @@ export class WikiController {
     type: AplusResponse<BitTableList<WikiBlackListResponseDto>>,
   })
   async blacklist(@Body() params: WikiBlackListDto) {
+    if (!params.supplierCode) {
+      params.supplierCode = this.tenantContext.tenant;
+    }
     return await this.wikiService.blacklist(params);
   }
 }

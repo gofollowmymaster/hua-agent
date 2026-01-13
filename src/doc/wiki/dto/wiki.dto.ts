@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { tenantCodeMap } from '@src/config/tenant';
 
 export class WikiTreeDto {
@@ -51,7 +51,7 @@ export class WikiBlackListDto {
     description: '类型,枚举值：文本，链接',
   })
   type: Array<BlackListType>;
-  @ApiProperty({
+  @ApiPropertyOptional({
     enum: tenantCodeMap,
     description: '服务商',
   })
