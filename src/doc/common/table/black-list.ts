@@ -4,6 +4,7 @@ import FeishuTable from '@src/common/feishu/table/feishu-table';
 import { NodeConfigService } from '@src/config/node-config.service';
 @Injectable()
 class WikiBlackListTable extends FeishuTable {
+  protected useCache = true;
   constructor(readonly tableHelper: FeishuTableHelper) {
     super();
     this.appToken = NodeConfigService.getFeishuTableConfig(
