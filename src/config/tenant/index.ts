@@ -8,17 +8,16 @@ export type FeishuAppConfig = {
 export type TenantConfig = {
   FeishuWikiSpaceIds: string[];
   hostTag: string;
+  WikiBlackListCheckoutGroupId: string;
   robots: {
     XiaoAClient: FeishuAppConfig;
     AuthClient?: FeishuAppConfig;
     //机器人Aplus智能体相关
-
     AilyAplusClient?: FeishuAppConfig;
   };
 
   //Aplus智能体表格相关
-  AilyLogTableAppToken?: string;
-  AilyLogOperatorTableId?: string;
+  feishuTables: Record<string, string>;
 };
 export type TenantRobots = keyof TenantConfig['robots'];
 export type TenantConfigKey = keyof TenantConfig;

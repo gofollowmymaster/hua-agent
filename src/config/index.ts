@@ -9,8 +9,6 @@ const globalConfig = Object.freeze({
   DefaultAlertFeishuUserId: '762a5468',
   //云效通知群
   AliDevopsFeishuGroupId: process.env.ALI_DEVOPS_NOTICE_GROUPID,
-  //wiki黑名单检测通知群
-  WikiBlackListCheckoutGroupId: process.env.WIKI_CHECK_NOTICE_GROUPID,
   ...db,
   jwtSecret: process.env.JWT_SECRET,
   sentryIntegrationToken: process.env.SENTRY_API_TOKEN,

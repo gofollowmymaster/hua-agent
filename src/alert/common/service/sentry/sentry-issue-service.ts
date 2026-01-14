@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { IssueStatus } from '@src/common/feishu/card/error-unresolved-card';
+import { IssueStatus } from '@src/common/feishu/card/warning-card/error-unresolved-card';
 import { firstValueFrom } from 'rxjs';
 import {
   IssueStatusDetailsType,

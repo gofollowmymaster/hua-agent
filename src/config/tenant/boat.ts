@@ -1,7 +1,9 @@
-export default {
+import { TenantConfig } from '.';
+const boatConfig: TenantConfig = {
   FeishuWikiSpaceIds: ['7549126549107195906'],
   hostTag: 'boat',
-
+  //wiki黑名单检测通知群
+  WikiBlackListCheckoutGroupId: 'oc_05458c875fe1007b24bac8f2fa057a3a',
   feishuTables: {
     //Aplus智能体表格相关
     AilyLogTableAppToken: 'A6qfbapjtafVLYsn9xic6mYNnfT',
@@ -25,3 +27,5 @@ export default {
     },
   },
 };
+
+export default boatConfig;

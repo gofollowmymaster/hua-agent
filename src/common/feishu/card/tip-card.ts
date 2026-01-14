@@ -1,6 +1,6 @@
 import { FeishuCard } from './feishu-card';
 
-export type PublishCardData = {
+export type TipCardData = {
   title: string;
   bgColor: string;
   content: string;
@@ -15,7 +15,7 @@ export default class TipCard extends FeishuCard {
    * @param alertInfo
    * @returns
    */
-  static buildCardMsg = (info: PublishCardData) => {
+  static buildCardMsg = (info: TipCardData) => {
     return super.build({
       ...info,
     });

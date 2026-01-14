@@ -1,6 +1,10 @@
-export default {
+import { TenantConfig } from '.';
+const yurexConfig: TenantConfig = {
   FeishuWikiSpaceIds: ['7583921476789652686'],
   hostTag: 'yurex',
+  //wiki黑名单检测通知群
+  WikiBlackListCheckoutGroupId: 'oc_79cc868ad3680d77b1d17c769d42c06a',
+
   feishuTables: {},
   robots: {
     XiaoAClient: {
@@ -13,3 +17,5 @@ export default {
     },
   },
 };
+
+export default yurexConfig;

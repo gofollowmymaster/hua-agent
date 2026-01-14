@@ -7,7 +7,7 @@ import CloseHandler from './close-handler';
 import { FeishuCallbackService } from '../callback.service';
 import { CallbackEventDto } from '../dto/feishu-callback.dto';
 import { CardCallbackReturnType } from '@src/common/feishu/type/card';
-import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolved-card';
+import { UnresolvedCardData } from '@src/common/feishu/card/warning-card/error-unresolved-card';
 
 // type CallbackHandlerParameters<T extends keyof EventHandles> = Parameters<
 //   EventHandles[T]

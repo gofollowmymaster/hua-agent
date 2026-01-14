@@ -8,7 +8,6 @@ import PageAlertFeishuAdapter from '../adapter/page-alert-feishu-adapter';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { ErrorBaseService } from './error-base.service';
 import { Injectable } from '@nestjs/common';
-import { IssueStatusEnum } from '@src/common/feishu/card/error-unresolved-card';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import { useAilyAlertSkill } from '../utils';
 import { MsgAlertService } from './msg-alert.service';
@@ -17,6 +16,7 @@ import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { HttpService } from '@nestjs/axios';
 import { BitTableFilter } from '@src/common/feishu/type/bitable';
+import { IssueStatusEnum } from '@src/common/feishu/card/warning-card/interface';
 
 @Injectable()
 export class PageErrorService extends ErrorBaseService {

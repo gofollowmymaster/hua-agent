@@ -8,9 +8,8 @@ import {
 } from '../type/alert';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import ErrorUnresolvedCard, {
-  IssueStatusEnum,
   UnresolvedCardData,
-} from '@src/common/feishu/card/error-unresolved-card';
+} from '@src/common/feishu/card/warning-card/error-unresolved-card';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import BaseAlertFeishuAdapter from '../adapter/base-alert-feishu-adapter';
 import { BitTableCreateRecord } from '@src/common/feishu/type/bitable';
@@ -22,6 +21,7 @@ import { getAppAccessToken } from '@src/common/feishu/utils';
 import { HttpService } from '@nestjs/axios';
 import { AlertContext } from './alert-event.context';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
+import { IssueStatusEnum } from '@src/common/feishu/card/warning-card/interface';
 
 export abstract class ErrorBaseService extends AlertBaseService {
   protected readonly alertFeishuAdapter: BaseAlertFeishuAdapter;
@@ -113,10 +113,6 @@ export abstract class ErrorBaseService extends AlertBaseService {
   protected async errorHandler() {
     const eventRecord = await this.writeToTable();
     if (this.isIgnoreThisError()) {
-      this.logger.info(
-        '[ ignore this error ] >',
-        this.alertContext.event.issueId,
-      );
       return;
     }
 
@@ -279,7 +275,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
   }
   protected async updateByCard(message_id: string, data) {
     const accessToken = await getAppAccessToken(FeishuApp.AlertClient);
-    const resData = await firstValueFrom(
+    await firstValueFrom(
       this.httpService.patch(
         'https://open.feishu.cn/open-apis/im/v1/messages/' + message_id,
         data,

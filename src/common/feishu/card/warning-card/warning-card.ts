@@ -1,37 +1,27 @@
-import { FeishuCard } from './feishu-card';
+import { FeishuCard } from '../feishu-card';
+import { IssueStatusEnum } from './interface';
+
+type StatusOption = {
+  text: string;
+  value: string;
+};
 
 export type UnresolvedCardData = {
-  project: string;
-  level?: string;
-  errorType: string;
   linkUrl?: string;
   userId?: string;
-  errorTime: string;
+  content: string;
   title: string;
   color?: string;
-  content: string;
   count?: number;
   status: IssueStatusEnum;
   issueId: string;
-  environment: string;
-  trackers: string;
+  statusOptions: StatusOption[];
   [key: string]: any;
 };
 
-export enum IssueStatusEnum {
-  unresolved = '待处理',
-  resolved = '已解决',
-  ignoreCount100 = '暂时忽略',
-  // ignoreCount1000 = '已忽略',
-  progressing = '处理中',
-  reopened = '重新打开',
-  closed = '已关闭',
-}
-export type IssueStatus = keyof typeof IssueStatusEnum;
-
-export default class ErrorUnresolvedCard extends FeishuCard {
-  static readonly templateId = 'AAqz6VqUmrfDw';
-  static readonly templateVersion = '1.0.23';
+export default class WarningCard extends FeishuCard {
+  static readonly templateId = 'AAqvFnIF0Qunq';
+  static readonly templateVersion = '1.0.1';
 
   /**
    * 构建飞书报警卡片消息
@@ -41,8 +31,8 @@ export default class ErrorUnresolvedCard extends FeishuCard {
   static buildCardMsg = (alertInfo: UnresolvedCardData) => {
     return super.build({
       ...alertInfo,
-      statusOptions: ErrorUnresolvedCard.statusOptions(alertInfo.status) || [],
-      color: ErrorUnresolvedCard.getColor(alertInfo.status),
+      statusOptions: WarningCard.statusOptions(alertInfo.status) || [],
+      color: WarningCard.getColor(alertInfo.status),
     });
   };
   static getColor(status: IssueStatusEnum) {
@@ -50,9 +40,8 @@ export default class ErrorUnresolvedCard extends FeishuCard {
       待处理: 'red',
       重新激活: 'red',
       处理中: 'red',
-      已解决: 'yellow',
       暂时忽略: 'yellow',
-      已关闭: 'green',
+      已解决: 'green',
     }[status];
   }
   static statusOptions(status: IssueStatusEnum) {

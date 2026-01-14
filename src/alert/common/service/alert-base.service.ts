@@ -6,7 +6,7 @@ import { RedisService } from '@src/common/service/redis/redis.service';
 // import { LoggerService } from '@src/common/service/logger/logger.service';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import Redis from 'ioredis';
-import { UnresolvedCardData } from '@src/common/feishu/card/error-unresolved-card';
+import { UnresolvedCardData } from '@src/common/feishu/card/warning-card/error-unresolved-card';
 
 @Injectable()
 export abstract class AlertBaseService extends BaseService {

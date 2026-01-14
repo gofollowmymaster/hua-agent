@@ -1,6 +1,9 @@
-export default {
+import { TenantConfig } from '.';
+const aplusConfig: TenantConfig = {
   FeishuWikiSpaceIds: ['7382766506582736900'],
   hostTag: 'lnk',
+  //wiki黑名单检测通知群
+  WikiBlackListCheckoutGroupId: 'oc_79cc868ad3680d77b1d17c769d42c06a',
   robots: {
     XiaoAClient: {
       appId: 'cli_a7b9fe27a3f8d00e',
@@ -24,3 +27,5 @@ export default {
       process.env.FEISHU_AILY_APLUS_TABLE_ID || 'tblcE7q8e2vD9c48',
   },
 };
+
+export default aplusConfig;

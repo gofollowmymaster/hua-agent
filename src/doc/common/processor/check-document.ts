@@ -1,14 +1,12 @@
 import * as lark from '@larksuiteoapi/node-sdk';
 
-import { OnWorkerEvent, Processor } from '@nestjs/bullmq';
+import { Processor } from '@nestjs/bullmq';
 
 import { RedisKeys } from '@src/common/const/redis-key.enum';
-import FeishuDocxHelper from '@src/common/feishu/helper/feishu-docx-helper';
 import FeishuFileHelper from '@src/common/feishu/helper/feishu-file-helper';
 import FeishuWikiHelper from '@src/common/feishu/helper/feishu-wiki-helper';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import { wait } from '@src/common/utils/job';
-import { Job } from 'bullmq';
 import Redis from 'ioredis';
 import { FeishuAuthType } from '@src/common/feishu/type/auth';
 import { WikiBlackListResponseDto } from '@src/doc/wiki/dto/wiki.dto';
@@ -74,7 +72,10 @@ export class CheckDocumentProcessor extends BaseProcessor {
           });
           this.feishuMessageHelper.createInteractToGroup(
             content,
-            NodeConfigService.getOrThrow('WikiBlackListCheckoutGroupId'),
+            NodeConfigService.getTenantConfigItem(
+              tenantCode,
+              'WikiBlackListCheckoutGroupId',
+            ),
           );
         }
       } catch (error) {
