@@ -18,16 +18,9 @@ export default class ClearAlertPerDayBaseService {
   ) {}
 
   async clear() {
-    const todayStart =
-      dayjs().subtract(1, 'D').startOf('day').valueOf() - 60 * 1000;
     const filter: BitTableFilter = {
       conjunction: 'and',
       conditions: [
-        {
-          field_name: '最后更新时间',
-          operator: 'isGreater',
-          value: ['ExactDate', todayStart + ''],
-        },
         {
           field_name: '日错误次数',
           operator: 'isGreater',
@@ -54,6 +47,6 @@ export default class ClearAlertPerDayBaseService {
     });
     if (list.length < 1) return;
 
-    const res = await this.feishuIssueTable.batchUpdate(list);
+    await this.feishuIssueTable.batchUpdate(list);
   }
 }
