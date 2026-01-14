@@ -8,7 +8,7 @@ import FixedTokenService from '.';
 @Injectable()
 export default class WikiFixedTokenService extends FixedTokenService {
   //每30分钟运行一次
-  protected readonly cron = '0 */10 * * * *';
+  protected readonly cron = '0 */30 * * * *';
   protected readonly jobName = 'Refresh Fixed Token';
   protected readonly projectModule = 'aily';
 
