@@ -11,6 +11,7 @@ import { ErrorEndpoint } from '../../type/alert';
 import { PushIssueCardToUserParams } from '../../type/sentry-issue';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import BaseSchedule from '@src/common/base/base.schedule';
+import { NodeConfigService } from '@src/config/node-config.service';
 
 @Injectable()
 export default class AlertStatisticService extends BaseSchedule {
@@ -31,7 +32,15 @@ export default class AlertStatisticService extends BaseSchedule {
     this.client = ClientFactory.create(FeishuApp.AlertClient);
   }
 
+  protected initContext() {
+    this.tenantContextDatas = [
+      {
+        tenantCode: NodeConfigService.get('defaultTenant'),
+      },
+    ];
+  }
   async handle() {
+    if (['development', 'dev', 'test'].includes(process.env.NODE_ENV)) return;
     this.pageIssueService.dayStatistic();
     this.requestIssueService.dayStatistic();
   }

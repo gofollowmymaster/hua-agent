@@ -9,6 +9,7 @@ import RequestIssueStatisticService from './services/request-issue.service';
 import PageIssueStatisticService from './services/page-issue.service';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import BaseSchedule from '@src/common/base/base.schedule';
+import { NodeConfigService } from '@src/config/node-config.service';
 
 @Injectable()
 export default class ClearAlertPerDayService extends BaseSchedule {
@@ -29,7 +30,16 @@ export default class ClearAlertPerDayService extends BaseSchedule {
     this.client = ClientFactory.create(FeishuApp.AlertClient);
   }
 
+  protected initContext() {
+    this.tenantContextDatas = [
+      {
+        tenantCode: NodeConfigService.get('defaultTenant'),
+      },
+    ];
+  }
+
   async handle() {
+    if (['development', 'dev', 'test'].includes(process.env.NODE_ENV)) return;
     this.pageIssueService.clear();
     this.requestIssueService.clear();
   }

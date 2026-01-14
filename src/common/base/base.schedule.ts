@@ -52,6 +52,11 @@ export default abstract class BaseSchedule implements OnModuleInit {
       });
     }
   }
+
+  /**
+   * 供外部主动触发
+   * @param force
+   */
   handleCron(force: boolean = false) {
     this.execute(force);
   }
@@ -66,7 +71,7 @@ export default abstract class BaseSchedule implements OnModuleInit {
     });
   }
 
-  protected abstract handle(context: any);
+  protected abstract handle(context: TenantContextType): void;
 
   protected sendAlertMsg(message: string, content: string) {
     sendCommonCardToFeishu({
