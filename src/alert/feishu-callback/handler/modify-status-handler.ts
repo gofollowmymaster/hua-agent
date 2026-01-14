@@ -1,7 +1,6 @@
 import { CustomCallbackHandleType } from '.';
 import ErrorUnresolvedCard, {
   IssueStatus,
-  UnresolvedCardData,
 } from '@src/common/feishu/card/warning-card/error-unresolved-card';
 import ErrorResolvedCard from '@src/common/feishu/card/warning-card/error-resolved-card';
 import { ModifyStatusEvent } from '@src/alert/common/type/alert';
@@ -9,7 +8,10 @@ import {
   CardCallbackReturnType,
   CardReturnType,
 } from '@src/common/feishu/type/card';
-import { IssueStatusEnum } from '@src/common/feishu/card/warning-card/interface';
+import {
+  IssueStatusEnum,
+  UnresolvedCardData,
+} from '@src/common/feishu/card/warning-card/interface';
 
 const ModifyStatusHandler: CustomCallbackHandleType = async (
   event,

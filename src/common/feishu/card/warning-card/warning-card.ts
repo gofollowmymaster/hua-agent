@@ -1,23 +1,5 @@
 import { FeishuCard } from '../feishu-card';
-import { IssueStatusEnum } from './interface';
-
-type StatusOption = {
-  text: string;
-  value: string;
-};
-
-export type UnresolvedCardData = {
-  linkUrl?: string;
-  userId?: string;
-  content: string;
-  title: string;
-  color?: string;
-  count?: number;
-  status: IssueStatusEnum;
-  issueId: string;
-  statusOptions: StatusOption[];
-  [key: string]: any;
-};
+import { BaseWarningCardData, IssueStatusEnum } from './interface';
 
 export default class WarningCard extends FeishuCard {
   static readonly templateId = 'AAqvFnIF0Qunq';
@@ -28,7 +10,7 @@ export default class WarningCard extends FeishuCard {
    * @param alertInfo
    * @returns
    */
-  static buildCardMsg = (alertInfo: UnresolvedCardData) => {
+  static buildCardMsg = (alertInfo: BaseWarningCardData) => {
     return super.build({
       ...alertInfo,
       statusOptions: WarningCard.statusOptions(alertInfo.status) || [],

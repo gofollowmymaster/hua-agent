@@ -1,23 +1,5 @@
 import { FeishuCard } from '../feishu-card';
-import { IssueStatusEnum } from './interface';
-
-export type UnresolvedCardData = {
-  project: string;
-  level?: string;
-  errorType: string;
-  linkUrl?: string;
-  userId?: string;
-  errorTime: string;
-  title: string;
-  color?: string;
-  content: string;
-  count?: number;
-  status: IssueStatusEnum;
-  issueId: string;
-  environment: string;
-  trackers: string;
-  [key: string]: any;
-};
+import { IssueStatusEnum, UnresolvedCardData } from './interface';
 
 export type IssueStatus = keyof typeof IssueStatusEnum;
 

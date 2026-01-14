@@ -7,9 +7,7 @@ import {
   ModifyStatusEvent,
 } from '../type/alert';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
-import ErrorUnresolvedCard, {
-  UnresolvedCardData,
-} from '@src/common/feishu/card/warning-card/error-unresolved-card';
+import ErrorUnresolvedCard from '@src/common/feishu/card/warning-card/error-unresolved-card';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import BaseAlertFeishuAdapter from '../adapter/base-alert-feishu-adapter';
 import { BitTableCreateRecord } from '@src/common/feishu/type/bitable';
@@ -21,7 +19,10 @@ import { getAppAccessToken } from '@src/common/feishu/utils';
 import { HttpService } from '@nestjs/axios';
 import { AlertContext } from './alert-event.context';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
-import { IssueStatusEnum } from '@src/common/feishu/card/warning-card/interface';
+import {
+  IssueStatusEnum,
+  UnresolvedCardData,
+} from '@src/common/feishu/card/warning-card/interface';
 
 export abstract class ErrorBaseService extends AlertBaseService {
   protected readonly alertFeishuAdapter: BaseAlertFeishuAdapter;

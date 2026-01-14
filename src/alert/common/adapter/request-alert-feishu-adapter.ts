@@ -3,11 +3,13 @@ import { RequestData } from '@src/alert/common/type/alert';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { Injectable, Scope } from '@nestjs/common';
 import { RequestAlertEvent } from '@src/alert/common/type/alert';
-import { UnresolvedCardData } from '@src/common/feishu/card/warning-card/error-unresolved-card';
 import dayjs from 'dayjs';
 import BaseAlertFeishuAdapter from './base-alert-feishu-adapter';
 import { AlertContext } from '../service/alert-event.context';
-import { IssueStatusEnum } from '@src/common/feishu/card/warning-card/interface';
+import {
+  IssueStatusEnum,
+  UnresolvedCardData,
+} from '@src/common/feishu/card/warning-card/interface';
 
 export const apiModuleBuMap = {
   im: '基础架构',

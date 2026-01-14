@@ -7,13 +7,13 @@ import {
 } from '@src/common/feishu/type/feishu-event';
 import { useAilyAlertSkill } from '@src/alert/common/utils';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
-import { UnresolvedCardData } from '@src/common/feishu/card/warning-card/error-unresolved-card';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import { BitTableFilter } from '@src/common/feishu/type/bitable';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
+import { UnresolvedCardData } from '@src/common/feishu/card/warning-card/interface';
 
 @Injectable()
 export class FeishuReceiveCallback {

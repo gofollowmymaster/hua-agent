@@ -5,8 +5,10 @@ import {
 import { CustomCallbackHandleType } from '.';
 
 import ErrorClosedCard from '@src/common/feishu/card/warning-card/error-closed-card';
-import { UnresolvedCardData } from '@src/common/feishu/card/warning-card/error-unresolved-card';
-import { IssueStatusEnum } from '@src/common/feishu/card/warning-card/interface';
+import {
+  IssueStatusEnum,
+  UnresolvedCardData,
+} from '@src/common/feishu/card/warning-card/interface';
 
 const CloseHandler: CustomCallbackHandleType = async (
   event,

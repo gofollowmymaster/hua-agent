@@ -12,9 +12,9 @@ import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { CommonErrorService } from '../common/service/error-common.service';
 import { RequestErrorService } from '../common/service/request-error-service';
 import { PageErrorService } from '../common/service/page-error-service';
-import { UnresolvedCardData } from '@src/common/feishu/card/warning-card/error-unresolved-card';
 import { CardCallbackReturnType } from '@src/common/feishu/type/card';
 import AlertStatisticService from '../common/schedule/alert-statistic';
+import { UnresolvedCardData } from '@src/common/feishu/card/warning-card/interface';
 
 @Injectable()
 export class FeishuCallbackService extends CommonErrorService {

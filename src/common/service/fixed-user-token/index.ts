@@ -7,8 +7,12 @@ import { sendCommonCardToFeishu } from '@src/common/feishu/utils';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import BaseSchedule from '@src/common/base/base.schedule';
-import { TenantContext } from '@src/common/service/context/tenant.context';
+import {
+  TenantContext,
+  TenantContextType,
+} from '@src/common/service/context/tenant.context';
 import { FeishuAuthType } from '@src/common/feishu/type/auth';
+import { tenantCodeMap } from '@src/config/tenant';
 
 @Injectable()
 export default class FixedTokenService extends BaseSchedule {
@@ -28,8 +32,9 @@ export default class FixedTokenService extends BaseSchedule {
     this.redis = redisService.getClient();
   }
 
-  async handle(force = false) {
-    if (!force && ['development', 'dev'].includes(process.env.NODE_ENV)) return;
+  async handle(tenantContext: TenantContextType) {
+    if (['development', 'dev'].includes(process.env.NODE_ENV)) return;
+    if (tenantContext.tenantCode == tenantCodeMap.D) return;
     const authClient = ClientFactory.create(FeishuApp.AilyAplusClient);
     this.client = authClient.client;
     this.loadToken();
@@ -55,7 +60,6 @@ export default class FixedTokenService extends BaseSchedule {
         refresh_token: tokenInCached.refresh_token,
       },
     });
-    this.logger.log('[ refreshAccessToken ] >' + JSON.stringify(res));
     if (res.code !== 0) {
       this.sendAlertMsg(res.msg);
       return;
