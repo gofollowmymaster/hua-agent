@@ -4,7 +4,8 @@ const yurexConfig: TenantConfig = {
   hostTag: 'yurex',
   //wiki黑名单检测通知群
   WikiBlackListCheckoutGroupId: 'oc_79cc868ad3680d77b1d17c769d42c06a',
-
+  //wiki黑名单检测通知人
+  WikiBlackListCheckoutUserId: '762a5468',
   feishuTables: {},
   robots: {
     XiaoAClient: {

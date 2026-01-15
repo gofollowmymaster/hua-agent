@@ -3,15 +3,15 @@ import { LoggerService } from '@src/common/service/logger/logger.service';
 import FeishuFrontendAlertTable from '../table/frontend-alert-table';
 import FeishuFrontendAlertIssueTable from '../table/frontend-alert-issue-table';
 import { RedisService } from '@src/common/service/redis/redis.service';
-import { PageAlertEvent } from '../type/alert';
+import { AlertEvent, PageAlertEvent } from '../type/alert';
 import PageAlertFeishuAdapter from '../adapter/page-alert-feishu-adapter';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { ErrorBaseService } from '@src/common/base/error-base.service';
 import { Injectable } from '@nestjs/common';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import { useAilyAlertSkill } from '../utils';
-import { MsgAlertService } from '../../../common/base/msg-alert.service';
-import { AlertContext } from '../../../common/base/alert-event.context';
+import { MsgAlertService } from './msg-alert.service';
+import { AlertContext } from '@src/common/base/alert-event.context';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { HttpService } from '@nestjs/axios';
@@ -20,6 +20,8 @@ import { IssueStatusEnum } from '@src/common/feishu/card/warning-card/interface'
 
 @Injectable()
 export class PageErrorService extends ErrorBaseService {
+  protected readonly CardType = 'professional';
+
   constructor(
     protected prisma: PrismaService,
     protected readonly logger: LoggerService,
@@ -28,7 +30,7 @@ export class PageErrorService extends ErrorBaseService {
     protected readonly redisService: RedisService,
     protected readonly alertFeishuAdapter: PageAlertFeishuAdapter,
     protected readonly msgAlertService: MsgAlertService,
-    protected readonly alertContext: AlertContext,
+    protected readonly alertContext: AlertContext<AlertEvent>,
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly feishuUserHelper: FeishuUserHelper,
     protected readonly httpService: HttpService,
@@ -92,9 +94,6 @@ export class PageErrorService extends ErrorBaseService {
         状态: this.getStatusThenError(fields['状态'] as IssueStatusEnum),
       });
     }
-    // } catch (err) {
-    //   sendExceptionToFeishu(err);
-    // }
   }
 
   async updateTable(issue_id: string, recordNew: Record<string, any>) {

@@ -10,13 +10,13 @@ export default class WarningCard extends FeishuCard {
    * @param alertInfo
    * @returns
    */
-  static buildCardMsg = (alertInfo: BaseWarningCardData) => {
+  static buildCardMsg(alertInfo: BaseWarningCardData) {
     return super.build({
       ...alertInfo,
-      statusOptions: WarningCard.statusOptions(alertInfo.status) || [],
+      statusOptions: WarningCard.statusOptions(),
       color: WarningCard.getColor(alertInfo.status),
     });
-  };
+  }
   static getColor(status: IssueStatusEnum) {
     return {
       待处理: 'red',
@@ -26,28 +26,16 @@ export default class WarningCard extends FeishuCard {
       已解决: 'green',
     }[status];
   }
-  static statusOptions(status: IssueStatusEnum) {
-    return {
-      待处理: [
-        {
-          text: '处理中',
-          value: 'progressing',
-        },
-        {
-          text: '暂时忽略',
-          value: 'ignoreCount100',
-        },
-      ],
-      处理中: [
-        {
-          text: '暂时忽略',
-          value: 'ignoreCount100',
-        },
-        {
-          text: '已解决',
-          value: 'resolved',
-        },
-      ],
-    }[status];
+  static statusOptions() {
+    return [
+      {
+        text: '处理中',
+        value: 'progressing',
+      },
+      {
+        text: '暂时忽略',
+        value: 'ignoreCount100',
+      },
+    ];
   }
 }

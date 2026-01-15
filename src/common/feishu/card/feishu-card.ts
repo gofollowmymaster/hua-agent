@@ -1,3 +1,5 @@
+import { BaseWarningCardData } from './warning-card/interface';
+
 export abstract class FeishuCard {
   protected static templateId = '';
   protected static templateVersion = '';
@@ -20,5 +22,9 @@ export abstract class FeishuCard {
       },
     };
     return JSON.stringify(content);
+  }
+
+  buildCardMsg(alertInfo: BaseWarningCardData): string {
+    return FeishuCard.build(alertInfo);
   }
 }

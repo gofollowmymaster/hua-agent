@@ -1,18 +1,16 @@
 import { AlertBaseService } from './alert-base.service';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import {
-  AlertEvent,
   AssignEvent,
   CloseIssueEvent,
   ModifyStatusEvent,
 } from '../../alert/common/type/alert';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
-import ErrorUnresolvedCard from '@src/common/feishu/card/warning-card/error-unresolved-card';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import BaseAlertFeishuAdapter from '../../alert/common/adapter/base-alert-feishu-adapter';
 import { BitTableCreateRecord } from '@src/common/feishu/type/bitable';
 import { firstValueFrom } from 'rxjs';
-import { MsgAlertService } from './msg-alert.service';
+
 import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { FeishuApp } from '@src/common/feishu/clients';
 import { getAppAccessToken } from '@src/common/feishu/utils';
@@ -27,20 +25,22 @@ import {
   WarningCardMap,
   WarningCardType,
 } from '@src/common/feishu/card/warning-card';
+import { MsgSenderService } from './msg-sender.service';
+import { BaseAlertEvent } from './interface';
 
 export abstract class ErrorBaseService extends AlertBaseService {
   protected readonly alertFeishuAdapter: BaseAlertFeishuAdapter;
-  protected readonly msgAlertService: MsgAlertService;
+  protected readonly msgAlertService: MsgSenderService;
   protected readonly feishuUserHelper: FeishuUserHelper;
   protected readonly httpService: HttpService;
-  protected readonly alertContext: AlertContext;
+  protected readonly alertContext: AlertContext<BaseAlertEvent>;
   protected readonly messageHelper: FeishuMessageHelper;
   protected readonly CardType: WarningCardType = 'professional';
 
   constructor(protected readonly redisService: RedisService) {
     super(redisService);
   }
-  protected getWarningCard() {
+  get WarningCard() {
     return WarningCardMap[this.CardType];
   }
 
@@ -48,11 +48,11 @@ export abstract class ErrorBaseService extends AlertBaseService {
     return this.alertContext.event.level === 'info';
   }
   protected abstract writeToTable(): Promise<any>;
-  abstract errorHookHandler(alertInfo: AlertEvent);
+  abstract errorHookHandler(alertInfo: BaseAlertEvent);
   abstract updateTable(issueId: string, recordNew: Record<string, any>);
   protected afterCreateIssueCard() {}
 
-  async sendFsAlertMsg(alertInfo: AlertEvent, message: string) {
+  async sendFsAlertMsg(alertInfo: BaseAlertEvent, message: string) {
     return await this.msgAlertService.sendFsAlertMsg(alertInfo, message);
   }
   /**
@@ -71,8 +71,9 @@ export abstract class ErrorBaseService extends AlertBaseService {
   }
   private async sendNewIssueCard(eventRecord: BitTableCreateRecord) {
     const issueCardData = await this.alertFeishuAdapter.toAplusAlertCardData();
+    console.log('[ issueCardData ] >', issueCardData);
     issueCardData.linkUrl = eventRecord.record_url;
-    const content = ErrorUnresolvedCard.buildCardMsg(issueCardData);
+    const content = this.WarningCard.buildCardMsg(issueCardData as any);
     const groupMsgInfo = await this.msgAlertService.sendFsAlertMsg(
       this.alertContext.event,
       content,
@@ -102,13 +103,13 @@ export abstract class ErrorBaseService extends AlertBaseService {
       content: JSON.stringify({
         type: 'template',
         data: {
-          template_id: ErrorUnresolvedCard.templateId,
-          template_version_name: ErrorUnresolvedCard.templateVersion,
+          template_id: this.WarningCard.templateId,
+          template_version_name: this.WarningCard.templateVersion,
           template_variable: {
             ...issueCardData,
             status: IssueStatusEnum.reopened,
             color: 'red',
-            statusOptions: ErrorUnresolvedCard.statusOptions(
+            statusOptions: this.WarningCard.statusOptions(
               IssueStatusEnum.unresolved,
             ),
           },
@@ -129,6 +130,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
       '{issueId}',
       this.alertContext.event.issueId,
     );
+
     const issueCardData = (await this.redis.hgetall(
       key,
     )) as BaseWarningCardData;

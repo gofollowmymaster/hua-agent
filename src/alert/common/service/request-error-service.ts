@@ -3,13 +3,13 @@ import { LoggerService } from '@src/common/service/logger/logger.service';
 import FeishuApiAlertTable from '../table/api-alert-table';
 import FeishuApiAlertIssueTable from '../table/api-alert-issue-table';
 import { RedisService } from '@src/common/service/redis/redis.service';
-import { RequestAlertEvent } from '../type/alert';
+import { AlertEvent, RequestAlertEvent } from '../type/alert';
 import { ErrorBaseService } from '@src/common/base/error-base.service';
 import RequestAlertFeishuAdapter from '../adapter/request-alert-feishu-adapter';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { Injectable } from '@nestjs/common';
-import { MsgAlertService } from '../../../common/base/msg-alert.service';
-import { AlertContext } from '../../../common/base/alert-event.context';
+import { MsgAlertService } from './msg-alert.service';
+import { AlertContext } from '@src/common/base/alert-event.context';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { HttpService } from '@nestjs/axios';
@@ -29,6 +29,7 @@ export const ignoreCodeList = [
 @Injectable()
 export class RequestErrorService extends ErrorBaseService {
   protected ignoreCodeList = ignoreCodeList;
+  protected readonly CardType = 'professional';
 
   constructor(
     protected prisma: PrismaService,
@@ -38,7 +39,7 @@ export class RequestErrorService extends ErrorBaseService {
     protected readonly redisService: RedisService,
     protected readonly alertFeishuAdapter: RequestAlertFeishuAdapter,
     protected readonly msgAlertService: MsgAlertService,
-    protected readonly alertContext: AlertContext,
+    protected readonly alertContext: AlertContext<AlertEvent>,
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly feishuUserHelper: FeishuUserHelper,
     protected readonly httpService: HttpService,

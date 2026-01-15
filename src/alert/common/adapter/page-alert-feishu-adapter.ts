@@ -4,10 +4,10 @@ import {
 } from '../type/alert-table';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { Injectable, Scope } from '@nestjs/common';
-import { PageAlertEvent } from '@src/alert/common/type/alert';
+import { AlertEvent, PageAlertEvent } from '@src/alert/common/type/alert';
 import dayjs from 'dayjs';
 import BaseAlertFeishuAdapter from './base-alert-feishu-adapter';
-import { AlertContext } from '../../../common/base/alert-event.context';
+import { AlertContext } from '@src/common/base/alert-event.context';
 import {
   IssueStatusEnum,
   UnresolvedCardData,
@@ -19,7 +19,7 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
   private appInfo: any;
   constructor(
     private readonly feishuBusinessLineTable: FeishuBusinessLineTable,
-    protected readonly alertContext: AlertContext,
+    protected readonly alertContext: AlertContext<AlertEvent>,
   ) {
     super();
   }
@@ -27,7 +27,6 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
     this.appInfo = await this.feishuBusinessLineTable.getBusinessLineBySubapp(
       event.pageModuleName || 'others',
     );
-
     this.event = event;
   }
 
@@ -36,10 +35,6 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
     return {
       标题: this.event.title,
       链接信息: this.event.webUrl,
-      // 是否解决: false,
-      // 负责人: [{ id: appInfo.userId }],
-      // 错误原因: '',
-      // 解决方案: '',
       IssueId: this.event.issueId,
       来源: 'Sentry告警',
       报警级别: this.event.level,

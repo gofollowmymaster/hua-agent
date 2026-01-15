@@ -8,7 +8,6 @@ import {
   AlertEvent,
   CommentEvent,
   ErrorEndpoint,
-  ErrorLevel,
   IssueAction,
   IssueEvent,
 } from '../common/type/alert';
@@ -24,6 +23,7 @@ import { PageErrorService } from '../common/service/page-error-service';
 import { RequestErrorService } from '../common/service/request-error-service';
 import { ErrorBaseService } from '../../common/base/error-base.service';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
+import { ErrorLevel } from '@src/common/base/interface';
 
 @Injectable()
 export class SentryWebhookService {

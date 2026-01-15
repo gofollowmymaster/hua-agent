@@ -1,11 +1,11 @@
 import { ApiAlertIssueTableDto, ApiAlertTableDto } from '../type/alert-table';
-import { RequestData } from '@src/alert/common/type/alert';
+import { AlertEvent, RequestData } from '@src/alert/common/type/alert';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { Injectable, Scope } from '@nestjs/common';
 import { RequestAlertEvent } from '@src/alert/common/type/alert';
 import dayjs from 'dayjs';
 import BaseAlertFeishuAdapter from './base-alert-feishu-adapter';
-import { AlertContext } from '../../../common/base/alert-event.context';
+import { AlertContext } from '@src/common/base/alert-event.context';
 import {
   IssueStatusEnum,
   UnresolvedCardData,
@@ -27,7 +27,7 @@ export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
   protected appInfo: any;
   constructor(
     private readonly feishuBusinessLineTable: FeishuBusinessLineTable,
-    protected readonly alertContext: AlertContext,
+    protected readonly alertContext: AlertContext<AlertEvent>,
   ) {
     super();
   }

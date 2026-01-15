@@ -5,7 +5,7 @@ import { PrismaService } from '@src/common/service/prisma/prisma.service';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
-import { AlertEvent, ErrorLevel } from '../../alert/common/type/alert';
+import { AlertEvent, ErrorLevel } from '../type/alert';
 
 describe('MsgAlertService', () => {
   let service: MsgAlertService;

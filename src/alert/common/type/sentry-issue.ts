@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Environment, ErrorEndpoint, ErrorLevel, RequestData } from './alert';
+import { Environment, ErrorEndpoint, RequestData } from './alert';
+import { ErrorLevel } from '@src/common/base/interface';
 
 class SentryEventExtra {
   @ApiPropertyOptional({

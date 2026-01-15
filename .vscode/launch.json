@@ -14,6 +14,22 @@
       "env": {
         "TS_NODE_PROJECT": "tsconfig.json"
       }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug NestJS",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceFolder}/node_modules/.bin/nest",
+        "start",
+        "--debug"
+      ],
+      "autoAttachChildProcesses": true,
+      "console": "integratedTerminal",
+      "restart": true,
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"]
     }
   ]
 }

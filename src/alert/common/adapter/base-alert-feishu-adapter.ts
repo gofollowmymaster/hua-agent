@@ -1,24 +1,13 @@
-import { AlertEvent } from '@src/alert/common/type/alert';
 // import { CommonCardData } from '@src/common/feishu/card/alert-card';
-import { AlertContext } from '../../../common/base/alert-event.context';
-import { UnresolvedCardData } from '@src/common/feishu/card/warning-card/interface';
+import { AlertContext } from '@src/common/base/alert-event.context';
+import { BaseWarningCardData } from '@src/common/feishu/card/warning-card/interface';
+import { BaseAlertEvent } from '@src/common/base/interface';
 
 export default abstract class BaseAlertFeishuAdapter {
-  protected event: AlertEvent;
-  protected readonly alertContext: AlertContext;
+  protected event: BaseAlertEvent;
+  protected readonly alertContext: AlertContext<BaseAlertEvent>;
 
-  abstract setEvent(event: AlertEvent);
+  abstract setEvent(event: BaseAlertEvent);
 
-  // toCommonCardeData(): CommonCardData {
-  //   return {
-  //     environment: this.event.environment,
-  //     project: this.event.pageModuleName,
-  //     linkUrl: this.event.webUrl,
-  //     level: this.event.level,
-  //     message: this.event.type,
-  //     content: this.event.culprit,
-  //     timestamp: this.event.timestamp,
-  //   };
-  // }
-  abstract toAplusAlertCardData(): Promise<UnresolvedCardData>;
+  abstract toAplusAlertCardData(): Promise<BaseWarningCardData>;
 }

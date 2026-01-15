@@ -1,21 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
-import { AlertEvent } from '../../alert/common/type/alert';
 
-export interface AlertContextStore {
-  errorEvent: AlertEvent;
+export interface AlertContextStore<T> {
+  errorEvent: T;
 }
 
 @Injectable()
-export class AlertContext {
-  private readonly asyncLocalStorage =
-    new AsyncLocalStorage<AlertContextStore>();
+export class AlertContext<T> {
+  private readonly asyncLocalStorage = new AsyncLocalStorage<
+    AlertContextStore<T>
+  >();
 
-  run(context: AlertContextStore, callback: () => any) {
+  run(context: AlertContextStore<T>, callback: () => any) {
     return this.asyncLocalStorage.run(context, callback);
   }
 
-  getStore(): AlertContextStore | undefined {
+  getStore(): AlertContextStore<T> | undefined {
     return this.asyncLocalStorage.getStore();
   }
   get event() {

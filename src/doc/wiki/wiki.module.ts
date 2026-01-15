@@ -11,6 +11,13 @@ import WikiBlackListTable from '../common/table/black-list';
 import { CheckDocumentProcessor } from '../common/processor/check-document';
 import { BullModule } from '@nestjs/bullmq';
 import configuration from '@src/config';
+import { WarningMsgService } from '../common/processor/warning-msg-service';
+import { WikiMsgSenderService } from '../common/processor/check-msg-sender';
+import { AlertContext } from '@src/common/base/alert-event.context';
+import { WikiAlertFeishuAdapter } from '../common/processor/alert-feishu.adapter';
+import { HttpModule } from '@nestjs/axios';
+import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
+import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 
 @Module({
   imports: [
@@ -34,6 +41,7 @@ import configuration from '@src/config';
         removeOnComplete: 100,
       },
     }),
+    HttpModule,
   ],
 
   controllers: [WikiController],
@@ -44,6 +52,10 @@ import configuration from '@src/config';
     WikiDirectoryService,
     WikiBlackListTable,
     CheckDocumentProcessor,
+    WarningMsgService,
+    WikiMsgSenderService,
+    AlertContext,
+    WikiAlertFeishuAdapter,
   ],
   exports: [WikiService],
 })

@@ -9,6 +9,7 @@ export type TenantConfig = {
   FeishuWikiSpaceIds: string[];
   hostTag: string;
   WikiBlackListCheckoutGroupId: string;
+  WikiBlackListCheckoutUserId: string;
   robots: {
     XiaoAClient: FeishuAppConfig;
     AuthClient?: FeishuAppConfig;

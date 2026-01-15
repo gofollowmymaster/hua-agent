@@ -4,6 +4,8 @@ const boatConfig: TenantConfig = {
   hostTag: 'boat',
   //wiki黑名单检测通知群
   WikiBlackListCheckoutGroupId: 'oc_05458c875fe1007b24bac8f2fa057a3a',
+  //wiki黑名单检测通知人
+  WikiBlackListCheckoutUserId: '762a5468',
   feishuTables: {
     //Aplus智能体表格相关
     AilyLogTableAppToken: 'A6qfbapjtafVLYsn9xic6mYNnfT',

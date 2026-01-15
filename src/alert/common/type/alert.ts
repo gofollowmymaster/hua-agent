@@ -1,19 +1,12 @@
+import { BaseAlertEvent, ErrorLevel } from '@src/common/base/interface';
 import { SentryStatus, SentryUser } from './sentry-issue';
 
-export class AlertEvent {
+export class AlertEvent extends BaseAlertEvent {
   pageModuleName: string;
   serverModuleName: string;
-  timestamp: number;
   environment: Environment;
-  issueId: string;
-  title: string;
-  level: ErrorLevel;
   webUrl: string;
-  culprit: string;
-  type: string;
   errorEndpoint: ErrorEndpoint;
-  issueUrl: string;
-  feishuUrl?: string;
   rawData: Record<string, any>;
   [key: string]: any;
 }
@@ -27,12 +20,6 @@ export class RequestAlertEvent extends AlertEvent {
   errorEndpoint: ErrorEndpoint.Server;
 }
 
-export enum ErrorLevel {
-  FATAL = 'fatal',
-  ERROR = 'error',
-  WARNING = 'warning',
-  INFO = 'info',
-}
 export enum Environment {
   PROD = 'prod',
   UAT = 'uat',
@@ -95,12 +82,6 @@ export type IssueEvent = {
   level: ErrorLevel;
   type: string;
   operator?: SentryUser;
-  // assignee: {
-  //   type: 'user';
-  //   name: 'Ahua';
-  //   id: 10;
-  //   email: 'ahua@aplnk.com';
-  // };
 };
 
 export type AssignEvent = {

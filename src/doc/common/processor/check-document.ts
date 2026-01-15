@@ -15,7 +15,9 @@ import { tenantCodeMap } from '@src/config/tenant';
 import BaseProcessor from '@src/common/base/base.processor';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
-import TipCard from '@src/common/feishu/card/tip-card';
+import { WarningMsgService } from './warning-msg-service';
+import dayjs from 'dayjs';
+import { ErrorLevel } from '@src/common/base/interface';
 type CheckDocumentParams = {
   blackList: WikiBlackListResponseDto[];
   tenantCode: tenantCodeMap;
@@ -30,6 +32,7 @@ export class CheckDocumentProcessor extends BaseProcessor {
     protected feishuMessageHelper: FeishuMessageHelper,
     protected feishuWikiHelper: FeishuWikiHelper,
     protected feishuFileHelper: FeishuFileHelper,
+    protected warningMsgService: WarningMsgService,
   ) {
     super(tenantContext);
     this.redis = redisService.getClient();
@@ -59,24 +62,23 @@ export class CheckDocumentProcessor extends BaseProcessor {
           },
           lark.withUserAccessToken(userInfo.access_token),
         );
-        console.log('[ res ] >', blackItem['关键字'], res);
         if (res.items.length > 0) {
           const docs = res.items.reduce((prev, next) => {
             prev = prev + `[${next.title}](${next.url})，`;
             return prev;
           }, '');
-          const content = TipCard.buildCardMsg({
+          const content = `服务商:<text_tag color='blue'>${tenantCode}</text_tag>的如下文档：${docs}存在黑名单中的关键字**${blackItem['关键字']}**，请及时处理！`;
+
+          this.warningMsgService.errorHookHandler({
+            timestamp: dayjs().valueOf(),
+            issueId: tenantCode + blackItem['关键字'],
             title: '知识库黑名单检测异常通知',
-            bgColor: 'red',
-            content: `服务商:<text_tag color='blue'>${tenantCode}</text_tag>的如下文档：${docs}存在黑名单中的关键字**${blackItem['关键字']}**，请及时处理！`,
+            culprit: content,
+            type: '',
+            issueUrl: '',
+            level: ErrorLevel.WARNING,
+            feishuUrl: '',
           });
-          this.feishuMessageHelper.createInteractToGroup(
-            content,
-            NodeConfigService.getTenantConfigItem(
-              tenantCode,
-              'WikiBlackListCheckoutGroupId',
-            ),
-          );
         }
       } catch (error) {
         throw new Error(

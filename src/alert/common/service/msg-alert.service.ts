@@ -1,32 +1,31 @@
-import {
-  AlertEvent,
-  Environment,
-  ErrorLevel,
-} from '../../alert/common/type/alert';
+import { AlertEvent, Environment } from '../type/alert';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import { NodeConfigService } from '@src/config/node-config.service';
-import { isNeedSendAlertMsg } from '../../alert/common/utils';
+import { isNeedSendAlertMsg } from '../utils';
 import { addRetryJob } from '@src/common/utils/job';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { PrismaService } from '@src/common/service/prisma/prisma.service';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { Injectable } from '@nestjs/common';
+import { MsgSenderService } from '../../../common/base/msg-sender.service';
+import { ErrorLevel } from '@src/common/base/interface';
 
 @Injectable()
-export class MsgAlertService {
+export class MsgAlertService extends MsgSenderService {
   constructor(
     protected prisma: PrismaService,
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly logger: LoggerService,
     protected readonly feishuBusinessLineTable: FeishuBusinessLineTable,
-  ) {}
-
+  ) {
+    super();
+  }
   /**
    * 飞书消息发送
    * @param alertInfo
    */
-  private async sendFeishuMsg(alertInfo: AlertEvent, message: string) {
+  async sendFeishuMsg(alertInfo: AlertEvent, message: string) {
     //获取飞书用户userid（todo）群Id -> 消息加急
     const { groupId: feishuGroupId } = await this.getGroupAndUserByProject(
       alertInfo.pageModuleName,
@@ -39,7 +38,6 @@ export class MsgAlertService {
     );
     return groupMsgInfo;
   }
-
   /**
    * 发送消息
    * @param alertInfo
