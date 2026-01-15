@@ -1,10 +1,10 @@
 import { RedisService } from '@src/common/service/redis/redis.service';
 import { ErrorEndpoint } from '../type/alert';
-import { ErrorBaseService } from './error-base.service';
+import { ErrorBaseService } from '@src/common/base/error-base.service';
 import { Injectable } from '@nestjs/common';
 import { RequestErrorService } from './request-error-service';
 import { PageErrorService } from './page-error-service';
-import { AlertBaseService } from './alert-base.service';
+import { AlertBaseService } from '@src/common/base/alert-base.service';
 
 @Injectable()
 export class CommonErrorService extends AlertBaseService {

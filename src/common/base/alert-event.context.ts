@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
-import { AlertEvent } from '../type/alert';
+import { AlertEvent } from '../../alert/common/type/alert';
 
 export interface AlertContextStore {
   errorEvent: AlertEvent;

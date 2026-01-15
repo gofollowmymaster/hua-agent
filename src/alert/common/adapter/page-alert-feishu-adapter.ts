@@ -7,7 +7,7 @@ import { Injectable, Scope } from '@nestjs/common';
 import { PageAlertEvent } from '@src/alert/common/type/alert';
 import dayjs from 'dayjs';
 import BaseAlertFeishuAdapter from './base-alert-feishu-adapter';
-import { AlertContext } from '../service/alert-event.context';
+import { AlertContext } from '../../../common/base/alert-event.context';
 import {
   IssueStatusEnum,
   UnresolvedCardData,

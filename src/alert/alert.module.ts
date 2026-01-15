@@ -33,8 +33,8 @@ import RequestClearIssueService from './common/schedule/clear-alert-issue/servic
 import { FeishuReceiveCallback } from './event/handler/receive-handler';
 import SyncFeishuUser from './common/schedule/sync-feishu-user';
 import { SentryProjectService } from './common/service/sentry/sentry-project-service';
-import { MsgAlertService } from './common/service/msg-alert.service';
-import { AlertContext } from './common/service/alert-event.context';
+import { MsgAlertService } from '../common/base/msg-alert.service';
+import { AlertContext } from '../common/base/alert-event.context';
 
 @Module({
   imports: [

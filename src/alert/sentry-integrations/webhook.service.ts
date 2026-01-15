@@ -22,7 +22,7 @@ import {
 import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { PageErrorService } from '../common/service/page-error-service';
 import { RequestErrorService } from '../common/service/request-error-service';
-import { ErrorBaseService } from '../common/service/error-base.service';
+import { ErrorBaseService } from '../../common/base/error-base.service';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 
 @Injectable()

@@ -5,11 +5,11 @@ import {
   AssignEvent,
   CloseIssueEvent,
   ModifyStatusEvent,
-} from '../type/alert';
+} from '../../alert/common/type/alert';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import ErrorUnresolvedCard from '@src/common/feishu/card/warning-card/error-unresolved-card';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
-import BaseAlertFeishuAdapter from '../adapter/base-alert-feishu-adapter';
+import BaseAlertFeishuAdapter from '../../alert/common/adapter/base-alert-feishu-adapter';
 import { BitTableCreateRecord } from '@src/common/feishu/type/bitable';
 import { firstValueFrom } from 'rxjs';
 import { MsgAlertService } from './msg-alert.service';
@@ -21,8 +21,12 @@ import { AlertContext } from './alert-event.context';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import {
   IssueStatusEnum,
-  UnresolvedCardData,
+  BaseWarningCardData,
 } from '@src/common/feishu/card/warning-card/interface';
+import {
+  WarningCardMap,
+  WarningCardType,
+} from '@src/common/feishu/card/warning-card';
 
 export abstract class ErrorBaseService extends AlertBaseService {
   protected readonly alertFeishuAdapter: BaseAlertFeishuAdapter;
@@ -31,9 +35,13 @@ export abstract class ErrorBaseService extends AlertBaseService {
   protected readonly httpService: HttpService;
   protected readonly alertContext: AlertContext;
   protected readonly messageHelper: FeishuMessageHelper;
+  protected readonly CardType: WarningCardType = 'professional';
 
   constructor(protected readonly redisService: RedisService) {
     super(redisService);
+  }
+  protected getWarningCard() {
+    return WarningCardMap[this.CardType];
   }
 
   protected isIgnoreThisError() {
@@ -88,7 +96,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
     this.afterCreateIssueCard();
   }
 
-  private async reopenIssueCard(issueCardData: UnresolvedCardData) {
+  private async reopenIssueCard(issueCardData: BaseWarningCardData) {
     //更新卡片信息  激活
     this.updateByCard(issueCardData.messageId, {
       content: JSON.stringify({
@@ -121,7 +129,9 @@ export abstract class ErrorBaseService extends AlertBaseService {
       '{issueId}',
       this.alertContext.event.issueId,
     );
-    const issueCardData = (await this.redis.hgetall(key)) as UnresolvedCardData;
+    const issueCardData = (await this.redis.hgetall(
+      key,
+    )) as BaseWarningCardData;
     //新issue 发送卡片消息
     if (!issueCardData.messageId) {
       this.sendNewIssueCard(eventRecord);

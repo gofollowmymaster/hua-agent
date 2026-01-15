@@ -11,7 +11,6 @@ import { UnresolvedCardData } from '@src/common/feishu/card/warning-card/interfa
 @Injectable()
 export abstract class AlertBaseService extends BaseService {
   protected readonly redis: Redis;
-  // protected readonly logger: LoggerService;
   protected readonly messageHelper: FeishuMessageHelper;
   protected readonly redisService: RedisService;
 

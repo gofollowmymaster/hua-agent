@@ -1,6 +1,6 @@
 import { AlertEvent } from '@src/alert/common/type/alert';
 // import { CommonCardData } from '@src/common/feishu/card/alert-card';
-import { AlertContext } from '../service/alert-event.context';
+import { AlertContext } from '../../../common/base/alert-event.context';
 import { UnresolvedCardData } from '@src/common/feishu/card/warning-card/interface';
 
 export default abstract class BaseAlertFeishuAdapter {
