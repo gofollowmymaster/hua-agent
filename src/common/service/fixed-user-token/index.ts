@@ -30,7 +30,8 @@ export default class FixedTokenService extends BaseSchedule {
   }
 
   async handle(tenantInfo: TenantContextType) {
-    if (tenantInfo.tenantCode === tenantCodeMap.D) return;
+    if ([tenantCodeMap.C, tenantCodeMap.D].includes(tenantInfo.tenantCode))
+      return;
     this.loadToken(tenantInfo);
   }
   async loadToken(tenantInfo: TenantContextType) {
