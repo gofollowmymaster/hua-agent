@@ -33,7 +33,6 @@ export class AilyService {
         code: code,
       },
     });
-    console.log('[ res ] >', res);
 
     if (res.code !== 0) {
       throw new FeishuApiException(res.msg);

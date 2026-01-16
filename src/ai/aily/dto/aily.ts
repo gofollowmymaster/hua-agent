@@ -21,11 +21,10 @@ export class FeishuGenerateTokenDto {
   @ApiProperty({
     type: String,
     description:
-      '飞书授权code，获取方式：https://accounts.feishu.cn/open-apis/authen/v1/authorize?app_id=cli_a8c53168e1b2100c&redirect_uri=https://auth.aplnk.com/admin.html&scope=aily:session:read%20aily:session:write%20aily:message:read%20aily:message:write%20aily:run:read%20aily:run:write%20aily:file:read%20aily:file:write%20aily:skill:read%20aily:skill:write%20docs:document.media:download',
+      '飞书授权code，获取方式：https://accounts.feishu.cn/open-apis/authen/v1/authorize?app_id=cli_a8c53168e1b2100c&redirect_uri=https://auth.test-xw.elnkpro.com/node-server&scope=aily:session:read%20aily:session:write%20aily:message:read%20aily:message:write%20aily:run:read%20aily:run:write%20aily:file:read%20aily:file:write%20aily:skill:read%20aily:skill:write%20docs:document.media:download',
   })
   code: string;
 }
-
 export class BindSessionCodeDto {
   @IsNotEmpty()
   @ApiProperty({

@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import BaseSchedule from '@src/common/base/base.schedule';
-import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
-import FeishuClient from '@src/common/feishu/clients/client';
 import FeishuDepartmentHelper from '@src/common/feishu/helper/feishu-department-helper';
 import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { TenantContext } from '@src/common/service/context/tenant.context';
@@ -16,7 +14,6 @@ export default class SyncFeishuUser extends BaseSchedule {
   protected readonly cron = '0 0 0 * * *';
   protected readonly jobName = 'Sync User Per Day';
   private readonly redis: Redis;
-  private readonly client: FeishuClient;
   constructor(
     protected readonly redisService: RedisService,
     protected prisma: PrismaService,
@@ -27,7 +24,6 @@ export default class SyncFeishuUser extends BaseSchedule {
   ) {
     super(tenantContext, schedulerRegistry);
     this.redis = redisService.getClient();
-    this.client = ClientFactory.create(FeishuApp.AlertClient);
   }
 
   async handle() {

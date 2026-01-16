@@ -34,6 +34,7 @@ export type WikiSearchParams = Parameters<
 export type WikiSearchReturn = Awaited<
   ReturnType<lark.Client['wiki']['v1']['node']['search']>
 >['data'];
+export type WikiSearchReturnItem = WikiSearchReturn['items'][0];
 
 export type WikiSearchData = WikiSearchParams['data'];
 export type WikiSearchPageParams = WikiSearchParams['params'];

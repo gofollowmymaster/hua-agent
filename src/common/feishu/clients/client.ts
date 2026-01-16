@@ -2,8 +2,9 @@ import * as lark from '@larksuiteoapi/node-sdk';
 import { FeishuAppClientsType } from '.';
 import { getGlobalAppInstance } from '@src/common/utils/app-config';
 import { TenantContext } from '@src/common/service/context/tenant.context';
-import { FeishuAppConfig, TenantCode } from '@src/config/tenant';
+import { TenantCode } from '@src/config/tenant';
 import { NodeConfigService } from '@src/config/node-config.service';
+import { FeishuAppConfig } from '@src/config/interface';
 class FeishuClient {
   private clientContainer: Record<string, lark.Client> = {};
 

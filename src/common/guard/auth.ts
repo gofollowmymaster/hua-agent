@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { NodeConfigService } from '@src/config/node-config.service';
 import { UserContext } from '@src/type/global';
 import dayjs from 'dayjs';
 import { Request } from 'express';
@@ -30,7 +31,8 @@ export class AuthGuard implements CanActivate {
   private async verify(token: string): Promise<UserContext> {
     const payload = await this.jwtService.verify(token);
     const loginTime = payload.loginTime;
-    if (loginTime < dayjs().subtract(14, 'day').valueOf() / 1000) {
+    const dayNum = Number(NodeConfigService.get('jwtTokenExpired'));
+    if (loginTime < dayjs().subtract(dayNum, 'day').valueOf() / 1000) {
       throw new UnauthorizedException('登录已过期');
     }
     return payload;

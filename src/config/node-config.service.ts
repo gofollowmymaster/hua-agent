@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import globalConfig from '@src/config';
 import { TenantCode, TenantConfigKey, tenantCodeMap } from '@src/config/tenant';
+import { GlobalConfigKey } from './interface';
 @Injectable()
 export class NodeConfigService {
-  static get(configKey?: string) {
+  static get(configKey?: GlobalConfigKey): any {
     return globalConfig[configKey];
   }
-  static getOrThrow(configKey?: string) {
+  static getOrThrow(configKey?: GlobalConfigKey): any {
     const configValue = globalConfig[configKey];
     if (!configValue) {
       throw new Error(`${configKey} is not defined`);

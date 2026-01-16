@@ -51,7 +51,7 @@ export const sendCommonCardToFeishu = (options: CommonCardData) => {
     color: options.color,
     message:
       (options.message || '内部错误') +
-      (request?.headers?.['x-request-id'] + ''),
+      (request?.headers?.['x-request-id'] || ''),
     content: options.content || '未知错误',
     timestamp: errorTime.valueOf(),
     linkUrl: `https://sls.console.aliyun.com/lognext/project/k8s-log-c893ce02efe464e778e67c48016348406/logsearch/elnkpro-prod-log?encode%3Dbase64%26queryString%3DIF9jb250YWluZXJfbmFtZV86IGFwbHVzLXNxbC1zZXJ2aWNlLXByb2Q%3D%26filterInfo%3DeyJmamNvZGUiOiIoKSIsImZxIjoiIn0%3D%26queryTimeType%3D99%26startTime%3D${errorTime.subtract(60, 's').valueOf() / 1000}%26endTime%3D${errorTime.add(60, 's').valueOf() / 1000}`,

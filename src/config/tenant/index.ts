@@ -1,10 +1,8 @@
+import { FeishuAppConfig } from '../interface';
 import aplus from './aplus';
 import boat from './boat';
 import yurex from './yurex';
-export type FeishuAppConfig = {
-  appId: string;
-  appSecret: string;
-};
+
 export type TenantConfig = {
   FeishuWikiSpaceIds: string[];
   hostTag: string;
@@ -30,7 +28,10 @@ export enum tenantCodeMap {
 }
 //服务商码
 export type TenantCode = (typeof tenantCodeMap)[keyof typeof tenantCodeMap];
-const tenantConfig: Readonly<Record<TenantCode, Readonly<TenantConfig>>> = {
+export type TenantConfigType = Readonly<
+  Record<TenantCode, Readonly<TenantConfig>>
+>;
+const tenantConfig: TenantConfigType = {
   aplus,
   boat,
   yurex,

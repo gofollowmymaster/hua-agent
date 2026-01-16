@@ -16,8 +16,10 @@ import BaseProcessor from '@src/common/base/base.processor';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import { WarningMsgService } from './warning-msg-service';
-import dayjs from 'dayjs';
-import { ErrorLevel } from '@src/common/base/interface';
+import TipCard from '@src/common/feishu/card/tip-card';
+import FeishuDocxHelper from '@src/common/feishu/helper/feishu-docx-helper';
+import { WikiSearchReturnItem } from '@src/common/feishu/type/wiki';
+import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 type CheckDocumentParams = {
   blackList: WikiBlackListResponseDto[];
   tenantCode: tenantCodeMap;
@@ -26,16 +28,22 @@ type CheckDocumentParams = {
 @Processor('check-document')
 export class CheckDocumentProcessor extends BaseProcessor {
   protected readonly redis: Redis;
+  protected feishuMessageHelper: FeishuMessageHelper;
+
   constructor(
     protected redisService: RedisService,
     protected readonly tenantContext: TenantContext,
-    protected feishuMessageHelper: FeishuMessageHelper,
     protected feishuWikiHelper: FeishuWikiHelper,
     protected feishuFileHelper: FeishuFileHelper,
     protected warningMsgService: WarningMsgService,
+    protected feishuDocxHelper: FeishuDocxHelper,
   ) {
     super(tenantContext);
     this.redis = redisService.getClient();
+    this.feishuMessageHelper = new FeishuMessageHelper(
+      ClientFactory.create(FeishuApp.AlertClient),
+      tenantContext,
+    );
   }
 
   async handle(data: CheckDocumentParams): Promise<any> {
@@ -63,30 +71,60 @@ export class CheckDocumentProcessor extends BaseProcessor {
           lark.withUserAccessToken(userInfo.access_token),
         );
         if (res.items.length > 0) {
-          const docs = res.items.reduce((prev, next) => {
-            prev = prev + `[${next.title}](${next.url})，`;
-            return prev;
-          }, '');
-          const content = `服务商:<text_tag color='blue'>${tenantCode}</text_tag>的如下文档：${docs}存在黑名单中的关键字**${blackItem['关键字']}**，请及时处理！`;
+          let matchedItems = res.items;
+          // 需要严格比对
+          if (blackItem['需要严格比对']) {
+            matchedItems = await this.matchRawContent(
+              matchedItems,
+              blackItem['关键字'],
+            );
+          }
+          if (matchedItems.length === 0) continue;
 
-          this.warningMsgService.errorHookHandler({
-            timestamp: dayjs().valueOf(),
-            issueId: tenantCode + blackItem['关键字'],
-            title: '知识库黑名单检测异常通知',
-            culprit: content,
-            type: '',
-            issueUrl: '',
-            level: ErrorLevel.WARNING,
-            feishuUrl: '',
-          });
+          await this.sendTipMsg(matchedItems, tenantCode, blackItem['关键字']);
         }
       } catch (error) {
-        throw new Error(
-          '检查文档失败：关键字' + blackItem['关键字'] + ' ' + error.message,
+        this.sendAlertMsg(
+          '检查文档失败：关键字' + blackItem['关键字'],
+          error.message,
         );
       }
 
       await wait(1000);
     }
+  }
+  protected sendTipMsg(
+    matchedItems: WikiSearchReturnItem[],
+    tenantCode: tenantCodeMap,
+    sensitiveWords: string,
+  ): void {
+    const docs = matchedItems.reduce((prev, next) => {
+      prev = prev + `[${next.title}](${next.url})，`;
+      return prev;
+    }, '');
+    const content = TipCard.buildCardMsg({
+      title: '知识库黑名单检测异常通知',
+      bgColor: 'red',
+      content: `服务商:<text_tag color='blue'>${tenantCode}</text_tag>的如下文档：${docs}存在黑名单中的关键字**${sensitiveWords}**，请及时处理！ \n <at id="all"></at>`,
+    });
+    this.feishuMessageHelper.createInteractToGroup(
+      content,
+      NodeConfigService.getTenantConfigItem(
+        tenantCode,
+        'WikiBlackListCheckoutGroupId',
+      ),
+    );
+  }
+  async matchRawContent(items: WikiSearchReturnItem[], word: string) {
+    const matchedItems = [];
+    for (const item of items) {
+      const { content } = await this.feishuDocxHelper.rawContent(
+        item.obj_token,
+      );
+      if (content?.indexOf(word) > -1) {
+        matchedItems.push(item);
+      }
+    }
+    return matchedItems;
   }
 }

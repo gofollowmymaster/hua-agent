@@ -1,6 +1,7 @@
 import db from './db';
-import tenantConfig from './tenant/index';
-const globalConfig = Object.freeze({
+import { GlobalConfigType } from './interface';
+import tenantConfig, { tenantCodeMap } from './tenant/index';
+const globalConfig: GlobalConfigType = Object.freeze({
   //node-server报警群
   DefaultAlertFeishuGroupId: process.env.SERVER_ALERT_GROUPID,
   //dev调试报警群
@@ -9,8 +10,11 @@ const globalConfig = Object.freeze({
   DefaultAlertFeishuUserId: '762a5468',
   //云效通知群
   AliDevopsFeishuGroupId: process.env.ALI_DEVOPS_NOTICE_GROUPID,
+
   ...db,
   jwtSecret: process.env.JWT_SECRET,
+  jwtTokenExpired: process.env.JWT_TOKEN_EXPIRED_TIME,
+
   sentryIntegrationToken: process.env.SENTRY_API_TOKEN,
 
   AliyunOrganizationId: '65f941491febde2b6c514822',
@@ -29,7 +33,6 @@ const globalConfig = Object.freeze({
       process.env.FEISHU_APLUS_NODE_ADMIN_MTABLE_TABLE_ID,
     DevopsTableAppToken: 'Jz0abVIqeajmfesIkfRcwiannof',
     SupplierDiffAppToken: 'HHtzbuGuua3mRvszTI8cYKBVnId',
-    BlackListTableAppToken: 'Jy9AbAbsdaMTYVs6H23cOMQRnro',
   },
 
   robots: {
@@ -52,9 +55,8 @@ const globalConfig = Object.freeze({
 
   //服务商特性配置
   tenantConfig,
-  defaultTenant: 'aplus',
-} as const);
+  defaultTenant: tenantCodeMap.A,
+});
 
 export default globalConfig;
-
 //todo 获取机器人配置   获取服务商具体配置项

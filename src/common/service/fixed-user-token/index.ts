@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
-import * as lark from '@larksuiteoapi/node-sdk';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
-import { sendCommonCardToFeishu } from '@src/common/feishu/utils';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import BaseSchedule from '@src/common/base/base.schedule';
@@ -21,7 +19,6 @@ export default class FixedTokenService extends BaseSchedule {
   protected readonly jobName: string;
   protected readonly projectModule: string;
 
-  private client: lark.Client;
   private readonly redis: Redis;
   constructor(
     protected redisService: RedisService,
@@ -32,14 +29,11 @@ export default class FixedTokenService extends BaseSchedule {
     this.redis = redisService.getClient();
   }
 
-  async handle(tenantContext: TenantContextType) {
-    if (['development', 'dev'].includes(process.env.NODE_ENV)) return;
-    if (tenantContext.tenantCode == tenantCodeMap.D) return;
-    const authClient = ClientFactory.create(FeishuApp.AilyAplusClient);
-    this.client = authClient.client;
-    this.loadToken();
+  async handle(tenantInfo: TenantContextType) {
+    if (tenantInfo.tenantCode === tenantCodeMap.D) return;
+    this.loadToken(tenantInfo);
   }
-  async loadToken() {
+  async loadToken(tenantInfo: TenantContextType) {
     const cacheKey = this.redisService.buildCacheKeyWithTemplates(
       RedisKeys.FEISHU_FIXED_ACCESS_TOKEN_USED,
       {
@@ -47,34 +41,39 @@ export default class FixedTokenService extends BaseSchedule {
       },
     );
     const tokenInCached: FeishuAuthType = await this.redis.hgetall(cacheKey);
-
     if (!tokenInCached?.refresh_token) {
       console.log('[ tokenInCached ] >', cacheKey, tokenInCached);
-      this.sendAlertMsg('token in cache is null');
+      this.sendAlertMsg(
+        '服务商：' + tenantInfo.tenantCode,
+        'token in cache is null：' + cacheKey,
+        '刷新飞书Token异常',
+      );
       return;
     }
+    const authClient = ClientFactory.create(FeishuApp.AilyAplusClient);
 
-    const res = await this.client.authen.refreshAccessToken.create({
+    const res = await authClient.client.authen.refreshAccessToken.create({
       data: {
         grant_type: 'refresh_token',
         refresh_token: tokenInCached.refresh_token,
       },
     });
     if (res.code !== 0) {
-      this.sendAlertMsg(res.msg);
+      console.log(
+        '[ projectModule ] >',
+        res,
+        tenantInfo.tenantCode,
+        authClient.client.appId,
+        authClient.client.appSecret,
+      );
+      this.sendAlertMsg(
+        '服务商：' + tenantInfo.tenantCode,
+        res.msg,
+        '刷新飞书Token异常',
+      );
       return;
     }
     await this.redis.hset(cacheKey, res.data);
     this.redis.expire(cacheKey, 60 * 60 * 24);
-  }
-
-  sendAlertMsg(errorMessage: string) {
-    sendCommonCardToFeishu({
-      title: '定时刷新Token异常报警',
-      project: process.env.PROJECT_NAME,
-      color: 'red',
-      message: `刷新飞书Token异常`,
-      content: errorMessage,
-    });
   }
 }

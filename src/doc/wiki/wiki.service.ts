@@ -4,12 +4,11 @@ import { Injectable } from '@nestjs/common';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 
 import { RedisKeys } from '@src/common/const/redis-key.enum';
-import WikiDirectoryService from '../schedule/wiki-directory';
+import WikiDirectoryService from '../common/schedule/wiki-directory';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import {
   BlackListType,
-  WikiBatchSearchDto,
   WikiBlackListDto,
   WikiBlackListResponseDto,
   WikiSearchDto,
@@ -81,15 +80,15 @@ export class WikiService {
     );
     return res;
   }
-  async batchSearch(params: WikiBatchSearchDto) {
+  async batchSearch() {
     const { list: blackList } = await this.blacklist({
       type: [BlackListType.text],
-      supplierCode: params.supplierCode,
+      supplierCode: this.userContext.tenant,
     });
 
     await this.checkDocumentQueue.add('checkDocument', {
       blackList,
-      tenantCode: params.supplierCode,
+      tenantCode: this.userContext.tenant,
     });
 
     return {};

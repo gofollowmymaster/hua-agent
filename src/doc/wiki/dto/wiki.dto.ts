@@ -32,14 +32,6 @@ export class WikiSearchDto {
   nodeId?: string;
 }
 
-export class WikiBatchSearchDto {
-  @ApiProperty({
-    enum: tenantCodeMap,
-    description: '服务商编码',
-  })
-  supplierCode: tenantCodeMap;
-}
-
 export enum BlackListType {
   text = '文本',
   link = '链接',

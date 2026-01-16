@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
-import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
-import FeishuClient from '@src/common/feishu/clients/client';
-// import { sendCommonCardToFeishu } from '@src/common/feishu/utils';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import RequestIssueStatisticService from './services/request-issue.service';
@@ -19,7 +16,6 @@ export default class AlertStatisticService extends BaseSchedule {
   protected readonly jobName = 'Alert Statistic Per Day';
 
   private readonly redis: Redis;
-  private readonly client: FeishuClient;
   constructor(
     protected readonly redisService: RedisService,
     protected readonly requestIssueService: RequestIssueStatisticService,
@@ -29,7 +25,6 @@ export default class AlertStatisticService extends BaseSchedule {
   ) {
     super(tenantContext, schedulerRegistry);
     this.redis = redisService.getClient();
-    this.client = ClientFactory.create(FeishuApp.AlertClient);
   }
 
   protected initContext() {

@@ -20,7 +20,11 @@ export default abstract class BaseProcessor extends WorkerHost {
       tenantCode,
     };
     this.tenantContext.run(tenantData, async () => {
-      this.handle(job.data);
+      try {
+        this.handle(job.data);
+      } catch (err) {
+        this.sendAlertMsg(this.constructor.name + '执行错误', err.message);
+      }
     });
   }
 

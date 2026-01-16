@@ -4,7 +4,6 @@ import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { WikiService } from './wiki.service';
 import { AuthGuard } from '@src/common/guard/auth';
 import {
-  WikiBatchSearchDto,
   WikiBlackListDto,
   WikiBlackListResponseDto,
   WikiSearchDto,
@@ -80,9 +79,8 @@ export class WikiController {
   })
   @UseGuards(SecretAuthGuard)
   @Post('/batchSearch')
-  @ApiBody({ type: WikiBatchSearchDto })
-  async batchSearch(@Body() params: WikiBatchSearchDto) {
-    return await this.wikiService.batchSearch(params);
+  async batchSearch() {
+    return await this.wikiService.batchSearch();
   }
 
   @ApiOperation({

@@ -24,8 +24,8 @@ const boatConfig: TenantConfig = {
     //机器人Aplus智能体相关
 
     AilyAplusClient: {
-      appId: 'cli_a6d55e522f71900e',
-      appSecret: 'JQnGCO6eQtXFTEuZP0ZFCcJwZYKQ31e3',
+      appId: 'cli_a85a4dc1c9259013',
+      appSecret: 'wmea3GufO6ADkITtv0CjkexcZmpCAsWi',
     },
   },
 };

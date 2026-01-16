@@ -58,24 +58,35 @@ export default abstract class BaseSchedule implements OnModuleInit {
    * @param force
    */
   handleCron(force: boolean = false) {
-    this.execute(force);
+    if (!force) return;
+
+    this.handle(this.tenantContext.getStore());
   }
-  async execute(force: boolean = false) {
-    if (!force && ['development', 'dev'].includes(process.env.NODE_ENV)) return;
+  async execute() {
+    // if (['development', 'dev'].includes(process.env.NODE_ENV)) return;
 
     this.logger.debug(this.constructor.name + ' Called ');
-    this.tenantContextDatas.forEach((tenantData) => {
+
+    for (const tenantData of this.tenantContextDatas) {
       this.tenantContext.run(tenantData, async () => {
-        this.handle(tenantData);
+        try {
+          await this.handle(tenantData);
+        } catch (err) {
+          this.sendAlertMsg(err.message, err.stack);
+        }
       });
-    });
+    }
   }
 
   protected abstract handle(context: TenantContextType): void;
 
-  protected sendAlertMsg(message: string, content: string) {
+  protected sendAlertMsg(
+    message: string,
+    content: string,
+    title = '定时任务报警',
+  ) {
     sendCommonCardToFeishu({
-      title: '定时任务报警',
+      title: title,
       project: process.env.PROJECT_NAME,
       color: 'red',
       message: message,
