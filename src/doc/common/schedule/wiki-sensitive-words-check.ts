@@ -9,7 +9,7 @@ export default class WikiSensitiveWordsCheckService extends BaseSchedule {
   protected readonly isOpen = ['prod', 'production'].includes(
     process.env.NODE_ENV,
   );
-  protected readonly cron = '0 9-20 * * * *';
+  protected readonly cron = '0 0 10-18 * * *';
   protected readonly jobName = 'Wiki-Sensitive-Words-Check';
 
   constructor(
