@@ -1,8 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { TenantContext } from '@src/common/service/context/tenant.context';
+import {
+  TenantContext,
+  TenantContextType,
+} from '@src/common/service/context/tenant.context';
 import BaseSchedule from '@src/common/base/base.schedule';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { WikiService } from '@src/doc/wiki/wiki.service';
+import { tenantCodeMap } from '@src/config/tenant';
 
 @Injectable()
 export default class WikiSensitiveWordsCheckService extends BaseSchedule {
@@ -20,7 +24,8 @@ export default class WikiSensitiveWordsCheckService extends BaseSchedule {
     super(tenantContext, schedulerRegistry);
   }
 
-  protected async handle() {
+  protected async handle(tenantData: TenantContextType) {
+    if (tenantData.tenantCode === tenantCodeMap.C) return;
     this.wikiService.batchSearch();
   }
 }
