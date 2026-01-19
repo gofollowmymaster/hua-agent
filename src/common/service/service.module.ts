@@ -5,7 +5,6 @@ import { LoggerService } from './logger/logger.service';
 import { TenantContext } from './context/tenant.context';
 import { PrismaService } from './prisma/prisma.service';
 import WikiFixedTokenService from './fixed-user-token/wiki-fixed-user-token';
-import { DelayedExecutor } from './delay-executor';
 @Global()
 @Module({
   providers: [
@@ -15,7 +14,6 @@ import { DelayedExecutor } from './delay-executor';
     TenantContext,
     PrismaService,
     WikiFixedTokenService,
-    DelayedExecutor,
   ],
   exports: [
     RedisProvider,
@@ -24,7 +22,6 @@ import { DelayedExecutor } from './delay-executor';
     TenantContext,
     PrismaService,
     WikiFixedTokenService,
-    DelayedExecutor,
   ],
 })
 export class GlobalServiceModule {}

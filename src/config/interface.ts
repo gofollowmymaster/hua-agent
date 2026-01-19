@@ -5,6 +5,11 @@ export type FeishuAppConfig = {
   appSecret: string;
 };
 export type GlobalConfigType = {
+  DB_REDIS_HOST: string;
+  DB_REDIS_PORT: number;
+  DB_REDIS_DB: number;
+  DB_REDIS_PASSWORD: string;
+
   //node-server报警群
   DefaultAlertFeishuGroupId: string;
   //dev调试报警群
