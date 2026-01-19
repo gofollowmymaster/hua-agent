@@ -58,8 +58,8 @@ export class TenantMiddleware implements NestMiddleware {
         host.indexOf(hostTag) == -1 &&
         user.supplierCode
       ) {
-        logger.info(
-          `请求开始【${req.method} - ${req.originalUrl}】 请求头:【${JSON.stringify(req.headers)}】请求体参数:【${JSON.stringify(req.body)}】 `,
+        logger.warning(
+          `非法请求 请求开始【${req.method} - ${req.originalUrl}】 请求头:【${JSON.stringify(req.headers)}】请求体参数:【${JSON.stringify(req.body)}】 `,
         );
         sendExceptionToFeishu(new BadRequestException('非法请求'));
       }

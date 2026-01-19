@@ -63,8 +63,6 @@ export default abstract class BaseSchedule implements OnModuleInit {
     this.handle(this.tenantContext.getStore());
   }
   async execute() {
-    // if (['development', 'dev'].includes(process.env.NODE_ENV)) return;
-
     this.logger.debug(this.constructor.name + ' Called ');
 
     for (const tenantData of this.tenantContextDatas) {

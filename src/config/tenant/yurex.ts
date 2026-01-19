@@ -3,7 +3,7 @@ const yurexConfig: TenantConfig = {
   FeishuWikiSpaceIds: ['7583921476789652686'],
   hostTag: 'yurex',
   //wiki黑名单检测通知群
-  WikiBlackListCheckoutGroupId: 'oc_79cc868ad3680d77b1d17c769d42c06a',
+  WikiBlackListCheckoutGroupId: 'oc_73081755e8517d3846182d1b195e129e',
   //wiki黑名单检测通知人
   WikiBlackListCheckoutUserId: '762a5468',
   feishuTables: {},

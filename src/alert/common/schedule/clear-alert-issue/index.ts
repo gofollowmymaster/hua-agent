@@ -9,6 +9,9 @@ import { NodeConfigService } from '@src/config/node-config.service';
 
 @Injectable()
 export default class ClearAlertPerDayService extends BaseSchedule {
+  protected readonly isOpen = ['prod', 'production'].includes(
+    process.env.NODE_ENV,
+  );
   protected readonly cron = '0 0 0 * * *';
   protected readonly jobName = 'Clear Alert Count Per Day';
 

@@ -10,10 +10,12 @@ import {
   TenantContextType,
 } from '@src/common/service/context/tenant.context';
 import { FeishuAuthType } from '@src/common/feishu/type/auth';
-import { tenantCodeMap } from '@src/config/tenant';
 
 @Injectable()
 export default class FixedTokenService extends BaseSchedule {
+  protected readonly isOpen = ['test', 'prod', 'production'].includes(
+    process.env.NODE_ENV,
+  );
   //每30分钟运行一次
   protected readonly cron: string;
   protected readonly jobName: string;
@@ -30,8 +32,6 @@ export default class FixedTokenService extends BaseSchedule {
   }
 
   async handle(tenantInfo: TenantContextType) {
-    if ([tenantCodeMap.C, tenantCodeMap.D].includes(tenantInfo.tenantCode))
-      return;
     this.loadToken(tenantInfo);
   }
   async loadToken(tenantInfo: TenantContextType) {
