@@ -24,8 +24,7 @@ export default class WikiSensitiveWordsCheckService extends BaseSchedule {
     super(tenantContext, schedulerRegistry);
   }
 
-  protected async handle(tenantData: TenantContextType) {
-    if (tenantData.tenantCode === tenantCodeMap.C) return;
+  protected async handle() {
     this.wikiService.batchSearch();
   }
 }
