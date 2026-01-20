@@ -153,3 +153,22 @@ export type PipelineDetail = {
     stages: PipelineStage[];
   };
 };
+
+export type executeAppReleaseWorkflowType = {
+  //流水线运行 id，也即流水线的运行次数。
+  object: number;
+  //	流水线 ID。
+  pipelineId: number;
+  //流水线运行 id，也即流水线的运行编号。
+  pipelineRunId: number;
+  time?: number;
+};
+
+export type executeAppReleaseWorkflowQuery = {
+  appName: string;
+  releaseWorkflowSn: string;
+  releaseStageSn: string;
+};
+export type executeAppReleaseWorkflowBody = {
+  [key: string]: any;
+};

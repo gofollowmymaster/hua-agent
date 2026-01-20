@@ -40,3 +40,32 @@ export const wait = (time: number) => {
     }, time);
   });
 };
+
+type HandleType = (
+  handle: (...params) => any,
+  wait: number,
+  thisObj: any,
+) => any;
+export const throttleByParams: HandleType = (handle, wait, thisObj) => {
+  handle = handle.bind(thisObj);
+  const timerContainer = {};
+  return (...params) => {
+    const timerKey = JSON.stringify(params);
+    const timer = timerContainer[timerKey];
+
+    return new Promise((resolve) => {
+      if (timer) {
+        clearTimeout(timer);
+        timerContainer[timerKey] = setTimeout(async () => {
+          const res = await handle(...params);
+          resolve(res);
+        }, wait);
+        return;
+      }
+      timerContainer[timerKey] = setTimeout(async () => {
+        const res = await handle(...params);
+        resolve(res);
+      }, wait);
+    });
+  };
+};

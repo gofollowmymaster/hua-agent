@@ -13,6 +13,7 @@ const AliDevopsApiPrefix = HttpDataCachePrefix + '{tenant}:ali-devops-api:';
 const AilyPrefix = RedisPrefix + '{tenant}:aily:';
 const FeishuUserTokenPrefix = RedisPrefix + '{tenant}:{module}:';
 const PushFeishuDocPrefix = RedisPrefix + 'push-feishu-doc:';
+const DevopsPrefix = RedisPrefix + 'devops:';
 
 export enum RedisKeys {
   WIKI_DIRECTORY = RedisWikiPrefix + 'directory:{spaceId}',
@@ -30,4 +31,5 @@ export enum RedisKeys {
   PUSH_FEISHU_DOC_CACHE = PushFeishuDocPrefix + '{tag}',
   ALI_DEVOPS_API_CACHE = AliDevopsApiPrefix + '{apiName}',
   SENTRY_API_CACHE = SentryApiPrefix + '{apiName}',
+  DEVOPS_APP_PUBLISH_CACHE = DevopsPrefix + 'publish:{workflowTag}',
 }

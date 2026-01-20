@@ -8,21 +8,30 @@ import ProjectPublishCard from '@src/common/feishu/card/project-publish';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import {
   AppWorkflowPublishType,
+  executeAppReleaseWorkflowBody,
+  executeAppReleaseWorkflowQuery,
+  executeAppReleaseWorkflowType,
   PipelineStage,
 } from './common/ali-api/interface';
 import UserAliyunTable from './common/table/user-token-table';
-import { addRetryJob } from '@src/common/utils/job';
+import { addRetryJob, throttleByParams } from '@src/common/utils/job';
 import TipCard from '@src/common/feishu/card/tip-card';
-import { NodeConfigService } from '@src/config/node-config.service';
 import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { BaseService } from '@src/common/base/BaseService';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { AliDevopsContext } from './common/service/ali-devops.context';
-// import { RedisKeys } from '@src/common/const/redis-key.enum';
+import { RedisKeys } from '@src/common/const/redis-key.enum';
+import { sendExceptionToFeishu } from '@src/common/feishu/utils';
+import dayjs from 'dayjs';
+import { NodeConfigService } from '@src/config/node-config.service';
 
 @Injectable()
 export class AliService extends BaseService {
   protected readonly redis: Redis;
+  protected readonly executeAppReleaseWorkflowThrottle: (
+    params: executeAppReleaseWorkflowQuery,
+    body: executeAppReleaseWorkflowBody,
+  ) => any;
 
   constructor(
     protected redisService: RedisService,
@@ -36,6 +45,12 @@ export class AliService extends BaseService {
   ) {
     super();
     this.redis = redisService.getClient();
+
+    this.executeAppReleaseWorkflowThrottle = throttleByParams(
+      this.devopsApiService.executeAppReleaseWorkflow,
+      1000 * 30,
+      devopsApiService,
+    );
   }
 
   async publish(params: AliDevopsDto) {
@@ -51,38 +66,36 @@ export class AliService extends BaseService {
         try {
           const appReleaseWorkflow =
             await this.devopsApiService.queryAppReleaseWorkflow(appOption);
-          const executeRes =
-            await this.devopsApiService.executeAppReleaseWorkflow(
-              {
-                appName: appReleaseWorkflow.appName,
-                releaseWorkflowSn: appReleaseWorkflow.releaseWorkflowSn,
-                releaseStageSn: appReleaseWorkflow.releaseStageSn,
-              },
-              {
-                ...appReleaseWorkflow.runParams,
-                ...appOption.metaData,
-                [appReleaseWorkflow.sourcesID]: appOption.branch,
-                FLOW_INST_RUNNING_COMMENT: params.content,
-              },
-            );
-          // const key = RedisKeys.PUSH_FEISHU_DOC_CACHE.replace(
-          //   '{tag}',
-          //   params.module + ':' + params.tag,
-          // );
-
-          // const { hash } = await this.redis.sadd(key, executeRes);
-          appReleaseWorkflow.status = 'INIT';
-          const job = addRetryJob(
-            async () =>
-              this.checkPipelineDetail(
-                appReleaseWorkflow,
-                params,
-                executeRes.pipelineRunId,
-              ),
-            60 * 1000,
-            20,
-          );
           resultList.push(appReleaseWorkflow);
+
+          const job = this.executeAppReleaseWorkflowThrottle(
+            {
+              appName: appReleaseWorkflow.appName,
+              releaseWorkflowSn: appReleaseWorkflow.releaseWorkflowSn,
+              releaseStageSn: appReleaseWorkflow.releaseStageSn,
+            },
+            {
+              ...appReleaseWorkflow.runParams,
+              ...appOption.metaData,
+              [appReleaseWorkflow.sourcesID]: appOption.branch,
+              FLOW_INST_RUNNING_COMMENT: params.content,
+            },
+          ).then((executeRes) => {
+            // const executeRes =
+
+            this.cacheExecuteInfo(appReleaseWorkflow, executeRes);
+            appReleaseWorkflow.status = 'INIT';
+            addRetryJob(
+              async () =>
+                this.checkPipelineDetail(
+                  appReleaseWorkflow,
+                  params,
+                  executeRes.pipelineRunId,
+                ),
+              60 * 1000,
+              20,
+            );
+          });
           queryJobs.push(job);
         } catch (error) {
           throw new Error(
@@ -113,7 +126,7 @@ export class AliService extends BaseService {
   async checkPipelineDetail(
     appReleaseWorkflow: AppWorkflowPublishType,
     params: AliDevopsDto,
-    pipelineRunId: string,
+    pipelineRunId: number,
   ) {
     const res = await this.devopsApiService.getPipelineDetail({
       appName: appReleaseWorkflow.appName,
@@ -121,11 +134,11 @@ export class AliService extends BaseService {
       releaseStageSn: appReleaseWorkflow.releaseStageSn,
       pipelineRunId: pipelineRunId,
     });
-    this.logger.info('[ res ] >' + JSON.stringify(res.pipelineRun.stages));
     const stages = res.pipelineRun.stages;
 
     if (stages[stages.length - 1].stageInfo.status === 'SUCCESS') {
       appReleaseWorkflow.status = 'SUCCESS';
+
       return true;
     } else {
       const currentStage = stages.find((stage: any) =>
@@ -134,11 +147,16 @@ export class AliService extends BaseService {
         ),
       );
       if (!currentStage) {
+        sendExceptionToFeishu(
+          new Error('当前未知状态：' + currentStage.stageInfo.status),
+        );
+        // console.log('[ currentStage-true ] >', currentStage.stageInfo);
         return true;
       }
       appReleaseWorkflow.status = currentStage.stageInfo?.status;
       if (appReleaseWorkflow.status === 'FAIL') {
         this.sendFailMsg(appReleaseWorkflow, currentStage, params.operator);
+
         return true;
       } else if (appReleaseWorkflow.status === 'WAITING') {
         const name = currentStage.stageInfo.jobs.find((job: any) => {
@@ -147,6 +165,8 @@ export class AliService extends BaseService {
         this.logger.info(
           '当前运行阶段->' + (name || currentStage.stageInfo.name),
         );
+        this.cancelWorkflow(appReleaseWorkflow, pipelineRunId);
+
         return true;
       } else if (appReleaseWorkflow.status === 'CANCELED') {
         return true;
@@ -155,6 +175,46 @@ export class AliService extends BaseService {
         return false;
       }
     }
+  }
+  async cacheExecuteInfo(
+    appReleaseWorkflow: AppWorkflowPublishType,
+    executeRes: executeAppReleaseWorkflowType,
+  ) {
+    const key = RedisKeys.DEVOPS_APP_PUBLISH_CACHE.replace(
+      '{workflowTag}',
+      appReleaseWorkflow.appName + ':' + appReleaseWorkflow.releaseStageSn,
+    );
+    executeRes.time = dayjs().valueOf();
+
+    this.redis.sadd(key, JSON.stringify(executeRes));
+  }
+  async cancelWorkflow(
+    appReleaseWorkflow: AppWorkflowPublishType,
+    pipelineRunId: number,
+  ) {
+    const key = RedisKeys.DEVOPS_APP_PUBLISH_CACHE.replace(
+      '{workflowTag}',
+      appReleaseWorkflow.appName + ':' + appReleaseWorkflow.releaseStageSn,
+    );
+    const executing = await this.redis.smembers(key);
+
+    const needCancelItem = executing
+      .map((item) => JSON.parse(item) as executeAppReleaseWorkflowType)
+      .filter((item) => {
+        return item.pipelineRunId !== pipelineRunId;
+      });
+    const current = dayjs().valueOf();
+    needCancelItem.forEach(async (item) => {
+      if (current - item.time > 1000 * 60 * 10)
+        this.devopsApiService.cancelExecuteAppReleaseWorkflow({
+          appName: appReleaseWorkflow.appName,
+          releaseWorkflowSn: appReleaseWorkflow.releaseWorkflowSn,
+          releaseStageSn: appReleaseWorkflow.releaseStageSn,
+          executionNumber: item.pipelineRunId,
+        });
+
+      this.redis.srem(key, JSON.stringify(item));
+    });
   }
 
   /**

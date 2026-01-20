@@ -1,26 +1,25 @@
-import { Injectable, Scope } from '@nestjs/common';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import { RedisKeys } from '../const/redis-key.enum';
 
-@Injectable({ scope: Scope.TRANSIENT })
+// @Injectable({ scope: Scope.TRANSIENT })
 export default abstract class HttpApiHelper {
-  protected readonly cacheKeytemplate: RedisKeys;
+  protected readonly cacheKeyTemplate: RedisKeys;
   protected readonly useCache: boolean;
   protected readonly ttl: number = 60 * 60 * 1;
   protected redis: Redis;
 
   constructor(
     protected redisService?: RedisService,
-    cacheKeytemplate?: RedisKeys,
+    cacheKeyTemplate?: RedisKeys,
   ) {
     this.redis = redisService?.getClient();
-    this.cacheKeytemplate = cacheKeytemplate;
+    this.cacheKeyTemplate = cacheKeyTemplate;
   }
   buildCacheKey(key: string) {
     const cacheKey = this.redisService.buildCacheKey(
-      this.cacheKeytemplate,
+      this.cacheKeyTemplate,
       '{apiName}',
       key,
     );
@@ -33,14 +32,14 @@ export default abstract class HttpApiHelper {
     key: string = '',
   ) {
     if (this.useCache && useCache) {
-      const cachaeKey = this.buildCacheKey(key);
+      const cacheKey = this.buildCacheKey(key);
 
-      let res = await this.redis?.get(cachaeKey);
+      let res = await this.redis?.get(cacheKey);
 
       if (res) return JSON.parse(res);
 
       res = await this.requestWrapper(handler, key.split(':')[0]);
-      this.redis.setex(cachaeKey, this.ttl, JSON.stringify(res));
+      this.redis.setex(cacheKey, this.ttl, JSON.stringify(res));
       return res;
     }
     return await this.requestWrapper(handler, key.split(':')[0]);

@@ -11,10 +11,14 @@ import {
   AppInfoType,
   AppReleaseWorkflow,
   AppWorkflowPublishType,
+  executeAppReleaseWorkflowBody,
+  executeAppReleaseWorkflowQuery,
+  executeAppReleaseWorkflowType,
   PipelineDetail,
 } from './interface';
 // import { AppWorkflowType } from '../../types/devops';
 import { AliDevopsContext } from '../service/ali-devops.context';
+import { throttleByParams } from '@src/common/utils/job';
 
 @Injectable()
 export class DevopsApiService extends HttpApiHelper {
@@ -167,7 +171,10 @@ export class DevopsApiService extends HttpApiHelper {
       url: `https://devops.aliyun.com/appstack/app/${appOption.appName}/workflow/${appConfig.sn}/stage/${handleWorkflowSource.sn}/current`,
     };
   };
-  async executeAppReleaseWorkflow(pathParams, params) {
+  async executeAppReleaseWorkflow(
+    pathParams: executeAppReleaseWorkflowQuery,
+    params: executeAppReleaseWorkflowBody,
+  ): Promise<executeAppReleaseWorkflowType> {
     const { appName, releaseWorkflowSn, releaseStageSn } = pathParams;
 
     return this.requestWrapper(async () => {
@@ -187,6 +194,29 @@ export class DevopsApiService extends HttpApiHelper {
       );
       return data;
     }, 'executeAppReleaseWorkflow');
+  }
+
+  async cancelExecuteAppReleaseWorkflow(
+    pathParams,
+  ): Promise<executeAppReleaseWorkflowType> {
+    const { appName, releaseWorkflowSn, releaseStageSn, executionNumber } =
+      pathParams;
+
+    return this.requestWrapper(async () => {
+      this.setAliyunToken();
+
+      const { data } = await firstValueFrom(
+        this.httpService.post(
+          `${this.prefix}${this.organizationId}/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}/executions/${executionNumber}:cancel`,
+
+          {},
+          {
+            headers: this.headers,
+          },
+        ),
+      );
+      return data;
+    }, 'cancelExecuteAppReleaseWorkflow');
   }
   async getPipelineDetail(pathParams): Promise<PipelineDetail> {
     const { appName, releaseWorkflowSn, releaseStageSn, pipelineRunId } =
