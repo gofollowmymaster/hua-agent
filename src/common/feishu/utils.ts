@@ -92,5 +92,6 @@ export const getAppAccessToken = async (AppName: FeishuAppClientsType) => {
   } else {
     throw new Error('Failed to get app_access_token');
   }
+  // client.client
   return app_access_token;
 };

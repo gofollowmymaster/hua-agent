@@ -9,6 +9,7 @@ import FeishuWikiHelper from './feishu-wiki-helper';
 import FeishuAilyHelper from './feishu-aily-helper';
 import FeishuDocxHelper from './feishu-docx-helper';
 import FeishuFileHelper from './feishu-file-helper';
+import FeishuAuthHelper from './feishu-auth-helper';
 
 @Module({})
 export class FeishuHelperModule {
@@ -52,6 +53,10 @@ export class FeishuHelperModule {
           provide: FeishuFileHelper,
           useClass: FeishuFileHelper,
         },
+        {
+          provide: FeishuAuthHelper,
+          useClass: FeishuAuthHelper,
+        },
       ],
       exports: [
         FeishuMessageHelper,
@@ -62,6 +67,7 @@ export class FeishuHelperModule {
         FeishuDocxHelper,
         FeishuAilyHelper,
         FeishuFileHelper,
+        FeishuAuthHelper,
       ],
     };
   }

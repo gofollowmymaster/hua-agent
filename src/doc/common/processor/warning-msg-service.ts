@@ -10,6 +10,7 @@ import { WikiAlertFeishuAdapter } from './alert-feishu.adapter';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import { HttpService } from '@nestjs/axios';
 import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
+import FeishuAuthHelper from '@src/common/feishu/helper/feishu-auth-helper';
 
 @Injectable()
 export class WarningMsgService extends ErrorBaseService {
@@ -25,6 +26,7 @@ export class WarningMsgService extends ErrorBaseService {
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly httpService: HttpService,
     protected readonly feishuUserHelper: FeishuUserHelper,
+    protected readonly feishuAuthHelper: FeishuAuthHelper,
   ) {
     super(redisService);
   }

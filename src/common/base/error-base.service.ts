@@ -13,7 +13,7 @@ import { firstValueFrom } from 'rxjs';
 
 import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { FeishuApp } from '@src/common/feishu/clients';
-import { getAppAccessToken } from '@src/common/feishu/utils';
+
 import { HttpService } from '@nestjs/axios';
 import { AlertContext } from './alert-event.context';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
@@ -27,6 +27,7 @@ import {
 } from '@src/common/feishu/card/warning-card';
 import { MsgSenderService } from './msg-sender.service';
 import { BaseAlertEvent } from './interface';
+import FeishuAuthHelper from '../feishu/helper/feishu-auth-helper';
 
 export abstract class ErrorBaseService extends AlertBaseService {
   protected readonly alertFeishuAdapter: BaseAlertFeishuAdapter;
@@ -35,6 +36,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
   protected readonly httpService: HttpService;
   protected readonly alertContext: AlertContext<BaseAlertEvent>;
   protected readonly messageHelper: FeishuMessageHelper;
+  protected readonly feishuAuthHelper: FeishuAuthHelper;
   protected readonly CardType: WarningCardType = 'professional';
 
   constructor(protected readonly redisService: RedisService) {
@@ -287,13 +289,14 @@ export abstract class ErrorBaseService extends AlertBaseService {
     });
   }
   protected async updateByCard(message_id: string, data) {
-    const accessToken = await getAppAccessToken(FeishuApp.AlertClient);
+    const { app_access_token: appAccessToken } =
+      await this.feishuAuthHelper.getAppAccessToken(FeishuApp.AlertClient);
     await firstValueFrom(
       this.httpService.patch(
         'https://open.feishu.cn/open-apis/im/v1/messages/' + message_id,
         data,
         {
-          headers: { Authorization: `Bearer ${accessToken}` },
+          headers: { Authorization: `Bearer ${appAccessToken}` },
         },
       ),
     );

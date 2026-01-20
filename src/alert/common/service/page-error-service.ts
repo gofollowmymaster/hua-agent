@@ -17,6 +17,7 @@ import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
 import { HttpService } from '@nestjs/axios';
 import { BitTableFilter } from '@src/common/feishu/type/bitable';
 import { IssueStatusEnum } from '@src/common/feishu/card/warning-card/interface';
+import FeishuAuthHelper from '@src/common/feishu/helper/feishu-auth-helper';
 
 @Injectable()
 export class PageErrorService extends ErrorBaseService {
@@ -33,6 +34,7 @@ export class PageErrorService extends ErrorBaseService {
     protected readonly alertContext: AlertContext<AlertEvent>,
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly feishuUserHelper: FeishuUserHelper,
+    protected readonly feishuAuthHelper: FeishuAuthHelper,
     protected readonly httpService: HttpService,
   ) {
     super(redisService);

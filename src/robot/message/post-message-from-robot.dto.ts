@@ -148,7 +148,7 @@ export class FeishuTicketDto {
     enum: FeishuApp,
     description: '飞书应用名称',
   })
-  appName: FeishuAppClientsType;
+  appName: FeishuApp;
 }
 
 export class BatchDeleteParamsDto {
