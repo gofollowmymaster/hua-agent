@@ -8,52 +8,7 @@ datasource db {
   url               = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
-
-model Subapp {
-  id         Int       @id @default(autoincrement())
-  subappName String    @unique
-  versions   Version[]
-}
-
-model Version {
-  id           Int          @id @default(autoincrement())
-  versionName  String       @unique
-  versionEntry String
-  subappId     Int
-  headerTags   HeaderTags[]
-  subapp       Subapp       @relation(fields: [subappId], references: [id])
-
-  @@index([subappId], map: "Version_subappId_fkey")
-}
-
-model HeaderTags {
-  id        Int     @id @default(autoincrement())
-  versionId Int
-  tagKey    String
-  tagValue  String
-  version   Version @relation(fields: [versionId], references: [id])
-
-  @@index([versionId], map: "HeaderTags_versionId_fkey")
-}
-
-model VerifyMCodeAndDCode {
-  id           Int            @id @default(autoincrement())
-  MId          String         @unique
-  DId          String?
-  createTime   DateTime       @default(now())
-  MIdStatus    MIdStatusEnum? @default(Enable)
-  CompanyNames CompanyNames[]
-}
-
-model CompanyNames {
-  id          Int                 @id @default(autoincrement())
-  MId         String
-  CompanyName String
-  createTime  DateTime            @default(now())
-  mid         VerifyMCodeAndDCode @relation(fields: [MId], references: [MId])
-
-  @@index([MId], map: "CompanyNames_MId_fkey")
-}
+ 
 
 
 
