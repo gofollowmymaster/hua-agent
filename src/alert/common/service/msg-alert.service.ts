@@ -108,9 +108,17 @@ export class MsgAlertService extends MsgSenderService {
     let urgentInfo;
     // 发送加急消息
     if (urgentType === 'App') {
-      urgentInfo = await this.messageHelper.urgentApp([userId], fMessageId);
+      urgentInfo = await this.messageHelper.urgentApp(
+        [userId],
+        fMessageId,
+        'union_id',
+      );
     } else {
-      urgentInfo = await this.messageHelper.urgentPhone([userId], fMessageId);
+      urgentInfo = await this.messageHelper.urgentPhone(
+        [userId],
+        fMessageId,
+        'union_id',
+      );
     }
 
     this.logger.info(urgentInfo);
