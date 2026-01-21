@@ -13,15 +13,14 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@src/common/guard/auth';
+import { getAppAccessToken } from '@src/common/feishu/utils';
 import { logger } from '@src/common/service/logger/logger.config';
 import { TableHeaderType } from '../dto/table-action.dto';
-import FeishuAuthHelper from '@src/common/feishu/helper/feishu-auth-helper';
 @Injectable()
 export class MessageService {
   constructor(
     private readonly feishuSense: FeishuSenseService,
     private readonly messageHelper: FeishuMessageHelper,
-    private readonly feishuAuthHelper: FeishuAuthHelper,
     private readonly httpService: HttpService,
   ) {}
 
@@ -86,9 +85,7 @@ export class MessageService {
   })
   @UseGuards(AuthGuard)
   async getTicket(params: FeishuTicketDto) {
-    const { app_access_token: appAccessToken } =
-      await this.feishuAuthHelper.getAppAccessToken(params.appName);
-    console.log('[ appAccessToken ] >', appAccessToken);
+    const appAccessToken = await getAppAccessToken(params.appName);
     const {
       data: { data },
     } = await firstValueFrom(
