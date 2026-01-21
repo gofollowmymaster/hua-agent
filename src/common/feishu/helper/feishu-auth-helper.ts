@@ -13,7 +13,7 @@ import { ClientFactory, FeishuApp } from '../clients';
 @Injectable({ scope: Scope.TRANSIENT })
 class FeishuAuthHelper extends FeishuDataApiHelper {
   protected readonly useCache = true;
-  protected readonly ttl = 60 * 60 * 30;
+  protected readonly ttl = 60 * 30;
   constructor(
     @Inject(FEISHU_CLIENT_ID) protected readonly feishuClient: FeishuClient,
     protected readonly userContext: TenantContext,

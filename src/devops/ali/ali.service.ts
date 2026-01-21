@@ -104,7 +104,7 @@ export class AliService extends BaseService {
       Promise.all(queryJobs)
         .then(() => {
           if (params.env.indexOf('dev') > -1) return;
-          // this.sendPushResultMsg(resultList, params);
+          this.sendPushResultMsg(resultList, params);
         })
         .catch((error) => {
           this.logger.error('查询流水线详情失败，失败原因：' + error.message);
