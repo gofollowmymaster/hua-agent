@@ -28,7 +28,7 @@ class FeishuAuthHelper extends FeishuDataApiHelper {
     }
     const res = await this.readWrapper(
       async () => {
-        const res = await this.client.auth.v3.appAccessToken.internal(
+        const res = await client.auth.v3.appAccessToken.internal(
           {
             data: {
               app_id: client.appId,

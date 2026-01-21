@@ -81,8 +81,6 @@ export class AliService extends BaseService {
               FLOW_INST_RUNNING_COMMENT: params.content,
             },
           ).then((executeRes) => {
-            // const executeRes =
-
             this.cacheExecuteInfo(appReleaseWorkflow, executeRes);
             appReleaseWorkflow.status = 'INIT';
             addRetryJob(
@@ -106,7 +104,7 @@ export class AliService extends BaseService {
       Promise.all(queryJobs)
         .then(() => {
           if (params.env.indexOf('dev') > -1) return;
-          this.sendPushResultMsg(resultList, params);
+          // this.sendPushResultMsg(resultList, params);
         })
         .catch((error) => {
           this.logger.error('查询流水线详情失败，失败原因：' + error.message);
@@ -138,7 +136,6 @@ export class AliService extends BaseService {
 
     if (stages[stages.length - 1].stageInfo.status === 'SUCCESS') {
       appReleaseWorkflow.status = 'SUCCESS';
-
       return true;
     } else {
       const currentStage = stages.find((stage: any) =>
@@ -150,12 +147,13 @@ export class AliService extends BaseService {
         sendExceptionToFeishu(
           new Error('当前未知状态：' + currentStage.stageInfo.status),
         );
-        // console.log('[ currentStage-true ] >', currentStage.stageInfo);
+        console.log('[ currentStage-true ] >', currentStage.stageInfo);
         return true;
       }
       appReleaseWorkflow.status = currentStage.stageInfo?.status;
       if (appReleaseWorkflow.status === 'FAIL') {
         this.sendFailMsg(appReleaseWorkflow, currentStage, params.operator);
+        console.log('[ currentStage-true ] >', currentStage.stageInfo);
 
         return true;
       } else if (appReleaseWorkflow.status === 'WAITING') {
@@ -166,6 +164,7 @@ export class AliService extends BaseService {
           '当前运行阶段->' + (name || currentStage.stageInfo.name),
         );
         this.cancelWorkflow(appReleaseWorkflow, pipelineRunId);
+        console.log('[ currentStage-true ] >', currentStage.stageInfo);
 
         return true;
       } else if (appReleaseWorkflow.status === 'CANCELED') {
