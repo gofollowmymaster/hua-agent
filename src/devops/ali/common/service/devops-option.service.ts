@@ -46,7 +46,7 @@ export class DevopsOptionService {
       {
         appName: 'aplus-quickbi-manage',
         workflowName: 'dev环境',
-        branch: 'feature/dev-publish',
+        branch: 'dev-publish',
       },
     ],
 
@@ -89,7 +89,7 @@ export class DevopsOptionService {
       {
         appName: 'aplus-quickbi-manage',
         workflowName: 'test环境',
-        branch: 'feature/test-publish',
+        branch: 'test-publish',
       },
     ],
 
@@ -132,7 +132,7 @@ export class DevopsOptionService {
       {
         appName: 'aplus-quickbi-manage',
         workflowName: 'UAT环境',
-        branch: 'feature/uat-publish',
+        branch: 'uat-publish',
       },
     ],
   };
