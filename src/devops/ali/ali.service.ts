@@ -83,7 +83,7 @@ export class AliService extends BaseService {
           ).then((executeRes) => {
             this.cacheExecuteInfo(appReleaseWorkflow, executeRes);
             appReleaseWorkflow.status = 'INIT';
-            addRetryJob(
+            return addRetryJob(
               async () =>
                 this.checkPipelineDetail(
                   appReleaseWorkflow,

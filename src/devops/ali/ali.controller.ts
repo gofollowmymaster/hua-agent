@@ -72,7 +72,6 @@ export class AliController {
     summary: '批量取消等待中流水线',
     description: '手动触发批量取消等待中流水线',
   })
-  // @ApiBody({ type: AliDevopsCommonDto })
   @UseGuards(SecretAuthGuard)
   async cancelRuns() {
     const res = this.devopsContext.run(
