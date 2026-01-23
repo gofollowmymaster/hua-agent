@@ -33,15 +33,22 @@ export class TenantMiddleware implements NestMiddleware {
       ),
     );
   }
+  private getTenantCode(code: string) {
+    return (
+      tenantCodeMap[code as TenantCode] ||
+      (Object.values(tenantCodeMap).includes(code as tenantCodeMap)
+        ? code
+        : null) ||
+      NodeConfigService.get('defaultTenant')
+    );
+  }
   async use(req: Request, _res: Response, next: NextFunction) {
     // 从不同来源获取租户ID
     const user = await this.extractTokenFromHeader(req);
 
     // 设置租户上下文 默认为小往
     const context = {
-      tenantCode:
-        tenantCodeMap[user.supplierCode as TenantCode] ||
-        NodeConfigService.get('defaultTenant'),
+      tenantCode: this.getTenantCode(user.supplierCode),
       user: user || {},
       request: req,
     };
