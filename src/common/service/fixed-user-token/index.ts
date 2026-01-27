@@ -43,7 +43,6 @@ export default class FixedTokenService extends BaseSchedule {
     );
     const tokenInCached: FeishuAuthType = await this.redis.hgetall(cacheKey);
     if (!tokenInCached?.refresh_token) {
-      console.log('[ tokenInCached ] >', cacheKey, tokenInCached);
       this.sendAlertMsg(
         '服务商：' + tenantInfo.tenantCode,
         'token in cache is null：' + cacheKey,
@@ -60,13 +59,6 @@ export default class FixedTokenService extends BaseSchedule {
       },
     });
     if (res.code !== 0) {
-      console.log(
-        '[ projectModule ] >',
-        res,
-        tenantInfo.tenantCode,
-        authClient.client.appId,
-        authClient.client.appSecret,
-      );
       this.sendAlertMsg(
         '服务商：' + tenantInfo.tenantCode,
         res.msg,

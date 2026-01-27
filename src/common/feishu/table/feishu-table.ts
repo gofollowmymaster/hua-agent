@@ -63,7 +63,6 @@ abstract class FeishuTable {
     useCache = true,
   ): Promise<BitTableList<any>> {
     const res = await this.search(data, params, useCache);
-    console.log('[ res ] >', res.items);
     const list = res.items.map((item) => {
       return this.flatItemField(item);
     });

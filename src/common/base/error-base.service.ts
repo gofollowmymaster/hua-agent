@@ -73,7 +73,6 @@ export abstract class ErrorBaseService extends AlertBaseService {
   }
   private async sendNewIssueCard(eventRecord: BitTableCreateRecord) {
     const issueCardData = await this.alertFeishuAdapter.toAplusAlertCardData();
-    console.log('[ issueCardData ] >', issueCardData);
     issueCardData.linkUrl = eventRecord.record_url;
     const content = this.WarningCard.buildCardMsg(issueCardData as any);
     const groupMsgInfo = await this.msgAlertService.sendFsAlertMsg(

@@ -25,7 +25,6 @@ export class AilyService {
     return cachedInfo;
   }
   async getTokenByCode(code: string): Promise<FeishuAuthType> {
-    console.log('[ res ] >');
     const client = ClientFactory.create(FeishuApp.AilyAplusClient);
     const res = await client.client.authen.accessToken.create({
       data: {

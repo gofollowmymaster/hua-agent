@@ -115,8 +115,7 @@ export class MessageService {
         },
       ),
     );
-    console.log('[ data ] >', data);
-    this.redis.setex(cacheKey, data.expire_in * 0.6, data.ticket);
+    this.redis.setex(cacheKey, Math.floor(data.expire_in * 0.6), data.ticket);
     return data;
   }
 }

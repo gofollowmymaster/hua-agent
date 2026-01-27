@@ -47,7 +47,6 @@ export function parseDataTokens(records: { content?: string }[]) {
 const results = parseDataTokens(data as any[])
   .map((item) => item.decoded[0])
   .filter((item) => item);
-console.log(JSON.stringify(results));
 
 //对 results 按照tenantName字results段分组
 const groupByTenantId = results.reduce((acc, item) => {
