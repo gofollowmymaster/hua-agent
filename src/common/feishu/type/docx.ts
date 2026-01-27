@@ -40,3 +40,7 @@ export type DocumentBlockDeleteParams = Parameters<
 export type DocumentBlockDeleteReturn = Awaited<
   ReturnType<lark.Client['docx']['v1']['documentBlockChildren']['batchDelete']>
 >['data'];
+
+export type DocumentMarkdownContentParams = Parameters<
+  lark.Client['docs']['v1']['content']['get']
+>['0']['params'];

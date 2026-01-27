@@ -67,9 +67,4 @@ export class WikiBlackListResponseDto {
     description: '关键字',
   })
   keyword: string;
-  @ApiProperty({
-    type: Boolean,
-    description: '是否需要严格比对',
-  })
-  rawSearch: boolean;
 }

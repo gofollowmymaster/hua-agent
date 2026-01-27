@@ -62,10 +62,11 @@ export class CheckDocumentProcessor extends BaseProcessor {
       'FeishuWikiSpaceIds',
     ) as string;
     for (const blackItem of blackList) {
+      const keyword = blackItem['关键字'];
       try {
         const res = await this.feishuWikiHelper.search(
           {
-            query: blackItem['关键字'],
+            query: keyword,
             space_id: spaceId[0],
           },
           lark.withUserAccessToken(userInfo.access_token),
@@ -73,21 +74,13 @@ export class CheckDocumentProcessor extends BaseProcessor {
         if (res.items.length > 0) {
           let matchedItems = res.items;
           // 需要严格比对
-          if (blackItem['需要严格比对']) {
-            matchedItems = await this.matchRawContent(
-              matchedItems,
-              blackItem['关键字'],
-            );
-          }
+          matchedItems = await this.matchRawContent(matchedItems, keyword);
           if (matchedItems.length === 0) continue;
 
-          await this.sendTipMsg(matchedItems, tenantCode, blackItem['关键字']);
+          await this.sendTipMsg(matchedItems, tenantCode, keyword);
         }
       } catch (error) {
-        this.sendAlertMsg(
-          '检查文档失败：关键字' + blackItem['关键字'],
-          error.message,
-        );
+        this.sendAlertMsg('检查文档失败：关键字' + keyword, error.message);
       }
 
       await wait(1000);
@@ -118,9 +111,11 @@ export class CheckDocumentProcessor extends BaseProcessor {
   async matchRawContent(items: WikiSearchReturnItem[], word: string) {
     const matchedItems = [];
     for (const item of items) {
-      const { content } = await this.feishuDocxHelper.rawContent(
-        item.obj_token,
-      );
+      const { content } = await this.feishuDocxHelper.markdownContent({
+        doc_token: item.obj_token,
+        doc_type: 'docx',
+        content_type: 'markdown',
+      });
       if (content?.indexOf(word) > -1) {
         matchedItems.push(item);
       }

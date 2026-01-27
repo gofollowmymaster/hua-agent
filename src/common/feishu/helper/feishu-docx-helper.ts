@@ -13,13 +13,14 @@ import {
   DocxCreateReturn,
   DocumentBlockDeleteData,
   DocumentBlockDeletePath,
+  DocumentMarkdownContentParams,
 } from '../type/docx';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 
 @Injectable({ scope: Scope.TRANSIENT })
 class FeishuDocxHelper extends FeishuDataApiHelper {
   protected readonly useCache = false;
-  protected readonly ttl = 60 * 60 * 24;
+  protected readonly ttl = 60 * 10;
   constructor(
     @Inject(FEISHU_CLIENT_ID) protected readonly feishuClient: FeishuClient,
     protected readonly userContext: TenantContext,
@@ -71,15 +72,30 @@ class FeishuDocxHelper extends FeishuDataApiHelper {
     );
   }
   async rawContent(documentId, lang: 0 | 1 = 0) {
-    return await this.requestWrapper(() =>
-      this.client.docx.v1.document.rawContent({
-        params: {
-          lang,
-        },
-        path: {
-          document_id: documentId,
-        },
-      }),
+    return await this.requestWrapper(
+      () =>
+        this.client.docx.v1.document.rawContent({
+          params: {
+            lang,
+          },
+          path: {
+            document_id: documentId,
+          },
+        }),
+      'rawContent',
+    );
+  }
+  async markdownContent(
+    params: DocumentMarkdownContentParams,
+    useCache = true,
+  ) {
+    return await this.readWrapper(
+      () =>
+        this.client.docs.v1.content.get({
+          params,
+        }),
+      useCache,
+      'markdownContent:' + JSON.stringify(params),
     );
   }
 }
