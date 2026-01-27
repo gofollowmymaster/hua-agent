@@ -6,13 +6,7 @@ import {
   MessageFromRobotDto,
 } from './post-message-from-robot.dto';
 
-import {
-  ApiBody,
-  ApiHeaders,
-  ApiOkResponse,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { records } from '@src/common/utils/actionTable/interface';
 import { AplusResponse } from '@src/type/global';
 @ApiTags('飞书机器人快捷操作')

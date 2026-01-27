@@ -16,14 +16,21 @@ import { AuthGuard } from '@src/common/guard/auth';
 import { logger } from '@src/common/service/logger/logger.config';
 import { TableHeaderType } from '../dto/table-action.dto';
 import FeishuAuthHelper from '@src/common/feishu/helper/feishu-auth-helper';
+import { RedisService } from '@src/common/service/redis/redis.service';
+import Redis from 'ioredis';
+import { RedisKeys } from '@src/common/const/redis-key.enum';
 @Injectable()
 export class MessageService {
+  private readonly redis: Redis;
   constructor(
     private readonly feishuSense: FeishuSenseService,
     private readonly messageHelper: FeishuMessageHelper,
     private readonly feishuAuthHelper: FeishuAuthHelper,
     private readonly httpService: HttpService,
-  ) {}
+    private readonly redisService: RedisService,
+  ) {
+    this.redis = this.redisService.getClient();
+  }
 
   async feishuFlowMessage(
     MessageFromRobot: MessageFromRobotDto,
@@ -86,6 +93,15 @@ export class MessageService {
   })
   @UseGuards(AuthGuard)
   async getTicket(params: FeishuTicketDto) {
+    const cacheKey = this.redisService.buildCacheKey(
+      RedisKeys.FEISHU_JSSDK_TICKET,
+      '{app}',
+      params.appName,
+    );
+    const cachedTicket = await this.redis.get(cacheKey);
+    if (cachedTicket) {
+      return { ticket: cachedTicket };
+    }
     const { app_access_token: appAccessToken } =
       await this.feishuAuthHelper.getAppAccessToken(params.appName);
     const {
@@ -99,6 +115,8 @@ export class MessageService {
         },
       ),
     );
+    console.log('[ data ] >', data);
+    this.redis.setex(cacheKey, data.expire_in * 0.6, data.ticket);
     return data;
   }
 }
