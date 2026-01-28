@@ -81,6 +81,8 @@ export class AliService extends BaseService {
               FLOW_INST_RUNNING_COMMENT: params.content,
             },
           ).then((executeRes) => {
+            appReleaseWorkflow.url =
+              appReleaseWorkflow.url + executeRes.pipelineRunId;
             this.cacheExecuteInfo(appReleaseWorkflow, executeRes);
             appReleaseWorkflow.status = 'INIT';
             return addRetryJob(

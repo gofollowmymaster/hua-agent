@@ -15,7 +15,3 @@ export const transformTableField = (item: BitTableCreateRecordField) => {
     return item;
   }
 };
-
-// export const transformTableFields=()=>{
-
-// }

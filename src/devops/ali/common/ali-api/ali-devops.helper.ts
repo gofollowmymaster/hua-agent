@@ -168,7 +168,7 @@ export class DevopsApiService extends HttpApiHelper {
       runParams,
       /** 源码库id 在请求参数中作为设置分支名称 */
       sourcesID: sources.sign,
-      url: `https://devops.aliyun.com/appstack/app/${appOption.appName}/workflow/${appConfig.sn}/stage/${handleWorkflowSource.sn}/current`,
+      url: `https://devops.aliyun.com/appstack/app/${appOption.appName}/workflow/${appConfig.sn}/stage/${handleWorkflowSource.sn}/builds/`,
     };
   };
   async executeAppReleaseWorkflow(
@@ -239,13 +239,14 @@ export class DevopsApiService extends HttpApiHelper {
 
   async listAppReleaseStageRuns(pathParams) {
     return this.requestWrapper(async () => {
-      const { appName, releaseWorkflowSn, releaseStageSn } = pathParams;
+      const { appName, releaseWorkflowSn, releaseStageSn, nextToken } =
+        pathParams;
 
       this.setAliyunToken();
 
       const { data } = await firstValueFrom(
         this.httpService.get(
-          `${this.prefix}${this.organizationId}/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}/executions?pagination=keyset&orderBy=id&perPage=100&sort=asc`,
+          `${this.prefix}${this.organizationId}/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}/executions?nextToken=${nextToken}&pagination=keyset&orderBy=id&perPage=100&sort=desc`,
           {
             headers: this.headers,
           },
