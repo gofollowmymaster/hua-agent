@@ -10,11 +10,14 @@ import FeishuAilyHelper from './feishu-aily-helper';
 import FeishuDocxHelper from './feishu-docx-helper';
 import FeishuFileHelper from './feishu-file-helper';
 import FeishuAuthHelper from './feishu-auth-helper';
+import FeishuOpenapiHelper from './feishu-openapi-helper';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({})
 export class FeishuHelperModule {
   static forRoot(client: FeishuClient): DynamicModule {
     return {
+      imports: [HttpModule],
       module: FeishuHelperModule,
       providers: [
         {
@@ -57,6 +60,10 @@ export class FeishuHelperModule {
           provide: FeishuAuthHelper,
           useClass: FeishuAuthHelper,
         },
+        {
+          provide: FeishuOpenapiHelper,
+          useClass: FeishuOpenapiHelper,
+        },
       ],
       exports: [
         FeishuMessageHelper,
@@ -68,6 +75,7 @@ export class FeishuHelperModule {
         FeishuAilyHelper,
         FeishuFileHelper,
         FeishuAuthHelper,
+        FeishuOpenapiHelper,
       ],
     };
   }

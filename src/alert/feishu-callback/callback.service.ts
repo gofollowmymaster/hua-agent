@@ -15,6 +15,7 @@ import { PageErrorService } from '../common/service/page-error-service';
 import { CardCallbackReturnType } from '@src/common/feishu/type/card';
 import AlertStatisticService from '../common/schedule/alert-statistic';
 import { UnresolvedCardData } from '@src/common/feishu/card/warning-card/interface';
+import { PublishCallbackService } from '@src/devops/ali/callback.service';
 
 @Injectable()
 export class FeishuCallbackService extends CommonErrorService {
@@ -30,6 +31,7 @@ export class FeishuCallbackService extends CommonErrorService {
     protected readonly pageErrorService: PageErrorService,
     protected readonly requestErrorService: RequestErrorService,
     readonly alertStatisticService: AlertStatisticService,
+    readonly publishCallbackService: PublishCallbackService,
   ) {
     super(redisService);
   }

@@ -128,9 +128,9 @@ export class SentryWebhookController {
 
   async error(params: SentryHookErrorDto) {
     const alertError = params.data.error;
-    // if (await this.sentryIssueService.isIssueIgnored(alertError.issue_id)) {
-    //   return;
-    // }
+    if (await this.sentryIssueService.isIssueIgnored(alertError.issue_id)) {
+      return;
+    }
 
     const requestData = alertError.extra?.__serialized__;
     const serverModuleName = getModuleNameByUrl(requestData?.url);

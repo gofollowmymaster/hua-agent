@@ -6,8 +6,9 @@ export const transformTableField = (item: BitTableCreateRecordField) => {
   } else if (Array.isArray(item)) {
     const first = item[0];
     if (typeof first === 'object' && first !== null && 'type' in first) {
-      if ((first as any).type === 'text') return (first as any).text;
-      if ((first as any).type === 'url') return (first as any).text;
+      return item.reduce((prev, next) => {
+        return prev + (next as any).text;
+      }, '');
     } else {
       return item;
     }

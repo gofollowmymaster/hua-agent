@@ -36,15 +36,15 @@ class UserAliyunTable extends FeishuTable {
         },
       ],
     };
-    const info = await this.search(
+    const info = await this.searchTransformed(
       { filter },
       {
         user_id_type: 'union_id',
       },
       true,
     );
-    const user = info.items[0].fields;
-    const token = user['云效token']?.[0]?.text;
+    const user = info.list[0];
+    const token = user['云效token'];
     if (!user['状态'] || !token) {
       throw new Error(`未找到用户${operator}的授权阿里云账号`);
     }

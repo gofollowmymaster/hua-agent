@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 
-import { BaseService } from '@src/common/base/BaseService';
+import { BaseService } from '@src/common/base/base-service';
 import { RedisService } from '@src/common/service/redis/redis.service';
 // import { LoggerService } from '@src/common/service/logger/logger.service';
 import { RedisKeys } from '@src/common/const/redis-key.enum';

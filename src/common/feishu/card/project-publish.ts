@@ -26,7 +26,7 @@ export default class ProjectPublishCard extends FeishuCard {
    * @param alertInfo
    * @returns
    */
-  static buildCardMsg = (info: PublishCardData) => {
+  static buildCardMsg = (info: PublishCardData): string => {
     return super.build({
       ...info,
       statusOptions: PublishStatusEnum[info.status],

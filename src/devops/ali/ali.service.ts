@@ -4,7 +4,6 @@ import Redis from 'ioredis';
 import { AliDevopsDto } from './dto/ali';
 import { DevopsApiService } from './common/ali-api/ali-devops.helper';
 import { DevopsOptionService } from './common/service/devops-option.service';
-import ProjectPublishCard from '@src/common/feishu/card/project-publish';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import {
   AppWorkflowPublishType,
@@ -17,13 +16,18 @@ import UserAliyunTable from './common/table/user-token-table';
 import { addRetryJob, throttleByParams } from '@src/common/utils/job';
 import TipCard from '@src/common/feishu/card/tip-card';
 import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
-import { BaseService } from '@src/common/base/BaseService';
+import { BaseService } from '@src/common/base/base-service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { AliDevopsContext } from './common/service/ali-devops.context';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import dayjs from 'dayjs';
 import { NodeConfigService } from '@src/config/node-config.service';
+import ProjectPublishWaitingCard from '@src/common/feishu/card/project-publish-waiting';
+import FeishuOpenapiHelper from '@src/common/feishu/helper/feishu-openapi-helper';
+import { ContactUserType } from '@src/common/feishu/type/contact';
+import { uniqueId } from 'lodash';
+import { PublishCardInfoType } from './types/devops';
 
 @Injectable()
 export class AliService extends BaseService {
@@ -38,6 +42,7 @@ export class AliService extends BaseService {
     protected devopsApiService: DevopsApiService,
     protected devopsOptionService: DevopsOptionService,
     protected feishuMessageHelper: FeishuMessageHelper,
+    protected feishuOpenapiHelper: FeishuOpenapiHelper,
     protected userAliyunTable: UserAliyunTable,
     protected devopsContext: AliDevopsContext,
     protected feishuUserHelper: FeishuUserHelper,
@@ -48,7 +53,7 @@ export class AliService extends BaseService {
 
     this.executeAppReleaseWorkflowThrottle = throttleByParams(
       this.devopsApiService.executeAppReleaseWorkflow,
-      1000 * 30,
+      1000,
       devopsApiService,
     );
   }
@@ -59,7 +64,6 @@ export class AliService extends BaseService {
     );
     const res = this.devopsContext.run({ token }, async () => {
       const appList = await this.devopsOptionService.checkApp(params);
-
       const resultList: AppWorkflowPublishType[] = [];
       const queryJobs: Promise<any>[] = [];
       for (const appOption of appList) {
@@ -83,8 +87,10 @@ export class AliService extends BaseService {
           ).then((executeRes) => {
             appReleaseWorkflow.url =
               appReleaseWorkflow.url + executeRes.pipelineRunId;
+            appReleaseWorkflow.executionNumber = executeRes.pipelineRunId;
             this.cacheExecuteInfo(appReleaseWorkflow, executeRes);
             appReleaseWorkflow.status = 'INIT';
+
             return addRetryJob(
               async () =>
                 this.checkPipelineDetail(
@@ -106,7 +112,7 @@ export class AliService extends BaseService {
       Promise.all(queryJobs)
         .then(() => {
           if (params.env.indexOf('dev') > -1) return;
-          this.sendPushResultMsg(resultList, params);
+          this.sendPushWaitingMsg(resultList, params);
         })
         .catch((error) => {
           this.logger.error('查询流水线详情失败，失败原因：' + error.message);
@@ -165,6 +171,14 @@ export class AliService extends BaseService {
         this.logger.info(
           '当前运行阶段->' + (name || currentStage.stageInfo.name),
         );
+
+        const jobId =
+          currentStage.stageInfo.jobs.find((job: any) => {
+            return (
+              job.name.indexOf('校验') > -1 || job.name.indexOf('卡点') > -1
+            );
+          })?.id + '';
+        appReleaseWorkflow.jobId = jobId;
         this.cancelWorkflow(appReleaseWorkflow, pipelineRunId);
         console.log('[ currentStage-true ] >', currentStage.stageInfo);
 
@@ -219,12 +233,12 @@ export class AliService extends BaseService {
   }
 
   /**
-   * 发送运行结果到群
+   * 发送卡点通知到群
    * @param appReleaseWorkflowList
    * @param params
    * @returns
    */
-  async sendPushResultMsg(
+  async sendPushWaitingMsg(
     appReleaseWorkflowList: AppWorkflowPublishType[],
     params: AliDevopsDto,
   ) {
@@ -237,17 +251,20 @@ export class AliService extends BaseService {
       return;
     }
     let testUser: string = '';
+    const testUserInfo: ContactUserType[] = [];
     for (const unionId of params.testUser) {
       const userInfo = await this.feishuUserHelper.getUserInfo({
         userId: unionId,
         userIdType: 'union_id',
       });
       testUser = testUser + `<at id="${userInfo.user.user_id}"></at>`;
+      testUserInfo.push(userInfo.user);
     }
 
-    this.logger.info('[ testUser ] >' + testUser);
-    const status = '';
-    const content = ProjectPublishCard.buildCardMsg({
+    const status = '测试卡点';
+    const runId = uniqueId();
+    const content = ProjectPublishWaitingCard.buildCardMsg({
+      runId,
       content: params.content,
       links: appReleaseWorkflowList.map((item) => {
         return {
@@ -262,12 +279,26 @@ export class AliService extends BaseService {
       workflowEnv: params.env,
       status,
       testUser,
+      btnDisabled: false,
     });
-    this.feishuMessageHelper.createInteractToGroup(
-      content,
-      NodeConfigService.get('AliDevopsFeishuGroupId'),
-    );
+    const publishCardInfo: PublishCardInfoType = {
+      appReleaseWorkflowList,
+      params,
+      testUser,
+    };
+    const cacheKey = RedisKeys.DEVOPS_APP_PUBLISH_CARD.replace('{id}', runId);
+    this.redis.set(cacheKey, JSON.stringify(publishCardInfo));
+    this.redis.expire(cacheKey, 60 * 60 * 12);
+    testUserInfo.forEach(async (user) => {
+      await this.feishuOpenapiHelper.createEphemeralInteractToGroup({
+        card: content,
+        user_id: user.user_id,
+        msg_type: 'interactive',
+        chat_id: NodeConfigService.get('AliDevopsFeishuGroupId'),
+      });
+    });
   }
+
   sendFailMsg(
     appReleaseWorkflow: AppWorkflowPublishType,
     currentStage: PipelineStage,

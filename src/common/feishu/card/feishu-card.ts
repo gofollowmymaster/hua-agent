@@ -1,5 +1,11 @@
-import { BaseWarningCardData } from './warning-card/interface';
-
+export type CardDataType<T> = {
+  type: 'template';
+  data: {
+    template_id: string;
+    template_version_name: string;
+    template_variable: T;
+  };
+};
 export abstract class FeishuCard {
   protected static templateId = '';
   protected static templateVersion = '';
@@ -9,7 +15,16 @@ export abstract class FeishuCard {
    * @param alertInfo
    * @returns
    */
-  protected static build(alertInfo: Record<string, any>) {
+  protected static build(alertInfo: Record<string, any>): string;
+  protected static build(
+    alertInfo: Record<string, any>,
+    toString: false,
+  ): CardDataType<Record<string, any>>;
+
+  protected static build(
+    alertInfo,
+    toString = true,
+  ): string | Record<string, any> {
     alertInfo.content = alertInfo.content
       ? alertInfo.content.slice(0, 500)
       : '--';
@@ -21,10 +36,10 @@ export abstract class FeishuCard {
         template_variable: { ...alertInfo },
       },
     };
-    return JSON.stringify(content);
+    return toString ? JSON.stringify(content) : content;
   }
 
-  buildCardMsg(alertInfo: BaseWarningCardData): string {
+  buildCardMsg(alertInfo: Record<string, any>): string | Record<string, any> {
     return FeishuCard.build(alertInfo);
   }
 }

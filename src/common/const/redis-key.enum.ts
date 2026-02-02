@@ -33,4 +33,5 @@ export enum RedisKeys {
   ALI_DEVOPS_API_CACHE = AliDevopsApiPrefix + '{apiName}',
   SENTRY_API_CACHE = SentryApiPrefix + '{apiName}',
   DEVOPS_APP_PUBLISH_CACHE = DevopsPrefix + 'publish:{workflowTag}',
+  DEVOPS_APP_PUBLISH_CARD = DevopsPrefix + 'publish-card:{id}',
 }

@@ -38,7 +38,7 @@ export class SentryIssueService extends HttpApiHelper {
     if (params.status == 'ignoreCount100') {
       status = 'ignored';
       statusDetails = {
-        ignoreCount: 50,
+        ignoreCount: 20,
       };
     } else {
       status = params.status;

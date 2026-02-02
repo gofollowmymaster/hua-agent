@@ -100,6 +100,8 @@ export type AppWorkflowPublishType = {
   sourcesID: string;
   url: string;
   status?: PipelineStageType;
+  executionNumber?: string;
+  jobId?: string;
 };
 
 export type executeAppReleaseWorkflowResponse = {

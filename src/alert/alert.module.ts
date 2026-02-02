@@ -35,11 +35,13 @@ import SyncFeishuUser from './common/schedule/sync-feishu-user';
 import { SentryProjectService } from './common/service/sentry/sentry-project-service';
 import { MsgAlertService } from './common/service/msg-alert.service';
 import { AlertContext } from '@src/common/base/alert-event.context';
+import { DevopsModule } from '@src/devops/devops.module';
 
 @Module({
   imports: [
     FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AlertClient)),
     HttpModule,
+    DevopsModule,
   ],
   controllers: [
     AlertMsgController,

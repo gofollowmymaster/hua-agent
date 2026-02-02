@@ -11,11 +11,12 @@ import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import UserAliyunTable from './ali/common/table/user-token-table';
 import { AliDevopsContext } from './ali/common/service/ali-devops.context';
 import CancelExecutionServer from './ali/common/schedule/cancel-execution';
+import { PublishCallbackService } from './ali/callback.service';
 
 @Module({
   imports: [
     HttpModule,
-    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AiHelperClient)),
+    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AlertClient)),
   ],
   providers: [
     LoggerService,
@@ -26,7 +27,9 @@ import CancelExecutionServer from './ali/common/schedule/cancel-execution';
     UserAliyunTable,
     AliDevopsContext,
     CancelExecutionServer,
+    PublishCallbackService,
   ],
   controllers: [AliController],
+  exports: [PublishCallbackService],
 })
 export class DevopsModule {}

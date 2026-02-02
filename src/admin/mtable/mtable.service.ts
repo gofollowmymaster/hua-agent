@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import AdminMtableTable from './table/mtable-table';
-import { BaseService } from '@src/common/base/BaseService';
+import { BaseService } from '@src/common/base/base-service';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { BitTableFilter } from '@src/common/feishu/type/bitable';
 

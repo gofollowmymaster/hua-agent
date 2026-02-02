@@ -35,6 +35,7 @@ export class FeishuCallbackHeader {
 class CallbackOperator {
   'tenant_key': string;
   'user_id': string;
+  'union_id': string;
   'open_id': string;
 }
 
@@ -64,6 +65,7 @@ class CallbackValueDto {
   'errorEndpoint'?: ErrorEndpoint;
   businessLine?: businessLine;
   period?: OpUnitType;
+  runId?: string;
 }
 class CallbackActionDto {
   @ApiProperty({

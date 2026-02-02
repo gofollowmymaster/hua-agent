@@ -26,6 +26,7 @@ class FeishuAuthHelper extends FeishuDataApiHelper {
     if (appName) {
       client = ClientFactory.create(appName)?.client;
     }
+    console.log('[ client.appId ] >', client.appId);
     const res = await this.readWrapper(
       async () => {
         const res = await client.auth.v3.appAccessToken.internal(

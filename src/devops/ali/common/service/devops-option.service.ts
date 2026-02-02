@@ -48,6 +48,11 @@ export class DevopsOptionService {
         workflowName: 'dev环境',
         branch: 'dev-publish',
       },
+      {
+        appName: 'aplus-login-center',
+        workflowName: 'dev环境',
+        branch: 'dev-publish',
+      },
     ],
 
     test: [
@@ -91,6 +96,11 @@ export class DevopsOptionService {
         workflowName: 'test环境',
         branch: 'test-publish',
       },
+      {
+        appName: 'aplus-login-center',
+        workflowName: 'test-com 环境',
+        branch: 'test-publish',
+      },
     ],
 
     uat: [
@@ -132,6 +142,11 @@ export class DevopsOptionService {
       {
         appName: 'aplus-quickbi-manage',
         workflowName: 'UAT环境',
+        branch: 'uat-publish',
+      },
+      {
+        appName: 'aplus-login-center',
+        workflowName: 'uat环境',
         branch: 'uat-publish',
       },
     ],

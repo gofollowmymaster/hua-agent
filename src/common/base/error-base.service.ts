@@ -27,7 +27,7 @@ import {
 } from '@src/common/feishu/card/warning-card';
 import { MsgSenderService } from './msg-sender.service';
 import { BaseAlertEvent } from './interface';
-import FeishuAuthHelper from '../feishu/helper/feishu-auth-helper';
+import FeishuOpenapiHelper from '../feishu/helper/feishu-openapi-helper';
 
 export abstract class ErrorBaseService extends AlertBaseService {
   protected readonly alertFeishuAdapter: BaseAlertFeishuAdapter;
@@ -36,7 +36,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
   protected readonly httpService: HttpService;
   protected readonly alertContext: AlertContext<BaseAlertEvent>;
   protected readonly messageHelper: FeishuMessageHelper;
-  protected readonly feishuAuthHelper: FeishuAuthHelper;
+  protected readonly feishuOpenapiHelper: FeishuOpenapiHelper;
   protected readonly CardType: WarningCardType = 'professional';
 
   constructor(protected readonly redisService: RedisService) {
@@ -100,7 +100,7 @@ export abstract class ErrorBaseService extends AlertBaseService {
 
   private async reopenIssueCard(issueCardData: BaseWarningCardData) {
     //更新卡片信息  激活
-    this.updateByCard(issueCardData.messageId, {
+    this.feishuOpenapiHelper.updateByCard(issueCardData.messageId, {
       content: JSON.stringify({
         type: 'template',
         data: {
@@ -286,18 +286,5 @@ export abstract class ErrorBaseService extends AlertBaseService {
       错误原因: eventData.reason,
       解决方案: eventData.solution,
     });
-  }
-  protected async updateByCard(message_id: string, data) {
-    const { app_access_token: appAccessToken } =
-      await this.feishuAuthHelper.getAppAccessToken(FeishuApp.AlertClient);
-    await firstValueFrom(
-      this.httpService.patch(
-        'https://open.feishu.cn/open-apis/im/v1/messages/' + message_id,
-        data,
-        {
-          headers: { Authorization: `Bearer ${appAccessToken}` },
-        },
-      ),
-    );
   }
 }

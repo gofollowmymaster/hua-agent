@@ -112,7 +112,9 @@ export class PageErrorService extends ErrorBaseService {
     };
     const issueRes = await table.search({ filter }, {}, false);
     if (issueRes.total == 0) {
-      sendExceptionToFeishu(new Error('修改卡片消息时未找到issue:' + issue_id));
+      sendExceptionToFeishu(
+        new Error('修改卡片消息(table中)时未找到issue:' + issue_id),
+      );
     } else {
       const record = issueRes.items[0];
       const { record_id: recordId } = record;

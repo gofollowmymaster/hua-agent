@@ -61,6 +61,7 @@ class FeishuMessageHelper extends FeishuApiHelper {
       },
     });
   }
+
   async createInteractToGroup(content: string, feishuGroupId) {
     return await this.createToGroup({
       receive_id: feishuGroupId,

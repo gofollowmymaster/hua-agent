@@ -15,17 +15,17 @@ import { ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@src/common/guard/auth';
 import { logger } from '@src/common/service/logger/logger.config';
 import { TableHeaderType } from '../dto/table-action.dto';
-import FeishuAuthHelper from '@src/common/feishu/helper/feishu-auth-helper';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
+import FeishuOpenapiHelper from '@src/common/feishu/helper/feishu-openapi-helper';
 @Injectable()
 export class MessageService {
   private readonly redis: Redis;
   constructor(
     private readonly feishuSense: FeishuSenseService,
     private readonly messageHelper: FeishuMessageHelper,
-    private readonly feishuAuthHelper: FeishuAuthHelper,
+    private readonly feishuOpenapiHelper: FeishuOpenapiHelper,
     private readonly httpService: HttpService,
     private readonly redisService: RedisService,
   ) {
@@ -93,29 +93,18 @@ export class MessageService {
   })
   @UseGuards(AuthGuard)
   async getTicket(params: FeishuTicketDto) {
-    const cacheKey = this.redisService.buildCacheKey(
-      RedisKeys.FEISHU_JSSDK_TICKET,
-      '{app}',
-      params.appName,
-    );
-    const cachedTicket = await this.redis.get(cacheKey);
-    if (cachedTicket) {
-      return { ticket: cachedTicket };
-    }
-    const { app_access_token: appAccessToken } =
-      await this.feishuAuthHelper.getAppAccessToken(params.appName);
-    const {
-      data: { data },
-    } = await firstValueFrom(
-      this.httpService.post(
-        'https://open.feishu.cn/open-apis/jssdk/ticket/get',
-        {},
-        {
-          headers: { Authorization: `Bearer ${appAccessToken}` },
-        },
-      ),
-    );
-    this.redis.setex(cacheKey, Math.floor(data.expire_in * 0.6), data.ticket);
+    // const cacheKey = this.redisService.buildCacheKey(
+    //   RedisKeys.FEISHU_JSSDK_TICKET,
+    //   '{app}',
+    //   params.appName,
+    // );
+    // const cachedTicket = await this.redis.get(cacheKey);
+    // if (cachedTicket) {
+    //   return { ticket: cachedTicket };
+    // }
+    const data = await this.feishuOpenapiHelper.getTicket(params.appName);
+
+    // this.redis.setex(cacheKey, Math.floor(data.expire_in * 0.6), data.ticket);
     return data;
   }
 }

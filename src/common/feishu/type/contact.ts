@@ -11,6 +11,7 @@ export type DepartmentIdType =
 export type ContactUserGetReturnType = Awaited<
   ReturnType<lark.Client['contact']['user']['get']>
 >['data'];
+export type ContactUserType = ContactUserGetReturnType['user'];
 
 export type FindByDepartmentParams = Parameters<
   lark.Client['contact']['user']['findByDepartment']

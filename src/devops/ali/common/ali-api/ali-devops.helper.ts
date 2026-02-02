@@ -18,7 +18,6 @@ import {
 } from './interface';
 // import { AppWorkflowType } from '../../types/devops';
 import { AliDevopsContext } from '../service/ali-devops.context';
-import { throttleByParams } from '@src/common/utils/job';
 
 @Injectable()
 export class DevopsApiService extends HttpApiHelper {
@@ -46,20 +45,36 @@ export class DevopsApiService extends HttpApiHelper {
     token = token ?? this.devopsContext.token;
     this.headers['x-yunxiao-token'] = token;
   }
+  async getRequest(url: string, options?: any) {
+    this.setAliyunToken();
+
+    const { data } = await firstValueFrom(
+      this.httpService.get(this.prefix + this.organizationId + url, {
+        headers: this.headers,
+        ...options,
+      }),
+    );
+    return data;
+  }
+  async postRequest(url: string, body: Record<string, any>, options?: any) {
+    this.setAliyunToken();
+
+    const { data } = await firstValueFrom(
+      this.httpService.post(this.prefix + this.organizationId + url, body, {
+        headers: this.headers,
+        ...options,
+      }),
+    );
+    return data;
+  }
 
   async queryAllApp(): Promise<AppInfoType> {
-    const uri = `${this.organizationId}/apps:search?pagination=keyset&orderBy=id&perPage=100&sort=asc`;
+    const uri = `/apps:search?pagination=keyset&orderBy=id&perPage=100&sort=asc`;
 
     return this.readWrapper(
       async () => {
-        this.setAliyunToken();
-
-        const { data } = await firstValueFrom(
-          this.httpService.get(this.prefix + uri, {
-            headers: this.headers,
-          }),
-        );
-        return data;
+        const res = await this.getRequest(uri);
+        return res;
       },
       true,
       uri,
@@ -68,34 +83,20 @@ export class DevopsApiService extends HttpApiHelper {
 
   /** 分页查找应用源详情 */
   async queryAppSource(appName: string) {
-    const uri = `${this.organizationId}/apps/${appName}/sources?pagination=keyset&orderBy=id&perPage=100&sort=asc`;
+    const uri = `/apps/${appName}/sources?pagination=keyset&orderBy=id&perPage=100&sort=asc`;
     return this.readWrapper(
       async () => {
-        this.setAliyunToken();
-
-        const { data } = await firstValueFrom(
-          this.httpService.get(this.prefix + uri, {
-            headers: this.headers,
-          }),
-        );
-        return data;
+        return await this.getRequest(uri);
       },
       true,
       uri,
     );
   }
   async queryAppRelease(appName) {
-    const uri = `${this.organizationId}/apps/${appName}`;
+    const uri = `/apps/${appName}`;
     return this.readWrapper(
       async () => {
-        this.setAliyunToken();
-
-        const { data } = await firstValueFrom(
-          this.httpService.get(this.prefix + uri, {
-            headers: this.headers,
-          }),
-        );
-        return data;
+        return await this.getRequest(uri);
       },
       true,
       uri,
@@ -106,17 +107,10 @@ export class DevopsApiService extends HttpApiHelper {
     appName: string;
     workflowName: string;
   }): Promise<AppWorkflowPublishType> {
-    const uri = `${this.organizationId}/apps/${appOption.appName}/releaseWorkflows`;
+    const uri = `/apps/${appOption.appName}/releaseWorkflows`;
     const info: AppReleaseWorkflow = await this.readWrapper(
       async () => {
-        this.setAliyunToken();
-
-        const { data } = await firstValueFrom(
-          this.httpService.get(this.prefix + uri, {
-            headers: this.headers,
-          }),
-        );
-        return data;
+        return await this.getRequest(uri);
       },
       true,
       uri,
@@ -178,21 +172,9 @@ export class DevopsApiService extends HttpApiHelper {
     const { appName, releaseWorkflowSn, releaseStageSn } = pathParams;
 
     return this.requestWrapper(async () => {
-      this.setAliyunToken();
+      const uri = `/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}:execute`;
 
-      const { data } = await firstValueFrom(
-        this.httpService.post(
-          `${this.prefix}${this.organizationId}/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}:execute`,
-
-          {
-            params,
-          },
-          {
-            headers: this.headers,
-          },
-        ),
-      );
-      return data;
+      return this.postRequest(uri, { params });
     }, 'executeAppReleaseWorkflow');
   }
 
@@ -203,37 +185,53 @@ export class DevopsApiService extends HttpApiHelper {
       pathParams;
 
     return this.requestWrapper(async () => {
-      this.setAliyunToken();
+      const uri = `/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}/executions/${executionNumber}:cancel`;
 
-      const { data } = await firstValueFrom(
-        this.httpService.post(
-          `${this.prefix}${this.organizationId}/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}/executions/${executionNumber}:cancel`,
-
-          {},
-          {
-            headers: this.headers,
-          },
-        ),
-      );
-      return data;
+      return this.postRequest(uri, {});
     }, 'cancelExecuteAppReleaseWorkflow');
   }
+
+  async passExecuteAppReleaseWorkflow(
+    pathParams,
+  ): Promise<executeAppReleaseWorkflowType> {
+    const {
+      appName,
+      releaseWorkflowSn,
+      releaseStageSn,
+      executionNumber,
+      jobId,
+    } = pathParams;
+
+    return this.requestWrapper(async () => {
+      const uri = `/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}/executions/${executionNumber}:passPipelineValidate?jobId=${jobId}`;
+      return this.postRequest(uri, {});
+    }, 'passExecuteAppReleaseWorkflow');
+  }
+
+  async refuseExecuteAppReleaseWorkflow(
+    pathParams,
+  ): Promise<executeAppReleaseWorkflowType> {
+    const {
+      appName,
+      releaseWorkflowSn,
+      releaseStageSn,
+      executionNumber,
+      jobId,
+    } = pathParams;
+
+    return this.requestWrapper(async () => {
+      const uri = `/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}/executions/${executionNumber}:refusePipelineValidate?jobId=${jobId}`;
+      return this.postRequest(uri, {});
+    }, 'refuseExecuteAppReleaseWorkflow');
+  }
+  //
   async getPipelineDetail(pathParams): Promise<PipelineDetail> {
     const { appName, releaseWorkflowSn, releaseStageSn, pipelineRunId } =
       pathParams;
 
     return this.requestWrapper(async () => {
-      this.setAliyunToken();
-
-      const { data } = await firstValueFrom(
-        this.httpService.get(
-          `${this.prefix}${this.organizationId}/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}/executions/${pipelineRunId}:getPipelineRun`,
-          {
-            headers: this.headers,
-          },
-        ),
-      );
-      return data;
+      const uri = `/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}/executions/${pipelineRunId}:getPipelineRun`;
+      return await this.getRequest(uri);
     }, 'getPipelineDetail');
   }
 
@@ -241,36 +239,16 @@ export class DevopsApiService extends HttpApiHelper {
     return this.requestWrapper(async () => {
       const { appName, releaseWorkflowSn, releaseStageSn, nextToken } =
         pathParams;
-
-      this.setAliyunToken();
-
-      const { data } = await firstValueFrom(
-        this.httpService.get(
-          `${this.prefix}${this.organizationId}/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}/executions?nextToken=${nextToken}&pagination=keyset&orderBy=id&perPage=100&sort=desc`,
-          {
-            headers: this.headers,
-          },
-        ),
-      );
-      return data;
+      const uri = `/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}/executions?nextToken=${nextToken}&pagination=keyset&orderBy=id&perPage=100&sort=desc`;
+      return await this.getRequest(uri);
     }, 'ListAppReleaseStageRuns');
   }
 
   async queryAllAppTemplate() {
     return this.readWrapper(
       async () => {
-        this.setAliyunToken();
-
-        const { data } = await firstValueFrom(
-          this.httpService.get(
-            `${this.prefix}${this.organizationId}/appTemplates:search?pagination=keyset&orderBy=id&perPage=100&sort=asc`,
-
-            {
-              headers: this.headers,
-            },
-          ),
-        );
-        return data;
+        const uri = ` /appTemplates:search?pagination=keyset&orderBy=id&perPage=100&sort=asc`;
+        return await this.getRequest(uri);
       },
       true,
       'queryAllAppTemplate',
