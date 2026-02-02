@@ -17,7 +17,6 @@ const DevopsPrefix = RedisPrefix + 'devops:';
 
 export enum RedisKeys {
   WIKI_DIRECTORY = RedisWikiPrefix + 'directory:{spaceId}',
-  FEISHU_JSSDK_TICKET = RedisWikiPrefix + 'feishu-jssdk:ticket:{app}',
   FEISHU_MTABLE = RedisPrefixMtable + '{appToken}:{tableId}',
   FEISHU_FIXED_ACCESS_TOKEN = FeishuUserTokenPrefix +
     'fixed-access-token:{code}',

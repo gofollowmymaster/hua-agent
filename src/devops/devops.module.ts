@@ -12,6 +12,7 @@ import UserAliyunTable from './ali/common/table/user-token-table';
 import { AliDevopsContext } from './ali/common/service/ali-devops.context';
 import CancelExecutionServer from './ali/common/schedule/cancel-execution';
 import { PublishCallbackService } from './ali/callback.service';
+import DevopsPublishLogTable from './ali/common/table/devops-publish-log-table';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { PublishCallbackService } from './ali/callback.service';
     AliDevopsContext,
     CancelExecutionServer,
     PublishCallbackService,
+    DevopsPublishLogTable,
   ],
   controllers: [AliController],
   exports: [PublishCallbackService],

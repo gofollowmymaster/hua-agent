@@ -118,7 +118,10 @@ class FeishuTableHelper extends FeishuDataApiHelper {
     );
   }
 
-  async create(records: BitTableFields): Promise<BitTableCreateData> {
+  async create(
+    records: BitTableFields,
+    params: BitTableCreateOption = {},
+  ): Promise<BitTableCreateData> {
     return this.requestWrapper(
       async () =>
         await this.client.bitable.appTableRecord.create({
@@ -126,6 +129,7 @@ class FeishuTableHelper extends FeishuDataApiHelper {
             app_token: this.appToken,
             table_id: this.tableId,
           },
+          params,
           data: {
             fields: records,
           },

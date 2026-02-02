@@ -49,3 +49,40 @@ export class AliDevopsByFeishuDto extends AliDevopsDto {
   })
   testUserStr?: string;
 }
+
+export class PublishLogDataDto {
+  @ApiProperty({
+    type: String,
+    description: '环境',
+  })
+  环境: string;
+  @ApiProperty({
+    type: [String],
+    description: '应用',
+  })
+  应用: string[];
+  @ApiPropertyOptional({
+    type: String,
+    description: '更新描述',
+  })
+  更新描述?: string;
+  @ApiProperty({
+    type: String,
+    description: '发起人',
+  })
+  发起人: string;
+  @ApiPropertyOptional({
+    type: [String],
+    description: '测试人员列表',
+  })
+  测试人员?: string[];
+  [key: string]: any;
+}
+export class PublishCreateDataDto {
+  @IsNotEmpty()
+  @ApiProperty({
+    type: PublishLogDataDto,
+    description: '记录信息',
+  })
+  records: PublishLogDataDto;
+}

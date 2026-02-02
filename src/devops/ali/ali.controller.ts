@@ -1,11 +1,16 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AliService } from './ali.service';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AliDevopsByFeishuDto, AliDevopsCommonDto } from './dto/ali';
+import {
+  AliDevopsByFeishuDto,
+  AliDevopsCommonDto,
+  PublishCreateDataDto,
+} from './dto/ali';
 import { SecretAuthGuard } from '@src/common/guard/secret-auth';
 import { sendCommonCardToFeishu } from '@src/common/feishu/utils';
 import CancelExecutionServer from './common/schedule/cancel-execution';
 import { AliDevopsContext } from './common/service/ali-devops.context';
+import DevopsPublishLogTable from './common/table/devops-publish-log-table';
 
 @Controller('devops')
 @ApiTags('阿里云效自动化')
@@ -14,6 +19,7 @@ export class AliController {
     private aliService: AliService,
     protected cancelExecutionServer: CancelExecutionServer,
     protected devopsContext: AliDevopsContext,
+    protected devopsPublishLogTable: DevopsPublishLogTable,
   ) {}
 
   @Post('publish')
@@ -65,6 +71,19 @@ export class AliController {
         body: [],
       };
     }
+  }
+
+  @Post('create')
+  @ApiOperation({
+    summary: '创建发布记录',
+    description: '创建发布记录',
+  })
+  @ApiBody({ type: PublishCreateDataDto })
+  @UseGuards(SecretAuthGuard)
+  async createToTable(@Body() params: PublishCreateDataDto) {
+    return this.devopsPublishLogTable.create(params.records, {
+      user_id_type: 'union_id',
+    });
   }
 
   @Post('cancel-runs')

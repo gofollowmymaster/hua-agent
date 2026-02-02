@@ -91,10 +91,13 @@ abstract class FeishuTable {
     return await this.tableHelper.batchUpdate(records, params);
   }
 
-  async create(data: BitTableFields): Promise<BitTableCreateRecord> {
+  async create(
+    data: BitTableFields,
+    params?: BitTableCreateOption,
+  ): Promise<BitTableCreateRecord> {
     this.setTableOption();
 
-    const { record } = await this.tableHelper.create(data);
+    const { record } = await this.tableHelper.create(data, params);
     return record;
   }
 }
