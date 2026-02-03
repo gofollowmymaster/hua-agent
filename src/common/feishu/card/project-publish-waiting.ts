@@ -37,4 +37,16 @@ export default class ProjectPublishWaitingCard extends FeishuCard {
       false,
     ) as CardDataType<PublishCardWaitingData>;
   };
+
+  /**
+   * 构建飞书卡片消息
+   * @param info
+   * @returns
+   */
+  static buildCardStringMsg = (info: PublishCardWaitingData) => {
+    return super.build({
+      ...info,
+      statusOptions: PublishStatusEnum[info.status],
+    });
+  };
 }

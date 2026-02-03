@@ -56,7 +56,7 @@ export class PublishCallbackService extends BaseService {
     const token = await this.userAliyunTable.getUserAliyunToken(operator);
     console.log('[ token ] >', token);
     this.devopsContext.run({ token }, async () => {
-      //取消发布
+      //通过
       for (const appReleaseWorkflow of cardInfo.appReleaseWorkflowList) {
         await this.devopsApiService.passExecuteAppReleaseWorkflow(
           appReleaseWorkflow,
@@ -122,7 +122,7 @@ export class PublishCallbackService extends BaseService {
         id: cardInfo.params.operator,
       },
       workflowEnv: cardInfo.params.env,
-      status: '已通过测试，正在发布中',
+      status: '测试拒绝，发布已取消',
       btnDisabled: true,
       testUser: cardInfo.testUser,
     });

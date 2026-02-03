@@ -36,17 +36,17 @@ const globalConfig: GlobalConfigType = Object.freeze({
   },
 
   robots: {
-    //Aily智能报警提示相关
+    //前端助手
     AiHelperClient: {
       appId: process.env.FEISHU_AILY_ALERT_APP_ID,
       appSecret: process.env.FEISHU_AILY_ALERT_APP_SECRET,
     },
-    //报警机器人相关
+    //通知助手
     AlertClient: {
       appId: process.env.FEISHU_ALERT_APP_APPID,
       appSecret: process.env.FEISHU_ALERT_APP_APPSECRET,
     },
-    //小郎
+    //小A随笔
     XiaoLClient: {
       appId: 'cli_a86495e1f4fa500b',
       appSecret: 'YkaB6aMhGbvurRFyWOymqhpXoQw5BiM8',

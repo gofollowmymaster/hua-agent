@@ -263,7 +263,7 @@ export class AliService extends BaseService {
 
     const status = '测试卡点';
     const runId = uniqueId();
-    const content = ProjectPublishWaitingCard.buildCardMsg({
+    const content = ProjectPublishWaitingCard.buildCardStringMsg({
       runId,
       content: params.content,
       links: appReleaseWorkflowList.map((item) => {
@@ -289,14 +289,18 @@ export class AliService extends BaseService {
     const cacheKey = RedisKeys.DEVOPS_APP_PUBLISH_CARD.replace('{id}', runId);
     this.redis.set(cacheKey, JSON.stringify(publishCardInfo));
     this.redis.expire(cacheKey, 60 * 60 * 12);
-    testUserInfo.forEach(async (user) => {
-      await this.feishuOpenapiHelper.createEphemeralInteractToGroup({
-        card: content,
-        user_id: user.user_id,
-        msg_type: 'interactive',
-        chat_id: NodeConfigService.get('AliDevopsFeishuGroupId'),
-      });
-    });
+    this.feishuMessageHelper.createInteractToGroup(
+      content,
+      NodeConfigService.get('AliDevopsFeishuGroupId'),
+    );
+    // testUserInfo.forEach(async (user) => {
+    //   await this.feishuOpenapiHelper.createEphemeralInteractToGroup({
+    //     card: content,
+    //     user_id: user.user_id,
+    //     msg_type: 'interactive',
+    //     chat_id: NodeConfigService.get('AliDevopsFeishuGroupId'),
+    //   });
+    // });
   }
 
   sendFailMsg(

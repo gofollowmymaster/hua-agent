@@ -16,7 +16,7 @@ class WikiBlackListTable extends FeishuTable {
     this.appToken = 'Jy9AbAbsdaMTYVs6H23cOMQRnro';
     this.tableId = 'tblPwHYM7sUwCWDu';
     this.tableHelper = new FeishuTableHelper(
-      ClientFactory.create(FeishuApp.XiaoAClient),
+      ClientFactory.create(FeishuApp.AlertClient),
       userContext,
       redisService,
     );
