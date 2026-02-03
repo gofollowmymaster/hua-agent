@@ -28,18 +28,25 @@ export class PublishCallbackService extends BaseDevopsService {
   ) {
     super(redisService);
   }
+  concurrentTask(list, handle) {
+    const tasks = [];
+    for (const item of list) {
+      tasks.push(handle(item));
+    }
+    return Promise.all(tasks);
+  }
   async passPublish(runId: string, operator: string) {
     const cardInfo = await this.checkPublishInCache(runId);
     if (!cardInfo) {
       throw new Error('发布信息已过期，如需通过请通过链接逐一处理');
     }
     const token = await this.userAliyunTable.getUserAliyunToken(operator);
-    console.log('[ token ] >', token);
     return this.devopsContext.run({ token }, async () => {
       //通过
-      for (const appReleaseWorkflow of cardInfo.appReleaseWorkflowList) {
+
+      const task = async (appReleaseWorkflow) => {
         if (appReleaseWorkflow.status === 'SUCCESS') {
-          continue;
+          return;
         }
         try {
           const res =
@@ -53,7 +60,9 @@ export class PublishCallbackService extends BaseDevopsService {
         } catch (error) {
           this.sendFailMsg(appReleaseWorkflow, '测试卡点-通过', operator);
         }
-      }
+      };
+
+      await this.concurrentTask(cardInfo.appReleaseWorkflowList, task);
       this.setPublishInCache(runId, cardInfo);
       const card = {
         content: cardInfo.params.content,
@@ -77,14 +86,20 @@ export class PublishCallbackService extends BaseDevopsService {
           (item) => item.status !== 'SUCCESS',
         )
       ) {
-        return ProjectPublishWaitingCard.buildCardMsg({
-          ...card,
-          btnDisabled: false,
-          runId,
-          status: '测试卡点',
-        });
+        return {
+          card: ProjectPublishWaitingCard.buildCardMsg({
+            ...card,
+            btnDisabled: false,
+            runId,
+            status: '测试卡点',
+          }),
+          msg: '处理失败',
+        };
       }
-      return ProjectPublishCard.buildCardJsonMsg(card);
+      return {
+        card: ProjectPublishCard.buildCardJsonMsg(card),
+        msg: '处理成功',
+      };
     });
   }
   async refusePublish(runId: string, operator: string) {
@@ -96,9 +111,9 @@ export class PublishCallbackService extends BaseDevopsService {
     console.log('[ token ] >', token);
     return this.devopsContext.run({ token }, async () => {
       //取消发布
-      for (const appReleaseWorkflow of cardInfo.appReleaseWorkflowList) {
+      const task = async (appReleaseWorkflow) => {
         if (appReleaseWorkflow.status === 'CANCELED') {
-          continue;
+          return;
         }
         try {
           const res =
@@ -112,7 +127,10 @@ export class PublishCallbackService extends BaseDevopsService {
         } catch (error) {
           this.sendFailMsg(appReleaseWorkflow, '测试卡点-拒绝', operator);
         }
-      }
+      };
+      await this.concurrentTask(cardInfo.appReleaseWorkflowList, task);
+      this.setPublishInCache(runId, cardInfo);
+
       const card = {
         content: cardInfo.params.content,
         links: cardInfo.appReleaseWorkflowList.map((item) => {
@@ -134,15 +152,21 @@ export class PublishCallbackService extends BaseDevopsService {
           (item) => item.status !== 'CANCELED',
         )
       ) {
-        return ProjectPublishWaitingCard.buildCardMsg({
-          ...card,
-          btnDisabled: false,
-          runId,
-          status: '测试卡点',
-        });
+        return {
+          msg: '处理失败',
+          card: ProjectPublishWaitingCard.buildCardMsg({
+            ...card,
+            btnDisabled: false,
+            runId,
+            status: '测试卡点',
+          }),
+        };
       }
 
-      return ProjectPublishCard.buildCardJsonMsg(card);
+      return {
+        card: ProjectPublishCard.buildCardJsonMsg(card),
+        msg: '处理成功',
+      };
     });
   }
 }

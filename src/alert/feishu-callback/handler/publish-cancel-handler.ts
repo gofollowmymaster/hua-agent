@@ -14,14 +14,14 @@ const PublishConfirmHandler: CustomCallbackHandleType = async (
     },
   } = event;
 
-  const card: CardDataType<PublishCardData> =
+  const { card, msg } =
     await handlerService.publishCallbackService.refusePublish(runId, union_id);
   return {
     toast: {
       type: 'info',
-      content: '处理成功',
+      content: msg,
       i18n: {
-        zh_cn: '处理成功',
+        zh_cn: msg,
         en_us: 'card action success',
       },
     },
