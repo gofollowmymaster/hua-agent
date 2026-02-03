@@ -39,7 +39,7 @@ export class PublishCallbackService extends BaseDevopsService {
       //通过
       for (const appReleaseWorkflow of cardInfo.appReleaseWorkflowList) {
         if (appReleaseWorkflow.status === 'SUCCESS') {
-          // continue;
+          continue;
         }
         try {
           const res =
@@ -71,10 +71,7 @@ export class PublishCallbackService extends BaseDevopsService {
         status: '已通过测试卡点',
         testUser: cardInfo.testUser,
       };
-      console.log(
-        '[ cardInfo.appReleaseWorkflowList ] >',
-        cardInfo.appReleaseWorkflowList,
-      );
+
       if (
         cardInfo.appReleaseWorkflowList.some(
           (item) => item.status !== 'SUCCESS',
