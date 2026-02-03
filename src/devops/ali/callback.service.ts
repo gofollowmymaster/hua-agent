@@ -65,13 +65,12 @@ export class PublishCallbackService extends BaseService {
       //删除消息
 
       //推送消息
-      await this.sendPushResultMsg(
-        cardInfo.appReleaseWorkflowList,
-        cardInfo.params,
-      );
+      // await this.sendPushResultMsg(
+      //   cardInfo.appReleaseWorkflowList,
+      //   cardInfo.params,
+      // );
     });
-    return ProjectPublishWaitingCard.buildCardMsg({
-      runId,
+    return ProjectPublishCard.buildCardMsg({
       content: cardInfo.params.content,
       links: cardInfo.appReleaseWorkflowList.map((item) => {
         return {
@@ -85,7 +84,6 @@ export class PublishCallbackService extends BaseService {
       },
       workflowEnv: cardInfo.params.env,
       status: '已通过测试，正在发布中',
-      btnDisabled: true,
       testUser: cardInfo.testUser,
     });
   }

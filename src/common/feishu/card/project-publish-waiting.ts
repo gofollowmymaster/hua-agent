@@ -21,7 +21,7 @@ export enum PublishStatusEnum {
 
 export default class ProjectPublishWaitingCard extends FeishuCard {
   static readonly templateId = 'AAqvo4o68JvgT';
-  static readonly templateVersion = '1.0.6';
+  static readonly templateVersion = '1.0.7';
 
   /**
    * 构建飞书卡片消息
