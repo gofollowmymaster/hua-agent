@@ -39,7 +39,7 @@ export class PublishCallbackService extends BaseDevopsService {
       //通过
       for (const appReleaseWorkflow of cardInfo.appReleaseWorkflowList) {
         if (appReleaseWorkflow.status === 'SUCCESS') {
-          continue;
+          // continue;
         }
         try {
           const res =
@@ -47,7 +47,9 @@ export class PublishCallbackService extends BaseDevopsService {
               appReleaseWorkflow,
             );
           console.log('[ res ] >', res);
-          appReleaseWorkflow.status = 'SUCCESS';
+          appReleaseWorkflow.status = res.success
+            ? 'SUCCESS'
+            : appReleaseWorkflow.status;
         } catch (error) {
           this.sendFailMsg(appReleaseWorkflow, '测试卡点-通过', operator);
         }
@@ -69,6 +71,10 @@ export class PublishCallbackService extends BaseDevopsService {
         status: '已通过测试卡点',
         testUser: cardInfo.testUser,
       };
+      console.log(
+        '[ cardInfo.appReleaseWorkflowList ] >',
+        cardInfo.appReleaseWorkflowList,
+      );
       if (
         cardInfo.appReleaseWorkflowList.some(
           (item) => item.status !== 'SUCCESS',
@@ -103,7 +109,9 @@ export class PublishCallbackService extends BaseDevopsService {
               appReleaseWorkflow,
             );
           console.log('[ res ] >', res);
-          appReleaseWorkflow.status = 'CANCELED';
+          appReleaseWorkflow.status = res.success
+            ? 'CANCELED'
+            : appReleaseWorkflow.status;
         } catch (error) {
           this.sendFailMsg(appReleaseWorkflow, '测试卡点-拒绝', operator);
         }

@@ -193,7 +193,7 @@ export class DevopsApiService extends HttpApiHelper {
 
   async passExecuteAppReleaseWorkflow(
     pathParams,
-  ): Promise<executeAppReleaseWorkflowType> {
+  ): Promise<{ success: boolean }> {
     const {
       appName,
       releaseWorkflowSn,
@@ -208,7 +208,7 @@ export class DevopsApiService extends HttpApiHelper {
 
   async refuseExecuteAppReleaseWorkflow(
     pathParams,
-  ): Promise<executeAppReleaseWorkflowType> {
+  ): Promise<{ success: boolean }> {
     const {
       appName,
       releaseWorkflowSn,
