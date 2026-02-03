@@ -4,7 +4,6 @@ import { FeishuCallbackDto } from './dto/feishu-callback.dto';
 import { FeishuCallbackService } from './callback.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { send } from 'process';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 
 @ApiTags('飞书回调')

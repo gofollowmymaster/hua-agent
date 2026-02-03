@@ -14,9 +14,7 @@ import {
 } from './common/ali-api/interface';
 import UserAliyunTable from './common/table/user-token-table';
 import { addRetryJob, throttleByParams } from '@src/common/utils/job';
-import TipCard from '@src/common/feishu/card/tip-card';
 import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
-import { BaseService } from '@src/common/base/base-service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { AliDevopsContext } from './common/service/ali-devops.context';
 import { RedisKeys } from '@src/common/const/redis-key.enum';
@@ -28,9 +26,10 @@ import FeishuOpenapiHelper from '@src/common/feishu/helper/feishu-openapi-helper
 import { ContactUserType } from '@src/common/feishu/type/contact';
 import { uniqueId } from 'lodash';
 import { PublishCardInfoType } from './types/devops';
+import { BaseDevopsService } from './common/service/base-devops.service';
 
 @Injectable()
-export class AliService extends BaseService {
+export class AliService extends BaseDevopsService {
   protected readonly redis: Redis;
   protected readonly executeAppReleaseWorkflowThrottle: (
     params: executeAppReleaseWorkflowQuery,
@@ -48,8 +47,7 @@ export class AliService extends BaseService {
     protected feishuUserHelper: FeishuUserHelper,
     protected readonly logger: LoggerService,
   ) {
-    super();
-    this.redis = redisService.getClient();
+    super(redisService);
 
     this.executeAppReleaseWorkflowThrottle = throttleByParams(
       this.devopsApiService.executeAppReleaseWorkflow,
@@ -160,7 +158,7 @@ export class AliService extends BaseService {
       }
       appReleaseWorkflow.status = currentStage.stageInfo?.status;
       if (appReleaseWorkflow.status === 'FAIL') {
-        this.sendFailMsg(appReleaseWorkflow, currentStage, params.operator);
+        this.sendFailMessage(appReleaseWorkflow, currentStage, params.operator);
         console.log('[ currentStage-true ] >', currentStage.stageInfo);
 
         return true;
@@ -286,44 +284,10 @@ export class AliService extends BaseService {
       params,
       testUser,
     };
-    const cacheKey = RedisKeys.DEVOPS_APP_PUBLISH_CARD.replace('{id}', runId);
-    this.redis.set(cacheKey, JSON.stringify(publishCardInfo));
-    this.redis.expire(cacheKey, 60 * 60 * 12);
+    this.setPublishInCache(runId, publishCardInfo);
     this.feishuMessageHelper.createInteractToGroup(
       content,
       NodeConfigService.get('AliDevopsFeishuGroupId'),
-    );
-    // testUserInfo.forEach(async (user) => {
-    //   await this.feishuOpenapiHelper.createEphemeralInteractToGroup({
-    //     card: content,
-    //     user_id: user.user_id,
-    //     msg_type: 'interactive',
-    //     chat_id: NodeConfigService.get('AliDevopsFeishuGroupId'),
-    //   });
-    // });
-  }
-
-  sendFailMsg(
-    appReleaseWorkflow: AppWorkflowPublishType,
-    currentStage: PipelineStage,
-    operator: string,
-  ) {
-    let stageName = currentStage.stageInfo.jobs.find((job) => {
-      return job.status === 'FAIL';
-    })?.name;
-    stageName = stageName || currentStage.stageInfo.name;
-    this.logger.info(
-      `应用${appReleaseWorkflow.appName}-${appReleaseWorkflow.workflowName}在运行阶段->${stageName} 执行失败`,
-    );
-    const content = TipCard.buildCardMsg({
-      title: '应用发布失败通知',
-      bgColor: 'red',
-      content: `应用:<text_tag color='blue'>${appReleaseWorkflow.appName}</text_tag>在**${stageName}**阶段运行失败！请及时处理！[${appReleaseWorkflow.appName}-${appReleaseWorkflow.workflowName}](${appReleaseWorkflow.url})`,
-    });
-    this.feishuMessageHelper.createInteractToUser(
-      content,
-      operator,
-      'union_id',
     );
   }
 }

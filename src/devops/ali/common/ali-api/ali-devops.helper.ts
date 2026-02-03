@@ -202,10 +202,8 @@ export class DevopsApiService extends HttpApiHelper {
       jobId,
     } = pathParams;
 
-    return this.requestWrapper(async () => {
-      const uri = `/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}/executions/${executionNumber}:passPipelineValidate?jobId=${jobId}`;
-      return this.postRequest(uri, {});
-    }, 'passExecuteAppReleaseWorkflow');
+    const uri = `/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}/executions/${executionNumber}:passPipelineValidate?jobId=${jobId}`;
+    return this.postRequest(uri, {});
   }
 
   async refuseExecuteAppReleaseWorkflow(
@@ -219,10 +217,8 @@ export class DevopsApiService extends HttpApiHelper {
       jobId,
     } = pathParams;
 
-    return this.requestWrapper(async () => {
-      const uri = `/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}/executions/${executionNumber}:refusePipelineValidate?jobId=${jobId}`;
-      return this.postRequest(uri, {});
-    }, 'refuseExecuteAppReleaseWorkflow');
+    const uri = `/apps/${appName}/releaseWorkflows/${releaseWorkflowSn}/releaseStages/${releaseStageSn}/executions/${executionNumber}:refusePipelineValidate?jobId=${jobId}`;
+    return this.postRequest(uri, {});
   }
   //
   async getPipelineDetail(pathParams): Promise<PipelineDetail> {

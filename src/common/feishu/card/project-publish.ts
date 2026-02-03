@@ -1,4 +1,4 @@
-import { FeishuCard } from './feishu-card';
+import { CardDataType, FeishuCard } from './feishu-card';
 
 export type PublishCardData = {
   workflowEnv: string;
@@ -32,5 +32,20 @@ export default class ProjectPublishCard extends FeishuCard {
       statusOptions: PublishStatusEnum[info.status],
       // color: ErrorUnresolvedCard.getColor(alertInfo.status),
     });
+  };
+  /**
+   * 构建飞书卡片消息
+   * @param alertInfo
+   * @returns
+   */
+  static buildCardJsonMsg = (info: PublishCardData) => {
+    return super.build(
+      {
+        ...info,
+        statusOptions: PublishStatusEnum[info.status],
+        // color: ErrorUnresolvedCard.getColor(alertInfo.status),
+      },
+      false,
+    ) as unknown as CardDataType<PublishCardData>;
   };
 }

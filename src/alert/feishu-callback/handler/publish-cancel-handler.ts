@@ -1,12 +1,12 @@
 import { CustomCallbackHandleType } from '.';
 import { CardCallbackReturnType } from '@src/common/feishu/type/card';
-import { PublishCardWaitingData } from '@src/common/feishu/card/project-publish-waiting';
 import { CardDataType } from '@src/common/feishu/card/feishu-card';
+import { PublishCardData } from '@src/common/feishu/card/project-publish';
 
 const PublishConfirmHandler: CustomCallbackHandleType = async (
   event,
   handlerService,
-): Promise<CardCallbackReturnType<PublishCardWaitingData>> => {
+): Promise<CardCallbackReturnType<PublishCardData>> => {
   const {
     operator: { union_id },
     action: {
@@ -14,7 +14,7 @@ const PublishConfirmHandler: CustomCallbackHandleType = async (
     },
   } = event;
 
-  const card: CardDataType<PublishCardWaitingData> =
+  const card: CardDataType<PublishCardData> =
     await handlerService.publishCallbackService.refusePublish(runId, union_id);
   return {
     toast: {
