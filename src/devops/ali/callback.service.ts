@@ -10,6 +10,7 @@ import { LoggerService } from '@src/common/service/logger/logger.service';
 import FeishuOpenapiHelper from '@src/common/feishu/helper/feishu-openapi-helper';
 import { AliDevopsContext } from './common/service/ali-devops.context';
 import { BaseDevopsService } from './common/service/base-devops.service';
+import ProjectPublishWaitingCard from '@src/common/feishu/card/project-publish-waiting';
 
 @Injectable()
 export class PublishCallbackService extends BaseDevopsService {
@@ -51,7 +52,8 @@ export class PublishCallbackService extends BaseDevopsService {
           this.sendFailMsg(appReleaseWorkflow, '测试卡点-通过', operator);
         }
       }
-      return ProjectPublishCard.buildCardJsonMsg({
+      this.setPublishInCache(runId, cardInfo);
+      const card = {
         content: cardInfo.params.content,
         links: cardInfo.appReleaseWorkflowList.map((item) => {
           return {
@@ -64,9 +66,22 @@ export class PublishCallbackService extends BaseDevopsService {
           id: cardInfo.params.operator,
         },
         workflowEnv: cardInfo.params.env,
-        status: '已通过测试，正在发布中',
+        status: '已通过测试卡点',
         testUser: cardInfo.testUser,
-      });
+      };
+      if (
+        cardInfo.appReleaseWorkflowList.some(
+          (item) => item.status !== 'SUCCESS',
+        )
+      ) {
+        return ProjectPublishWaitingCard.buildCardMsg({
+          ...card,
+          btnDisabled: false,
+          runId,
+          status: '测试卡点',
+        });
+      }
+      return ProjectPublishCard.buildCardJsonMsg(card);
     });
   }
   async refusePublish(runId: string, operator: string) {
@@ -93,7 +108,7 @@ export class PublishCallbackService extends BaseDevopsService {
           this.sendFailMsg(appReleaseWorkflow, '测试卡点-拒绝', operator);
         }
       }
-      return ProjectPublishCard.buildCardJsonMsg({
+      const card = {
         content: cardInfo.params.content,
         links: cardInfo.appReleaseWorkflowList.map((item) => {
           return {
@@ -108,7 +123,21 @@ export class PublishCallbackService extends BaseDevopsService {
         workflowEnv: cardInfo.params.env,
         status: '测试拒绝，发布已取消',
         testUser: cardInfo.testUser,
-      });
+      };
+      if (
+        cardInfo.appReleaseWorkflowList.some(
+          (item) => item.status !== 'CANCELED',
+        )
+      ) {
+        return ProjectPublishWaitingCard.buildCardMsg({
+          ...card,
+          btnDisabled: false,
+          runId,
+          status: '测试卡点',
+        });
+      }
+
+      return ProjectPublishCard.buildCardJsonMsg(card);
     });
   }
 }

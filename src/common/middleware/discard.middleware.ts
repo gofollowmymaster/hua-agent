@@ -5,11 +5,7 @@ import { sendExceptionToFeishu } from '../feishu/utils';
 @Injectable()
 export class DiscardMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
-    if (
-      ['mock-server', 'aplus-frontend-verify'].includes(
-        req.originalUrl.split('/')[1],
-      )
-    ) {
+    if (['mock-server'].includes(req.originalUrl.split('/')[1])) {
       sendExceptionToFeishu(
         new Error('当前访问废弃的功能'),
         '当前访问地址：' + req.originalUrl,
