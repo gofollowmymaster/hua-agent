@@ -21,7 +21,7 @@ export default abstract class BaseProcessor extends WorkerHost {
     };
     this.tenantContext.run(tenantData, async () => {
       try {
-        this.handle(job.data);
+        await this.handle(job.data);
       } catch (err) {
         this.sendAlertMsg(this.constructor.name + '执行错误', err.message);
       }

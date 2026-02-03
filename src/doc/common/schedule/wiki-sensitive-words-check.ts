@@ -21,6 +21,6 @@ export default class WikiSensitiveWordsCheckService extends BaseSchedule {
   }
 
   protected async handle() {
-    this.wikiService.batchSearch();
+    await this.wikiService.batchSearch();
   }
 }
