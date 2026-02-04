@@ -97,7 +97,8 @@ export default class IssueStatisticService {
     const { items: list } = await this.businessLineTable.list();
     this.businessLines = list;
 
-    for (const businessLine of businessLines) {
+    for (const item of list) {
+      const businessLine = item.fields['业务线'] as string;
       const requestIssueList = await this.getIssuesToday(businessLine);
       const tableData = requestIssueList.map(({ fields }) => {
         return {

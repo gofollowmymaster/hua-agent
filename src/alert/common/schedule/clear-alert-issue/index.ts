@@ -33,8 +33,9 @@ export default class ClearAlertPerDayService extends BaseSchedule {
     ];
   }
 
-  async handle() {
-    if (['development', 'dev', 'test'].includes(process.env.NODE_ENV)) return;
+  async handle(store: any, force: boolean = false) {
+    if (!force && ['development', 'dev', 'test'].includes(process.env.NODE_ENV))
+      return;
     this.pageIssueService.clear();
     this.requestIssueService.clear();
   }

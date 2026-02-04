@@ -60,7 +60,7 @@ export default abstract class BaseSchedule implements OnModuleInit {
   handleCron(force: boolean = false) {
     if (!force) return;
 
-    this.handle(this.tenantContext.getStore());
+    this.handle(this.tenantContext.getStore(), force);
   }
   async execute() {
     this.logger.debug(this.constructor.name + ' Called ');
@@ -68,7 +68,7 @@ export default abstract class BaseSchedule implements OnModuleInit {
     for (const tenantData of this.tenantContextDatas) {
       this.tenantContext.run(tenantData, async () => {
         try {
-          await this.handle(tenantData);
+          await this.handle(tenantData, true);
         } catch (err) {
           this.sendAlertMsg(err.message, err.stack);
         }
@@ -76,7 +76,7 @@ export default abstract class BaseSchedule implements OnModuleInit {
     }
   }
 
-  protected abstract handle(context: TenantContextType): void;
+  protected abstract handle(context: TenantContextType, force: boolean): void;
 
   protected sendAlertMsg(
     message: string,
