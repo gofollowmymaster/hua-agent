@@ -32,6 +32,11 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
 
   async toFrontendAlertTableData(): Promise<FrontendAlertTableDto> {
     await this.setEvent(this.alertContext.event as PageAlertEvent);
+    delete this.event.rawData.breadcrumbs;
+    delete this.event.rawData.exception;
+    const RawData = JSON.stringify(this.event.rawData);
+    const truncatedRawData =
+      RawData.length > 400000 ? RawData.slice(0, 400000) + '...' : RawData;
     return {
       标题: this.event.title,
       链接信息: this.event.webUrl,
@@ -42,7 +47,7 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       应用名: [this.event.pageModuleName],
       业务线: this.appInfo.bu,
       环境: this.event.environment,
-      RawData: JSON.stringify(this.event.rawData),
+      RawData: truncatedRawData,
     };
   }
   async toFrontendAlertIssueTableData(): Promise<FrontendAlertIssueTableDto> {

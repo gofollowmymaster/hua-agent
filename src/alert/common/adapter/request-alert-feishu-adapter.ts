@@ -42,7 +42,8 @@ export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
 
   async toApiAlertTableData(): Promise<ApiAlertTableDto> {
     await this.setEvent(this.alertContext.event as RequestAlertEvent);
-
+    delete this.event.rawData.breadcrumbs;
+    delete this.event.rawData.exception;
     const bu = apiModuleBuMap[this.event.serverModuleName] || this.appInfo.bu;
     return {
       接口地址: this.requestData.url,

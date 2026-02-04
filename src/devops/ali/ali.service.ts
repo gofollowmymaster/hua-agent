@@ -10,7 +10,6 @@ import {
   executeAppReleaseWorkflowBody,
   executeAppReleaseWorkflowQuery,
   executeAppReleaseWorkflowType,
-  PipelineStage,
 } from './common/ali-api/interface';
 import UserAliyunTable from './common/table/user-token-table';
 import { addRetryJob, throttleByParams } from '@src/common/utils/job';

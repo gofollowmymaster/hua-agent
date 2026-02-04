@@ -43,9 +43,12 @@ export class SentryWebhookService {
 
   async checkIssueInCache(issueId: string) {
     const issueInfo = await this.redis.hgetall(
-      RedisKeys.SENTRY_ALERT_COUNT_ISSUE.replace('{issueId}', issueId),
+      this.redisService.buildCacheKey(
+        RedisKeys.SENTRY_ALERT_COUNT_ISSUE,
+        '{issueId}',
+        issueId,
+      ),
     );
-
     if (!issueInfo.issueId) {
       //跨天问题
       throw new Error(`Issue:${issueId}已失效`);
