@@ -16,7 +16,7 @@ import { NotReportException } from '@src/common/exception/not-report-exception';
  * 自定义异常拦截器
  * todo: 该拦截器会导致请求没有返回数据，暂时注释掉
  */
-@Catch(BaseException)
+@Catch(BaseException, NotReportException)
 export class AplusExceptionsFilter implements ExceptionFilter {
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
@@ -39,8 +39,9 @@ export class AplusExceptionsFilter implements ExceptionFilter {
       message,
       path,
     };
-    if (exception instanceof NotReportException) {
+    if (exception instanceof BaseException) {
       httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
+      return;
     }
     sendExceptionToFeishu(exception, reqContext);
   }
