@@ -18,8 +18,8 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
-    if (!token) {
-      throw new NotReportException('缺少必要的token信息', 401);
+    if (!token || token.length < 10) {
+      throw new NotReportException('缺少必要的token信息:' + token, 401);
     }
     try {
       const payload = await this.verify(token);
