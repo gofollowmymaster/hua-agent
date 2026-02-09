@@ -10,12 +10,13 @@ import { HttpAdapterHost } from '@nestjs/core';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { BaseException } from '@src/common/exception/base-exception';
 import { isNumber } from 'lodash';
+import { NotReportException } from '@src/common/exception/not-report-exception';
 
 /**
  * 自定义异常拦截器
  * todo: 该拦截器会导致请求没有返回数据，暂时注释掉
  */
-@Catch()
+@Catch(BaseException)
 export class AplusExceptionsFilter implements ExceptionFilter {
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
@@ -28,12 +29,9 @@ export class AplusExceptionsFilter implements ExceptionFilter {
     const hostName = httpAdapter.getRequestHostname(request);
     const data = request.body;
 
-    const httpStatus =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : isNumber(exception.code)
-          ? exception.code
-          : HttpStatus.INTERNAL_SERVER_ERROR;
+    const httpStatus = isNumber(exception.code)
+      ? exception.code
+      : HttpStatus.INTERNAL_SERVER_ERROR;
     const reqContext = hostName + path + JSON.stringify(data);
     const message = exception.message || 'Internal Server Error';
     const responseBody = {
@@ -41,9 +39,9 @@ export class AplusExceptionsFilter implements ExceptionFilter {
       message,
       path,
     };
-
+    if (exception instanceof NotReportException) {
+      httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
+    }
     sendExceptionToFeishu(exception, reqContext);
-
-    httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
   }
 }

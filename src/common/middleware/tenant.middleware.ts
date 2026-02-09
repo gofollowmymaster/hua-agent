@@ -44,8 +44,17 @@ export class TenantMiddleware implements NestMiddleware {
   }
   async use(req: Request, _res: Response, next: NextFunction) {
     // 从不同来源获取租户ID
-    const user = await this.extractTokenFromHeader(req);
+    let user;
 
+    try {
+      user = await this.extractTokenFromHeader(req);
+    } catch (e) {
+      logger.warn(
+        `非法请求 请求开始【${req.method} - ${req.originalUrl}】 请求头:【${JSON.stringify(req.headers)}】请求体参数:【${JSON.stringify(req.body)}】 `,
+      );
+      sendExceptionToFeishu(e);
+      user = {};
+    }
     // 设置租户上下文 默认为小往
     const context = {
       tenantCode: this.getTenantCode(user.supplierCode),
@@ -83,13 +92,8 @@ export class TenantMiddleware implements NestMiddleware {
     return payload;
   }
   private async jwtTokenHandle(headerToken: string): Promise<UserContext> {
-    let payload;
-    try {
-      payload = await this.jwtService.decode(headerToken);
-    } catch (e) {
-      sendExceptionToFeishu(e);
-      payload = {};
-    }
+    const payload = await this.jwtService.decode(headerToken);
+
     return payload;
   }
 

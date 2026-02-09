@@ -9,6 +9,7 @@ import { NodeConfigService } from '@src/config/node-config.service';
 import { UserContext } from '@src/type/global';
 import dayjs from 'dayjs';
 import { Request } from 'express';
+import { NotReportException } from '../exception/not-report-exception';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -18,7 +19,7 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      throw new UnauthorizedException();
+      throw new NotReportException('缺少必要的token信息', 401);
     }
     try {
       const payload = await this.verify(token);
