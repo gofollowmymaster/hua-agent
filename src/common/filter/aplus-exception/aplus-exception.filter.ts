@@ -2,7 +2,6 @@ import {
   ExceptionFilter,
   Catch,
   ArgumentsHost,
-  HttpException,
   HttpStatus,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
@@ -39,10 +38,9 @@ export class AplusExceptionsFilter implements ExceptionFilter {
       message,
       path,
     };
-    if (exception instanceof BaseException) {
-      httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
-      return;
+    if (!(exception instanceof NotReportException)) {
+      sendExceptionToFeishu(exception, reqContext);
     }
-    sendExceptionToFeishu(exception, reqContext);
+    httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
   }
 }

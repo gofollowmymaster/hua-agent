@@ -85,6 +85,7 @@ export class CheckDocumentProcessor extends BaseProcessor {
 
       await wait(1000);
     }
+    //todo 根据触发渠道不同，发送飞书消息检测结果通知触发人员
   }
   protected sendTipMsg(
     matchedItems: WikiSearchReturnItem[],
