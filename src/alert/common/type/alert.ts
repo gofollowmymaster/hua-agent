@@ -7,8 +7,6 @@ export class AlertEvent extends BaseAlertEvent {
   environment: Environment;
   webUrl: string;
   errorEndpoint: ErrorEndpoint;
-  rawData: Record<string, any>;
-  [key: string]: any;
 }
 
 export class PageAlertEvent extends AlertEvent {

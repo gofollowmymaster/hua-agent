@@ -9,10 +9,8 @@ import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import BaseAlertFeishuAdapter from '../../alert/common/adapter/base-alert-feishu-adapter';
 import { BitTableCreateRecord } from '@src/common/feishu/type/bitable';
-import { firstValueFrom } from 'rxjs';
 
 import FeishuUserHelper from '@src/common/feishu/helper/feishu-user-helper';
-import { FeishuApp } from '@src/common/feishu/clients';
 
 import { HttpService } from '@nestjs/axios';
 import { AlertContext } from './alert-event.context';

@@ -5,6 +5,7 @@ export enum ErrorLevel {
   INFO = 'info',
 }
 export class BaseAlertEvent {
+  project: string;
   timestamp: number;
   issueId: string;
   title: string;
@@ -13,5 +14,6 @@ export class BaseAlertEvent {
   issueUrl: string;
   level: ErrorLevel;
   feishuUrl?: string;
+  message?: string;
   rawData?: Record<string, any>;
 }

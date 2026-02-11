@@ -210,12 +210,12 @@ export class SentryWebhookService {
     }
     //发送加急消息
     const msgData = {
-      ...errorEvent,
       level: ErrorLevel.FATAL,
       message: '当前系统最近5分钟内报错数超过10个,请及时处理',
       content: '',
       timestamp: dayjs().valueOf(),
     };
+
     const content = CommonAlertCard.buildCardMsg({
       ...msgData,
       project:
@@ -227,7 +227,10 @@ export class SentryWebhookService {
         'https://cloud.elnkpro.com:9000/organizations/aplus-frontend-team/issues/?query=is%3Aunresolved%20issue.priority%3A%5Bhigh%2C%20medium%5D%20event.timestamp%3A-1h&referrer=issue-list&statsPeriod=14d',
     });
     // 异步发送飞书消息
-    const groupMsgInfo = await service.sendFsAlertMsg(msgData, content);
+    const groupMsgInfo = await service.sendFsAlertMsg(
+      { ...errorEvent, ...msgData },
+      content,
+    );
     this.redis.hset(key, groupMsgInfo);
     this.redis.expire(key, 60 * 30);
   }

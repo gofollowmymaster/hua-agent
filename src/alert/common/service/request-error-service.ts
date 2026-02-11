@@ -3,7 +3,7 @@ import { LoggerService } from '@src/common/service/logger/logger.service';
 import FeishuApiAlertTable from '../table/api-alert-table';
 import FeishuApiAlertIssueTable from '../table/api-alert-issue-table';
 import { RedisService } from '@src/common/service/redis/redis.service';
-import { AlertEvent, RequestAlertEvent } from '../type/alert';
+import { RequestAlertEvent } from '../type/alert';
 import { ErrorBaseService } from '@src/common/base/error-base.service';
 import RequestAlertFeishuAdapter from '../adapter/request-alert-feishu-adapter';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
@@ -40,7 +40,7 @@ export class RequestErrorService extends ErrorBaseService {
     protected readonly redisService: RedisService,
     protected readonly alertFeishuAdapter: RequestAlertFeishuAdapter,
     protected readonly msgAlertService: MsgAlertService,
-    protected readonly alertContext: AlertContext<AlertEvent>,
+    protected readonly alertContext: AlertContext<RequestAlertEvent>,
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly feishuUserHelper: FeishuUserHelper,
     protected readonly feishuAuthHelper: FeishuAuthHelper,
