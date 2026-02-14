@@ -1,6 +1,5 @@
 import { CustomCallbackHandleType } from '.';
 import { CardCallbackReturnType } from '@src/common/feishu/type/card';
-import { CardDataType } from '@src/common/feishu/card/feishu-card';
 import { PublishCardData } from '@src/common/feishu/card/project-publish';
 
 const PublishConfirmHandler: CustomCallbackHandleType = async (

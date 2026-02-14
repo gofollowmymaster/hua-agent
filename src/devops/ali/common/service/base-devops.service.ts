@@ -27,7 +27,7 @@ export class BaseDevopsService extends BaseService {
   async setPublishInCache(runId: string, cardInfo: PublishCardInfoType) {
     const cacheKey = RedisKeys.DEVOPS_APP_PUBLISH_CARD.replace('{id}', runId);
     this.redis.set(cacheKey, JSON.stringify(cardInfo));
-    this.redis.expire(cacheKey, 60 * 60 * 12);
+    this.redis.expire(cacheKey, 60 * 60 * 24);
   }
   async checkPublishInCache(runId: string) {
     const cacheKey = this.redisService.buildCacheKey(

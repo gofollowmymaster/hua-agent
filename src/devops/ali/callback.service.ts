@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import { DevopsApiService } from './common/ali-api/ali-devops.helper';
@@ -38,7 +38,7 @@ export class PublishCallbackService extends BaseDevopsService {
   async passPublish(runId: string, operator: string) {
     const cardInfo = await this.checkPublishInCache(runId);
     if (!cardInfo) {
-      throw new Error('发布信息已过期，如需通过请通过链接逐一处理');
+      throw new NotFoundException('发布信息已过期，如需通过请通过链接逐一处理');
     }
     const token = await this.userAliyunTable.getUserAliyunToken(operator);
     return this.devopsContext.run({ token }, async () => {
@@ -53,7 +53,7 @@ export class PublishCallbackService extends BaseDevopsService {
             await this.devopsApiService.passExecuteAppReleaseWorkflow(
               appReleaseWorkflow,
             );
-          console.log('[ res ] >', res);
+          //todo  测试卡点通过失败 需要查询当前状态是否已通过，并考虑没有权限导致的接口调用失败场景
           appReleaseWorkflow.status = res.success
             ? 'SUCCESS'
             : appReleaseWorkflow.status;
@@ -105,7 +105,7 @@ export class PublishCallbackService extends BaseDevopsService {
   async refusePublish(runId: string, operator: string) {
     const cardInfo = await this.checkPublishInCache(runId);
     if (!cardInfo) {
-      throw new Error('发布信息已过期，如需通过请通过链接逐一处理');
+      throw new NotFoundException('发布信息已过期，如需通过请通过链接逐一处理');
     }
     const token = await this.userAliyunTable.getUserAliyunToken(operator);
     console.log('[ token ] >', token);

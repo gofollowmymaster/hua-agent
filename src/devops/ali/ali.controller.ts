@@ -67,7 +67,7 @@ export class AliController {
       });
       return {
         code: 500,
-        message: '失败',
+        message: '失败：' + error.message,
         body: [],
       };
     }

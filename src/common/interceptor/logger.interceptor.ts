@@ -30,7 +30,7 @@ export class LoggingInterceptor<T> implements NestInterceptor<T, Response<T>> {
     '/uploads/',
   ];
 
-  constructor(isLogRequest: boolean = false) {
+  constructor(isLogRequest: boolean = true) {
     this.isLogRequest = isLogRequest;
   }
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
