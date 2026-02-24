@@ -12,7 +12,7 @@ export class SupplierDiffService {
 
   constructor(
     private readonly redisService: RedisService,
-    private readonly SupplierDiffTable: SupplierDiffTable,
+    private readonly supplierDiffTable: SupplierDiffTable,
   ) {
     this.redis = redisService.getClient();
   }
@@ -33,7 +33,7 @@ export class SupplierDiffService {
         },
       ],
     };
-    const { items } = await this.SupplierDiffTable.search({
+    const { items } = await this.supplierDiffTable.search({
       filter,
     });
     const list = items.map(({ fields, record_id }) => {

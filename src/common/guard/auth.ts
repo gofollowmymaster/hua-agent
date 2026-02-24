@@ -10,7 +10,6 @@ import { UserContext } from '@src/type/global';
 import dayjs from 'dayjs';
 import { Request } from 'express';
 import { NotReportException } from '../exception/not-report-exception';
-
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}

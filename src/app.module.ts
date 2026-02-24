@@ -21,6 +21,7 @@ import { GlobalServiceModule } from './common/service/service.module';
 import { GlobalExceptionHandlerModule } from './common/filter/global-exception-handler/global-exception.module';
 import { ManageModule } from './manage/manage.module';
 import { DocModule } from './doc/doc.module';
+import { LoggerMiddleware } from './common/middleware/logger.middleware';
 
 const modulesAll = [
   ManageModule,
@@ -63,6 +64,7 @@ const modulesAll = [
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*'); // 你可以指定特定的路由
     consumer.apply(TenantMiddleware).forRoutes('*'); //服务商上下文中间件放在最前面，后续任何消息发送才可行
     consumer.apply(DiscardMiddleware).forRoutes('*'); // 你可以指定特定的路由
   }
