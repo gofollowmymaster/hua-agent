@@ -32,6 +32,10 @@ export class FeishuEventController {
     if (callbackInfo.type === 'url_verification') {
       return { challenge: callbackInfo.challenge };
     }
+    //用户和机器人的会话首次被创建 1.0老版本
+    if (callbackInfo.type === 'p2p_chat_create') {
+      return {};
+    }
     const { header, event } = callbackInfo;
 
     // const handler = EventHandler[header.event_type];

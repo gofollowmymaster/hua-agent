@@ -23,7 +23,7 @@ export class SupplierDiffService {
       conditions: [
         {
           field_name: '业务线',
-          operator: 'is',
+          operator: 'contains',
           value: [businessLine],
         },
         {
