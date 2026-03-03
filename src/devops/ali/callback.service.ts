@@ -11,6 +11,8 @@ import FeishuOpenapiHelper from '@src/common/feishu/helper/feishu-openapi-helper
 import { AliDevopsContext } from './common/service/ali-devops.context';
 import { BaseDevopsService } from './common/service/base-devops.service';
 import ProjectPublishWaitingCard from '@src/common/feishu/card/project-publish-waiting';
+import { AppWorkflowPublishType } from './common/ali-api/interface';
+import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 
 @Injectable()
 export class PublishCallbackService extends BaseDevopsService {
@@ -53,12 +55,18 @@ export class PublishCallbackService extends BaseDevopsService {
             await this.devopsApiService.passExecuteAppReleaseWorkflow(
               appReleaseWorkflow,
             );
-          //todo  测试卡点通过失败 需要查询当前状态是否已通过，并考虑没有权限导致的接口调用失败场景
+
           appReleaseWorkflow.status = res.success
             ? 'SUCCESS'
             : appReleaseWorkflow.status;
         } catch (error) {
           this.sendFailMsg(appReleaseWorkflow, '测试卡点-通过', operator);
+        }
+        if (appReleaseWorkflow.status === 'SUCCESS') {
+          return;
+        }
+        if (await this.checkPipelineDetail(appReleaseWorkflow)) {
+          appReleaseWorkflow.status = 'SUCCESS';
         }
       };
 
@@ -168,5 +176,57 @@ export class PublishCallbackService extends BaseDevopsService {
         msg: '处理成功',
       };
     });
+  }
+
+  /**
+   * 检查流水线运行情况
+   * @param appReleaseWorkflow
+   * @param params
+   * @param pipelineRunId
+   * @returns
+   */
+  async checkPipelineDetail(appReleaseWorkflow: AppWorkflowPublishType) {
+    const res = await this.devopsApiService.getPipelineDetail({
+      appName: appReleaseWorkflow.appName,
+      releaseWorkflowSn: appReleaseWorkflow.releaseWorkflowSn,
+      releaseStageSn: appReleaseWorkflow.releaseStageSn,
+      pipelineRunId: appReleaseWorkflow.executionNumber,
+    });
+    const stages = res.pipelineRun.stages;
+
+    if (stages[stages.length - 1].stageInfo.status === 'SUCCESS') {
+      appReleaseWorkflow.status = 'SUCCESS';
+      return true;
+    } else {
+      const currentStage = stages.find((stage: any) =>
+        ['RUNNING', 'WAITING', 'FAIL', 'CANCELED'].includes(
+          stage.stageInfo.status,
+        ),
+      );
+      if (!currentStage) {
+        sendExceptionToFeishu(
+          new Error('当前未知状态：' + currentStage.stageInfo.status),
+        );
+        return true;
+      }
+      appReleaseWorkflow.status = currentStage.stageInfo?.status;
+      if (appReleaseWorkflow.status === 'FAIL') {
+        return false;
+      } else if (appReleaseWorkflow.status === 'WAITING') {
+        const name = currentStage.stageInfo.jobs.find((job: any) => {
+          return job.status === 'WAITING';
+        }).name;
+        this.logger.info(
+          '当前运行阶段->' + (name || currentStage.stageInfo.name),
+        );
+
+        return false;
+      } else if (appReleaseWorkflow.status === 'CANCELED') {
+        return true;
+      } else {
+        this.logger.info('当前运行阶段->' + currentStage.stageInfo.name);
+        return false;
+      }
+    }
   }
 }

@@ -15,9 +15,14 @@ export const apiModuleBuMap = {
   im: '基础架构',
   'download-center': '基础架构',
   wms: '仓储物流',
+  tms: '仓储物流',
+  oms: '仓储物流',
+  gcs: '仓储物流',
   bms: '业财一体',
   ad: '商家运营',
   'data-compare': '基础架构',
+  platform: '基础架构',
+  'global-console': '基础架构',
 };
 
 @Injectable({ scope: Scope.REQUEST })

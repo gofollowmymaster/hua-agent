@@ -8,7 +8,6 @@ import {
 } from './dto/ali';
 import { SecretAuthGuard } from '@src/common/guard/secret-auth';
 import { sendCommonCardToFeishu } from '@src/common/feishu/utils';
-import CancelExecutionServer from './common/schedule/cancel-execution';
 import { AliDevopsContext } from './common/service/ali-devops.context';
 import DevopsPublishLogTable from './common/table/devops-publish-log-table';
 
@@ -17,7 +16,6 @@ import DevopsPublishLogTable from './common/table/devops-publish-log-table';
 export class AliController {
   constructor(
     private aliService: AliService,
-    protected cancelExecutionServer: CancelExecutionServer,
     protected devopsContext: AliDevopsContext,
     protected devopsPublishLogTable: DevopsPublishLogTable,
   ) {}
@@ -84,25 +82,5 @@ export class AliController {
     return this.devopsPublishLogTable.create(params.records, {
       user_id_type: 'union_id',
     });
-  }
-
-  @Post('cancel-runs')
-  @ApiOperation({
-    summary: '批量取消等待中流水线',
-    description: '手动触发批量取消等待中流水线',
-  })
-  @UseGuards(SecretAuthGuard)
-  async cancelRuns() {
-    const res = this.devopsContext.run(
-      {
-        token:
-          'pt-jgoR3UlxLAGU184xIjaPWgWf_0966a36a-6aff-4755-848a-f140610e3a08',
-      },
-      async () => {
-        await this.cancelExecutionServer.handleCron(true);
-      },
-    );
-
-    return res;
   }
 }
