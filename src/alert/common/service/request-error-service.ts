@@ -16,6 +16,7 @@ import { HttpService } from '@nestjs/axios';
 import { BitTableFilter } from '@src/common/feishu/type/bitable';
 import { IssueStatusEnum } from '@src/common/feishu/card/warning-card/interface';
 import FeishuAuthHelper from '@src/common/feishu/helper/feishu-auth-helper';
+import FeishuOpenapiHelper from '@src/common/feishu/helper/feishu-openapi-helper';
 export const ignoreCodeList = [
   '401',
   '10002',
@@ -44,6 +45,7 @@ export class RequestErrorService extends ErrorBaseService {
     protected readonly messageHelper: FeishuMessageHelper,
     protected readonly feishuUserHelper: FeishuUserHelper,
     protected readonly feishuAuthHelper: FeishuAuthHelper,
+    protected readonly feishuOpenapiHelper: FeishuOpenapiHelper,
     protected readonly httpService: HttpService,
   ) {
     super(redisService);
