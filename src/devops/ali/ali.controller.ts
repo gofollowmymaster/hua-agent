@@ -56,6 +56,7 @@ export class AliController {
         })),
       };
     } catch (error) {
+      console.log('[ publish error ] >', error);
       sendCommonCardToFeishu({
         title: '应用发布异常',
         project: process.env.PROJECT_NAME,

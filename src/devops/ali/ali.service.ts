@@ -50,7 +50,7 @@ export class AliService extends BaseDevopsService {
 
     this.executeAppReleaseWorkflowThrottle = throttleByParams(
       this.devopsApiService.executeAppReleaseWorkflow,
-      1000,
+      1000 * 60,
       devopsApiService,
     );
   }

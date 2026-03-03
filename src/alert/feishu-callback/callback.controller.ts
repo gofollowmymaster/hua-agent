@@ -29,6 +29,7 @@ export class FeishuCallbackController {
     try {
       return await this.feishuCallbackService.handle(callbackInfo);
     } catch (error) {
+      console.log('[ error ] >', error);
       sendExceptionToFeishu(error);
       const msg = `操作失败:` + error.message;
       return {
