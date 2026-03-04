@@ -50,7 +50,8 @@ export default abstract class HttpApiHelper {
 
       return data;
     } catch (err) {
-      sendExceptionToFeishu(err, 'Api 请求失败:' + requestName);
+      err.message = `Api 请求失败:  requestName:${requestName}   ${err.message}   msg:' ${err.response?.data?.msg}`;
+      throw err;
     }
   }
 }

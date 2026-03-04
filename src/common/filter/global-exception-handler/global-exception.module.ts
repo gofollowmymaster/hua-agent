@@ -8,7 +8,10 @@ export class GlobalExceptionHandlerModule implements OnApplicationBootstrap {
     process.on('uncaughtException', this.uncaughtException);
   }
   uncaughtException(error: Error) {
-    console.log('[ uncaughtExceptionWarning: ] >', error);
+    console.log(
+      '[ uncaughtExceptionWarning: ] >',
+      (error + '').substring(0, 2000),
+    );
 
     sendExceptionToFeishu(error);
     // 需要优雅地关闭应用
@@ -16,7 +19,10 @@ export class GlobalExceptionHandlerModule implements OnApplicationBootstrap {
   }
   unhandledRejection(reason, promise) {
     promise.catch((error: Error) => {
-      console.log('[ PromiseRejectionHandledWarning: ] >', reason);
+      console.log(
+        '[ PromiseRejectionHandledWarning: ] >',
+        (reason + '').substring(0, 2000),
+      );
       sendExceptionToFeishu(error);
     });
   }

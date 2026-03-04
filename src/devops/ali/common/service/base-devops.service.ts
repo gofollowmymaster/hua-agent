@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import ProjectPublishCard from '@src/common/feishu/card/project-publish';
@@ -27,7 +27,7 @@ export class BaseDevopsService extends BaseService {
   async setPublishInCache(runId: string, cardInfo: PublishCardInfoType) {
     const cacheKey = RedisKeys.DEVOPS_APP_PUBLISH_CARD.replace('{id}', runId);
     this.redis.set(cacheKey, JSON.stringify(cardInfo));
-    this.redis.expire(cacheKey, 60 * 60 * 24);
+    this.redis.expire(cacheKey, 60 * 60 * 24 * 7);
   }
   async checkPublishInCache(runId: string) {
     const cacheKey = this.redisService.buildCacheKey(
@@ -37,6 +37,9 @@ export class BaseDevopsService extends BaseService {
     );
     const cardInfo = await this.redis.get(cacheKey);
     const cardInfoParsed = JSON.parse(cardInfo + '');
+    if (!cardInfo) {
+      throw new NotFoundException('发布信息已过期，如需通过请通过链接逐一处理');
+    }
     return cardInfoParsed as PublishCardInfoType;
   }
 
@@ -92,20 +95,25 @@ export class BaseDevopsService extends BaseService {
 
   sendFailMsg(
     appReleaseWorkflow: AppWorkflowPublishType,
-    stageName: string,
-    operator: string,
+    options: {
+      stageName: string;
+      operator: string;
+      title?: string;
+      message?: string;
+    },
   ) {
     this.logger.info(
-      `应用${appReleaseWorkflow.appName}-${appReleaseWorkflow.workflowName}在运行阶段->${stageName} 执行失败`,
+      `应用${appReleaseWorkflow.appName}-${appReleaseWorkflow.workflowName}在运行阶段->${options.stageName} 执行失败`,
     );
     const content = TipCard.buildCardMsg({
-      title: '应用发布失败通知',
+      title: options.title || '应用发布失败通知',
       bgColor: 'red',
-      content: `应用:<text_tag color='blue'>${appReleaseWorkflow.appName}</text_tag>在**${stageName}**阶段运行失败！请及时处理！[${appReleaseWorkflow.appName}-${appReleaseWorkflow.workflowName}](${appReleaseWorkflow.url})`,
+      content: `应用:<text_tag color='blue'>${appReleaseWorkflow.appName}</text_tag>在**${options.stageName}**阶段运行失败！请及时处理！[${appReleaseWorkflow.appName}-${appReleaseWorkflow.workflowName}](${appReleaseWorkflow.url})\n
+      ${options.message ? `失败信息：${options.message}` : ''}`,
     });
     this.feishuMessageHelper.createInteractToUser(
       content,
-      operator,
+      options.operator,
       'union_id',
     );
   }
@@ -119,6 +127,9 @@ export class BaseDevopsService extends BaseService {
       return job.status === 'FAIL';
     })?.name;
     stageName = stageName || currentStage.stageInfo.name;
-    this.sendFailMsg(appReleaseWorkflow, stageName, operator);
+    this.sendFailMsg(appReleaseWorkflow, {
+      stageName,
+      operator,
+    });
   }
 }

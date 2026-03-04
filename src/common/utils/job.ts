@@ -53,18 +53,26 @@ export const throttleByParams: HandleType = (handle, wait, thisObj) => {
     const timerKey = JSON.stringify(params);
     const timer = timerContainer[timerKey];
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       if (timer) {
         clearTimeout(timer);
         timerContainer[timerKey] = setTimeout(async () => {
-          const res = await handle(...params);
-          resolve(res);
+          try {
+            const res = await handle(...params);
+            resolve(res);
+          } catch (error) {
+            reject(error);
+          }
         }, wait);
         return;
       }
       timerContainer[timerKey] = setTimeout(async () => {
-        const res = await handle(...params);
-        resolve(res);
+        try {
+          const res = await handle(...params);
+          resolve(res);
+        } catch (error) {
+          reject(error);
+        }
       }, wait);
     });
   };

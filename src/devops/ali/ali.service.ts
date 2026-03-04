@@ -59,7 +59,8 @@ export class AliService extends BaseDevopsService {
     const token = await this.userAliyunTable.getUserAliyunToken(
       params.operator,
     );
-    const res = this.devopsContext.run({ token }, async () => {
+
+    const res = this.devopsContext.run({ token: token }, async () => {
       const appList = await this.devopsOptionService.checkApp(params);
       const resultList: AppWorkflowPublishType[] = [];
       const queryJobs: Promise<any>[] = [];
@@ -81,28 +82,38 @@ export class AliService extends BaseDevopsService {
               [appReleaseWorkflow.sourcesID]: appOption.branch,
               FLOW_INST_RUNNING_COMMENT: params.content,
             },
-          ).then((executeRes) => {
-            appReleaseWorkflow.url =
-              appReleaseWorkflow.url + executeRes.pipelineRunId;
-            appReleaseWorkflow.executionNumber = executeRes.pipelineRunId;
-            this.cacheExecuteInfo(appReleaseWorkflow, executeRes);
-            appReleaseWorkflow.status = 'INIT';
+          )
+            .then((executeRes) => {
+              appReleaseWorkflow.url =
+                appReleaseWorkflow.url + executeRes.pipelineRunId;
+              appReleaseWorkflow.executionNumber = executeRes.pipelineRunId;
+              this.cacheExecuteInfo(appReleaseWorkflow, executeRes);
+              appReleaseWorkflow.status = 'INIT';
 
-            return addRetryJob(
-              async () =>
-                this.checkPipelineDetail(
-                  appReleaseWorkflow,
-                  params,
-                  executeRes.pipelineRunId,
-                ),
-              60 * 1000,
-              20,
-            );
-          });
+              return addRetryJob(
+                async () =>
+                  this.checkPipelineDetail(
+                    appReleaseWorkflow,
+                    params,
+                    executeRes.pipelineRunId,
+                  ),
+                60 * 1000,
+                20,
+              );
+            })
+            .catch((error) => {
+              this.sendFailMsg(appReleaseWorkflow, {
+                stageName: '发起时',
+                operator: params.operator,
+                message: error.message,
+              });
+            });
           queryJobs.push(job);
         } catch (error) {
-          throw new Error(
-            `应用：${appOption.appName}发布失败，失败原因：${error.message}`,
+          sendExceptionToFeishu(
+            new Error(
+              `应用：${appOption.appName}发布失败，失败原因：${error.message}`,
+            ),
           );
         }
       }

@@ -58,7 +58,6 @@ export class DevopsApiService extends HttpApiHelper {
   }
   async postRequest(url: string, body: Record<string, any>, options?: any) {
     this.setAliyunToken();
-
     const { data } = await firstValueFrom(
       this.httpService.post(this.prefix + this.organizationId + url, body, {
         headers: this.headers,

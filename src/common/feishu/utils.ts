@@ -29,7 +29,7 @@ export const sendExceptionToFeishuOrigin = (
     content: reqContext + exception.stack,
   };
   if (process.env.NODE_ENV === 'dev') {
-    console.log('[ exception ] >', exception);
+    console.log('[ exception ] >', (exception + '').substring(0, 2000));
   }
   sendCommonCardToFeishu(options);
 };

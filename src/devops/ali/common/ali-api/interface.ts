@@ -78,7 +78,7 @@ export type AppReleaseWorkflow = {
   type: 'CR' | 'APP_RELEASE';
   releaseStages: ReleaseStages[];
 };
-type PipelineStageType =
+export type PipelineStageType =
   | 'SUCCESS'
   | 'FAIL'
   | 'RUNNING'

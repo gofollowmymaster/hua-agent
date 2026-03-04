@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import { DevopsApiService } from './common/ali-api/ali-devops.helper';
@@ -11,8 +11,12 @@ import FeishuOpenapiHelper from '@src/common/feishu/helper/feishu-openapi-helper
 import { AliDevopsContext } from './common/service/ali-devops.context';
 import { BaseDevopsService } from './common/service/base-devops.service';
 import ProjectPublishWaitingCard from '@src/common/feishu/card/project-publish-waiting';
-import { AppWorkflowPublishType } from './common/ali-api/interface';
+import {
+  AppWorkflowPublishType,
+  PipelineStageType,
+} from './common/ali-api/interface';
 import { sendExceptionToFeishu } from '@src/common/feishu/utils';
+import { PublishCardInfoType } from './types/devops';
 
 @Injectable()
 export class PublishCallbackService extends BaseDevopsService {
@@ -39,13 +43,9 @@ export class PublishCallbackService extends BaseDevopsService {
   }
   async passPublish(runId: string, operator: string) {
     const cardInfo = await this.checkPublishInCache(runId);
-    if (!cardInfo) {
-      throw new NotFoundException('发布信息已过期，如需通过请通过链接逐一处理');
-    }
+
     const token = await this.userAliyunTable.getUserAliyunToken(operator);
     return this.devopsContext.run({ token }, async () => {
-      //通过
-
       const task = async (appReleaseWorkflow) => {
         if (appReleaseWorkflow.status === 'SUCCESS') {
           return;
@@ -60,14 +60,17 @@ export class PublishCallbackService extends BaseDevopsService {
             ? 'SUCCESS'
             : appReleaseWorkflow.status;
         } catch (error) {
-          this.sendFailMsg(appReleaseWorkflow, '测试卡点-通过', operator);
+          this.sendFailMsg(appReleaseWorkflow, {
+            stageName: '测试卡点-通过',
+            operator,
+            title: '测试卡点通过失败',
+          });
         }
         if (appReleaseWorkflow.status === 'SUCCESS') {
           return;
         }
-        if (await this.checkPipelineDetail(appReleaseWorkflow)) {
-          appReleaseWorkflow.status = 'SUCCESS';
-        }
+        appReleaseWorkflow.status =
+          await this.checkPipelineRunStatus(appReleaseWorkflow);
       };
 
       await this.concurrentTask(cardInfo.appReleaseWorkflowList, task);
@@ -85,38 +88,64 @@ export class PublishCallbackService extends BaseDevopsService {
           id: cardInfo.params.operator,
         },
         workflowEnv: cardInfo.params.env,
-        status: '已通过测试卡点',
+
         testUser: cardInfo.testUser,
       };
 
-      if (
-        cardInfo.appReleaseWorkflowList.some(
-          (item) => item.status !== 'SUCCESS',
-        )
-      ) {
-        return {
-          card: ProjectPublishWaitingCard.buildCardMsg({
-            ...card,
-            btnDisabled: false,
-            runId,
-            status: '测试卡点',
-          }),
-          msg: '处理失败',
-        };
-      }
-      return {
-        card: ProjectPublishCard.buildCardJsonMsg(card),
-        msg: '处理成功',
-      };
+      return this.batchHandleResponse(cardInfo, '已通过测试卡点', runId);
     });
+  }
+  private batchHandleResponse(
+    cardInfo: PublishCardInfoType,
+    status: string,
+    runId: string,
+  ) {
+    const card = {
+      content: cardInfo.params.content,
+      links: cardInfo.appReleaseWorkflowList.map((item) => {
+        return {
+          project: item.appName,
+          link: `[${item.appName}（${item.workflowName}）](${item.url})`,
+          status: item.status,
+        };
+      }),
+      operator: {
+        id: cardInfo.params.operator,
+      },
+      workflowEnv: cardInfo.params.env,
+      status,
+      testUser: cardInfo.testUser,
+    };
+    if (
+      cardInfo.appReleaseWorkflowList.some((item) => item.status === 'WAITING')
+    ) {
+      return {
+        card: ProjectPublishWaitingCard.buildCardMsg({
+          ...card,
+          btnDisabled: false,
+          runId,
+          status: '测试卡点',
+        }),
+        msg: '处理失败',
+      };
+    }
+    let msg = '处理成功';
+    if (
+      cardInfo.appReleaseWorkflowList.some((item) =>
+        ['FAIL', 'CANCELED'].includes(item.status),
+      )
+    ) {
+      msg = '处理成功，但部分流水线运行失败或取消，请点击查看详情';
+    }
+    return {
+      card: ProjectPublishCard.buildCardJsonMsg(card),
+      msg,
+    };
   }
   async refusePublish(runId: string, operator: string) {
     const cardInfo = await this.checkPublishInCache(runId);
-    if (!cardInfo) {
-      throw new NotFoundException('发布信息已过期，如需通过请通过链接逐一处理');
-    }
+
     const token = await this.userAliyunTable.getUserAliyunToken(operator);
-    console.log('[ token ] >', token);
     return this.devopsContext.run({ token }, async () => {
       //取消发布
       const task = async (appReleaseWorkflow) => {
@@ -128,53 +157,26 @@ export class PublishCallbackService extends BaseDevopsService {
             await this.devopsApiService.refuseExecuteAppReleaseWorkflow(
               appReleaseWorkflow,
             );
-          console.log('[ res ] >', res);
           appReleaseWorkflow.status = res.success
             ? 'CANCELED'
             : appReleaseWorkflow.status;
         } catch (error) {
-          this.sendFailMsg(appReleaseWorkflow, '测试卡点-拒绝', operator);
+          this.sendFailMsg(appReleaseWorkflow, {
+            stageName: '测试卡点-拒绝',
+            operator,
+            title: '测试卡点拒绝失败',
+          });
         }
+        if (appReleaseWorkflow.status === 'SUCCESS') {
+          return;
+        }
+        appReleaseWorkflow.status =
+          await this.checkPipelineRunStatus(appReleaseWorkflow);
       };
       await this.concurrentTask(cardInfo.appReleaseWorkflowList, task);
       this.setPublishInCache(runId, cardInfo);
 
-      const card = {
-        content: cardInfo.params.content,
-        links: cardInfo.appReleaseWorkflowList.map((item) => {
-          return {
-            project: item.appName,
-            link: `[${item.appName}（${item.workflowName}）](${item.url})`,
-            status: item.status,
-          };
-        }),
-        operator: {
-          id: cardInfo.params.operator,
-        },
-        workflowEnv: cardInfo.params.env,
-        status: '测试拒绝，发布已取消',
-        testUser: cardInfo.testUser,
-      };
-      if (
-        cardInfo.appReleaseWorkflowList.some(
-          (item) => item.status !== 'CANCELED',
-        )
-      ) {
-        return {
-          msg: '处理失败',
-          card: ProjectPublishWaitingCard.buildCardMsg({
-            ...card,
-            btnDisabled: false,
-            runId,
-            status: '测试卡点',
-          }),
-        };
-      }
-
-      return {
-        card: ProjectPublishCard.buildCardJsonMsg(card),
-        msg: '处理成功',
-      };
+      return this.batchHandleResponse(cardInfo, '测试拒绝，发布已取消', runId);
     });
   }
 
@@ -185,7 +187,9 @@ export class PublishCallbackService extends BaseDevopsService {
    * @param pipelineRunId
    * @returns
    */
-  async checkPipelineDetail(appReleaseWorkflow: AppWorkflowPublishType) {
+  async checkPipelineRunStatus(
+    appReleaseWorkflow: AppWorkflowPublishType,
+  ): Promise<PipelineStageType> {
     const res = await this.devopsApiService.getPipelineDetail({
       appName: appReleaseWorkflow.appName,
       releaseWorkflowSn: appReleaseWorkflow.releaseWorkflowSn,
@@ -196,7 +200,7 @@ export class PublishCallbackService extends BaseDevopsService {
 
     if (stages[stages.length - 1].stageInfo.status === 'SUCCESS') {
       appReleaseWorkflow.status = 'SUCCESS';
-      return true;
+      return 'SUCCESS';
     } else {
       const currentStage = stages.find((stage: any) =>
         ['RUNNING', 'WAITING', 'FAIL', 'CANCELED'].includes(
@@ -207,12 +211,10 @@ export class PublishCallbackService extends BaseDevopsService {
         sendExceptionToFeishu(
           new Error('当前未知状态：' + currentStage.stageInfo.status),
         );
-        return true;
+        return currentStage.stageInfo.status;
       }
       appReleaseWorkflow.status = currentStage.stageInfo?.status;
-      if (appReleaseWorkflow.status === 'FAIL') {
-        return false;
-      } else if (appReleaseWorkflow.status === 'WAITING') {
+      if (appReleaseWorkflow.status === 'WAITING') {
         const name = currentStage.stageInfo.jobs.find((job: any) => {
           return job.status === 'WAITING';
         }).name;
@@ -220,12 +222,10 @@ export class PublishCallbackService extends BaseDevopsService {
           '当前运行阶段->' + (name || currentStage.stageInfo.name),
         );
 
-        return false;
-      } else if (appReleaseWorkflow.status === 'CANCELED') {
-        return true;
+        return 'WAITING';
       } else {
         this.logger.info('当前运行阶段->' + currentStage.stageInfo.name);
-        return false;
+        return appReleaseWorkflow.status;
       }
     }
   }
