@@ -14,7 +14,7 @@ import { TenantContext } from '@src/common/service/context/tenant.context';
 @Injectable({ scope: Scope.TRANSIENT })
 class FeishuFileHelper extends FeishuDataApiHelper {
   protected readonly useCache = false;
-  protected readonly ttl = 60 * 60 * 24;
+  protected readonly ttl = 60 * 60;
   constructor(
     @Inject(FEISHU_CLIENT_ID) protected readonly feishuClient: FeishuClient,
     protected readonly userContext: TenantContext,

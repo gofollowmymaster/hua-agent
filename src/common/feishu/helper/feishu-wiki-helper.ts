@@ -120,6 +120,7 @@ class FeishuWikiHelper extends FeishuDataApiHelper {
         hasChild: item.has_child,
         nodeToken: item.node_token,
         parentNodeToken: item.parent_node_token,
+        updateTime: item.obj_edit_time,
         objType: item.obj_type,
         title: item.title,
         uniqueId,

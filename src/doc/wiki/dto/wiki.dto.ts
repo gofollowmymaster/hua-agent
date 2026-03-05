@@ -68,3 +68,45 @@ export class WikiBlackListResponseDto {
   })
   keyword: string;
 }
+
+export enum FeedbackType {
+  Typo = '错别字、拼写错误',
+  Inconsistent = '文档与系统实操不一致',
+  LinkBroken = '链接跳转有问题',
+  DifficultToUnderstand = '文档难以理解',
+  Other = '建议或其他',
+}
+export class WikiFeedbackDto {
+  @ApiProperty({
+    enum: FeedbackType,
+    description: '类型,枚举值： ',
+  })
+  type: FeedbackType;
+  @ApiProperty({
+    type: String,
+    description: '问题描述',
+  })
+  description: string;
+  //images 需要定义为一个文件
+  @ApiPropertyOptional({
+    type: 'string',
+    format: 'binary',
+    description: '文件上传',
+  })
+  images: Express.Multer.File; // 类型可以是 any 或
+  // @ApiPropertyOptional({
+  //   type:  ,
+  //   description: '截图',
+  // })
+  // images: string[];
+  @ApiProperty({
+    type: String,
+    description: '节点ID',
+  })
+  node: string;
+  @ApiProperty({
+    type: String,
+    description: '飞书链接',
+  })
+  feishuUrl: string;
+}

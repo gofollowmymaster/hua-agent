@@ -12,7 +12,6 @@ import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { PublishCardInfoType } from '../../types/devops';
 import { AliDevopsDto } from '../../dto/ali';
 import { AppWorkflowPublishType, PipelineStage } from '../ali-api/interface';
-import { set } from 'lodash-es';
 
 @Injectable()
 export class BaseDevopsService extends BaseService {

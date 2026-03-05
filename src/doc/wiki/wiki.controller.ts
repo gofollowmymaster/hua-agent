@@ -1,11 +1,26 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UploadedFile,
+  UploadedFiles,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 
-import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { WikiService } from './wiki.service';
 import { AuthGuard } from '@src/common/guard/auth';
 import {
   WikiBlackListDto,
   WikiBlackListResponseDto,
+  WikiFeedbackDto,
   WikiSearchDto,
   WikiTreeDto,
 } from './dto/wiki.dto';
@@ -13,6 +28,7 @@ import { SecretAuthGuard } from '@src/common/guard/secret-auth';
 import { NodeConfigService } from '@src/config/node-config.service';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import { AplusResponse, BitTableList } from '@src/type/global';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('wiki相关接口')
 @Controller('wiki')
@@ -98,5 +114,24 @@ export class WikiController {
       params.supplierCode = this.tenantContext.tenant;
     }
     return await this.wikiService.blacklist(params);
+  }
+
+  @ApiOperation({
+    summary: '反馈知识库文档问题',
+    description: '反馈知识库文档问题',
+  })
+  @UseGuards(AuthGuard)
+  @Post('/feedback')
+  @UseInterceptors(FileInterceptor('images'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: WikiFeedbackDto })
+  @ApiOkResponse({
+    type: AplusResponse<boolean>,
+  })
+  async feedback(
+    @UploadedFile() images: Express.Multer.File,
+    @Body() params: WikiFeedbackDto,
+  ) {
+    return await this.wikiService.feedback({ ...params, images });
   }
 }

@@ -117,7 +117,9 @@ export class PublishCallbackService extends BaseDevopsService {
       testUser: cardInfo.testUser,
     };
     if (
-      cardInfo.appReleaseWorkflowList.some((item) => item.status === 'WAITING')
+      cardInfo.appReleaseWorkflowList.some((item) =>
+        ['WAITING', 'RUNNING'].includes(item.status),
+      )
     ) {
       return {
         card: ProjectPublishWaitingCard.buildCardMsg({
@@ -126,7 +128,7 @@ export class PublishCallbackService extends BaseDevopsService {
           runId,
           status: '测试卡点',
         }),
-        msg: '处理失败',
+        msg: '处理中，请稍后',
       };
     }
     let msg = '处理成功';

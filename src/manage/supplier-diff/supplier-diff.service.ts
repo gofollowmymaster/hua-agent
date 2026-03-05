@@ -28,7 +28,7 @@ export class SupplierDiffService {
         },
         {
           field_name: '应用端',
-          operator: 'is',
+          operator: 'contains',
           value: [appCode],
         },
       ],

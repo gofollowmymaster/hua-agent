@@ -6,7 +6,6 @@ import configuration from './config';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
 import { ConfigModule } from '@nestjs/config';
 
-import { WikiModule } from './doc/wiki/wiki.module';
 import { DemoPluginModule } from './demo-plugin/demo-plugin.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AiModule } from './ai/ai.module';
@@ -28,7 +27,7 @@ const modulesAll = [
   RobotModule,
   AiModule,
   AdminModule,
-  WikiModule,
+  DocModule,
   DocModule,
   DemoPluginModule,
   AlertModule,

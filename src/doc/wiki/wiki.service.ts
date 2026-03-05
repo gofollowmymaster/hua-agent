@@ -11,6 +11,7 @@ import {
   BlackListType,
   WikiBlackListDto,
   WikiBlackListResponseDto,
+  WikiFeedbackDto,
   WikiSearchDto,
   WikiTreeDto,
 } from './dto/wiki.dto';
@@ -115,5 +116,11 @@ export class WikiService {
     };
     const res = this.wikiBlackListTable.searchTransformed(params);
     return res;
+  }
+  async feedback(params: WikiFeedbackDto): Promise<boolean> {
+    // 处理用户反馈的知识库文档问题，例如记录到数据库或发送通知等
+    this.logger.info(`Received feedback: ${JSON.stringify(params)}`);
+    // 这里可以添加具体的处理逻辑，例如将反馈保存到数据库或发送邮件通知管理员等
+    return true;
   }
 }
