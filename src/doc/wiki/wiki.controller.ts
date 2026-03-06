@@ -122,7 +122,7 @@ export class WikiController {
   })
   @UseGuards(AuthGuard)
   @Post('/feedback')
-  @UseInterceptors(FileInterceptor('images'))
+  @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: WikiFeedbackDto })
   @ApiOkResponse({

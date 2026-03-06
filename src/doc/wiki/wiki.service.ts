@@ -125,7 +125,7 @@ export class WikiService {
   }
   async feedback(params: WikiFeedbackDto): Promise<boolean> {
     const fileStream = Readable.from(params.image.buffer) as ReadStream;
-
+    console.log('[ ---------bitable_image----------- ] >');
     // 上传飞书
     const res = await this.feishuMediaHelper.upload({
       file_name: params.image.originalname,

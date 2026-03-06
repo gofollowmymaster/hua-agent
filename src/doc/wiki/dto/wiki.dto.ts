@@ -88,7 +88,7 @@ export class WikiFeedbackDto {
     description: '问题描述',
   })
   description: string;
-  //images 需要定义为一个文件
+  //image 需要定义为一个文件
   @ApiPropertyOptional({
     type: 'string',
     format: 'binary',
