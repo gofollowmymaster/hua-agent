@@ -115,6 +115,8 @@ class FeishuWikiHelper extends FeishuDataApiHelper {
     return node.items.map((item) => {
       const str = (parentNode?.title ?? '') + ':' + item.title;
       const uniqueId = createHash('md5').update(str).digest('hex');
+
+      console.log('[ updateTime ] >', item);
       return {
         key: item.node_token,
         hasChild: item.has_child,

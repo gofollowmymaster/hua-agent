@@ -78,10 +78,11 @@ export enum FeedbackType {
 }
 export class WikiFeedbackDto {
   @ApiProperty({
-    enum: FeedbackType,
-    description: '类型,枚举值： ',
+    type: String,
+    description:
+      '类型,枚举值： 错别字、拼写错误，文档与系统实操不一致，链接跳转有问题，文档难以理解，建议或其他 ',
   })
-  type: FeedbackType;
+  type: string;
   @ApiProperty({
     type: String,
     description: '问题描述',

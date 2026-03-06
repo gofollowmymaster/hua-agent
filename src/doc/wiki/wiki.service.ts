@@ -126,10 +126,6 @@ export class WikiService {
   async feedback(params: WikiFeedbackDto): Promise<boolean> {
     const fileStream = Readable.from(params.image.buffer) as ReadStream;
 
-    const extra = JSON.stringify({
-      drive_route_token: this.wikiFeedbackTable.realAppToken,
-    });
-
     // 上传飞书
     const res = await this.feishuMediaHelper.upload({
       file_name: params.image.originalname,
@@ -140,6 +136,7 @@ export class WikiService {
     });
     const userInfo = this.userContext.user;
 
+    params.type = JSON.parse(params.type);
     //保存
     await this.wikiFeedbackTable.create({
       问题描述: params.description,
