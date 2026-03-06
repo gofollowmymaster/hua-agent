@@ -8,12 +8,15 @@ import { NodeConfigService } from '@src/config/node-config.service';
 abstract class FeishuApiHelper {
   protected feishuClient: FeishuClient;
   protected readonly userContext: TenantContext;
-  get client() {
+  protected get client() {
     return this.feishuClient.getClient(
       this.userContext?.tenant || NodeConfigService.get('defaultTenant'),
     );
   }
-  async requestWrapper(handler: () => Promise<any>, requestName: string = '') {
+  protected async requestWrapper(
+    handler: () => Promise<any>,
+    requestName: string = '',
+  ) {
     try {
       const res = await handler();
       const { code, data } = res;

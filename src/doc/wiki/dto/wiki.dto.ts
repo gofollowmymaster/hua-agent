@@ -93,7 +93,7 @@ export class WikiFeedbackDto {
     format: 'binary',
     description: '文件上传',
   })
-  images: Express.Multer.File; // 类型可以是 any 或
+  image: Express.Multer.File; // 类型可以是 any 或
   // @ApiPropertyOptional({
   //   type:  ,
   //   description: '截图',

@@ -129,9 +129,9 @@ export class WikiController {
     type: AplusResponse<boolean>,
   })
   async feedback(
-    @UploadedFile() images: Express.Multer.File,
+    @UploadedFile() image: Express.Multer.File,
     @Body() params: WikiFeedbackDto,
   ) {
-    return await this.wikiService.feedback({ ...params, images });
+    return await this.wikiService.feedback({ ...params, image });
   }
 }

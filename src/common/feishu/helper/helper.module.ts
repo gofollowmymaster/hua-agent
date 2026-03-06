@@ -12,6 +12,7 @@ import FeishuFileHelper from './feishu-file-helper';
 import FeishuAuthHelper from './feishu-auth-helper';
 import FeishuOpenapiHelper from './feishu-openapi-helper';
 import { HttpModule } from '@nestjs/axios';
+import FeishuMediaHelper from './feishu-media-helper';
 
 @Module({})
 export class FeishuHelperModule {
@@ -64,6 +65,10 @@ export class FeishuHelperModule {
           provide: FeishuOpenapiHelper,
           useClass: FeishuOpenapiHelper,
         },
+        {
+          provide: FeishuMediaHelper,
+          useClass: FeishuMediaHelper,
+        },
       ],
       exports: [
         FeishuMessageHelper,
@@ -76,6 +81,7 @@ export class FeishuHelperModule {
         FeishuFileHelper,
         FeishuAuthHelper,
         FeishuOpenapiHelper,
+        FeishuMediaHelper,
       ],
     };
   }

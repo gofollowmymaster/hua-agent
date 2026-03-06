@@ -25,6 +25,10 @@ import { Queue } from 'bullmq';
 import { BitTableList } from '@src/type/global';
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import { TenantContext } from '@src/common/service/context/tenant.context';
+import FeishuMediaHelper from '@src/common/feishu/helper/feishu-media-helper';
+import WikiFeedbackTable from '../common/table/feedback';
+import { Readable } from 'stream';
+import { ReadStream } from 'fs';
 
 @Injectable()
 export class WikiService {
@@ -35,7 +39,9 @@ export class WikiService {
     private readonly logger: LoggerService,
     private wikiDirectoryService: WikiDirectoryService,
     private readonly redisService: RedisService,
+    private readonly feishuMediaHelper: FeishuMediaHelper,
     private readonly wikiBlackListTable: WikiBlackListTable,
+    private readonly wikiFeedbackTable: WikiFeedbackTable,
     protected readonly userContext: TenantContext,
 
     @InjectQueue('check-document') private checkDocumentQueue: Queue,
@@ -118,9 +124,33 @@ export class WikiService {
     return res;
   }
   async feedback(params: WikiFeedbackDto): Promise<boolean> {
-    // 处理用户反馈的知识库文档问题，例如记录到数据库或发送通知等
-    this.logger.info(`Received feedback: ${JSON.stringify(params)}`);
-    // 这里可以添加具体的处理逻辑，例如将反馈保存到数据库或发送邮件通知管理员等
+    const fileStream = Readable.from(params.image.buffer) as ReadStream;
+
+    const extra = JSON.stringify({
+      drive_route_token: this.wikiFeedbackTable.realAppToken,
+    });
+
+    // 上传飞书
+    const res = await this.feishuMediaHelper.upload({
+      file_name: params.image.originalname,
+      file: fileStream,
+      size: params.image.size,
+      parent_node: this.wikiFeedbackTable.realAppToken,
+      parent_type: 'bitable_image',
+    });
+    const userInfo = this.userContext.user;
+
+    //保存
+    await this.wikiFeedbackTable.create({
+      问题描述: params.description,
+      链接: params.feishuUrl,
+      问题类别: params.type,
+      截图: [res],
+      'wiki-Token': params.node,
+      服务商: userInfo.supplierName,
+      供应商: userInfo.tenantName,
+      用户: userInfo.username,
+    });
     return true;
   }
 }

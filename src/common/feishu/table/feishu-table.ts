@@ -30,6 +30,16 @@ abstract class FeishuTable {
       ttl: this.ttl,
     });
   }
+  get realAppToken() {
+    this.setTableOption();
+
+    return this.tableHelper.appToken;
+  }
+  get realTableId() {
+    this.setTableOption();
+
+    return this.tableHelper.tableId;
+  }
   flatItemField(data: BitTableDataList[0]) {
     const res = {
       id: data.record_id,

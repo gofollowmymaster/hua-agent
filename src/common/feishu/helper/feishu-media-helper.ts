@@ -24,13 +24,9 @@ class FeishuMediaHelper extends FeishuDataApiHelper {
   async upload(
     data: FeishuMediaDeleteParams,
   ): Promise<FeishuMediaDeleteReturn> {
-    return await this.requestWrapper(
-      () =>
-        this.client.drive.v1.media.uploadAll({
-          data,
-        }),
-      'uploadMedia',
-    );
+    return await this.client.drive.v1.media.uploadAll({
+      data,
+    });
   }
 }
 
