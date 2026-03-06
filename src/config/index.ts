@@ -51,6 +51,11 @@ const globalConfig: GlobalConfigType = Object.freeze({
       appId: 'cli_a86495e1f4fa500b',
       appSecret: 'YkaB6aMhGbvurRFyWOymqhpXoQw5BiM8',
     },
+    //导航
+    AplusNavClient: {
+      appId: 'cli_a9f22e5f0d39dced',
+      appSecret: 'RNNA54hq3hM8fOqZrSDzIrBRXK1BF3tI',
+    },
   },
 
   //服务商特性配置

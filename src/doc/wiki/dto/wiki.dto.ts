@@ -91,14 +91,10 @@ export class WikiFeedbackDto {
   @ApiPropertyOptional({
     type: 'string',
     format: 'binary',
-    description: '文件上传',
+    description: '截图',
   })
   image: Express.Multer.File; // 类型可以是 any 或
-  // @ApiPropertyOptional({
-  //   type:  ,
-  //   description: '截图',
-  // })
-  // images: string[];
+
   @ApiProperty({
     type: String,
     description: '节点ID',

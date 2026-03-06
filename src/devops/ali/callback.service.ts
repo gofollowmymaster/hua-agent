@@ -60,6 +60,7 @@ export class PublishCallbackService extends BaseDevopsService {
             ? 'SUCCESS'
             : appReleaseWorkflow.status;
         } catch (error) {
+          console.log('[ passExecuteAppReleaseWorkflow error ] >', error);
           this.sendFailMsg(appReleaseWorkflow, {
             stageName: '测试卡点-通过',
             operator,
@@ -75,22 +76,6 @@ export class PublishCallbackService extends BaseDevopsService {
 
       await this.concurrentTask(cardInfo.appReleaseWorkflowList, task);
       this.setPublishInCache(runId, cardInfo);
-      const card = {
-        content: cardInfo.params.content,
-        links: cardInfo.appReleaseWorkflowList.map((item) => {
-          return {
-            project: item.appName,
-            link: `[${item.appName}（${item.workflowName}）](${item.url})`,
-            status: item.status,
-          };
-        }),
-        operator: {
-          id: cardInfo.params.operator,
-        },
-        workflowEnv: cardInfo.params.env,
-
-        testUser: cardInfo.testUser,
-      };
 
       return this.batchHandleResponse(cardInfo, '已通过测试卡点', runId);
     });
@@ -163,6 +148,8 @@ export class PublishCallbackService extends BaseDevopsService {
             ? 'CANCELED'
             : appReleaseWorkflow.status;
         } catch (error) {
+          console.log('[ refuseExecuteAppReleaseWorkflow error ] >', error);
+
           this.sendFailMsg(appReleaseWorkflow, {
             stageName: '测试卡点-拒绝',
             operator,
