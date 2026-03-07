@@ -25,7 +25,7 @@ export class WikiSearchDto {
     description: '搜索关键词',
   })
   query: string;
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: String,
     description: '子节点Id',
   })
@@ -39,7 +39,6 @@ export enum BlackListType {
 export class WikiBlackListDto {
   @ApiProperty({
     type: Array<BlackListType>,
-
     description: '类型,枚举值：文本，链接',
   })
   type: Array<BlackListType>;

@@ -34,12 +34,12 @@ import { ReadStream } from 'fs';
 export class WikiService {
   private readonly redis: Redis;
   private readonly feishuWikiHelper: FeishuWikiHelper;
+  private readonly feishuMediaHelper: FeishuMediaHelper;
 
   constructor(
     private readonly logger: LoggerService,
     private wikiDirectoryService: WikiDirectoryService,
     private readonly redisService: RedisService,
-    private readonly feishuMediaHelper: FeishuMediaHelper,
     private readonly wikiBlackListTable: WikiBlackListTable,
     private readonly wikiFeedbackTable: WikiFeedbackTable,
     protected readonly userContext: TenantContext,
@@ -49,6 +49,13 @@ export class WikiService {
     this.redis = redisService.getClient();
     this.feishuWikiHelper = new FeishuWikiHelper(
       ClientFactory.create(FeishuApp.AilyAplusClient),
+      userContext,
+      redisService,
+    );
+
+    //反馈功能统一使用一个Aplus的多为表格
+    this.feishuMediaHelper = new FeishuMediaHelper(
+      ClientFactory.create(FeishuApp.AlertClient),
       userContext,
       redisService,
     );
@@ -135,7 +142,7 @@ export class WikiService {
       parent_type: 'bitable_image',
     });
     const userInfo = this.userContext.user;
-
+    console.log('[ userInfo ] >', userInfo);
     params.type = JSON.parse(params.type);
     //保存
     await this.wikiFeedbackTable.create({

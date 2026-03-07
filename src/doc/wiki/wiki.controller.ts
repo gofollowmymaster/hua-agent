@@ -82,7 +82,7 @@ export class WikiController {
     summary: '按关键词搜索知识空间',
     description: '按关键词搜索知识空间',
   })
-  @UseGuards(SecretAuthGuard)
+  @UseGuards(AuthGuard)
   @Post('/search')
   @ApiBody({ type: WikiSearchDto })
   async search(@Body() params: WikiSearchDto) {
