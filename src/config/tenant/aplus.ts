@@ -7,9 +7,9 @@ const aplusConfig: TenantConfig = {
   //wiki黑名单检测通知人
   WikiBlackListCheckoutUserId: '762a5468',
   robots: {
-    XiaoAClient: {
-      appId: 'cli_a7b9fe27a3f8d00e',
-      appSecret: 'I7EAE1RyP9ClVfee2btuidKZarf8JHez',
+    WikiClient: {
+      appId: 'cli_a9243e8665781cb2',
+      appSecret: 'gNxYxMs6njDh91RSi5AcSeKcWnzJVzcu',
     },
     AuthClient: {
       appId: 'cli_a6d55e522f71900e',

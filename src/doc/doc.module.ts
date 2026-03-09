@@ -21,7 +21,7 @@ import WikiFeedbackTable from './common/table/feedback';
 
 @Module({
   imports: [
-    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.XiaoAClient)),
+    FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.WikiClient)),
     BullModule.forRoot({
       connection: {
         host: configuration['DB_REDIS_HOST'], // 你的 Redis 服务器地址

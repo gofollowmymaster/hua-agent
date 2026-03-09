@@ -13,7 +13,7 @@ const boatConfig: TenantConfig = {
   },
 
   robots: {
-    XiaoAClient: {
+    WikiClient: {
       appId: 'cli_a85a4dc1c9259013',
       appSecret: 'wmea3GufO6ADkITtv0CjkexcZmpCAsWi',
     },

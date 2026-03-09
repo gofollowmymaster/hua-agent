@@ -8,9 +8,9 @@ const yurexConfig: TenantConfig = {
   WikiBlackListCheckoutUserId: '762a5468',
   feishuTables: {},
   robots: {
-    XiaoAClient: {
-      appId: 'cli_a7b9fe27a3f8d00e',
-      appSecret: 'I7EAE1RyP9ClVfee2btuidKZarf8JHez',
+    WikiClient: {
+      appId: 'cli_a9243e8665781cb2',
+      appSecret: 'gNxYxMs6njDh91RSi5AcSeKcWnzJVzcu',
     },
     AilyAplusClient: {
       appId: process.env.FEISHU_AILY_APP_ID_APLUS,

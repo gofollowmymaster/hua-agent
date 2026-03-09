@@ -6,6 +6,7 @@ import FeishuClient from './client';
 import AuthClient from './auth-client';
 import XiaoLClient from './xiao-l-client';
 import AplusNavClient from './nav-client';
+import WikiClient from './wiki-client';
 export const feishuAppClients = {
   AlertClient,
   XiaoAClient,
@@ -14,6 +15,7 @@ export const feishuAppClients = {
   XiaoLClient,
   AiHelperClient,
   AplusNavClient,
+  WikiClient,
 };
 export enum FeishuApp {
   AlertClient = 'AlertClient',
@@ -23,6 +25,7 @@ export enum FeishuApp {
   AilyAplusClient = 'AilyAplusClient',
   AuthClient = 'AuthClient',
   AplusNavClient = 'AplusNavClient',
+  WikiClient = 'WikiClient',
 }
 
 export type FeishuAppClientsType = keyof typeof feishuAppClients;

@@ -36,6 +36,10 @@ const globalConfig: GlobalConfigType = Object.freeze({
   },
 
   robots: {
+    XiaoAClient: {
+      appId: 'cli_a7b9fe27a3f8d00e',
+      appSecret: 'I7EAE1RyP9ClVfee2btuidKZarf8JHez',
+    },
     //前端助手
     AiHelperClient: {
       appId: process.env.FEISHU_AILY_ALERT_APP_ID,
