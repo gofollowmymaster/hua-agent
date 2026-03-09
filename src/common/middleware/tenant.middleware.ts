@@ -44,7 +44,7 @@ export class TenantMiddleware implements NestMiddleware {
   }
   async use(req: Request, _res: Response, next: NextFunction) {
     // 从不同来源获取租户ID
-    let user;
+    let user: UserContext;
 
     try {
       user = await this.extractTokenFromHeader(req);
@@ -77,7 +77,11 @@ export class TenantMiddleware implements NestMiddleware {
         logger.warn(
           `非法请求 请求开始【${req.method} - ${req.originalUrl}】 请求头:【${JSON.stringify(req.headers)}】请求体参数:【${JSON.stringify(req.body)}】 `,
         );
-        sendExceptionToFeishu(new BadRequestException('非法请求'));
+        sendExceptionToFeishu(
+          new BadRequestException(
+            `非法请求，源自${host}的请求，携带的Token服务商为${user.supplierName}`,
+          ),
+        );
       }
       next();
     });

@@ -154,6 +154,9 @@ export class WikiService {
       服务商: userInfo.supplierName,
       供应商: userInfo.tenantName,
       用户: userInfo.username,
+      服务商Code: userInfo.supplierCode,
+      供应商Code: userInfo.tenantCode,
+      用户Code: userInfo.userCode,
     });
     return true;
   }
