@@ -32,6 +32,8 @@ export default class FixedTokenService extends BaseSchedule {
   }
 
   async handle(tenantInfo: TenantContextType) {
+    if (process.env.NODE_ENV === 'test' && tenantInfo.user.supplierCode === 'C')
+      return;
     this.loadToken(tenantInfo);
   }
   async loadToken(tenantInfo: TenantContextType) {

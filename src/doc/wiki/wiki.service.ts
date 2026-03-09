@@ -157,6 +157,7 @@ export class WikiService {
       服务商Code: userInfo.supplierCode,
       供应商Code: userInfo.tenantCode,
       用户Code: userInfo.userCode,
+      环境: process.env.NODE_ENV,
     });
     return true;
   }
