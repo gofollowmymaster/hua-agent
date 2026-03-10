@@ -131,25 +131,30 @@ export class WikiService {
     return res;
   }
   async feedback(params: WikiFeedbackDto): Promise<boolean> {
-    const fileStream = Readable.from(params.image.buffer) as ReadStream;
-    console.log('[ ---------bitable_image----------- ] >');
-    // 上传飞书
-    const res = await this.feishuMediaHelper.upload({
-      file_name: params.image.originalname,
-      file: fileStream,
-      size: params.image.size,
-      parent_node: this.wikiFeedbackTable.realAppToken,
-      parent_type: 'bitable_image',
-    });
+    let file: {
+      file_token?: string;
+    };
+    if (params.image?.buffer) {
+      const fileStream = Readable.from(params.image.buffer) as ReadStream;
+      console.log('[ ---------bitable_image----------- ] >');
+      // 上传飞书
+      file = await this.feishuMediaHelper.upload({
+        file_name: params.image.originalname,
+        file: fileStream,
+        size: params.image.size,
+        parent_node: this.wikiFeedbackTable.realAppToken,
+        parent_type: 'bitable_image',
+      });
+    }
+
     const userInfo = this.userContext.user;
-    console.log('[ userInfo ] >', userInfo);
     params.type = JSON.parse(params.type);
     //保存
     await this.wikiFeedbackTable.create({
       问题描述: params.description,
       链接: params.feishuUrl,
       问题类别: params.type,
-      截图: [res],
+      截图: file ? [file] : [],
       'wiki-Token': params.node,
       服务商: userInfo.supplierName,
       供应商: userInfo.tenantName,
