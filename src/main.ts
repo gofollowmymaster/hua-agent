@@ -44,6 +44,8 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       stopAtFirstError: true,
+      transform: true,
+      disableErrorMessages: process.env.NODE_ENV == 'production' ? true : false,
     }),
   );
   // 增加请求体大小限制

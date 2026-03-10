@@ -1,5 +1,14 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { tenantCodeMap } from '@src/config/tenant';
+import { JsonTypeValidator } from '@src/doc/common/validator/json-type';
+import {
+  IsString,
+  IsNotEmpty,
+  IsUrl,
+  ValidateIf,
+  IsJSON,
+  Validate,
+} from 'class-validator';
 
 export class WikiTreeDto {
   @ApiProperty({
@@ -75,17 +84,25 @@ export enum FeedbackType {
   DifficultToUnderstand = '文档难以理解',
   Other = '建议或其他',
 }
+
 export class WikiFeedbackDto {
   @ApiProperty({
     type: String,
     description:
       '类型,枚举值： 错别字、拼写错误，文档与系统实操不一致，链接跳转有问题，文档难以理解，建议或其他 ',
+    example: ['错别字、拼写错误', '文档难以理解'],
+    pattern: '^\\[.*\\]$',
+  })
+  @IsJSON({ message: 'type必须是有效的JSON字符串' })
+  @Validate(JsonTypeValidator, {
+    message: 'type必须是包含有效反馈类型的JSON数组',
   })
   type: string;
   @ApiProperty({
     type: String,
     description: '问题描述',
   })
+  @IsNotEmpty({ message: '问题描述不能为空' })
   description: string;
   //image 需要定义为一个文件
   @ApiPropertyOptional({
@@ -93,16 +110,27 @@ export class WikiFeedbackDto {
     format: 'binary',
     description: '截图',
   })
+  @ValidateIf((o) => o.image !== undefined)
   image: Express.Multer.File; // 类型可以是 any 或
 
   @ApiProperty({
     type: String,
     description: '节点ID',
   })
+  @IsNotEmpty({ message: '节点ID不能为空' })
   node: string;
   @ApiProperty({
     type: String,
     description: '飞书链接',
   })
+  @IsString({ message: '飞书链接必须是字符串' })
+  @IsNotEmpty({ message: '飞书链接不能为空' })
+  @IsUrl(
+    {
+      protocols: ['https'],
+      require_protocol: true,
+    },
+    { message: '请输入有效的飞书链接' },
+  )
   feishuUrl: string;
 }
