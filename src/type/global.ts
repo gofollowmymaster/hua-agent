@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { TenantCode } from '@src/config/tenant';
 
-export class AplusResponse<T> {
+export class AplusResponse<T = Record<string, any>> {
   @ApiProperty({
     type: Number,
     description: '返回码',
@@ -18,7 +18,7 @@ export class AplusResponse<T> {
   })
   body: T;
 }
-export class BitTableList<T> {
+export class BitTableList<T = any[]> {
   @ApiProperty({
     type: Number,
     description: '总计',

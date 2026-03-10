@@ -9,6 +9,7 @@ import {
   IsJSON,
   Validate,
 } from 'class-validator';
+import { AplusResponse, BitTableList } from '@src/type/global';
 
 export class WikiTreeDto {
   @ApiProperty({
@@ -133,4 +134,47 @@ export class WikiFeedbackDto {
     { message: '请输入有效的飞书链接' },
   )
   feishuUrl: string;
+}
+
+/**
+ * 响应 DTO 类
+ * 使用具体的响应类而不是泛型，以便 Swagger/Apifox 能够完整解析响应结构
+ */
+
+export class AplusResponseWikiFeedback extends AplusResponse<boolean> {
+  @ApiProperty({
+    type: Number,
+    example: 200,
+    description: '返回码',
+  })
+  code: number;
+
+  @ApiProperty({
+    type: String,
+    example: 'success',
+    description: '返回信息',
+  })
+  message: string;
+
+  @ApiProperty({
+    type: Boolean,
+    example: true,
+    description: '返回数据',
+  })
+  body: boolean;
+}
+
+export class WikiBlackListResponseListDto extends BitTableList {
+  @ApiProperty({
+    type: [WikiBlackListResponseDto],
+    description: '列表',
+  })
+  list: WikiBlackListResponseDto[];
+}
+export class AplusResponseWikiBlackListList extends AplusResponse {
+  @ApiProperty({
+    type: WikiBlackListResponseListDto,
+    description: '数据',
+  })
+  body: WikiBlackListResponseListDto;
 }

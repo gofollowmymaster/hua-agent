@@ -3,7 +3,6 @@ import {
   Controller,
   Post,
   UploadedFile,
-  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -19,15 +18,15 @@ import { WikiService } from './wiki.service';
 import { AuthGuard } from '@src/common/guard/auth';
 import {
   WikiBlackListDto,
-  WikiBlackListResponseDto,
   WikiFeedbackDto,
   WikiSearchDto,
   WikiTreeDto,
+  AplusResponseWikiFeedback,
+  AplusResponseWikiBlackListList,
 } from './dto/wiki.dto';
 import { SecretAuthGuard } from '@src/common/guard/secret-auth';
 import { NodeConfigService } from '@src/config/node-config.service';
 import { TenantContext } from '@src/common/service/context/tenant.context';
-import { AplusResponse, BitTableList } from '@src/type/global';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('wiki相关接口')
@@ -107,7 +106,7 @@ export class WikiController {
   @Post('/blacklist')
   @ApiBody({ type: WikiBlackListDto })
   @ApiOkResponse({
-    type: AplusResponse<BitTableList<WikiBlackListResponseDto>>,
+    type: AplusResponseWikiBlackListList,
   })
   async blacklist(@Body() params: WikiBlackListDto) {
     if (!params.supplierCode) {
@@ -126,7 +125,7 @@ export class WikiController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: WikiFeedbackDto })
   @ApiOkResponse({
-    type: AplusResponse<boolean>,
+    type: AplusResponseWikiFeedback,
   })
   async feedback(
     @UploadedFile() image: Express.Multer.File,
