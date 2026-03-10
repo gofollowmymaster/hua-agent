@@ -46,8 +46,11 @@ export class PublishCallbackService extends BaseDevopsService {
 
     const token = await this.userAliyunTable.getUserAliyunToken(operator);
     return this.devopsContext.run({ token }, async () => {
-      const task = async (appReleaseWorkflow) => {
-        if (appReleaseWorkflow.status === 'SUCCESS') {
+      const task = async (appReleaseWorkflow: AppWorkflowPublishType) => {
+        //流水线生命周期已经结束
+        if (
+          ['SUCCESS', 'FAIL', 'CANCELED'].includes(appReleaseWorkflow.status)
+        ) {
           return;
         }
         try {
@@ -60,14 +63,21 @@ export class PublishCallbackService extends BaseDevopsService {
             ? 'SUCCESS'
             : appReleaseWorkflow.status;
         } catch (error) {
-          console.log('[ passExecuteAppReleaseWorkflow error ] >', error);
+          console.log(
+            '[ passExecuteAppReleaseWorkflow error ] >',
+            error.status,
+            error.data,
+          );
           this.sendFailMsg(appReleaseWorkflow, {
             stageName: '测试卡点-通过',
             operator,
             title: '测试卡点通过失败',
           });
+          return;
         }
-        if (appReleaseWorkflow.status === 'SUCCESS') {
+        if (
+          ['SUCCESS', 'FAIL', 'CANCELED'].includes(appReleaseWorkflow.status)
+        ) {
           return;
         }
         appReleaseWorkflow.status =
