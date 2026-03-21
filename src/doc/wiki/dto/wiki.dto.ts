@@ -18,7 +18,7 @@ export class WikiTreeDto {
   })
   spaceId: string;
   @ApiProperty({
-    type: String,
+    type: Boolean,
     description: '是否强制刷新数据（不使用缓存）',
   })
   force: boolean;

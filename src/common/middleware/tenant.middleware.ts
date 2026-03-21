@@ -72,7 +72,8 @@ export class TenantMiddleware implements NestMiddleware {
       if (
         process.env.NODE_ENV !== 'dev' &&
         host.indexOf(hostTag) == -1 &&
-        user.supplierCode
+        user.supplierCode &&
+        !(req.headers['ignore-supplier-check'] == 'true')
       ) {
         logger.warn(
           `非法请求 请求开始【${req.method} - ${req.originalUrl}】 请求头:【${JSON.stringify(req.headers)}】请求体参数:【${JSON.stringify(req.body)}】 `,

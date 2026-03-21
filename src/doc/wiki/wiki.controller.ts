@@ -25,6 +25,7 @@ import {
   AplusResponseWikiBlackListList,
 } from './dto/wiki.dto';
 import { SecretAuthGuard } from '@src/common/guard/secret-auth';
+import { CompositeAuthOrSecretGuard } from '@src/common/guard/composite-auth';
 import { NodeConfigService } from '@src/config/node-config.service';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -102,7 +103,7 @@ export class WikiController {
     summary: '获取链接黑名单列表',
     description: '获取链接黑名单列表',
   })
-  @UseGuards(AuthGuard)
+  @UseGuards(CompositeAuthOrSecretGuard)
   @Post('/blacklist')
   @ApiBody({ type: WikiBlackListDto })
   @ApiOkResponse({

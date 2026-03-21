@@ -18,6 +18,7 @@ import { DiscardMiddleware } from './common/middleware/discard.middleware';
 import { DevopsModule } from './devops/devops.module';
 import { GlobalServiceModule } from './common/service/service.module';
 import { GlobalExceptionHandlerModule } from './common/filter/global-exception-handler/global-exception.module';
+import { GuardModule } from './common/guard/guard.module';
 import { ManageModule } from './manage/manage.module';
 import { DocModule } from './doc/doc.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
@@ -58,6 +59,7 @@ const modulesAll = [
     }),
     ScheduleModule.forRoot(),
     GlobalExceptionHandlerModule,
+    GuardModule,
     ...modulesAll,
   ],
 })

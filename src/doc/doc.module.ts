@@ -18,6 +18,7 @@ import { WikiAlertFeishuAdapter } from './common/processor/alert-feishu.adapter'
 import { HttpModule } from '@nestjs/axios';
 import WikiSensitiveWordsCheckService from './common/schedule/wiki-sensitive-words-check';
 import WikiFeedbackTable from './common/table/feedback';
+import { GuardModule } from '@src/common/guard/guard.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import WikiFeedbackTable from './common/table/feedback';
       },
     }),
     HttpModule,
+    GuardModule,
   ],
 
   controllers: [WikiController],
