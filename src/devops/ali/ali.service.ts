@@ -52,7 +52,7 @@ export class AliService extends BaseDevopsService {
       this.devopsApiService.executeAppReleaseWorkflow,
       1000 * 60,
       devopsApiService,
-      ['params'],
+      [0],
     );
   }
 

@@ -47,7 +47,7 @@ type HandleType = (
   handle: (...params) => any,
   wait: number,
   thisObj: any,
-  throttleParamKeys?: string[],
+  throttleParamKeys?: (string | number)[],
 ) => any;
 export const throttleByParams: HandleType = (
   handle,
@@ -63,6 +63,7 @@ export const throttleByParams: HandleType = (
       : params;
 
     const timerKey = JSON.stringify(throttleParams);
+    console.log('[ timerKey ] >', timerKey);
     const timer = timerContainer[timerKey];
 
     return new Promise((resolve, reject) => {
