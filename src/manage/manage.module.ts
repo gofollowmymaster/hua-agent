@@ -6,13 +6,20 @@ import { FeishuHelperModule } from '@src/common/feishu/helper/helper.module';
 
 import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import SupplierDiffTable from './common/table/supplier-diff.table';
+import { SensitiveWordController } from './sensitive-word/sensitive-word.controller';
+import { SensitiveWordService } from './sensitive-word/sensitive-word.service';
 
 @Module({
   imports: [
     FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.XiaoAClient)),
   ],
-  controllers: [SupplierDiffController],
-  providers: [SupplierDiffService, LoggerService, SupplierDiffTable],
-  exports: [SupplierDiffService],
+  controllers: [SupplierDiffController, SensitiveWordController],
+  providers: [
+    SupplierDiffService,
+    SensitiveWordService,
+    LoggerService,
+    SupplierDiffTable,
+  ],
+  exports: [SupplierDiffService, SensitiveWordService],
 })
 export class ManageModule {}

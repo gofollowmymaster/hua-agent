@@ -54,9 +54,14 @@ export class WikiBlackListDto {
   type: Array<BlackListType>;
   @ApiPropertyOptional({
     enum: tenantCodeMap,
-    description: '服务商',
+    description: '服务商，默认Token的服务商',
   })
   supplierCode: tenantCodeMap;
+  @ApiPropertyOptional({
+    enum: [true, false],
+    description: '是否启用',
+  })
+  status: boolean;
 }
 export class WikiBlackListResponseDto {
   @ApiProperty({ example: 1, description: 'ID' })

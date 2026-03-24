@@ -1,21 +1,8 @@
 import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger';
 import type { records } from '../../common/utils/actionTable/interface';
 import { FeishuMsgType, ReceiveIdType } from '@src/common/feishu/type/im';
-import { FeishuApp, FeishuAppClientsType } from '@src/common/feishu/clients';
-/**
- * 
-  参考一下数据帮我生成一个包含支持nestjs/swagger的类{
-    "sender": "Ollie.liu",
-    "messageType": "GROUP",
-    "keyword": "--",
-    "preKeywordContent": "",
-    "createTime": "2024/11/16 12:17",
-    "originalContent": "123",
-    "content": "@小A 123",
-    "replyContent": "",
-    "bacKeywordContent": "--"
-}
- */
+import { FeishuApp } from '@src/common/feishu/clients';
+
 export class MessageFromRobotDto {
   @ApiProperty({
     type: Number,
@@ -135,6 +122,36 @@ export class FeishuMessageSenderDto {
     description: 'uuid',
   })
   uuid?: string;
+  @ApiPropertyOptional({
+    enum: ReceiveIdType,
+    default: ReceiveIdType.ChatId,
+    description: '接收对象类型',
+  })
+  receive_id_type?: ReceiveIdType;
+}
+
+export class FeishuCardMessageSenderDto {
+  @ApiProperty({
+    type: String,
+    description: '接受对象ID',
+  })
+  receive_id: string;
+  @ApiProperty({
+    type: String,
+    description: '消息内容,富文本格式',
+  })
+  content: string;
+  @ApiProperty({
+    type: String,
+    description: '消息标题',
+  })
+  title: string;
+  @ApiProperty({
+    type: String,
+    description: '卡片颜色',
+  })
+  bgColor: string;
+
   @ApiPropertyOptional({
     enum: ReceiveIdType,
     default: ReceiveIdType.ChatId,

@@ -6,7 +6,8 @@ import { TenantContext } from '@src/common/service/context/tenant.context';
 import { RedisService } from '@src/common/service/redis/redis.service';
 @Injectable()
 class WikiBlackListTable extends FeishuTable {
-  protected useCache = false;
+  protected useCache = true;
+  protected ttl = 60 * 5;
   readonly tableHelper: FeishuTableHelper;
   constructor(
     protected readonly userContext: TenantContext,

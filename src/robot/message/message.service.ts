@@ -3,12 +3,13 @@ import {
   MessageFromRobotDto,
   FeishuMessageSenderDto,
   FeishuTicketDto,
+  FeishuCardMessageSenderDto,
 } from './post-message-from-robot.dto';
 
 import { FeishuSenseService } from './logic/feishu.sense.service';
 import { removeAtXiaoA } from './logic';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
-import { ReceiveIdType } from '@src/common/feishu/type/im';
+import { FeishuMsgType, ReceiveIdType } from '@src/common/feishu/type/im';
 import { HttpService } from '@nestjs/axios';
 import { ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@src/common/guard/auth';
@@ -17,6 +18,7 @@ import { TableHeaderType } from '../dto/table-action.dto';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import FeishuOpenapiHelper from '@src/common/feishu/helper/feishu-openapi-helper';
+import TipCard from '@src/common/feishu/card/tip-card';
 @Injectable()
 export class MessageService {
   private readonly redis: Redis;
@@ -82,6 +84,19 @@ export class MessageService {
       receive_id: params.receive_id,
       msg_type: params.msg_type,
       content: params.content,
+    });
+  }
+
+  async sendFeishuCardMessage(params: FeishuCardMessageSenderDto) {
+    const content = TipCard.buildCardMsg({
+      title: params.title,
+      bgColor: params.bgColor,
+      content: params.content,
+    });
+    return this.sendFeishuMessage({
+      ...params,
+      msg_type: FeishuMsgType.Interactive,
+      content,
     });
   }
 

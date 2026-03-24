@@ -1,3 +1,5 @@
+import { pick } from 'lodash';
+
 /**
  * 添加执行任务可重试多次直到执行成功
  * @param handler
@@ -45,12 +47,22 @@ type HandleType = (
   handle: (...params) => any,
   wait: number,
   thisObj: any,
+  throttleParamKeys?: string[],
 ) => any;
-export const throttleByParams: HandleType = (handle, wait, thisObj) => {
+export const throttleByParams: HandleType = (
+  handle,
+  wait,
+  thisObj,
+  throttleParamKeys,
+) => {
   handle = handle.bind(thisObj);
   const timerContainer = {};
   return (...params) => {
-    const timerKey = JSON.stringify(params);
+    const throttleParams = throttleParamKeys.length
+      ? pick(params, throttleParamKeys)
+      : params;
+
+    const timerKey = JSON.stringify(throttleParams);
     const timer = timerContainer[timerKey];
 
     return new Promise((resolve, reject) => {

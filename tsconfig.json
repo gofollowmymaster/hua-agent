@@ -30,7 +30,7 @@
     "scripts/**/*.ts",
     "type/**/*.ts",
     "ecosystem.config.js",
-    "src/manage/supplier-diff/supplier-diff.service.ts"
+    "src/manage/supplier-diff/sensitive-word.service.ts"
   ],
   "exclude": ["node_modules", "dist"]
 }

@@ -98,6 +98,7 @@ export class WikiService {
     const { list: blackList } = await this.blacklist({
       type: [BlackListType.text],
       supplierCode: this.userContext.tenant,
+      status: true,
     });
 
     await this.checkDocumentQueue.add('checkDocument', {

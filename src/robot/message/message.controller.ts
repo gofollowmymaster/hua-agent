@@ -1,6 +1,7 @@
 import { Body, Controller, Post, Headers } from '@nestjs/common';
 import { MessageService } from './message.service';
 import {
+  FeishuCardMessageSenderDto,
   FeishuMessageSenderDto,
   FeishuTicketDto,
   MessageFromRobotDto,
@@ -9,7 +10,7 @@ import {
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { records } from '@src/common/utils/actionTable/interface';
 import { AplusResponse } from '@src/type/global';
-@ApiTags('飞书机器人快捷操作')
+@ApiTags('飞书机器人消息快捷操作')
 @Controller('robot')
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
@@ -45,6 +46,23 @@ export class MessageController {
   @Post('sendFeishuMessage')
   async sendFeishuMessage(@Body() MessageFromRobot: FeishuMessageSenderDto) {
     const res = await this.messageService.sendFeishuMessage(MessageFromRobot);
+    return res;
+  }
+
+  //通用发送飞书卡片消息
+  @ApiOperation({
+    summary: '通用发送飞书卡片消息',
+    description:
+      '通用发送通用卡片消息到任何群或个人,消息体需遵循飞书消息富文本格式，具体参见文档:https://open.feishu.cn/document/feishu-cards/feishu-card-cardkit/components/markdown',
+  })
+  @ApiBody({ type: FeishuCardMessageSenderDto })
+  @ApiOkResponse({ type: AplusResponse<records> })
+  @Post('sendFeishuCardMessage')
+  async sendFeishuCardMessage(
+    @Body() MessageFromRobot: FeishuCardMessageSenderDto,
+  ) {
+    const res =
+      await this.messageService.sendFeishuCardMessage(MessageFromRobot);
     return res;
   }
 
