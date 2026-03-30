@@ -13,27 +13,27 @@ export class SensitiveWordService {
     version: '1.0.0',
     platforms: [
       {
-        id: 'aplus',
-        name: 'aplus',
-        words: [] as string[],
-      },
-      {
         id: 'boat',
         name: '云舟',
         words: [] as string[],
-        domains: ['*.test-com.elnkpro.com', '*.uat-cb.clouboat.com'],
+        domains: ['*.test-com.elnkpro.com', '*.clouboat.com'],
       },
       {
         id: 'yurex',
         name: 'yurex',
         words: [] as string[],
-        domains: ['*.uat.yurexcc.com'],
+        domains: ['*.yurexcc.com'],
       },
       {
         id: '袋鼠云',
         name: '袋鼠云',
         words: [] as string[],
-        domains: ['*.test-xw.elnkpro.com', '*.uat.elnkpro.com'],
+        domains: [
+          'dev-v2.elnkpro.com',
+          '*.test-xw.elnkpro.com',
+          '*.uat.elnkpro.com',
+          '*.aplnk.com',
+        ],
       },
     ],
   };
