@@ -8,10 +8,12 @@ import { ClientFactory, FeishuApp } from '@src/common/feishu/clients';
 import SupplierDiffTable from './common/table/supplier-diff.table';
 import { SensitiveWordController } from './sensitive-word/sensitive-word.controller';
 import { SensitiveWordService } from './sensitive-word/sensitive-word.service';
+import { DocModule } from '@src/doc/doc.module';
 
 @Module({
   imports: [
     FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.XiaoAClient)),
+    DocModule,
   ],
   controllers: [SupplierDiffController, SensitiveWordController],
   providers: [

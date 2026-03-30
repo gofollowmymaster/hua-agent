@@ -5,7 +5,7 @@ import { SensitiveWordService } from './sensitive-word.service';
 import { SensitiveWordDto } from './dto/sensitive-word.dto';
 import { SecretAuthGuard } from '@src/common/guard/secret-auth';
 
-@ApiTags('敏感词警报')
+@ApiTags('敏感词管理')
 @Controller('sensitive-word')
 export class SensitiveWordController {
   constructor(private readonly sensitiveWordService: SensitiveWordService) {}
@@ -21,7 +21,16 @@ export class SensitiveWordController {
   @UseGuards(SecretAuthGuard)
   @Post('/alert')
   @ApiBody({ type: SensitiveWordDto })
-  async list(@Body() params: SensitiveWordDto) {
+  async alert(@Body() params: SensitiveWordDto) {
     return await this.sensitiveWordService.alert(params);
+  }
+  @ApiOperation({
+    summary: '敏感词预设数据',
+    description: '敏感词预设数据',
+  })
+  @UseGuards(SecretAuthGuard)
+  @Post('/preset')
+  async preset() {
+    return await this.sensitiveWordService.preset();
   }
 }

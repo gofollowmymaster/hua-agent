@@ -70,7 +70,7 @@ export class WikiBlackListResponseDto {
     type: Array<BlackListType>,
     description: '类型,枚举值：文本，链接',
   })
-  type: Array<BlackListType>;
+  类型: Array<BlackListType>;
   @ApiProperty({
     enum: tenantCodeMap,
     description: '服务商',
@@ -80,7 +80,7 @@ export class WikiBlackListResponseDto {
     type: String,
     description: '关键字',
   })
-  keyword: string;
+  关键字: string;
 }
 
 export enum FeedbackType {

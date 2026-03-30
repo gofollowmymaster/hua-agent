@@ -3,16 +3,65 @@ import { Injectable } from '@nestjs/common';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import { SensitiveWordDto } from './dto/sensitive-word.dto';
+import { WikiService } from '@src/doc/wiki/wiki.service';
+import { BlackListType, WikiBlackListDto } from '@src/doc/wiki/dto/wiki.dto';
 
 @Injectable()
 export class SensitiveWordService {
   private readonly redis: Redis;
+  private presetPlatform = {
+    version: '1.0.0',
+    platforms: [
+      {
+        id: 'aplus',
+        name: 'aplus',
+        words: [] as string[],
+      },
+      {
+        id: 'boat',
+        name: '云舟',
+        words: [] as string[],
+        domains: ['*.test-com.elnkpro.com', '*.uat-cb.clouboat.com'],
+      },
+      {
+        id: 'yurex',
+        name: 'yurex',
+        words: [] as string[],
+        domains: ['*.uat.yurexcc.com'],
+      },
+      {
+        id: '袋鼠云',
+        name: '袋鼠云',
+        words: [] as string[],
+        domains: ['*.test-xw.elnkpro.com', '*.uat.elnkpro.com'],
+      },
+    ],
+  };
 
-  constructor(private readonly redisService: RedisService) {
+  constructor(
+    private readonly redisService: RedisService,
+    private readonly wikiService: WikiService,
+  ) {
     this.redis = redisService.getClient();
   }
 
   async alert(params: SensitiveWordDto) {
     return params.sensitiveWord;
+  }
+  async preset() {
+    for (const platform of this.presetPlatform.platforms) {
+      const res = await this.wikiService.blacklist({
+        type: [BlackListType.text],
+        supplierCode: platform.id,
+        status: true,
+      } as WikiBlackListDto);
+      const blackList = (res as any).list || [];
+      const words = blackList.map((item) => item.关键字);
+      console.log('[ blackList ] >', res);
+
+      platform.words = words;
+    }
+
+    return this.presetPlatform;
   }
 }
