@@ -50,6 +50,7 @@ export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
     delete this.event.rawData.breadcrumbs;
     delete this.event.rawData.exception;
     const bu = apiModuleBuMap[this.event.serverModuleName] || this.appInfo.bu;
+    const rawData = this.truncateRawData();
     return {
       接口地址: this.requestData.url,
       http状态码: '200',
@@ -63,7 +64,7 @@ export default class RequestAlertFeishuAdapter extends BaseAlertFeishuAdapter {
       链接信息: this.event.webUrl,
       应用名: this.event.pageModuleName,
       IssueId: this.event.issueId,
-      RawData: JSON.stringify(this.event.rawData),
+      RawData: rawData,
     };
   }
 

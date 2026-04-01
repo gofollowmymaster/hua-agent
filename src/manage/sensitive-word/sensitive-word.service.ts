@@ -57,7 +57,6 @@ export class SensitiveWordService {
       } as WikiBlackListDto);
       const blackList = (res as any).list || [];
       const words = blackList.map((item) => item.关键字);
-      console.log('[ blackList ] >', res);
 
       platform.words = words;
     }

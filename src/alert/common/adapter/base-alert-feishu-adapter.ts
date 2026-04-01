@@ -10,4 +10,11 @@ export default abstract class BaseAlertFeishuAdapter {
   abstract setEvent(event: BaseAlertEvent);
 
   abstract toAplusAlertCardData(): Promise<BaseWarningCardData>;
+  truncateStr(data: any) {
+    const RawData = JSON.stringify(data);
+    return RawData.length > 300000 ? RawData.slice(0, 300000) + '...' : RawData;
+  }
+  truncateRawData() {
+    return this.truncateStr(this.event.rawData);
+  }
 }

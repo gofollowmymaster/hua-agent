@@ -34,9 +34,7 @@ export default class PageAlertFeishuAdapter extends BaseAlertFeishuAdapter {
     await this.setEvent(this.alertContext.event as PageAlertEvent);
     delete this.event.rawData.breadcrumbs;
     delete this.event.rawData.exception;
-    const RawData = JSON.stringify(this.event.rawData);
-    const truncatedRawData =
-      RawData.length > 400000 ? RawData.slice(0, 400000) + '...' : RawData;
+    const truncatedRawData = this.truncateRawData();
     return {
       标题: this.event.title,
       链接信息: this.event.webUrl,
