@@ -5,7 +5,7 @@ import { NodeConfigService } from '../../config/node-config.service';
 @Injectable()
 class ClientSecretTable extends FeishuTable {
   protected readonly useCache = true;
-  protected readonly ttl = 60 * 60 * 24 * 7;
+  protected readonly ttl = 60 * 60 * 24;
 
   constructor(readonly tableHelper: FeishuTableHelper) {
     super();

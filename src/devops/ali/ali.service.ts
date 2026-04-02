@@ -120,7 +120,7 @@ export class AliService extends BaseDevopsService {
       }
       Promise.all(queryJobs)
         .then(() => {
-          if (params.env.indexOf('dev') > -1) return;
+          if (['dev', 'prod'].includes(params.env)) return;
           this.sendPushWaitingMsg(resultList, params);
         })
         .catch((error) => {

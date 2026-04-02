@@ -150,6 +150,64 @@ export class DevopsOptionService {
         branch: 'uat-publish',
       },
     ],
+    prod: [
+      {
+        appName: 'publish-admin-app',
+        workflowName: 'PROD环境',
+        branch: 'master',
+      },
+      {
+        appName: 'publish-user-app',
+        workflowName: 'PROD环境',
+        branch: 'master',
+      },
+      {
+        appName: 'publish-admin-tenant-app',
+        workflowName: 'boat生产环境',
+        branch: 'master',
+      },
+      {
+        appName: 'publish-user-tenant-app',
+        workflowName: 'boat生产环境',
+        branch: 'master',
+      },
+      {
+        appName: 'publish-admin-yurex-app',
+        workflowName: 'PROD环境',
+        branch: 'master',
+      },
+      {
+        appName: 'publish-user-yurex-app',
+        workflowName: 'PROD环境',
+        branch: 'master',
+      },
+      {
+        appName: 'test-admin-publish-app',
+        workflowName: '正式环境',
+        branch: 'master',
+      },
+      {
+        appName: 'test-user-publish-app',
+        workflowName: '正式环境',
+        branch: 'master',
+      },
+      {
+        appName: 'global-console',
+        workflowName: '正式环境',
+        branch: 'master',
+      },
+
+      // {
+      //   appName: 'aplus-quickbi-manage',
+      //   workflowName: '正式环境',
+      //   branch: 'master',
+      // },
+      // {
+      //   appName: 'aplus-login-center',
+      //   workflowName: '正式环境',
+      //   branch: 'master',
+      // },
+    ],
   };
   constructor(private readonly devopsApiService: DevopsApiService) {}
   /**
