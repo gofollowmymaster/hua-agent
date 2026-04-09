@@ -12,7 +12,7 @@ class TrackingMetadataTable extends FeishuTable {
     this.appToken = NodeConfigService.getFeishuTableConfig(
       'TrackingMetadataAppToken',
     );
-    this.tableId = 'tblZhKbrIuV52FDo';
+    this.tableId = 'tblZKbrIuV52FDo';
     this.tableHelper.setTableOption({
       appToken: this.appToken,
       tableId: this.tableId,
