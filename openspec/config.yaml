@@ -1,5 +1,18 @@
 schema: spec-driven
 
+context: |
+  语言：中文（简体）
+  所有产出物必须用简体中文撰写。 但是:
+    - 保持技术专业术语比如： "API", "REST", "GraphQL" 等在英文中
+    - 代码示例和文件路径仍使用英文
+  技术栈： TypeScript, NestJs, Node.js 20
+
+rules:
+  proposal:
+    - 保持 proposals在 500 字以内
+    - 包含一个 "Non-goals" 部分
+  tasks:
+    - 将任务拆分成最大为 2 小时的任务块
 # Project context (optional)
 # This is shown to AI when creating artifacts.
 # Add your tech stack, conventions, style guides, domain knowledge, etc.

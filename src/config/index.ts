@@ -33,6 +33,7 @@ const globalConfig: GlobalConfigType = Object.freeze({
       process.env.FEISHU_APLUS_NODE_ADMIN_MTABLE_TABLE_ID,
     DevopsTableAppToken: 'Jz0abVIqeajmfesIkfRcwiannof',
     SupplierDiffAppToken: 'HHtzbuGuua3mRvszTI8cYKBVnId',
+    TrackingMetadataAppToken: 'C6ElwN9sHiLXdKka7g5c0iSinBe',
   },
 
   robots: {
