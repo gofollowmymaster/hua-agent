@@ -28,9 +28,8 @@ export class TrackingMetadataService {
     };
     const res = await this.table.searchTransformed({
       filter,
-      field_names: ['业务线', '事件类型', '事件'],
+      field_names: ['业务线', '事件类型', '事件', '事件名称'],
     });
-    console.log('[ res ] >', res);
     return res.list || [];
   }
 }

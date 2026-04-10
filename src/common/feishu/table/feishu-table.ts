@@ -59,7 +59,7 @@ abstract class FeishuTable {
 
   async search(
     data: BitTableSearchPayloadData,
-    params: BitTableSearchPayloadParams = {},
+    params: BitTableSearchPayloadParams = { page_size: 500 },
     useCache = true,
   ): Promise<BitTablePagination> {
     this.setTableOption();
@@ -69,7 +69,7 @@ abstract class FeishuTable {
   }
   async searchTransformed(
     data: BitTableSearchPayloadData,
-    params: BitTableSearchPayloadParams = {},
+    params: BitTableSearchPayloadParams = { page_size: 500 },
     useCache = true,
   ): Promise<BitTableList<any>> {
     const res = await this.search(data, params, useCache);
