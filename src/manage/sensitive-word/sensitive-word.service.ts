@@ -16,13 +16,13 @@ export class SensitiveWordService {
         id: 'boat',
         name: '云舟',
         words: [] as string[],
-        domains: ['*.test-com.elnkpro.com', '*.clouboat.com', 'localhost'],
+        domains: ['*.test-com.elnkpro.com', '*.clouboat.com'],
       },
       {
         id: 'yurex',
         name: 'yurex',
         words: [] as string[],
-        domains: ['*.yurexcc.com', 'localhost'],
+        domains: ['*.yurexcc.com'],
       },
       {
         id: '袋鼠云',
