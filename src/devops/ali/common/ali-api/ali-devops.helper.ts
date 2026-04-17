@@ -125,16 +125,9 @@ export class DevopsApiService extends HttpApiHelper {
     },
   ): AppWorkflowPublishType => {
     const releaseStages = appConfig.releaseStages;
-    console.log(
-      '[ releaseStages ] >',
-      releaseStages,
-      releaseStages.name,
-      appOption.workflowName,
-    );
     const handleWorkflowSource = releaseStages.find(
       (workflowStage) => workflowStage.name === appOption.workflowName,
     );
-    console.log('[ handleWorkflowSource ] >', handleWorkflowSource);
     const pipelineConfig =
       handleWorkflowSource.pipeline.pipeline.pipelineConfigVo ?? {};
     const settings = JSON.parse(pipelineConfig.settings ?? '{}');
