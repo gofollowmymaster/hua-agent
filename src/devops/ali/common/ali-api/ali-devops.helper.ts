@@ -114,7 +114,7 @@ export class DevopsApiService extends HttpApiHelper {
       true,
       uri,
     );
-    //只去第一个
+    //只取第一个
     return this.handleWorkflowData(info[0], appOption);
   }
   handleWorkflowData = (
@@ -125,9 +125,16 @@ export class DevopsApiService extends HttpApiHelper {
     },
   ): AppWorkflowPublishType => {
     const releaseStages = appConfig.releaseStages;
+    console.log(
+      '[ releaseStages ] >',
+      releaseStages,
+      releaseStages.name,
+      appOption.workflowName,
+    );
     const handleWorkflowSource = releaseStages.find(
       (workflowStage) => workflowStage.name === appOption.workflowName,
     );
+    console.log('[ handleWorkflowSource ] >', handleWorkflowSource);
     const pipelineConfig =
       handleWorkflowSource.pipeline.pipeline.pipelineConfigVo ?? {};
     const settings = JSON.parse(pipelineConfig.settings ?? '{}');

@@ -183,12 +183,12 @@ export class DevopsOptionService {
       },
       {
         appName: 'test-admin-publish-app',
-        workflowName: '正式环境',
+        workflowName: 'PROD环境',
         branch: 'master',
       },
       {
         appName: 'test-user-publish-app',
-        workflowName: '正式环境',
+        workflowName: 'PROD环境',
         branch: 'master',
       },
       {
@@ -197,16 +197,16 @@ export class DevopsOptionService {
         branch: 'master',
       },
 
-      // {
-      //   appName: 'aplus-quickbi-manage',
-      //   workflowName: '正式环境',
-      //   branch: 'master',
-      // },
-      // {
-      //   appName: 'aplus-login-center',
-      //   workflowName: '正式环境',
-      //   branch: 'master',
-      // },
+      {
+        appName: 'aplus-quickbi-manage',
+        workflowName: 'PROD环境',
+        branch: 'master',
+      },
+      {
+        appName: 'aplus-login-center',
+        workflowName: 'PROD环境',
+        branch: 'master',
+      },
     ],
   };
   constructor(private readonly devopsApiService: DevopsApiService) {}
@@ -235,20 +235,11 @@ export class DevopsOptionService {
    * 检查APP是否存在
    */
   async checkApp(params: AliDevopsDto) {
-    const apps = await this.devopsApiService.queryAllApp();
-    const appNames = apps.data.map((item: any) => item.name);
     const runAppList = this.getOptions(params.env, params.apps);
 
-    const notExistList = runAppList.reduce((prev, item) => {
-      if (!appNames.includes(item.appName)) {
-        prev.push(item.appName);
-      }
-      return prev;
-    }, [] as string[]);
-
-    if (notExistList.length) {
+    if (runAppList.length < 1) {
       throw new Error(
-        `应用：${notExistList.join(',')}不存在，请检查应用配置是否正确`,
+        `应用：${runAppList.map((item) => item.appName).join(',')}不存在，请检查应用配置是否正确`,
       );
     }
     return runAppList;

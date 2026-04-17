@@ -70,7 +70,6 @@ export class AliService extends BaseDevopsService {
           const appReleaseWorkflow =
             await this.devopsApiService.queryAppReleaseWorkflow(appOption);
           resultList.push(appReleaseWorkflow);
-          console.log('[ appReleaseWorkflow ] >', appReleaseWorkflow);
           const job = this.executeAppReleaseWorkflowThrottle(
             {
               appName: appReleaseWorkflow.appName,
