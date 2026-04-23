@@ -93,7 +93,7 @@ export class DevopsOptionService {
       },
       {
         appName: 'aplus-quickbi-manage',
-        workflowName: 'test环境',
+        workflowName: '服务商test环境',
         branch: 'test-publish',
       },
       {
