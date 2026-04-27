@@ -13,6 +13,7 @@ import {
 
 export const apiModuleBuMap = {
   im: '基础架构',
+  bi: '基础架构',
   'download-center': '基础架构',
   wms: '仓储物流',
   tms: '仓储物流',
