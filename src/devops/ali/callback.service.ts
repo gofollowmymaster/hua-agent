@@ -73,7 +73,7 @@ export class PublishCallbackService extends BaseDevopsService {
             operator,
             title: '测试卡点通过失败',
           });
-          return;
+          // return;
         }
         if (
           ['SUCCESS', 'FAIL', 'CANCELED'].includes(appReleaseWorkflow.status)
