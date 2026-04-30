@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import ProjectPublishCard from '@src/common/feishu/card/project-publish';
@@ -12,6 +12,7 @@ import { RedisKeys } from '@src/common/const/redis-key.enum';
 import { PublishCardInfoType } from '../../types/devops';
 import { AliDevopsDto } from '../../dto/ali';
 import { AppWorkflowPublishType, PipelineStage } from '../ali-api/interface';
+import { NotReportException } from '@src/common/exception/not-report-exception';
 
 @Injectable()
 export class BaseDevopsService extends BaseService {
@@ -37,7 +38,9 @@ export class BaseDevopsService extends BaseService {
     const cardInfo = await this.redis.get(cacheKey);
     const cardInfoParsed = JSON.parse(cardInfo + '');
     if (!cardInfo) {
-      throw new NotFoundException('发布信息已过期，如需通过请通过链接逐一处理');
+      throw new NotReportException(
+        '发布信息已过期，如需通过请通过链接逐一处理',
+      );
     }
     return cardInfoParsed as PublishCardInfoType;
   }

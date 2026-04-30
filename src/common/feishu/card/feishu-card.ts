@@ -26,7 +26,7 @@ export abstract class FeishuCard {
     toString = true,
   ): string | Record<string, any> {
     alertInfo.content = alertInfo.content
-      ? alertInfo.content.slice(0, 500)
+      ? alertInfo.content.slice(0, 1000)
       : '--';
     const content = {
       type: 'template',
