@@ -4,35 +4,81 @@ import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import { SensitiveWordDto } from './dto/sensitive-word.dto';
 import { WikiService } from '@src/doc/wiki/wiki.service';
-import { BlackListType, WikiBlackListDto } from '@src/doc/wiki/dto/wiki.dto';
+import { BlackListType, EndpointNum } from '@src/doc/wiki/dto/wiki.dto';
+import { tenantCodeMap } from '@src/config/tenant';
 
+type PlatformType = {
+  version: string;
+  platforms: {
+    id: string;
+    name: string;
+    words: string[];
+    endpoint: EndpointNum[];
+    domains: string[];
+  }[];
+};
 @Injectable()
 export class SensitiveWordService {
   private readonly redis: Redis;
-  private presetPlatform = {
+  private presetPlatform: PlatformType = {
     version: '1.0.0',
     platforms: [
       {
         id: 'boat',
         name: '云舟',
         words: [] as string[],
-        domains: ['*.test-com.elnkpro.com', '*.clouboat.com'],
+        endpoint: [EndpointNum.User],
+        domains: [
+          'auth.test-com.elnkpro.com',
+          'user.test-com.elnkpro.com',
+          'user.*.clouboat.com',
+        ],
+      },
+      {
+        id: 'boat',
+        name: '云舟-admin',
+        endpoint: [EndpointNum.Admin],
+        words: [] as string[],
+        domains: ['admin.test-com.elnkpro.com', 'admin.*.clouboat.com'],
       },
       {
         id: 'yurex',
         name: 'yurex',
+        endpoint: [EndpointNum.User],
         words: [] as string[],
-        domains: ['*.yurexcc.com'],
+        domains: ['user.*.yurexcc.com', 'auth.*.yurexcc.com'],
+      },
+      {
+        id: 'yurex',
+        name: 'yurex-admin',
+        endpoint: [EndpointNum.Admin],
+        words: [] as string[],
+        domains: ['admin.*.yurexcc.com'],
       },
       {
         id: '袋鼠云',
         name: '袋鼠云',
+        endpoint: [EndpointNum.User],
         words: [] as string[],
         domains: [
-          'dev-v2.elnkpro.com',
-          '*.test-xw.elnkpro.com',
-          '*.uat.elnkpro.com',
-          '*.aplnk.com',
+          'user.dev-v2.elnkpro.com',
+          'user.test-xw.elnkpro.com',
+          'user.uat.elnkpro.com',
+          'user.aplnk.com',
+          'localhost',
+        ],
+      },
+      {
+        id: '袋鼠云',
+        name: '袋鼠云-admin',
+        endpoint: [EndpointNum.Admin],
+
+        words: [] as string[],
+        domains: [
+          'admin.dev-v2.elnkpro.com',
+          'admin.test-xw.elnkpro.com',
+          'admin.uat.elnkpro.com',
+          'admin.aplnk.com',
           'localhost',
         ],
       },
@@ -53,9 +99,10 @@ export class SensitiveWordService {
     for (const platform of this.presetPlatform.platforms) {
       const res = await this.wikiService.blacklist({
         type: [BlackListType.text],
-        supplierCode: platform.id,
+        supplierCode: platform.id as tenantCodeMap,
         status: true,
-      } as WikiBlackListDto);
+        endpoint: platform.endpoint,
+      });
       const blackList = (res as any).list || [];
       const words = blackList.map((item) => item.关键字);
 

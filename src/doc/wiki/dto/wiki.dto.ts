@@ -46,6 +46,10 @@ export enum BlackListType {
   text = '文本',
   link = '链接',
 }
+export enum EndpointNum {
+  User = 'user',
+  Admin = 'admin',
+}
 export class WikiBlackListDto {
   @ApiProperty({
     type: Array<BlackListType>,
@@ -62,6 +66,11 @@ export class WikiBlackListDto {
     description: '是否启用',
   })
   status: boolean;
+  @ApiPropertyOptional({
+    enum: EndpointNum,
+    description: '业务端',
+  })
+  endpoint: EndpointNum[] = [EndpointNum.User, EndpointNum.Admin];
 }
 export class WikiBlackListResponseDto {
   @ApiProperty({ example: 1, description: 'ID' })

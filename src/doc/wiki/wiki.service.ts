@@ -9,6 +9,7 @@ import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import {
   BlackListType,
+  EndpointNum,
   WikiBlackListDto,
   WikiBlackListResponseDto,
   WikiFeedbackDto,
@@ -99,6 +100,7 @@ export class WikiService {
       type: [BlackListType.text],
       supplierCode: this.userContext.tenant,
       status: true,
+      endpoint: [EndpointNum.User],
     });
 
     await this.checkDocumentQueue.add('checkDocument', {
@@ -124,6 +126,11 @@ export class WikiService {
             field_name: '平台',
             operator: 'is',
             value: [data.supplierCode],
+          },
+          {
+            field_name: '业务端',
+            operator: 'contains',
+            value: [...data.endpoint],
           },
         ],
       },
