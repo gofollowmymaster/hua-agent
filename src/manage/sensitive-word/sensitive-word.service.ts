@@ -11,6 +11,7 @@ type PlatformType = {
   version: string;
   platforms: {
     id: string;
+    supplierCode: string;
     name: string;
     words: string[];
     endpoint: EndpointNum[];
@@ -25,6 +26,7 @@ export class SensitiveWordService {
     platforms: [
       {
         id: 'boat',
+        supplierCode: 'boat',
         name: '云舟',
         words: [] as string[],
         endpoint: [EndpointNum.User],
@@ -35,8 +37,9 @@ export class SensitiveWordService {
         ],
       },
       {
-        id: 'boat',
+        id: 'boat-admin',
         name: '云舟-admin',
+        supplierCode: 'boat',
         endpoint: [EndpointNum.Admin],
         words: [] as string[],
         domains: ['admin.test-com.elnkpro.com', 'admin.*.clouboat.com'],
@@ -44,13 +47,15 @@ export class SensitiveWordService {
       {
         id: 'yurex',
         name: 'yurex',
+        supplierCode: 'yurex',
         endpoint: [EndpointNum.User],
         words: [] as string[],
         domains: ['user.*.yurexcc.com', 'auth.*.yurexcc.com'],
       },
       {
-        id: 'yurex',
+        id: 'yurex-admin',
         name: 'yurex-admin',
+        supplierCode: 'yurex',
         endpoint: [EndpointNum.Admin],
         words: [] as string[],
         domains: ['admin.*.yurexcc.com'],
@@ -58,6 +63,7 @@ export class SensitiveWordService {
       {
         id: '袋鼠云',
         name: '袋鼠云',
+        supplierCode: '袋鼠云',
         endpoint: [EndpointNum.User],
         words: [] as string[],
         domains: [
@@ -69,10 +75,10 @@ export class SensitiveWordService {
         ],
       },
       {
-        id: '袋鼠云',
+        id: '袋鼠云-admin',
         name: '袋鼠云-admin',
+        supplierCode: '袋鼠云',
         endpoint: [EndpointNum.Admin],
-
         words: [] as string[],
         domains: [
           'admin.dev-v2.elnkpro.com',
@@ -99,7 +105,7 @@ export class SensitiveWordService {
     for (const platform of this.presetPlatform.platforms) {
       const res = await this.wikiService.blacklist({
         type: [BlackListType.text],
-        supplierCode: platform.id as tenantCodeMap,
+        supplierCode: platform.supplierCode as tenantCodeMap,
         status: true,
         endpoint: platform.endpoint,
       });
