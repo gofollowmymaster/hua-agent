@@ -66,12 +66,12 @@ export class PublishCallbackService extends BaseDevopsService {
           console.log(
             '[ passExecuteAppReleaseWorkflow error ] >',
             error.status,
-            error.data,
+            error,
           );
           this.sendFailMsg(appReleaseWorkflow, {
             stageName: '测试卡点-通过',
             operator,
-            title: '测试卡点通过失败' + error.data,
+            title: '测试卡点通过失败' + error,
           });
           // return;
         }
