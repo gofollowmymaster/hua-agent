@@ -1,4 +1,4 @@
-import { AlertEvent, Environment } from '../type/alert';
+import { AlertEvent, Environment, ErrorEndpoint } from '../type/alert';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import { NodeConfigService } from '@src/config/node-config.service';
 import { isNeedSendAlertMsg } from '../utils';
@@ -10,6 +10,21 @@ import FeishuBusinessLineTable from '@src/common/table/business-line-table';
 import { Injectable } from '@nestjs/common';
 import { MsgSenderService } from '../../../common/base/msg-sender.service';
 import { ErrorLevel } from '@src/common/base/interface';
+
+export const apiModuleBuMap = {
+  im: 'subapp-admin-base',
+  bi: 'subapp-admin-base',
+  'download-center': 'subapp-admin-base',
+  wms: 'subapp-admin-wms',
+  tms: 'subapp-admin-wms',
+  oms: 'subapp-admin-wms',
+  gcs: 'subapp-admin-wms',
+  bms: 'subapp-admin-bms',
+  ad: 'subapp-admin-mos',
+  'data-compare': 'subapp-admin-base',
+  platform: 'subapp-admin-base',
+  'global-console': 'subapp-admin-base',
+};
 
 @Injectable()
 export class MsgAlertService extends MsgSenderService {
@@ -27,10 +42,8 @@ export class MsgAlertService extends MsgSenderService {
    */
   async sendFeishuMsg(alertInfo: AlertEvent, message: string) {
     //获取飞书用户userid（todo）群Id -> 消息加急
-    const { groupId: feishuGroupId } = await this.getGroupAndUserByProject(
-      alertInfo.pageModuleName,
-      alertInfo.environment,
-    );
+    const { groupId: feishuGroupId } =
+      await this.getGroupAndUserByProject(alertInfo);
     // 发送群消息
     const groupMsgInfo = await this.messageHelper.createInteractToGroup(
       message,
@@ -73,10 +86,8 @@ export class MsgAlertService extends MsgSenderService {
     const urgentType = isNeedSendAlertMsg(alertInfo.timestamp)
       ? 'Phone'
       : 'App';
-    const { fUserId: feishuUserId } = await this.getGroupAndUserByProject(
-      alertInfo.pageModuleName,
-      alertInfo.environment,
-    );
+    const { fUserId: feishuUserId } =
+      await this.getGroupAndUserByProject(alertInfo);
     let res = await this.sendFsAlertMsgToUser(
       groupMsgInfo,
       feishuUserId,
@@ -189,11 +200,9 @@ export class MsgAlertService extends MsgSenderService {
     return !!message.userAlerted[0].reactionTime;
   }
 
-  private async getGroupAndUserByProject(
-    pageModuleName: string,
-    environment: Environment,
-  ) {
-    // const { pageModuleName, environment } = alertInfo;
+  private async getGroupAndUserByProject(alertInfo: AlertEvent) {
+    const { pageModuleName, serverModuleName, errorEndpoint, environment } =
+      alertInfo;
     if (environment == 'dev' || environment == 'development') {
       return {
         groupId: NodeConfigService.getOrThrow('FeishuMsgDebugGroupId'),
@@ -214,7 +223,10 @@ export class MsgAlertService extends MsgSenderService {
     /**
      * 解码并处理有空格的情况
      */
-    const projectName = decodeURIComponent(pageModuleName).trim();
+    let projectName = decodeURIComponent(pageModuleName).trim();
+    if (errorEndpoint == ErrorEndpoint.Server) {
+      projectName = apiModuleBuMap[serverModuleName] || projectName;
+    }
     const {
       frontendAlertGroupId: groupId,
       frontendLeaderId: fUserId,
