@@ -1,135 +1,143 @@
 # AGENTS.md
 
-## Tech Stack
+## 技术栈
 
-- **Framework**: NestJS + TypeScript
+- **框架**: NestJS + TypeScript
 - **ORM**: Prisma (MySQL)
-- **Package Manager**: pnpm
-- **Cache/Queue**: Redis + BullMQ
-- **Linting**: ESLint + Prettier
+- **包管理器**: pnpm
+- **缓存/队列**: Redis + BullMQ
+- **代码检查**: ESLint + Prettier
 
-## Essential Commands
+## 常用命令
 
-### Environment Loading (IMPORTANT)
+### 环境加载（重要）
 
-Always prefix commands with the correct env loader:
+始终在命令前加上正确的环境加载器：
 
 ```bash
-pnpm env:dev   -- for development
-pnpm env:test  -- for test environment
-pnpm env:prod  -- for production
+pnpm env:dev   -- 用于开发环境
+pnpm env:test  -- 用于测试环境
+pnpm env:prod  -- 用于生产环境
 ```
 
-### Development
+### 开发
 
 ```bash
-pnpm start:dev          # Run in dev mode (with hot reload)
-pnpm build:dev         # Build for dev
-pnpm start:debug       # Debug mode
+pnpm start:dev          # 以开发模式运行（支持热重载）
+pnpm build:dev         # 开发环境构建
+pnpm start:debug       # 调试模式
 ```
 
-### Database (Prisma)
+### 数据库（Prisma）
 
 ```bash
-pnpm pg                # prisma generate - generates Prisma client
+pnpm pg                # prisma generate - 生成 Prisma 客户端
 pnpm pf                # prisma format
-pnpm migrate:dev       # Create migration (dev)
-pnpm migrate:test      # Create migration (test)
-pnpm migrate:prod      # Apply migrations (prod)
-pnpm pmSdo             # Open Prisma Studio
+pnpm migrate:dev       # 创建迁移（开发环境）
+pnpm migrate:test      # 创建迁移（测试环境）
+pnpm migrate:prod      # 应用迁移（生产环境）
+pnpm pmSdo             # 打开 Prisma Studio
 ```
 
-### Build & Deploy
+### 构建与部署
 
 ```bash
-pnpm docker:dev         # Run dev via PM2 in Docker
-pnpm docker:test        # Run test via PM2 in Docker
-pnpm docker:prod        # Run prod via PM2 in Docker
+pnpm docker:dev         # 在 Docker 中通过 PM2 运行开发环境
+pnpm docker:test        # 在 Docker 中通过 PM2 运行测试环境
+pnpm docker:prod        # 在 Docker 中通过 PM2 运行生产环境
 ```
 
-### Code Quality
+### 代码质量
 
 ```bash
 pnpm lint              # ESLint --fix
-pnpm format            # Prettier write
+pnpm format            # Prettier 写入格式化结果
 ```
 
-### Testing
+### 测试
 
 ```bash
-pnpm test              # Unit tests (jest from src/, *.spec.ts)
-pnpm test:cov          # With coverage
+pnpm test              # 单元测试（jest，来自 src/ 下的 *.spec.ts）
+pnpm test:cov          # 带覆盖率的测试
 ```
 
-## Environment Files
+## 环境文件
 
-Environment variables load in this order (later overrides earlier):
+环境变量按以下顺序加载（后加载的会覆盖先加载的）：
 
 - `dev`: `.env` → `.env.dev` → `.env.dev.local`
 - `test`: `.env` → `.env.test` → `.env.test.local`
 - `prod`: `.env` → `.env.prod` → `.env.prod.local`
 
-## Path Aliases
+## 路径别名
 
 - `@src/*` → `src/*`
 - `@utils/*` → `src/utils/*`
 - `@mockServer/*` → `mockServer/*`
 
-## Architecture
+## 架构
 
-### Module Structure
+### 长期架构文档
+
+- AI Agent 长期开发文档入口：`docs/ai-agent/README.md`
+- 项目开发规范文档入口：`docs/standard/README.md`
+- 深度架构、目录边界、业务模块规范、飞书集成、权限/多租户说明沉淀在 `docs/ai-agent/`
+- 开发流程、代码风格、模块设计、测试验证规范沉淀在 `docs/standard/`
+- `AGENTS.md` 只保留高频规则和快速索引，避免与专题文档重复维护
+
+### 模块结构
 
 ```
 src/
-├── manage/       # Management features
-├── robot/        # Feishu robot integrations
-├── ai/           # AI features
-├── admin/        # Admin panel
-├── doc/          # Documentation
-├── alert/        # Alerting system
-├── fd-copilot/   # Frontend copilot
-├── devops/       # DevOps integrations
-├── common/       # Shared: guards, filters, interceptors, middleware, services
-│   └── service/  # Global: Redis, Logger, Prisma, TenantContext
-├── config/       # Configuration with tenant support (A, yurex, boat)
-└── main.ts       # Entry point (port 3000)
+├── manage/       # 管理功能
+├── robot/        # 飞书机器人集成
+├── ai/           # AI 功能
+├── admin/        # 管理后台
+├── doc/          # 文档
+├── alert/        # 告警系统
+├── fd-copilot/   # 前端 Copilot
+├── devops/       # DevOps 集成
+├── common/       # 共享内容：守卫、过滤器、拦截器、中间件、服务
+│   └── service/  # 全局服务：Redis、Logger、Prisma、TenantContext
+├── config/       # 支持租户的配置（A、yurex、boat）
+└── main.ts       # 入口文件（端口 3000）
 ```
 
-### Global Services (available everywhere)
+### 全局服务（处处可用）
 
-- `PrismaService` - Database access via Prisma
-- `RedisService` / `RedisProvider` - Redis operations
-- `LoggerService` - Winston logging
-- `TenantContext` - Multi-tenant support
+- `PrismaService` - 通过 Prisma 访问数据库
+- `RedisService` / `RedisProvider` - Redis 操作
+- `LoggerService` - Winston 日志
+- `TenantContext` - 多租户支持
 
-### API Documentation
+### API 文档
 
-- Swagger UI: `/swagger` (only in `NODE_ENV=dev`)
+- Swagger UI: `/swagger`（仅在 `NODE_ENV=dev` 时可用）
 - Swagger JSON: `/swagger/json`
 
 ## Prisma
 
 - Schema: `prisma/schema.prisma`
-- Database: MySQL
-- Binary targets: `native`, `debian-openssl-3.0.x`
-- Always run `pnpm pg` after schema changes
+- 数据库: MySQL
+- 二进制目标: `native`, `debian-openssl-3.0.x`
+- Schema 变更后始终运行 `pnpm pg`
 
-## OpenSpec Workflow
+## OpenSpec 工作流
 
-This repo uses OpenSpec for change management:
+本仓库使用 OpenSpec 进行变更管理：
 
-- Changes live in `openspec/changes/`
-- Use the skills: `openspec-propose`, `openspec-apply-change`, `openspec-archive-change`
-- Run via `/opsx-propose`, `/opsx-apply`, `/opsx-archive`
+- 变更位于 `openspec/changes/`
+- 使用技能：`openspec-propose`、`openspec-apply-change`、`openspec-archive-change`
+- 通过 `/opsx-propose`、`/opsx-apply`、`/opsx-archive` 运行
 
-## Code Style
+## 代码风格
 
-- **Prettier**: single quotes, trailing commas
-- **ESLint**: TypeScript recommended rules (no-explicit-any off)
-- **TypeScript**: strictNullChecks off, noImplicitAny off
+- **Prettier**: 单引号、尾随逗号
+- **ESLint**: TypeScript 推荐规则（关闭 no-explicit-any）
+- **TypeScript**: 关闭 strictNullChecks、关闭 noImplicitAny
 
-## Testing Notes
+## 测试说明
 
-- Only 1 spec file found (`src/alert/common/service/msg-alert.service.spec.ts`)
-- Tests use `@nestjs/testing` and `supertest`
-- Test pattern: `*.spec.ts` in src directory
+- 仅发现 1 个 spec 文件（`src/alert/common/service/msg-alert.service.spec.ts`）
+- 测试使用 `@nestjs/testing` 和 `supertest`
+- 测试文件模式：src 目录下的 `*.spec.ts`
