@@ -15,6 +15,7 @@ import { RagController } from './rag/rag.controller';
 import { RagService } from './rag/rag.service';
 import { RagDatabaseService } from './rag/services/rag-database.service';
 import { DocumentLoaderService } from './rag/services/document-loader.service';
+import { WecomRagBotService } from './rag/wecom-rag-bot.service';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { DocumentLoaderService } from './rag/services/document-loader.service';
     RagService,
     RagDatabaseService,
     DocumentLoaderService,
+    WecomRagBotService,
   ],
   controllers: [AilyController, LogOperatorController, RagController],
 })
