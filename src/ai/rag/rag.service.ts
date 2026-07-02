@@ -6,12 +6,16 @@ import {
 import { PromptTemplate } from '@langchain/core/prompts';
 import { ChatOpenAI, OpenAIEmbeddings } from '@langchain/openai';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
-import type pg from 'pg';
+import type { Prisma } from '@prisma/rag-client';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { getRagConfig } from './rag.config';
 import { DocumentLoaderService } from './services/document-loader.service';
-import { RagDatabaseService } from './services/rag-database.service';
-import type { IngestSummary, LoadedDocument, RetrievedChunk } from './types';
+import { RagPrismaService } from './services/prisma/rag-prisma.service';
+import type {
+  IngestSummary,
+  LoadedDocument,
+  RetrievedChunk,
+} from './types/rag.type';
 
 type RagStreamEvent =
   | {
@@ -35,7 +39,7 @@ export class RagService {
   private readonly defaultTopK: number;
 
   constructor(
-    private readonly db: RagDatabaseService,
+    private readonly ragPrisma: RagPrismaService,
     private readonly loader: DocumentLoaderService,
     private readonly logger: LoggerService,
   ) {
@@ -264,11 +268,15 @@ export class RagService {
     }
 
     if (!hasText) {
-      this.logger.warn('RAG stream returned no text, fallback to invoke', undefined, {
-        stage: 'rag_stream_empty_fallback',
-        topK,
-        chunks: chunks.length,
-      });
+      this.logger.warn(
+        'RAG stream returned no text, fallback to invoke',
+        undefined,
+        {
+          stage: 'rag_stream_empty_fallback',
+          topK,
+          chunks: chunks.length,
+        },
+      );
       yield {
         type: 'status',
         data: {
@@ -281,7 +289,8 @@ export class RagService {
 
       const response = await this.model.invoke(prompt);
       const text =
-        this.extractContentText(response.content) || JSON.stringify(response.content);
+        this.extractContentText(response.content) ||
+        JSON.stringify(response.content);
       if (text) yield { type: 'answer', data: text };
     }
 
@@ -295,40 +304,50 @@ export class RagService {
   }
 
   async listDocuments() {
-    const result = await this.db.query(
-      `SELECT d.id,
-              d.source_path,
-              d.file_name,
-              d.file_type,
-              d.file_hash,
-              d.file_size,
-              d.chunk_count,
-              d.status,
-              d.error,
-              d.created_at,
-              d.updated_at,
-              d.ingested_at,
-              COUNT(c.id)::int AS actual_chunk_count
-       FROM aplus_documents d
-       LEFT JOIN aplus_chunks c ON c.document_id = d.id
-       GROUP BY d.id
-       ORDER BY d.updated_at DESC`,
-    );
+    const documents = await this.ragPrisma.aplusDocument.findMany({
+      include: {
+        _count: {
+          select: { chunks: true },
+        },
+      },
+      orderBy: { updatedAt: 'desc' },
+    });
 
-    return result.rows;
+    return documents.map((document) => ({
+      id: document.id,
+      source_path: document.sourcePath,
+      file_name: document.fileName,
+      file_type: document.fileType,
+      file_hash: document.fileHash,
+      file_size: document.fileSize,
+      chunk_count: document.chunkCount,
+      status: document.status,
+      error: document.error,
+      created_at: document.createdAt,
+      updated_at: document.updatedAt,
+      ingested_at: document.ingestedAt,
+      actual_chunk_count: document._count.chunks,
+    }));
   }
 
   async deleteDocument(id: number) {
-    const result = await this.db.query(
-      'DELETE FROM aplus_documents WHERE id = $1 RETURNING id, source_path',
-      [id],
-    );
+    const document = await this.ragPrisma.aplusDocument.findUnique({
+      where: { id },
+      select: { id: true, sourcePath: true },
+    });
 
-    if (result.rowCount === 0) {
+    if (!document) {
       throw new BadRequestException(`Document #${id} not found`);
     }
 
-    return { deleted: result.rows[0] };
+    await this.ragPrisma.aplusDocument.delete({ where: { id } });
+
+    return {
+      deleted: {
+        id: document.id,
+        source_path: document.sourcePath,
+      },
+    };
   }
 
   private async retrieve(
@@ -337,24 +356,23 @@ export class RagService {
   ): Promise<RetrievedChunk[]> {
     const limit = Math.min(Math.max(Number(topK) || this.defaultTopK, 1), 20);
     const vector = await this.embeddings.embedQuery(question);
-    const result = await this.db.query(
-      `SELECT c.id,
-              c.document_id,
-              c.chunk_index,
-              c.content,
-              c.metadata,
-              d.file_name,
-              d.source_path,
-              1 - (c.embedding <=> $1::vector) AS similarity
-       FROM aplus_chunks c
-       JOIN aplus_documents d ON d.id = c.document_id
-       WHERE c.embedding IS NOT NULL
-       ORDER BY c.embedding <=> $1::vector
-       LIMIT $2`,
-      [JSON.stringify(vector), limit],
-    );
+    const rows = await this.ragPrisma.$queryRaw<any[]>`
+      SELECT c.id,
+             c.document_id,
+             c.chunk_index,
+             c.content,
+             c.metadata,
+             d.file_name,
+             d.source_path,
+             1 - (c.embedding <=> ${JSON.stringify(vector)}::vector) AS similarity
+      FROM aplus_chunks c
+      JOIN aplus_documents d ON d.id = c.document_id
+      WHERE c.embedding IS NOT NULL
+      ORDER BY c.embedding <=> ${JSON.stringify(vector)}::vector
+      LIMIT ${limit}
+    `;
 
-    return result.rows.map((row) => ({
+    return rows.map((row) => ({
       id: String(row.id),
       documentId: String(row.document_id),
       fileName: row.file_name,
@@ -371,7 +389,8 @@ export class RagService {
     const response = await this.model.invoke(prompt);
 
     return (
-      this.extractContentText(response.content) || JSON.stringify(response.content)
+      this.extractContentText(response.content) ||
+      JSON.stringify(response.content)
     );
   }
 
@@ -501,7 +520,7 @@ ${chunk.content}`;
       durationMs: fileStart ? Date.now() - fileStart : undefined,
     });
 
-    return this.db.transaction(async (client) => {
+    return this.ragPrisma.$transaction(async (client) => {
       const documentId = await this.upsertProcessingDocument(client, document);
       this.logIngestProgress({
         stage: 'file_write_start',
@@ -511,35 +530,33 @@ ${chunk.content}`;
         durationMs: fileStart ? Date.now() - fileStart : undefined,
       });
 
-      await client.query('DELETE FROM aplus_chunks WHERE document_id = $1', [
-        documentId,
-      ]);
+      await client.$executeRaw`
+        DELETE FROM aplus_chunks WHERE document_id = ${documentId}::bigint
+      `;
 
       for (let index = 0; index < chunks.length; index += 1) {
-        await client.query(
-          `INSERT INTO aplus_chunks
-             (document_id, chunk_index, content, metadata, embedding)
-           VALUES ($1, $2, $3, $4::jsonb, $5::vector)`,
-          [
-            documentId,
-            index,
-            chunks[index].content,
-            JSON.stringify(chunks[index].metadata),
-            JSON.stringify(embeddings[index]),
-          ],
-        );
+        await client.$executeRaw`
+          INSERT INTO aplus_chunks
+            (document_id, chunk_index, content, metadata, embedding)
+          VALUES (
+            ${documentId}::bigint,
+            ${index},
+            ${chunks[index].content},
+            ${JSON.stringify(chunks[index].metadata)}::jsonb,
+            ${JSON.stringify(embeddings[index])}::vector
+          )
+        `;
       }
 
-      await client.query(
-        `UPDATE aplus_documents
-         SET chunk_count = $2,
-             status = 'ready',
-             error = NULL,
-             updated_at = CURRENT_TIMESTAMP,
-             ingested_at = CURRENT_TIMESTAMP
-         WHERE id = $1`,
-        [documentId, chunks.length],
-      );
+      await client.$executeRaw`
+        UPDATE aplus_documents
+        SET chunk_count = ${chunks.length},
+            status = 'ready',
+            error = NULL,
+            updated_at = CURRENT_TIMESTAMP,
+            ingested_at = CURRENT_TIMESTAMP
+        WHERE id = ${documentId}::bigint
+      `;
 
       this.logIngestProgress({
         stage: 'file_write_done',
@@ -568,32 +585,33 @@ ${chunk.content}`;
   }
 
   private async upsertProcessingDocument(
-    client: pg.PoolClient,
+    client: Prisma.TransactionClient,
     document: LoadedDocument,
   ): Promise<string> {
-    const result = await client.query(
-      `INSERT INTO aplus_documents
-         (source_path, file_name, file_type, file_hash, file_size, status, updated_at)
-       VALUES ($1, $2, $3, $4, $5, 'processing', CURRENT_TIMESTAMP)
-       ON CONFLICT (source_path) DO UPDATE
-       SET file_name = EXCLUDED.file_name,
-           file_type = EXCLUDED.file_type,
-           file_hash = EXCLUDED.file_hash,
-           file_size = EXCLUDED.file_size,
-           status = 'processing',
-           error = NULL,
-           updated_at = CURRENT_TIMESTAMP
-       RETURNING id`,
-      [
-        document.sourcePath,
-        document.fileName,
-        document.fileType,
-        document.fileHash,
-        document.fileSize,
-      ],
-    );
+    const result = await client.$queryRaw<Array<{ id: bigint }>>`
+      INSERT INTO aplus_documents
+        (source_path, file_name, file_type, file_hash, file_size, status, updated_at)
+      VALUES (
+        ${document.sourcePath},
+        ${document.fileName},
+        ${document.fileType},
+        ${document.fileHash},
+        ${document.fileSize},
+        'processing',
+        CURRENT_TIMESTAMP
+      )
+      ON CONFLICT (source_path) DO UPDATE
+      SET file_name = EXCLUDED.file_name,
+          file_type = EXCLUDED.file_type,
+          file_hash = EXCLUDED.file_hash,
+          file_size = EXCLUDED.file_size,
+          status = 'processing',
+          error = NULL,
+          updated_at = CURRENT_TIMESTAMP
+      RETURNING id
+    `;
 
-    const id = result.rows[0]?.id;
+    const id = result[0]?.id;
     if (!id) {
       throw new InternalServerErrorException('failed to upsert document');
     }
@@ -611,39 +629,49 @@ ${chunk.content}`;
     },
     error: string,
   ) {
-    await this.db.query(
-      `INSERT INTO aplus_documents
-         (source_path, file_name, file_type, file_hash, file_size, chunk_count, status, error, updated_at)
-       VALUES ($1, $2, $3, $4, $5, 0, 'failed', $6, CURRENT_TIMESTAMP)
-       ON CONFLICT (source_path) DO UPDATE
-       SET file_name = EXCLUDED.file_name,
-           file_type = EXCLUDED.file_type,
-           file_hash = EXCLUDED.file_hash,
-           file_size = EXCLUDED.file_size,
-           chunk_count = 0,
-           status = 'failed',
-           error = EXCLUDED.error,
-           updated_at = CURRENT_TIMESTAMP`,
-      [
-        file.sourcePath,
-        file.fileName,
-        file.fileType,
-        file.fileHash,
-        file.fileSize,
-        error,
-      ],
-    );
+    await this.ragPrisma.$executeRaw`
+      INSERT INTO aplus_documents
+        (source_path, file_name, file_type, file_hash, file_size, chunk_count, status, error, updated_at)
+      VALUES (
+        ${file.sourcePath},
+        ${file.fileName},
+        ${file.fileType},
+        ${file.fileHash},
+        ${file.fileSize},
+        0,
+        'failed',
+        ${error},
+        CURRENT_TIMESTAMP
+      )
+      ON CONFLICT (source_path) DO UPDATE
+      SET file_name = EXCLUDED.file_name,
+          file_type = EXCLUDED.file_type,
+          file_hash = EXCLUDED.file_hash,
+          file_size = EXCLUDED.file_size,
+          chunk_count = 0,
+          status = 'failed',
+          error = EXCLUDED.error,
+          updated_at = CURRENT_TIMESTAMP
+    `;
   }
 
   private async findDocumentBySourcePath(sourcePath: string) {
-    const result = await this.db.query(
-      'SELECT id, file_hash, status FROM aplus_documents WHERE source_path = $1',
-      [sourcePath],
-    );
+    const document = await this.ragPrisma.aplusDocument.findUnique({
+      where: { sourcePath },
+      select: {
+        id: true,
+        fileHash: true,
+        status: true,
+      },
+    });
 
-    return result.rows[0] as
-      | { id: string; file_hash: string; status: string }
-      | undefined;
+    if (!document) return undefined;
+
+    return {
+      id: document.id,
+      file_hash: document.fileHash,
+      status: document.status,
+    };
   }
 
   private formatLocation(metadata: Record<string, unknown>) {

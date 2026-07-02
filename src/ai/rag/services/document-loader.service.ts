@@ -8,7 +8,11 @@ import mammoth from 'mammoth';
 import pdfParse from 'pdf-parse';
 import xlsx from 'xlsx';
 import { getRagConfig } from '../rag.config';
-import type { LoadedDocument, LoadedSegment, RawDocumentFile } from '../types';
+import type {
+  LoadedDocument,
+  LoadedSegment,
+  RawDocumentFile,
+} from '../types/rag.type';
 
 const IGNORED_NAMES = new Set(['.DS_Store', '.WeDrive']);
 const SUPPORTED_EXTENSIONS = new Set([

@@ -1,0 +1,43 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../../node_modules/@prisma/rag-client"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("RAG_DATABASE_URL")
+}
+
+model AplusDocument {
+  id         BigInt       @id @default(autoincrement())
+  sourcePath String       @unique @map("source_path") @db.Text
+  fileName   String       @map("file_name") @db.Text
+  fileType   String       @map("file_type") @db.Text
+  fileHash   String       @map("file_hash") @db.Text
+  fileSize   BigInt       @map("file_size")
+  chunkCount Int          @default(0) @map("chunk_count")
+  status     String       @default("ready") @db.Text
+  error      String?      @db.Text
+  createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime     @default(now()) @map("updated_at") @db.Timestamptz(6)
+  ingestedAt DateTime?    @map("ingested_at") @db.Timestamptz(6)
+  chunks     AplusChunk[]
+
+  @@map("aplus_documents")
+}
+
+model AplusChunk {
+  id         BigInt                @id @default(autoincrement())
+  documentId BigInt                @map("document_id")
+  chunkIndex Int                   @map("chunk_index")
+  content    String                @db.Text
+  metadata   Json                  @default("{}") @db.JsonB
+  embedding  Unsupported("vector")
+  createdAt  DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  document   AplusDocument         @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, chunkIndex])
+  @@index([documentId], map: "idx_aplus_chunks_document_id")
+  @@map("aplus_chunks")
+}

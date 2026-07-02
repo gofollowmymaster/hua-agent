@@ -3,7 +3,7 @@ import { WSClient, generateReqId, MessageType } from '@wecom/aibot-node-sdk';
 import type { Logger as WecomLogger } from '@wecom/aibot-node-sdk';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { RagService } from './rag.service';
-import { getWecomRagBotConfig, WecomRagBotConfig } from './wecom-rag.config';
+import { getWecomRagBotConfig, WecomRagBotConfig } from './rag.config';
 import type {
   WecomBaseMessageFrame,
   WecomEnterChatFrame,

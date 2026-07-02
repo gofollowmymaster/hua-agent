@@ -13,9 +13,9 @@ import LogOperatorAdapter from './log-operator/adapter/log-operator-adapter';
 import WikiFixedTokenService from '@src/common/service/fixed-user-token/wiki-fixed-user-token';
 import { RagController } from './rag/rag.controller';
 import { RagService } from './rag/rag.service';
-import { RagDatabaseService } from './rag/services/rag-database.service';
 import { DocumentLoaderService } from './rag/services/document-loader.service';
 import { WecomRagBotService } from './rag/wecom-rag-bot.service';
+import { RagPrismaService } from './rag/services/prisma/rag-prisma.service';
 
 @Module({
   imports: [
@@ -31,7 +31,7 @@ import { WecomRagBotService } from './rag/wecom-rag-bot.service';
     LogOperatorAdapter,
     WikiFixedTokenService,
     RagService,
-    RagDatabaseService,
+    RagPrismaService,
     DocumentLoaderService,
     WecomRagBotService,
   ],
