@@ -46,9 +46,15 @@ const modulesAll = [
     }),
 
     // 静态资源服务
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'mockServer'),
-    }),
+    ServeStaticModule.forRoot(
+      {
+        rootPath: join(__dirname, '..', 'public'),
+        serveRoot: '/public',
+      },
+      {
+        rootPath: join(__dirname, '..', 'mockServer'),
+      },
+    ),
     DevtoolsModule.register({
       http: ['production', 'prod'].includes(process.env.NODE_ENV),
       port: 3001,

@@ -1,6 +1,8 @@
 import { BaseAlertEvent, ErrorLevel } from '@src/common/base/interface';
 import { SentryStatus, SentryUser } from './sentry-issue';
 
+export { ErrorLevel };
+
 export class AlertEvent extends BaseAlertEvent {
   pageModuleName: string;
   serverModuleName: string;

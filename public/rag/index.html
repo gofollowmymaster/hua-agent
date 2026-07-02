@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAG 企业知识库问答</title>
+  <style>
+    :root {
+      --bg: #f7f7f4;
+      --panel: #ffffff;
+      --panel-soft: #f2f5f0;
+      --text: #20231f;
+      --muted: #6a7167;
+      --border: #dce2d8;
+      --accent: #246b55;
+      --accent-soft: #e4f3ed;
+      --danger: #b42318;
+      --danger-soft: #fff0ee;
+      --shadow: 0 18px 42px rgba(31, 41, 35, 0.08);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #121512;
+        --panel: #1a1f1b;
+        --panel-soft: #22291f;
+        --text: #f1f5ee;
+        --muted: #a3ad9d;
+        --border: #354033;
+        --accent: #8ed8ba;
+        --accent-soft: #19362c;
+        --danger: #ffb4a9;
+        --danger-soft: #401c18;
+        --shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    button,
+    textarea,
+    input {
+      font: inherit;
+    }
+
+    .app {
+      width: min(1120px, 100%);
+      min-height: 100vh;
+      margin: 0 auto;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 16px;
+      padding: 24px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 18px 20px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 650;
+      letter-spacing: 0;
+    }
+
+    .sub {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      word-break: break-all;
+    }
+
+    .settings {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .topk {
+      width: 72px;
+      height: 36px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--panel-soft);
+      color: var(--text);
+    }
+
+    .messages {
+      min-height: 360px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 4px;
+      scroll-behavior: smooth;
+    }
+
+    .empty {
+      height: 100%;
+      min-height: 300px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      text-align: center;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--panel) 72%, transparent);
+      padding: 24px;
+    }
+
+    .bubble {
+      width: min(760px, 100%);
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 8px 24px rgba(31, 41, 35, 0.05);
+    }
+
+    .bubble.user {
+      align-self: flex-end;
+      background: var(--accent-soft);
+      border-color: color-mix(in srgb, var(--accent) 34%, var(--border));
+    }
+
+    .bubble.assistant {
+      align-self: flex-start;
+    }
+
+    .role {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .content {
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .content p {
+      margin: 0 0 10px;
+    }
+
+    .content p:last-child {
+      margin-bottom: 0;
+    }
+
+    .content code {
+      font-family: var(--mono);
+      font-size: 0.92em;
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: var(--panel-soft);
+    }
+
+    .content pre {
+      margin: 10px 0;
+      overflow-x: auto;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--panel-soft);
+    }
+
+    .content pre code {
+      display: block;
+      padding: 0;
+      background: transparent;
+      white-space: pre-wrap;
+    }
+
+    .cursor::after {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 1em;
+      margin-left: 2px;
+      vertical-align: -0.18em;
+      background: var(--accent);
+      animation: blink 1s steps(2, start) infinite;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    .error {
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      color: var(--danger);
+      background: var(--danger-soft);
+      border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--border));
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .error.show {
+      display: flex;
+    }
+
+    .composer {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .input {
+      width: 100%;
+      min-height: 94px;
+      max-height: 220px;
+      resize: vertical;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--panel-soft);
+      color: var(--text);
+      outline: none;
+    }
+
+    .input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn {
+      min-width: 88px;
+      height: 38px;
+      padding: 0 16px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--panel-soft);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 650;
+    }
+
+    .btn:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+    }
+
+    .btn:not(:disabled):hover {
+      filter: brightness(0.98);
+    }
+
+    @media (max-width: 720px) {
+      .app {
+        padding: 12px;
+      }
+
+      .header {
+        flex-direction: column;
+      }
+
+      .settings {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .buttons {
+        justify-content: flex-end;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div>
+        <h1 class="title">RAG 企业知识库问答</h1>
+        <p class="sub">接口：/ai/rag/query/stream</p>
+      </div>
+      <label class="settings">
+        <span>检索片段 topK</span>
+        <input id="topK" class="topk" type="number" min="1" max="20" value="5" inputmode="numeric">
+      </label>
+    </header>
+
+    <section id="messages" class="messages" role="log" aria-live="polite">
+      <div id="empty" class="empty">输入问题开始查询已索引的企业知识库。</div>
+    </section>
+
+    <section id="error" class="error" role="alert">
+      <span id="errorText"></span>
+      <button id="clearError" class="btn" type="button">关闭</button>
+    </section>
+
+    <form id="form" class="composer">
+      <textarea
+        id="question"
+        class="input"
+        rows="3"
+        placeholder="输入问题，Enter 发送，Shift+Enter 换行"
+        aria-label="问题输入"
+      ></textarea>
+      <div class="actions">
+        <span id="status" class="status">就绪</span>
+        <div class="buttons">
+          <button id="stop" class="btn" type="button" disabled>停止</button>
+          <button id="send" class="btn primary" type="submit" disabled>发送</button>
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    const form = document.querySelector('#form');
+    const input = document.querySelector('#question');
+    const topKInput = document.querySelector('#topK');
+    const messagesEl = document.querySelector('#messages');
+    const emptyEl = document.querySelector('#empty');
+    const sendBtn = document.querySelector('#send');
+    const stopBtn = document.querySelector('#stop');
+    const statusEl = document.querySelector('#status');
+    const errorEl = document.querySelector('#error');
+    const errorTextEl = document.querySelector('#errorText');
+    const clearErrorBtn = document.querySelector('#clearError');
+
+    let abortController = null;
+    let busy = false;
+
+    function setBusy(nextBusy) {
+      busy = nextBusy;
+      input.disabled = nextBusy;
+      topKInput.disabled = nextBusy;
+      stopBtn.disabled = !nextBusy;
+      updateSendState();
+      statusEl.textContent = nextBusy ? '检索并生成中...' : '就绪';
+    }
+
+    function updateSendState() {
+      sendBtn.disabled = busy || input.value.trim().length === 0;
+    }
+
+    function showError(message) {
+      errorTextEl.textContent = message;
+      errorEl.classList.add('show');
+    }
+
+    function clearError() {
+      errorTextEl.textContent = '';
+      errorEl.classList.remove('show');
+    }
+
+    function appendMessage(role, text) {
+      emptyEl?.remove();
+      const article = document.createElement('article');
+      article.className = `bubble ${role}`;
+
+      const roleEl = document.createElement('span');
+      roleEl.className = 'role';
+      roleEl.textContent = role === 'user' ? '你' : '助手';
+
+      const contentEl = document.createElement('div');
+      contentEl.className = 'content';
+      contentEl.innerHTML = renderMarkdownLite(text);
+
+      article.append(roleEl, contentEl);
+      messagesEl.appendChild(article);
+      scrollToBottom();
+      return contentEl;
+    }
+
+    function scrollToBottom() {
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function escapeHtml(value) {
+      return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function renderInline(value) {
+      return escapeHtml(value).replace(/`([^`]+)`/g, '<code>$1</code>');
+    }
+
+    function renderMarkdownLite(text) {
+      const blocks = [];
+      const parts = text.split(/```/);
+
+      parts.forEach((part, index) => {
+        if (index % 2 === 1) {
+          const lines = part.replace(/^\w+\n/, '').replace(/\n$/, '');
+          blocks.push(`<pre><code>${escapeHtml(lines)}</code></pre>`);
+          return;
+        }
+
+        const paragraphs = part
+          .split(/\n{2,}/)
+          .map((paragraph) => paragraph.trim())
+          .filter(Boolean)
+          .map((paragraph) => `<p>${renderInline(paragraph).replace(/\n/g, '<br>')}</p>`);
+
+        blocks.push(...paragraphs);
+      });
+
+      return blocks.join('') || '<p></p>';
+    }
+
+    function parseSseChunk(buffer, onData) {
+      const events = buffer.split(/\n\n/);
+      const remainder = events.pop() ?? '';
+
+      for (const event of events) {
+        const dataLines = event
+          .split(/\n/)
+          .filter((line) => line.startsWith('data:'))
+          .map((line) => line.slice(5).replace(/^ /, ''));
+
+        if (dataLines.length > 0) {
+          onData(normalizeSseData(dataLines.join('\n')));
+        }
+      }
+
+      return remainder;
+    }
+
+    function normalizeSseData(data) {
+      if (data === '[DONE]') return '';
+      if (!data) return '';
+
+      try {
+        const parsed = JSON.parse(data);
+        if (typeof parsed === 'string') return parsed;
+        if (parsed && typeof parsed.data === 'string') return parsed.data;
+      } catch {
+        return data;
+      }
+
+      return data;
+    }
+
+    async function ask(question) {
+      clearError();
+      appendMessage('user', question);
+      const assistantContent = appendMessage('assistant', '');
+      assistantContent.classList.add('cursor');
+
+      const topK = Math.min(Math.max(Number(topKInput.value) || 5, 1), 20);
+      topKInput.value = String(topK);
+      const url = `/ai/rag/query/stream?question=${encodeURIComponent(question)}&topK=${encodeURIComponent(topK)}`;
+
+      abortController = new AbortController();
+      setBusy(true);
+
+      let answer = '';
+      let buffer = '';
+
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: { Accept: 'text/event-stream' },
+          signal: abortController.signal,
+        });
+
+        if (!response.ok || !response.body) {
+          throw new Error(`请求失败：${response.status} ${response.statusText}`);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          buffer = parseSseChunk(buffer, (data) => {
+            answer += data;
+            assistantContent.innerHTML = renderMarkdownLite(answer);
+            scrollToBottom();
+          });
+        }
+
+        buffer += decoder.decode();
+        parseSseChunk(`${buffer}\n\n`, (data) => {
+          answer += data;
+          assistantContent.innerHTML = renderMarkdownLite(answer);
+        });
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          statusEl.textContent = '已停止';
+        } else {
+          showError(error.message || '问答请求失败');
+        }
+      } finally {
+        assistantContent.classList.remove('cursor');
+        abortController = null;
+        setBusy(false);
+        input.focus();
+      }
+    }
+
+    input.addEventListener('input', updateSendState);
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        if (!sendBtn.disabled) form.requestSubmit();
+      }
+    });
+
+    topKInput.addEventListener('change', () => {
+      const topK = Math.min(Math.max(Number(topKInput.value) || 5, 1), 20);
+      topKInput.value = String(topK);
+    });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const question = input.value.trim();
+      if (!question || busy) return;
+      input.value = '';
+      updateSendState();
+      void ask(question);
+    });
+
+    stopBtn.addEventListener('click', () => {
+      abortController?.abort();
+    });
+
+    clearErrorBtn.addEventListener('click', clearError);
+    updateSendState();
+  </script>
+</body>
+</html>
