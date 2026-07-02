@@ -16,6 +16,8 @@ import { RagService } from './rag/rag.service';
 import { DocumentLoaderService } from './rag/services/document-loader.service';
 import { WecomRagBotService } from './rag/wecom-rag-bot.service';
 import { RagPrismaService } from './rag/services/prisma/rag-prisma.service';
+import { RagDocumentService } from './rag/services/rag-document.service';
+import { RagIngestService } from './rag/services/rag-ingest.service';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { RagPrismaService } from './rag/services/prisma/rag-prisma.service';
     WikiFixedTokenService,
     RagService,
     RagPrismaService,
+    RagIngestService,
+    RagDocumentService,
     DocumentLoaderService,
     WecomRagBotService,
   ],

@@ -17,17 +17,23 @@ import { SkipTransform } from '@src/common/decorator/skip-transform.decorator';
 import { RagIngestDto } from './dto/ingest.dto';
 import { RagQueryDto } from './dto/query.dto';
 import { RagService } from './rag.service';
+import { RagDocumentService } from './services/rag-document.service';
+import { RagIngestService } from './services/rag-ingest.service';
 
 @ApiTags('RAG 企业知识库')
 @Controller('ai/rag')
 export class RagController {
-  constructor(private readonly ragService: RagService) {}
+  constructor(
+    private readonly ragService: RagService,
+    private readonly ragIngestService: RagIngestService,
+    private readonly ragDocumentService: RagDocumentService,
+  ) {}
 
   @Post('ingest')
   @ApiOperation({ summary: '扫描 raw 目录并索引 RAG 文档' })
   @ApiBody({ type: RagIngestDto })
   ingest(@Body() body: RagIngestDto) {
-    return this.ragService.ingest({ force: Boolean(body?.force) });
+    return this.ragIngestService.ingest({ force: Boolean(body?.force) });
   }
 
   @Post('query')
@@ -63,12 +69,12 @@ export class RagController {
   @Get('documents')
   @ApiOperation({ summary: '获取 RAG 已索引文档列表' })
   documents() {
-    return this.ragService.listDocuments();
+    return this.ragDocumentService.listDocuments();
   }
 
   @Delete('documents/:id')
   @ApiOperation({ summary: '删除 RAG 已索引文档' })
   deleteDocument(@Param('id', ParseIntPipe) id: number) {
-    return this.ragService.deleteDocument(id);
+    return this.ragDocumentService.deleteDocument(id);
   }
 }

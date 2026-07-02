@@ -40,3 +40,16 @@ export interface IngestSummary {
     reason?: string;
   }>;
 }
+
+export type RagStreamEvent =
+  | {
+      type: 'status';
+      data: {
+        stage: string;
+        message: string;
+        topK?: number;
+        chunks?: number;
+      };
+    }
+  | { type: 'answer'; data: string }
+  | { type: 'done'; data: { stage: string; message: string } };
