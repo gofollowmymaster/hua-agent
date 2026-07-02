@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
+  MessageEvent,
   Param,
   ParseIntPipe,
   Post,
@@ -10,7 +12,8 @@ import {
   Sse,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { from, map, Observable } from 'rxjs';
+import { catchError, from, map, Observable, of } from 'rxjs';
+import { SkipTransform } from '@src/common/decorator/skip-transform.decorator';
 import { RagIngestDto } from './dto/ingest.dto';
 import { RagQueryDto } from './dto/query.dto';
 import { RagService } from './rag.service';
@@ -34,15 +37,26 @@ export class RagController {
     return this.ragService.answerQuestion(body.question, body.topK);
   }
 
+  @SkipTransform()
   @Sse('query/stream')
+  @Header('Cache-Control', 'no-cache, no-transform')
+  @Header('X-Accel-Buffering', 'no')
   @ApiOperation({ summary: 'RAG SSE 流式问答' })
   queryStream(
     @Query('question') question: string,
     @Query('topK') topK?: string,
-  ): Observable<{ data: string }> {
+  ): Observable<MessageEvent> {
     const parsedTopK = topK ? Number(topK) : undefined;
     return from(this.ragService.streamAnswer(question, parsedTopK)).pipe(
-      map((chunk) => ({ data: chunk })),
+      map((event) => ({ type: event.type, data: event.data })),
+      catchError((error) =>
+        of({
+          type: 'error',
+          data: {
+            message: error instanceof Error ? error.message : String(error),
+          },
+        }),
+      ),
     );
   }
 

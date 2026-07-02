@@ -69,3 +69,12 @@ DTO：
 - 小工具函数放入 `utils` 前，先判断是否应属于 helper、service、adapter 或业务模块。
 - 新增公共能力必须有明确边界和调用方，不为假想复用提前抽象。
 - 不引入第二套同职责技术方案，例如新的日志库、ORM、HTTP 封装方式。
+
+## 自定义装饰器/注解规范
+
+- 跨模块通用装饰器统一放到 `src/common/decorator/`。
+- 单业务模块私有装饰器放到 `src/<module>/decorator/`。
+- 装饰器文件命名使用 `*.decorator.ts`。
+- 基于 `SetMetadata` 的装饰器必须同时导出稳定 metadata key。
+- Guard、Interceptor、Pipe 读取装饰器元数据时，优先使用 `Reflector.getAllAndOverride`，支持方法级配置覆盖类级配置。
+- 通用装饰器不放进 `interceptor/`、`guard/`、`middleware/` 等消费者目录。

@@ -471,18 +471,32 @@
       return blocks.join('') || '<p></p>';
     }
 
-    function parseSseChunk(buffer, onData) {
-      const events = buffer.split(/\n\n/);
+    function parseSseChunk(buffer, onEvent) {
+      const normalizedBuffer = buffer.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      const events = normalizedBuffer.split(/\n\n/);
       const remainder = events.pop() ?? '';
 
       for (const event of events) {
-        const dataLines = event
-          .split(/\n/)
-          .filter((line) => line.startsWith('data:'))
-          .map((line) => line.slice(5).replace(/^ /, ''));
+        let eventType = 'message';
+        const dataLines = [];
+
+        event.split(/\n/).forEach((rawLine) => {
+          const line = rawLine.trimEnd();
+          const normalizedLine = line.trimStart();
+
+          if (normalizedLine.startsWith('event:')) {
+            eventType = normalizedLine.slice(6).trim() || 'message';
+            return;
+          }
+
+          if (normalizedLine.startsWith('data:')) {
+            dataLines.push(normalizedLine.slice(5).replace(/^ /, ''));
+          }
+        });
 
         if (dataLines.length > 0) {
-          onData(normalizeSseData(dataLines.join('\n')));
+          const data = normalizeSseData(dataLines.join('\n'));
+          if (data) onEvent({ type: eventType, data });
         }
       }
 
@@ -504,6 +518,31 @@
       return data;
     }
 
+    function handleStreamEvent(event, onAnswer) {
+      if (event.type === 'answer' || event.type === 'message') {
+        onAnswer(String(event.data));
+        return true;
+      }
+
+      if (event.type === 'status' && event.data && typeof event.data === 'object') {
+        statusEl.textContent = event.data.message || '处理中...';
+      }
+
+      if (event.type === 'done') {
+        statusEl.textContent = '生成完成';
+      }
+
+      if (event.type === 'error') {
+        const message =
+          event.data && typeof event.data === 'object'
+            ? event.data.message
+            : event.data;
+        throw new Error(message || '问答请求失败');
+      }
+
+      return false;
+    }
+
     async function ask(question) {
       clearError();
       appendMessage('user', question);
@@ -518,6 +557,7 @@
       setBusy(true);
 
       let answer = '';
+      let receivedData = false;
       let buffer = '';
 
       try {
@@ -539,18 +579,28 @@
           if (done) break;
 
           buffer += decoder.decode(value, { stream: true });
-          buffer = parseSseChunk(buffer, (data) => {
-            answer += data;
-            assistantContent.innerHTML = renderMarkdownLite(answer);
-            scrollToBottom();
+          buffer = parseSseChunk(buffer, (event) => {
+            const rendered = handleStreamEvent(event, (data) => {
+              answer += data;
+              assistantContent.innerHTML = renderMarkdownLite(answer);
+              scrollToBottom();
+            });
+            if (rendered) receivedData = true;
           });
         }
 
         buffer += decoder.decode();
-        parseSseChunk(`${buffer}\n\n`, (data) => {
-          answer += data;
-          assistantContent.innerHTML = renderMarkdownLite(answer);
+        parseSseChunk(`${buffer}\n\n`, (event) => {
+          const rendered = handleStreamEvent(event, (data) => {
+            answer += data;
+            assistantContent.innerHTML = renderMarkdownLite(answer);
+          });
+          if (rendered) receivedData = true;
         });
+
+        if (!receivedData) {
+          throw new Error('接口已响应，但未收到可渲染的 SSE data 内容');
+        }
       } catch (error) {
         if (error.name === 'AbortError') {
           statusEl.textContent = '已停止';
