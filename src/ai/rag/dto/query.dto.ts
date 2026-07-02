@@ -1,0 +1,18 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+
+export class RagQueryDto {
+  @ApiProperty({ description: '用户问题' })
+  @IsString()
+  question!: string;
+
+  @ApiPropertyOptional({
+    description: '检索片段数量，范围 1 到 20',
+    default: 5,
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(20)
+  topK?: number;
+}

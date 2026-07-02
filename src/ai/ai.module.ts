@@ -11,6 +11,10 @@ import { PrismaService } from '@src/common/service/prisma/prisma.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import LogOperatorAdapter from './log-operator/adapter/log-operator-adapter';
 import WikiFixedTokenService from '@src/common/service/fixed-user-token/wiki-fixed-user-token';
+import { RagController } from './rag/rag.controller';
+import { RagService } from './rag/rag.service';
+import { RagDatabaseService } from './rag/services/rag-database.service';
+import { DocumentLoaderService } from './rag/services/document-loader.service';
 
 @Module({
   imports: [
@@ -25,7 +29,10 @@ import WikiFixedTokenService from '@src/common/service/fixed-user-token/wiki-fix
     LoggerService,
     LogOperatorAdapter,
     WikiFixedTokenService,
+    RagService,
+    RagDatabaseService,
+    DocumentLoaderService,
   ],
-  controllers: [AilyController, LogOperatorController],
+  controllers: [AilyController, LogOperatorController, RagController],
 })
 export class AiModule {}

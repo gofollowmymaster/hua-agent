@@ -27,9 +27,13 @@
     "pg": "prisma generate",
     "pf": "prisma format",
     "pmd": "prisma migrate dev",
-    "pmSdo": "prisma studio"
+    "pmSdo": "prisma studio",
+    "rag:db:init": "node scripts/rag-db-init.mjs"
   },
   "dependencies": {
+    "@langchain/core": "^0.3.79",
+    "@langchain/openai": "^0.6.13",
+    "@langchain/textsplitters": "^0.1.0",
     "@larksuiteoapi/node-sdk": "^1.54.0",
     "@nestjs/axios": "^4.0.0",
     "@nestjs/bullmq": "^11.0.4",
@@ -52,15 +56,21 @@
     "class-validator": "^0.14.2",
     "cron": "^4.3.5",
     "dayjs": "^1.11.13",
+    "fast-xml-parser": "^5.3.2",
     "fs-extra": "^11.2.0",
     "ioredis": "^5.6.1",
+    "jszip": "^3.10.1",
     "lodash": "^4.17.21",
+    "mammoth": "^1.11.0",
+    "pdf-parse": "^1.1.1",
+    "pg": "^8.16.3",
     "prisma": "^5.16.1",
     "redis": "^5.5.6",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.1",
-    "winston": "^3.17.0"
+    "winston": "^3.17.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
@@ -72,6 +82,8 @@
     "@types/lodash-es": "^4.17.12",
     "@types/multer": "^2.0.0",
     "@types/node": "^20.3.1",
+    "@types/pdf-parse": "^1.1.5",
+    "@types/pg": "^8.15.6",
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
