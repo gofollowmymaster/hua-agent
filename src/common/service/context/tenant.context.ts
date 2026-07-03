@@ -16,8 +16,8 @@ export class TenantContext {
   private readonly asyncLocalStorage =
     new AsyncLocalStorage<TenantContextType>();
 
-  run(context: TenantContextType, callback: () => void) {
-    this.asyncLocalStorage.run(context, callback);
+  run<T>(context: TenantContextType, callback: () => T): T {
+    return this.asyncLocalStorage.run(context, callback);
   }
 
   getStore(): TenantContextType | undefined {

@@ -1,12 +1,20 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { TenantContext } from '@src/common/service/context/tenant.context';
+import { NodeConfigService } from '@src/config/node-config.service';
+import { TenantCode } from '@src/config/tenant';
 import { RagPrismaService } from './prisma/rag-prisma.service';
 
 @Injectable()
 export class RagDocumentService {
-  constructor(private readonly ragPrisma: RagPrismaService) {}
+  constructor(
+    private readonly ragPrisma: RagPrismaService,
+    private readonly tenantContext: TenantContext,
+  ) {}
 
   async listDocuments() {
+    const tenantCode = this.currentTenant();
     const documents = await this.ragPrisma.aplusDocument.findMany({
+      where: { tenantCode },
       include: {
         _count: {
           select: { chunks: true },
@@ -17,6 +25,7 @@ export class RagDocumentService {
 
     return documents.map((document) => ({
       id: document.id,
+      tenant_code: document.tenantCode,
       source_path: document.sourcePath,
       file_name: document.fileName,
       file_type: document.fileType,
@@ -33,12 +42,13 @@ export class RagDocumentService {
   }
 
   async deleteDocument(id: number) {
+    const tenantCode = this.currentTenant();
     const document = await this.ragPrisma.aplusDocument.findUnique({
       where: { id },
-      select: { id: true, sourcePath: true },
+      select: { id: true, tenantCode: true, sourcePath: true },
     });
 
-    if (!document) {
+    if (!document || document.tenantCode !== tenantCode) {
       throw new BadRequestException(`Document #${id} not found`);
     }
 
@@ -47,8 +57,13 @@ export class RagDocumentService {
     return {
       deleted: {
         id: document.id,
+        tenant_code: document.tenantCode,
         source_path: document.sourcePath,
       },
     };
+  }
+
+  private currentTenant(): TenantCode {
+    return this.tenantContext.tenant ?? NodeConfigService.get('defaultTenant');
   }
 }

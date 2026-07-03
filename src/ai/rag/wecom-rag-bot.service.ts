@@ -2,14 +2,21 @@ import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { WSClient, generateReqId, MessageType } from '@wecom/aibot-node-sdk';
 import type { Logger as WecomLogger } from '@wecom/aibot-node-sdk';
 import { LoggerService } from '@src/common/service/logger/logger.service';
+import { TenantContext } from '@src/common/service/context/tenant.context';
+import { NodeConfigService } from '@src/config/node-config.service';
+import { TenantCode, tenantCodeMap } from '@src/config/tenant';
+import type { WecomRagBotConfig } from '@src/config/interface';
 import { RagService } from './rag.service';
-import { getWecomRagBotConfig, WecomRagBotConfig } from './rag.config';
 import type {
   WecomBaseMessageFrame,
   WecomEnterChatFrame,
   WecomRagMessageContext,
   WecomTextMessageFrame,
 } from './types/wecom-rag.type';
+
+type TenantWecomRagBotConfig = WecomRagBotConfig & {
+  tenantCode: TenantCode;
+};
 
 const EMPTY_QUESTION_TIP = '请发送需要查询的文本问题。';
 const UNSUPPORTED_MESSAGE_TIP = '不支持该消息类型，请发送文本问题。';
@@ -19,88 +26,111 @@ const WELCOME_TEXT = '您好，我是企业知识库问答助手。请直接发�
 
 @Injectable()
 export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
-  private readonly config: WecomRagBotConfig;
-  private client?: WSClient;
+  private readonly configs: TenantWecomRagBotConfig[];
+  private readonly defaultTopK: number;
+  private readonly clients = new Map<string, WSClient>();
 
   constructor(
     private readonly ragService: RagService,
     private readonly logger: LoggerService,
+    private readonly tenantContext: TenantContext,
   ) {
-    this.config = getWecomRagBotConfig();
+    this.configs = this.getWecomRagBotConfigs();
+    this.defaultTopK = NodeConfigService.get('vcHelper').defaultTopK;
   }
 
   onModuleInit() {
-    if (!this.config.enabled) {
-      this.logger.info('WeCom RAG bot is disabled');
+    const enabledConfigs = this.configs.filter((config) => config.enabled);
+    if (enabledConfigs.length === 0) {
+      this.logger.info('WeCom RAG bot is disabled for all tenants');
       return;
     }
 
-    if (!this.config.botId || !this.config.secret) {
-      this.logger.warn('WeCom RAG bot config is incomplete');
-      return;
+    for (const config of enabledConfigs) {
+      if (!config.botId || !config.secret) {
+        this.logger.warn('WeCom RAG bot config is incomplete', undefined, {
+          tenantCode: config.tenantCode,
+        });
+        continue;
+      }
+
+      const client = new WSClient({
+        botId: config.botId,
+        secret: config.secret,
+        wsUrl: config.wsUrl,
+        maxReconnectAttempts: -1,
+        logger: this.buildWecomLogger(config),
+      });
+
+      this.bindEvents(client, config);
+      this.clients.set(config.tenantCode, client);
+      client.connect();
     }
-
-    this.client = new WSClient({
-      botId: this.config.botId,
-      secret: this.config.secret,
-      wsUrl: this.config.wsUrl,
-      maxReconnectAttempts: -1,
-      logger: this.buildWecomLogger(),
-    });
-
-    this.bindEvents(this.client);
-    this.client.connect();
   }
 
   onModuleDestroy() {
-    this.client?.disconnect();
+    for (const client of this.clients.values()) {
+      client.disconnect();
+    }
+    this.clients.clear();
   }
 
-  private bindEvents(client: WSClient) {
+  private bindEvents(client: WSClient, config: TenantWecomRagBotConfig) {
     client.on('connected', () => {
-      this.logger.info('WeCom RAG bot websocket connected');
+      this.logger.info('WeCom RAG bot websocket connected', undefined, {
+        tenantCode: config.tenantCode,
+      });
     });
 
     client.on('authenticated', () => {
-      this.logger.info('WeCom RAG bot authenticated');
+      this.logger.info('WeCom RAG bot authenticated', undefined, {
+        tenantCode: config.tenantCode,
+      });
     });
 
     client.on('disconnected', (reason) => {
       this.logger.warn('WeCom RAG bot websocket disconnected', undefined, {
+        tenantCode: config.tenantCode,
         reason,
       });
     });
 
     client.on('reconnecting', (attempt) => {
       this.logger.warn('WeCom RAG bot websocket reconnecting', undefined, {
+        tenantCode: config.tenantCode,
         attempt,
       });
     });
 
     client.on('error', (error) => {
       this.logger.error('WeCom RAG bot websocket error', undefined, {
+        tenantCode: config.tenantCode,
         error: error.message,
       });
     });
 
     client.on('event.enter_chat', (frame) => {
-      return this.replyWelcome(frame);
+      return this.replyWelcome(client, config, frame);
     });
 
     client.on('message.text', (frame) => {
-      return this.handleTextMessage(frame);
+      return this.handleTextMessage(client, config, frame);
     });
 
     client.on('message', (frame) => {
       if (frame.body?.msgtype !== MessageType.Text) {
-        return this.handleUnsupportedMessage(frame);
+        return this.handleUnsupportedMessage(client, config, frame);
       }
     });
   }
 
-  private async replyWelcome(frame: WecomEnterChatFrame) {
+  private async replyWelcome(
+    client: WSClient,
+    config: TenantWecomRagBotConfig,
+    frame: WecomEnterChatFrame,
+  ) {
     try {
-      await this.client?.replyWelcome(frame, {
+      await client.replyWelcome(frame, {
         msgtype: 'text',
         text: { content: WELCOME_TEXT },
       });
@@ -109,20 +139,26 @@ export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
         'Failed to reply WeCom RAG welcome message',
         undefined,
         {
+          tenantCode: config.tenantCode,
           error: this.formatError(error),
         },
       );
     }
   }
 
-  private async handleTextMessage(frame: WecomTextMessageFrame) {
+  private async handleTextMessage(
+    client: WSClient,
+    config: TenantWecomRagBotConfig,
+    frame: WecomTextMessageFrame,
+  ) {
     const context = this.buildMessageContext(frame);
     if (!context.question) {
-      await this.replyText(frame, EMPTY_QUESTION_TIP, true);
+      await this.replyText(client, frame, EMPTY_QUESTION_TIP, true);
       return;
     }
 
     this.logger.info('WeCom RAG question received', undefined, {
+      tenantCode: config.tenantCode,
       msgId: context.msgId,
       chatId: context.chatId,
       userId: context.userId,
@@ -133,22 +169,28 @@ export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
     let answerContent = '';
 
     try {
-      await this.replyStream(frame, streamId, THINKING_TIP, false);
+      await this.replyStream(client, frame, streamId, THINKING_TIP, false);
 
-      for await (const event of this.ragService.streamAnswer(
-        context.question,
-        this.config.defaultTopK,
-      )) {
-        if (event.type !== 'answer') continue;
+      await this.tenantContext.run(
+        { tenantCode: config.tenantCode },
+        async () => {
+          for await (const event of this.ragService.streamAnswer(
+            context.question,
+            this.defaultTopK,
+          )) {
+            if (event.type !== 'answer') continue;
 
-        const token = event.data;
-        if (!token) continue;
+            const token = event.data;
+            if (!token) continue;
 
-        answerContent += token;
-        await this.replyStream(frame, streamId, answerContent, false);
-      }
+            answerContent += token;
+            await this.replyStream(client, frame, streamId, answerContent, false);
+          }
+        },
+      );
 
       await this.replyStream(
+        client,
         frame,
         streamId,
         answerContent
@@ -158,23 +200,35 @@ export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
       );
     } catch (error) {
       this.logger.error('Failed to answer WeCom RAG question', undefined, {
+        tenantCode: config.tenantCode,
         msgId: context.msgId,
         chatId: context.chatId,
         userId: context.userId,
         error: this.formatError(error),
       });
-      await this.replyStream(frame, streamId, RAG_UNAVAILABLE_TIP, true);
+      await this.replyStream(
+        client,
+        frame,
+        streamId,
+        RAG_UNAVAILABLE_TIP,
+        true,
+      );
     }
   }
 
-  private async handleUnsupportedMessage(frame: WecomBaseMessageFrame) {
+  private async handleUnsupportedMessage(
+    client: WSClient,
+    config: TenantWecomRagBotConfig,
+    frame: WecomBaseMessageFrame,
+  ) {
     this.logger.info('Unsupported WeCom RAG message received', undefined, {
+      tenantCode: config.tenantCode,
       msgId: frame.body?.msgid,
       msgType: frame.body?.msgtype,
       chatId: this.resolveChatId(frame.body),
       userId: frame.body?.from?.userid,
     });
-    await this.replyText(frame, UNSUPPORTED_MESSAGE_TIP, true);
+    await this.replyText(client, frame, UNSUPPORTED_MESSAGE_TIP, true);
   }
 
   private buildMessageContext(
@@ -196,37 +250,67 @@ export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async replyText(
+    client: WSClient,
     frame: WecomTextMessageFrame | WecomBaseMessageFrame,
     content: string,
     finish: boolean,
   ) {
-    await this.replyStream(frame, generateReqId('rag_stream'), content, finish);
+    await this.replyStream(
+      client,
+      frame,
+      generateReqId('rag_stream'),
+      content,
+      finish,
+    );
   }
 
   private async replyStream(
+    client: WSClient,
     frame: WecomTextMessageFrame | WecomBaseMessageFrame,
     streamId: string,
     content: string,
     finish: boolean,
   ) {
-    if (!this.client) return;
-    await this.client.replyStreamNonBlocking(frame, streamId, content, finish);
+    await client.replyStreamNonBlocking(frame, streamId, content, finish);
   }
 
-  private buildWecomLogger(): WecomLogger {
+  private buildWecomLogger(config: TenantWecomRagBotConfig): WecomLogger {
     return {
       debug: (message: string, ...args: any[]) =>
-        this.logger.debug(message, undefined, { args }),
+        this.logger.debug(message, undefined, {
+          tenantCode: config.tenantCode,
+          args,
+        }),
       info: (message: string, ...args: any[]) =>
-        this.logger.info(message, undefined, { args }),
+        this.logger.info(message, undefined, {
+          tenantCode: config.tenantCode,
+          args,
+        }),
       warn: (message: string, ...args: any[]) =>
-        this.logger.warn(message, undefined, { args }),
+        this.logger.warn(message, undefined, {
+          tenantCode: config.tenantCode,
+          args,
+        }),
       error: (message: string, ...args: any[]) =>
-        this.logger.error(message, undefined, { args }),
+        this.logger.error(message, undefined, {
+          tenantCode: config.tenantCode,
+          args,
+        }),
     };
   }
 
   private formatError(error: unknown) {
     return error instanceof Error ? error.message : String(error);
+  }
+
+  private getWecomRagBotConfigs(): TenantWecomRagBotConfig[] {
+    const tenantConfigs = NodeConfigService.get('tenantConfig');
+    return Object.values(tenantCodeMap)
+      .map((tenantCode) => {
+        const wecomBot =
+          tenantConfigs[tenantCode]?.wecomBot?.vcHelperClient;
+        return wecomBot ? { tenantCode, ...wecomBot } : undefined;
+      })
+      .filter(Boolean) as TenantWecomRagBotConfig[];
   }
 }

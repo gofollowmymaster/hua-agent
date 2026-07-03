@@ -5,7 +5,7 @@ import pg from 'pg';
 
 const { Pool } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const schemaPath = path.resolve(__dirname, '../database/rag/schema.sql');
+const schemaPath = path.resolve(__dirname, '../prisma/rag/schema.sql');
 const connectionString =
   process.env.RAG_DATABASE_URL ?? 'postgres://user:123456@localhost:5432/hello_pg';
 

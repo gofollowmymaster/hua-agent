@@ -18,6 +18,7 @@ export interface LoadedDocument extends RawDocumentFile {
 
 export interface RetrievedChunk {
   id: string;
+  tenantCode: string;
   documentId: string;
   fileName: string;
   sourcePath: string;

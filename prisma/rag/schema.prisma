@@ -11,7 +11,8 @@ datasource db {
 
 model AplusDocument {
   id         BigInt       @id @default(autoincrement())
-  sourcePath String       @unique @map("source_path") @db.Text
+  tenantCode String       @map("tenant_code") @db.Text
+  sourcePath String       @map("source_path") @db.Text
   fileName   String       @map("file_name") @db.Text
   fileType   String       @map("file_type") @db.Text
   fileHash   String       @map("file_hash") @db.Text
@@ -24,11 +25,14 @@ model AplusDocument {
   ingestedAt DateTime?    @map("ingested_at") @db.Timestamptz(6)
   chunks     AplusChunk[]
 
+  @@unique([tenantCode, sourcePath])
+  @@index([tenantCode], map: "idx_aplus_documents_tenant_code")
   @@map("aplus_documents")
 }
 
 model AplusChunk {
   id         BigInt                @id @default(autoincrement())
+  tenantCode String                @map("tenant_code") @db.Text
   documentId BigInt                @map("document_id")
   chunkIndex Int                   @map("chunk_index")
   content    String                @db.Text
@@ -37,7 +41,9 @@ model AplusChunk {
   createdAt  DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
   document   AplusDocument         @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
-  @@unique([documentId, chunkIndex])
+  @@unique([tenantCode, documentId, chunkIndex])
+  @@index([tenantCode], map: "idx_aplus_chunks_tenant_code")
   @@index([documentId], map: "idx_aplus_chunks_document_id")
+  @@index([tenantCode, documentId], map: "idx_aplus_chunks_tenant_document")
   @@map("aplus_chunks")
 }

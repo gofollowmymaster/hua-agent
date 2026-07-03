@@ -1,4 +1,11 @@
 import { TenantConfig } from '.';
+
+function booleanEnv(key: string, fallback: boolean) {
+  const value = process.env[key];
+  if (value === undefined) return fallback;
+  return ['1', 'true', 'yes', 'on'].includes(value.toLowerCase());
+}
+
 const boatConfig: TenantConfig = {
   FeishuWikiSpaceIds: ['7549126549107195906'],
   hostTag: 'boat',
@@ -26,6 +33,13 @@ const boatConfig: TenantConfig = {
     AilyAplusClient: {
       appId: 'cli_a85a4dc1c9259013',
       appSecret: 'wmea3GufO6ADkITtv0CjkexcZmpCAsWi',
+    },
+  },
+  wecomBot: {
+    vcHelperClient: {
+      enabled: true,
+      botId: 'aibUgGjuQhOI3B19q_aVc6NEnAkTgiXGDyU',
+      secret: 'aROn3aRkDzzVBeqVP3h7xtMjnabIQJUCUj4ECFd6Qd6',
     },
   },
 };

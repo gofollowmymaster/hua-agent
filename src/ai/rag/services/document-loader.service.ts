@@ -7,7 +7,8 @@ import JSZip from 'jszip';
 import mammoth from 'mammoth';
 import pdfParse from 'pdf-parse';
 import xlsx from 'xlsx';
-import { getRagConfig } from '../rag.config';
+import { TenantCode } from '@src/config/tenant';
+import { NodeConfigService } from '@src/config/node-config.service';
 import type {
   LoadedDocument,
   LoadedSegment,
@@ -30,11 +31,15 @@ export class DocumentLoaderService {
   private readonly rawDir: string;
 
   constructor() {
-    this.rawDir = path.resolve(process.cwd(), getRagConfig().rawDir);
+    this.rawDir = path.resolve(
+      process.cwd(),
+      NodeConfigService.get('vcHelper').rawDir,
+    );
   }
 
-  async scanRawFiles(): Promise<RawDocumentFile[]> {
-    const absolutePaths = await this.walk(this.rawDir);
+  async scanRawFiles(tenantCode: TenantCode): Promise<RawDocumentFile[]> {
+    const tenantRawDir = path.join(this.rawDir, tenantCode);
+    const absolutePaths = await this.walk(tenantRawDir);
     const files: RawDocumentFile[] = [];
 
     for (const absolutePath of absolutePaths) {
@@ -42,7 +47,7 @@ export class DocumentLoaderService {
       if (!SUPPORTED_EXTENSIONS.has(ext)) continue;
 
       const stat = await fs.stat(absolutePath);
-      const sourcePath = path.relative(process.cwd(), absolutePath);
+      const sourcePath = path.relative(tenantRawDir, absolutePath);
       files.push({
         absolutePath,
         sourcePath,
@@ -83,7 +88,15 @@ export class DocumentLoaderService {
   }
 
   private async walk(dir: string): Promise<string[]> {
-    const entries = await fs.readdir(dir, { withFileTypes: true });
+    let entries: Awaited<ReturnType<typeof fs.readdir>>;
+    try {
+      entries = await fs.readdir(dir, { withFileTypes: true });
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+        return [];
+      }
+      throw error;
+    }
     const files: string[] = [];
 
     for (const entry of entries) {

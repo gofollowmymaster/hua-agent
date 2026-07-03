@@ -1,4 +1,11 @@
 import { TenantConfig } from '.';
+
+function booleanEnv(key: string, fallback: boolean) {
+  const value = process.env[key];
+  if (value === undefined) return fallback;
+  return ['1', 'true', 'yes', 'on'].includes(value.toLowerCase());
+}
+
 const yurexConfig: TenantConfig = {
   FeishuWikiSpaceIds: ['7583921476789652686'],
   hostTag: 'yurex',
@@ -15,6 +22,13 @@ const yurexConfig: TenantConfig = {
     AilyAplusClient: {
       appId: process.env.FEISHU_AILY_APP_ID_APLUS,
       appSecret: process.env.FEISHU_AILY_APP_SECRET_APLUS,
+    },
+  },
+  wecomBot: {
+    vcHelperClient: {
+      enabled: false,
+      botId: '',
+      secret: '',
     },
   },
 };

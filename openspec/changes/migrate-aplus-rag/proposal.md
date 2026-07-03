@@ -28,5 +28,5 @@
 
 ## Impact
 
-- 影响 `src/ai` 模块注册、`package.json`/lockfile、环境变量模板、`database/rag`、`scripts` 和新增 `raw/` 资料目录。
+- 影响 `src/ai` 模块注册、`package.json`/lockfile、环境变量模板、`prisma/rag`、`scripts` 和新增 `raw/` 资料目录。
 - 运行依赖新增一个可用的 PostgreSQL + pgvector 实例，并要求配置 `RAG_DATABASE_URL`。

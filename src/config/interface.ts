@@ -4,6 +4,22 @@ export type FeishuAppConfig = {
   appId: string;
   appSecret: string;
 };
+
+export type RagConfig = {
+  rawDir: string;
+  chunkSize: number;
+  chunkOverlap: number;
+  embeddingBatchSize: number;
+  defaultTopK: number;
+};
+
+export type WecomRagBotConfig = {
+  enabled: boolean;
+  botId: string;
+  secret: string;
+  wsUrl?: string;
+};
+
 export type GlobalConfigType = {
   DB_REDIS_HOST: string;
   DB_REDIS_PORT: number;
@@ -25,6 +41,17 @@ export type GlobalConfigType = {
   sentryIntegrationToken: string;
 
   AliyunOrganizationId: string;
+
+  databaseUrl: string;
+  openAiApiKey: string;
+  openAiBaseUrl?: string;
+  modelName: string;
+  embeddingsApiKey: string;
+  embeddingsBaseUrl?: string;
+  embeddingsModelName: string;
+  embeddingsDimensions: number;
+
+  vcHelper: RagConfig;
 
   feishuTables: {
     //报警表格相关

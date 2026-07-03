@@ -1,6 +1,20 @@
 import db from './db';
 import { GlobalConfigType } from './interface';
 import tenantConfig, { tenantCodeMap } from './tenant/index';
+
+const DEFAULT_RAG_DATABASE_URL = 'postgres://user:123456@localhost:5432/vc_rag';
+
+function numberEnv(key: string, fallback: number) {
+  const value = Number(process.env[key]);
+  return Number.isFinite(value) && value > 0 ? value : fallback;
+}
+
+function maxNumberEnv(key: string, fallback: number, max: number) {
+  return Math.min(numberEnv(key, fallback), max);
+}
+
+const openAiApiKey = process.env.OPENAI_API_KEY ?? '';
+
 const globalConfig: GlobalConfigType = Object.freeze({
   //node-server报警群
   DefaultAlertFeishuGroupId: process.env.SERVER_ALERT_GROUPID,
@@ -18,6 +32,24 @@ const globalConfig: GlobalConfigType = Object.freeze({
   sentryIntegrationToken: process.env.SENTRY_API_TOKEN,
 
   AliyunOrganizationId: '65f941491febde2b6c514822',
+
+  databaseUrl: process.env.RAG_DATABASE_URL ?? DEFAULT_RAG_DATABASE_URL,
+  openAiApiKey,
+  openAiBaseUrl: process.env.OPENAI_BASE_URL,
+  modelName: process.env.MODEL_NAME ?? 'qwen-plus',
+  embeddingsApiKey: process.env.EMBEDDINGS_API_KEY ?? openAiApiKey,
+  embeddingsBaseUrl:
+    process.env.EMBEDDINGS_BASE_URL ?? process.env.OPENAI_BASE_URL,
+  embeddingsModelName: process.env.EMBEDDINGS_MODEL_NAME ?? 'text-embedding-v3',
+  embeddingsDimensions: numberEnv('EMBEDDINGS_DIMENSIONS', 1024),
+
+  vcHelper: {
+    rawDir: process.env.RAW_DIR ?? 'raw',
+    chunkSize: numberEnv('RAG_CHUNK_SIZE', 800),
+    chunkOverlap: numberEnv('RAG_CHUNK_OVERLAP', 120),
+    embeddingBatchSize: maxNumberEnv('RAG_EMBEDDING_BATCH_SIZE', 10, 10),
+    defaultTopK: numberEnv('RAG_DEFAULT_TOP_K', 5),
+  },
 
   feishuTables: {
     //报警表格相关

@@ -10,6 +10,7 @@ import {
   Post,
   Query,
   Sse,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { catchError, from, map, Observable, of } from 'rxjs';
@@ -19,6 +20,7 @@ import { RagQueryDto } from './dto/query.dto';
 import { RagService } from './rag.service';
 import { RagDocumentService } from './services/rag-document.service';
 import { RagIngestService } from './services/rag-ingest.service';
+import { AuthGuard } from '@src/common/guard/auth';
 
 @ApiTags('RAG 企业知识库')
 @Controller('ai/rag')
@@ -32,6 +34,7 @@ export class RagController {
   @Post('ingest')
   @ApiOperation({ summary: '扫描 raw 目录并索引 RAG 文档' })
   @ApiBody({ type: RagIngestDto })
+  @UseGuards(AuthGuard)
   ingest(@Body() body: RagIngestDto) {
     return this.ragIngestService.ingest({ force: Boolean(body?.force) });
   }

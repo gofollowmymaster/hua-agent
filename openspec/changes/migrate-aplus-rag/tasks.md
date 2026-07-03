@@ -11,7 +11,7 @@
 
 ## 3. 数据库、配置和依赖
 
-- [x] 3.1 新增 `database/rag/schema.sql` 和 `scripts/rag-db-init.mjs`。
+- [x] 3.1 新增 `prisma/rag/schema.sql` 和 `scripts/rag-db-init.mjs`。
 - [x] 3.2 更新 `package.json` 脚本和 RAG 依赖。
 - [x] 3.3 更新环境变量模板/配置说明，不提交真实密钥。
 

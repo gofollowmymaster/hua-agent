@@ -3,6 +3,8 @@ const mockDisconnect = jest.fn();
 const mockOn = jest.fn();
 const mockReplyStreamNonBlocking = jest.fn();
 const mockReplyWelcome = jest.fn();
+let mockWecomRagBotConfigs: any[] = [];
+let mockRagConfig: any = {};
 
 jest.mock('@wecom/aibot-node-sdk', () => ({
   MessageType: { Text: 'text' },
@@ -16,10 +18,19 @@ jest.mock('@wecom/aibot-node-sdk', () => ({
   })),
 }));
 
-const { WecomRagBotService } = require('./wecom-rag-bot.service');
+jest.mock('@src/config/node-config.service', () => ({
+  NodeConfigService: {
+    get: jest.fn((key: string) => {
+      if (key === 'vcHelper') return mockRagConfig;
+      if (key === 'tenantConfig') return buildTenantConfig();
+      return undefined;
+    }),
+  },
+}));
 
 describe('WecomRagBotService', () => {
   let ragService: { streamAnswer: jest.Mock };
+  let tenantContext: { run: jest.Mock };
   let logger: {
     info: jest.Mock;
     warn: jest.Mock;
@@ -29,11 +40,27 @@ describe('WecomRagBotService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.WECOM_RAG_BOT_ENABLED = 'true';
-    process.env.WECOM_RAG_BOT_ID = 'bot-id';
-    process.env.WECOM_RAG_BOT_SECRET = 'secret';
-    delete process.env.WECOM_RAG_BOT_WS_URL;
-    delete process.env.WECOM_RAG_DEFAULT_TOP_K;
+    mockWecomRagBotConfigs = [
+      {
+        tenantCode: 'aplus',
+        enabled: true,
+        botId: 'bot-id',
+        secret: 'secret',
+      },
+      {
+        tenantCode: 'boat',
+        enabled: false,
+        botId: '',
+        secret: '',
+      },
+      {
+        tenantCode: 'yurex',
+        enabled: false,
+        botId: '',
+        secret: '',
+      },
+    ];
+    mockRagConfig = { defaultTopK: 5 };
 
     ragService = {
       streamAnswer: jest.fn(async function* () {
@@ -52,11 +79,19 @@ describe('WecomRagBotService', () => {
       error: jest.fn(),
       debug: jest.fn(),
     };
+    tenantContext = {
+      run: jest.fn((_context, callback) => callback()),
+    };
   });
 
   it('does not connect when disabled', () => {
-    process.env.WECOM_RAG_BOT_ENABLED = 'false';
-    const service = new WecomRagBotService(ragService as any, logger as any);
+    mockWecomRagBotConfigs[0].enabled = false;
+    const WecomRagBotService = getWecomRagBotService();
+    const service = new WecomRagBotService(
+      ragService as any,
+      logger as any,
+      tenantContext as any,
+    );
 
     service.onModuleInit();
 
@@ -64,7 +99,12 @@ describe('WecomRagBotService', () => {
   });
 
   it('registers handlers and connects when enabled', () => {
-    const service = new WecomRagBotService(ragService as any, logger as any);
+    const WecomRagBotService = getWecomRagBotService();
+    const service = new WecomRagBotService(
+      ragService as any,
+      logger as any,
+      tenantContext as any,
+    );
 
     service.onModuleInit();
 
@@ -77,13 +117,22 @@ describe('WecomRagBotService', () => {
   });
 
   it('streams rag answer for text messages', async () => {
-    process.env.WECOM_RAG_DEFAULT_TOP_K = '8';
-    const service = new WecomRagBotService(ragService as any, logger as any);
+    mockRagConfig.defaultTopK = 8;
+    const WecomRagBotService = getWecomRagBotService();
+    const service = new WecomRagBotService(
+      ragService as any,
+      logger as any,
+      tenantContext as any,
+    );
     service.onModuleInit();
     const handler = getHandler('message.text');
 
     await handler(buildTextFrame('什么是 VC？'));
 
+    expect(tenantContext.run).toHaveBeenCalledWith(
+      { tenantCode: 'aplus' },
+      expect.any(Function),
+    );
     expect(ragService.streamAnswer).toHaveBeenCalledWith('什么是 VC？', 8);
     expect(mockReplyStreamNonBlocking).toHaveBeenNthCalledWith(
       1,
@@ -115,7 +164,12 @@ describe('WecomRagBotService', () => {
   });
 
   it('replies tip for empty text messages', async () => {
-    const service = new WecomRagBotService(ragService as any, logger as any);
+    const WecomRagBotService = getWecomRagBotService();
+    const service = new WecomRagBotService(
+      ragService as any,
+      logger as any,
+      tenantContext as any,
+    );
     service.onModuleInit();
     const handler = getHandler('message.text');
 
@@ -131,7 +185,12 @@ describe('WecomRagBotService', () => {
   });
 
   it('replies unsupported tip for non-text messages', async () => {
-    const service = new WecomRagBotService(ragService as any, logger as any);
+    const WecomRagBotService = getWecomRagBotService();
+    const service = new WecomRagBotService(
+      ragService as any,
+      logger as any,
+      tenantContext as any,
+    );
     service.onModuleInit();
     const handler = getHandler('message');
 
@@ -149,7 +208,12 @@ describe('WecomRagBotService', () => {
     ragService.streamAnswer = jest.fn(async function* () {
       throw new Error('rag failed');
     });
-    const service = new WecomRagBotService(ragService as any, logger as any);
+    const WecomRagBotService = getWecomRagBotService();
+    const service = new WecomRagBotService(
+      ragService as any,
+      logger as any,
+      tenantContext as any,
+    );
     service.onModuleInit();
     const handler = getHandler('message.text');
 
@@ -162,7 +226,46 @@ describe('WecomRagBotService', () => {
       true,
     );
   });
+
+  it('creates one websocket client per enabled tenant', () => {
+    mockWecomRagBotConfigs[1] = {
+      tenantCode: 'boat',
+      enabled: true,
+      botId: 'boat-bot-id',
+      secret: 'boat-secret',
+    };
+    const WecomRagBotService = getWecomRagBotService();
+    const service = new WecomRagBotService(
+      ragService as any,
+      logger as any,
+      tenantContext as any,
+    );
+
+    service.onModuleInit();
+
+    expect(mockConnect).toHaveBeenCalledTimes(2);
+  });
 });
+
+function getWecomRagBotService() {
+  return require('./wecom-rag-bot.service').WecomRagBotService;
+}
+
+function buildTenantConfig() {
+  return mockWecomRagBotConfigs.reduce((config, item) => {
+    config[item.tenantCode] = {
+      wecomBot: {
+        vcHelperClient: {
+          enabled: item.enabled,
+          botId: item.botId,
+          secret: item.secret,
+          wsUrl: item.wsUrl,
+        },
+      },
+    };
+    return config;
+  }, {});
+}
 
 function getHandler(eventName: string) {
   const call = mockOn.mock.calls.find(([name]) => name === eventName);

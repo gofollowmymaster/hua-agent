@@ -1,4 +1,11 @@
 import { TenantConfig } from '.';
+
+function booleanEnv(key: string, fallback: boolean) {
+  const value = process.env[key];
+  if (value === undefined) return fallback;
+  return ['1', 'true', 'yes', 'on'].includes(value.toLowerCase());
+}
+
 const aplusConfig: TenantConfig = {
   FeishuWikiSpaceIds: ['7382766506582736900'],
   hostTag: 'lnk',
@@ -27,6 +34,13 @@ const aplusConfig: TenantConfig = {
       process.env.FEISHU_AILY_APLUS_APP_TOKEN || 'CccVb85n4aVC7hsWjVhcY5YfnSe',
     AilyLogOperatorTableId:
       process.env.FEISHU_AILY_APLUS_TABLE_ID || 'tblcE7q8e2vD9c48',
+  },
+  wecomBot: {
+    vcHelperClient: {
+      enabled: false,
+      botId: '',
+      secret: '',
+    },
   },
 };
 

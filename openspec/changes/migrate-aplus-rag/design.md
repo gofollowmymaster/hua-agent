@@ -14,7 +14,7 @@
 
 - RAG 使用独立 PostgreSQL schema：`aplus_documents` 与 `aplus_chunks`。
 - `aplus_chunks.embedding` 使用 `vector(1024)`，检索 SQL 保留 `embedding <=> queryVector` 和 HNSW cosine 索引。
-- 初始化脚本 `scripts/rag-db-init.mjs` 读取 `database/rag/schema.sql`，连接 `RAG_DATABASE_URL`，不使用 Prisma migration。
+- 初始化脚本 `scripts/rag-db-init.mjs` 读取 `prisma/rag/schema.sql`，连接 `RAG_DATABASE_URL`，不使用 Prisma migration。
 
 ## Configuration
 

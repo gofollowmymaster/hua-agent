@@ -1,4 +1,4 @@
-import { FeishuAppConfig } from '../interface';
+import { FeishuAppConfig, WecomRagBotConfig } from '../interface';
 import aplus from './aplus';
 import boat from './boat';
 import yurex from './yurex';
@@ -17,6 +17,9 @@ export type TenantConfig = {
 
   //Aplus智能体表格相关
   feishuTables: Record<string, string>;
+  wecomBot?: {
+    vcHelperClient?: WecomRagBotConfig;
+  };
 };
 export type TenantRobots = keyof TenantConfig['robots'];
 export type TenantConfigKey = keyof TenantConfig;

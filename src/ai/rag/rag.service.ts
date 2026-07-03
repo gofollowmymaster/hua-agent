@@ -1,8 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { ChatOpenAI, OpenAIEmbeddings } from '@langchain/openai';
+import { TenantContext } from '@src/common/service/context/tenant.context';
 import { LoggerService } from '@src/common/service/logger/logger.service';
-import { getRagConfig } from './rag.config';
+import { NodeConfigService } from '@src/config/node-config.service';
+import { TenantCode } from '@src/config/tenant';
 import { RagPrismaService } from './services/prisma/rag-prisma.service';
 import type { RagStreamEvent, RetrievedChunk } from './types/rag.type';
 
@@ -15,27 +17,28 @@ export class RagService {
   constructor(
     private readonly ragPrisma: RagPrismaService,
     private readonly logger: LoggerService,
+    private readonly tenantContext: TenantContext,
   ) {
     this.logger.setContext(RagService.name);
 
-    const config = getRagConfig();
-    this.defaultTopK = config.defaultTopK;
+    const ragConfig = NodeConfigService.get('vcHelper');
+    this.defaultTopK = ragConfig.defaultTopK;
 
     this.embeddings = new OpenAIEmbeddings({
-      apiKey: config.embeddingsApiKey,
-      model: config.embeddingsModelName,
-      dimensions: config.embeddingsDimensions,
+      apiKey: NodeConfigService.get('embeddingsApiKey'),
+      model: NodeConfigService.get('embeddingsModelName'),
+      dimensions: NodeConfigService.get('embeddingsDimensions'),
       configuration: {
-        baseURL: config.embeddingsBaseUrl,
+        baseURL: NodeConfigService.get('embeddingsBaseUrl'),
       },
     });
 
     this.model = new ChatOpenAI({
       temperature: 0,
-      model: config.modelName,
-      apiKey: config.openAiApiKey,
+      model: NodeConfigService.get('modelName'),
+      apiKey: NodeConfigService.get('openAiApiKey'),
       configuration: {
-        baseURL: config.openAiBaseUrl,
+        baseURL: NodeConfigService.get('openAiBaseUrl'),
       },
     });
   }
@@ -105,6 +108,7 @@ export class RagService {
         undefined,
         {
           stage: 'rag_stream_empty_fallback',
+          tenantCode: this.tenantContext.tenant,
           topK,
           chunks: chunks.length,
         },
@@ -139,10 +143,12 @@ export class RagService {
     question: string,
     topK = this.defaultTopK,
   ): Promise<RetrievedChunk[]> {
+    const tenantCode = this.tenantContext.tenant;
     const limit = Math.min(Math.max(Number(topK) || this.defaultTopK, 1), 20);
     const vector = await this.embeddings.embedQuery(question);
     const rows = await this.ragPrisma.$queryRaw<any[]>`
       SELECT c.id,
+             c.tenant_code,
              c.document_id,
              c.chunk_index,
              c.content,
@@ -153,12 +159,15 @@ export class RagService {
       FROM aplus_chunks c
       JOIN aplus_documents d ON d.id = c.document_id
       WHERE c.embedding IS NOT NULL
+        AND c.tenant_code = ${tenantCode}
+        AND d.tenant_code = ${tenantCode}
       ORDER BY c.embedding <=> ${JSON.stringify(vector)}::vector
       LIMIT ${limit}
     `;
 
     return rows.map((row) => ({
       id: String(row.id),
+      tenantCode: row.tenant_code,
       documentId: String(row.document_id),
       fileName: row.file_name,
       sourcePath: row.source_path,

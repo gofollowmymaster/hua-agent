@@ -30,7 +30,7 @@
     "pf": "prisma format",
     "pmd": "prisma migrate dev",
     "pmSdo": "prisma studio",
-    "rag:db:init": "node scripts/rag-db-init.mjs"
+    "rag:db:init": "pnpm env:dev -- node scripts/rag-db-init.mjs"
   },
   "dependencies": {
     "@langchain/core": "^0.3.79",

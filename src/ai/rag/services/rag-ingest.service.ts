@@ -6,8 +6,10 @@ import {
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import type { Prisma } from '@prisma/rag-client';
+import { TenantCode } from '@src/config/tenant';
 import { LoggerService } from '@src/common/service/logger/logger.service';
-import { getRagConfig } from '../rag.config';
+import { TenantContext } from '@src/common/service/context/tenant.context';
+import { NodeConfigService } from '@src/config/node-config.service';
 import type { IngestSummary, LoadedDocument } from '../types/rag.type';
 import { DocumentLoaderService } from './document-loader.service';
 import { RagPrismaService } from './prisma/rag-prisma.service';
@@ -22,38 +24,42 @@ export class RagIngestService {
     private readonly ragPrisma: RagPrismaService,
     private readonly loader: DocumentLoaderService,
     private readonly logger: LoggerService,
+    private readonly tenantContext: TenantContext,
   ) {
     this.logger.setContext(RagIngestService.name);
 
-    const config = getRagConfig();
-    this.embeddingBatchSize = config.embeddingBatchSize;
+    const ragConfig = NodeConfigService.get('vcHelper');
+    this.embeddingBatchSize = ragConfig.embeddingBatchSize;
 
     this.embeddings = new OpenAIEmbeddings({
-      apiKey: config.embeddingsApiKey,
-      model: config.embeddingsModelName,
-      dimensions: config.embeddingsDimensions,
+      apiKey: NodeConfigService.get('embeddingsApiKey'),
+      model: NodeConfigService.get('embeddingsModelName'),
+      dimensions: NodeConfigService.get('embeddingsDimensions'),
       configuration: {
-        baseURL: config.embeddingsBaseUrl,
+        baseURL: NodeConfigService.get('embeddingsBaseUrl'),
       },
     });
 
     this.splitter = new RecursiveCharacterTextSplitter({
-      chunkSize: config.chunkSize,
-      chunkOverlap: config.chunkOverlap,
+      chunkSize: ragConfig.chunkSize,
+      chunkOverlap: ragConfig.chunkOverlap,
       separators: ['\n\n', '\n', '。', '！', '？', '.', '!', '?', ' ', ''],
     });
   }
 
   async ingest(options: { force?: boolean } = {}): Promise<IngestSummary> {
+    const tenantCode = this.currentTenant();
     const ingestStart = Date.now();
     this.logIngestProgress({
       stage: 'scan_start',
+      tenantCode,
       force: Boolean(options.force),
     });
 
-    const files = await this.loader.scanRawFiles();
+    const files = await this.loader.scanRawFiles(tenantCode);
     this.logIngestProgress({
       stage: 'scan_done',
+      tenantCode,
       force: Boolean(options.force),
       totalFiles: files.length,
       durationMs: Date.now() - ingestStart,
@@ -78,6 +84,7 @@ export class RagIngestService {
         fileName: file.fileName,
         fileType: file.fileType,
         fileSize: file.fileSize,
+        tenantCode,
       };
 
       this.logIngestProgress({
@@ -85,7 +92,10 @@ export class RagIngestService {
         ...fileLogContext,
       });
 
-      const existing = await this.findDocumentBySourcePath(file.sourcePath);
+      const existing = await this.findDocumentBySourcePath(
+        tenantCode,
+        file.sourcePath,
+      );
       if (
         existing &&
         existing.file_hash === file.fileHash &&
@@ -116,7 +126,7 @@ export class RagIngestService {
           durationMs: Date.now() - fileStart,
         });
 
-        const chunks = await this.buildChunks(document);
+        const chunks = await this.buildChunks(tenantCode, document);
         this.logIngestProgress({
           stage: 'file_chunk_done',
           ...fileLogContext,
@@ -130,6 +140,7 @@ export class RagIngestService {
         }
 
         const documentId = await this.replaceDocumentChunks(
+          tenantCode,
           document,
           chunks,
           fileLogContext,
@@ -153,7 +164,7 @@ export class RagIngestService {
       } catch (error) {
         summary.failedFiles += 1;
         const message = error instanceof Error ? error.message : String(error);
-        await this.markDocumentFailed(file, message);
+        await this.markDocumentFailed(tenantCode, file, message);
         summary.files.push({
           sourcePath: file.sourcePath,
           status: 'failed',
@@ -170,6 +181,7 @@ export class RagIngestService {
 
     this.logIngestProgress({
       stage: 'ingest_done',
+      tenantCode,
       force: Boolean(options.force),
       durationMs: Date.now() - ingestStart,
       summary,
@@ -178,7 +190,7 @@ export class RagIngestService {
     return summary;
   }
 
-  private async buildChunks(document: LoadedDocument) {
+  private async buildChunks(tenantCode: TenantCode, document: LoadedDocument) {
     const chunks: Array<{
       content: string;
       metadata: Record<string, unknown>;
@@ -196,6 +208,7 @@ export class RagIngestService {
             sourcePath: document.sourcePath,
             fileName: document.fileName,
             fileType: document.fileType,
+            tenantCode,
           },
         });
       }
@@ -205,6 +218,7 @@ export class RagIngestService {
   }
 
   private async replaceDocumentChunks(
+    tenantCode: TenantCode,
     document: LoadedDocument,
     chunks: Array<{ content: string; metadata: Record<string, unknown> }>,
     logContext?: Record<string, unknown>,
@@ -231,7 +245,11 @@ export class RagIngestService {
     });
 
     return this.ragPrisma.$transaction(async (client) => {
-      const documentId = await this.upsertProcessingDocument(client, document);
+      const documentId = await this.upsertProcessingDocument(
+        client,
+        tenantCode,
+        document,
+      );
       this.logIngestProgress({
         stage: 'file_write_start',
         ...logContext,
@@ -241,14 +259,17 @@ export class RagIngestService {
       });
 
       await client.$executeRaw`
-        DELETE FROM aplus_chunks WHERE document_id = ${documentId}::bigint
+        DELETE FROM aplus_chunks
+        WHERE tenant_code = ${tenantCode}
+          AND document_id = ${documentId}::bigint
       `;
 
       for (let index = 0; index < chunks.length; index += 1) {
         await client.$executeRaw`
           INSERT INTO aplus_chunks
-            (document_id, chunk_index, content, metadata, embedding)
+            (tenant_code, document_id, chunk_index, content, metadata, embedding)
           VALUES (
+            ${tenantCode},
             ${documentId}::bigint,
             ${index},
             ${chunks[index].content},
@@ -266,6 +287,7 @@ export class RagIngestService {
             updated_at = CURRENT_TIMESTAMP,
             ingested_at = CURRENT_TIMESTAMP
         WHERE id = ${documentId}::bigint
+          AND tenant_code = ${tenantCode}
       `;
 
       this.logIngestProgress({
@@ -296,12 +318,14 @@ export class RagIngestService {
 
   private async upsertProcessingDocument(
     client: Prisma.TransactionClient,
+    tenantCode: TenantCode,
     document: LoadedDocument,
   ): Promise<string> {
     const result = await client.$queryRaw<Array<{ id: bigint }>>`
       INSERT INTO aplus_documents
-        (source_path, file_name, file_type, file_hash, file_size, status, updated_at)
+        (tenant_code, source_path, file_name, file_type, file_hash, file_size, status, updated_at)
       VALUES (
+        ${tenantCode},
         ${document.sourcePath},
         ${document.fileName},
         ${document.fileType},
@@ -310,7 +334,7 @@ export class RagIngestService {
         'processing',
         CURRENT_TIMESTAMP
       )
-      ON CONFLICT (source_path) DO UPDATE
+      ON CONFLICT (tenant_code, source_path) DO UPDATE
       SET file_name = EXCLUDED.file_name,
           file_type = EXCLUDED.file_type,
           file_hash = EXCLUDED.file_hash,
@@ -330,6 +354,7 @@ export class RagIngestService {
   }
 
   private async markDocumentFailed(
+    tenantCode: TenantCode,
     file: {
       sourcePath: string;
       fileName: string;
@@ -341,8 +366,9 @@ export class RagIngestService {
   ) {
     await this.ragPrisma.$executeRaw`
       INSERT INTO aplus_documents
-        (source_path, file_name, file_type, file_hash, file_size, chunk_count, status, error, updated_at)
+        (tenant_code, source_path, file_name, file_type, file_hash, file_size, chunk_count, status, error, updated_at)
       VALUES (
+        ${tenantCode},
         ${file.sourcePath},
         ${file.fileName},
         ${file.fileType},
@@ -353,7 +379,7 @@ export class RagIngestService {
         ${error},
         CURRENT_TIMESTAMP
       )
-      ON CONFLICT (source_path) DO UPDATE
+      ON CONFLICT (tenant_code, source_path) DO UPDATE
       SET file_name = EXCLUDED.file_name,
           file_type = EXCLUDED.file_type,
           file_hash = EXCLUDED.file_hash,
@@ -365,9 +391,12 @@ export class RagIngestService {
     `;
   }
 
-  private async findDocumentBySourcePath(sourcePath: string) {
-    const document = await this.ragPrisma.aplusDocument.findUnique({
-      where: { sourcePath },
+  private async findDocumentBySourcePath(
+    tenantCode: TenantCode,
+    sourcePath: string,
+  ) {
+    const document = await this.ragPrisma.aplusDocument.findFirst({
+      where: { tenantCode, sourcePath },
       select: {
         id: true,
         fileHash: true,
@@ -389,5 +418,10 @@ export class RagIngestService {
       Object.entries(meta).filter(([, value]) => value !== undefined),
     );
     this.logger.info('RAG ingest progress' + meta.stage, undefined, cleanMeta);
+  }
+
+  private currentTenant(): TenantCode {
+    console.log('[ this.tenantContext.tenant  ] >', this.tenantContext.tenant);
+    return this.tenantContext.tenant ?? NodeConfigService.get('defaultTenant');
   }
 }
