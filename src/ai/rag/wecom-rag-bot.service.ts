@@ -176,7 +176,19 @@ export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
         async () => {
           for await (const event of this.ragService.streamAnswer(
             context.question,
-            this.defaultTopK,
+            {
+              topK: this.defaultTopK,
+              session: {
+                channel: 'wecom',
+                conversationId: context.chatId,
+                conversationType: context.chatType,
+                participantId: context.userId,
+                messageId: context.msgId,
+                metadata: {
+                  reqId: frame.headers?.req_id,
+                },
+              },
+            },
           )) {
             if (event.type !== 'answer') continue;
 

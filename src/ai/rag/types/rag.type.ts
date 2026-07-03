@@ -42,12 +42,45 @@ export interface IngestSummary {
   }>;
 }
 
+export type RagChannel = 'http' | 'wecom' | 'feishu' | 'web' | string;
+
+export type RagMemoryRole = 'user' | 'assistant';
+
+export interface RagSessionInput {
+  channel: RagChannel;
+  conversationId?: string;
+  conversationType?: string;
+  participantId?: string;
+  messageId?: string;
+  replyToMessageId?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface RagResolvedSession extends RagSessionInput {
+  tenantCode: string;
+  sessionKey: string;
+  encodedSessionKey: string;
+}
+
+export interface RagMemoryMessage {
+  role: RagMemoryRole;
+  content: string;
+  createdAt: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface RagQueryOptions {
+  topK?: number;
+  session?: RagSessionInput;
+}
+
 export type RagStreamEvent =
   | {
       type: 'status';
       data: {
         stage: string;
         message: string;
+        sessionKey?: string;
         topK?: number;
         chunks?: number;
       };

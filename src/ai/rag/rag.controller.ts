@@ -21,6 +21,7 @@ import { RagService } from './rag.service';
 import { RagDocumentService } from './services/rag-document.service';
 import { RagIngestService } from './services/rag-ingest.service';
 import { AuthGuard } from '@src/common/guard/auth';
+import type { RagQueryOptions } from './types/rag.type';
 
 @ApiTags('RAG 企业知识库')
 @Controller('ai/rag')
@@ -43,7 +44,10 @@ export class RagController {
   @ApiOperation({ summary: 'RAG 同步问答' })
   @ApiBody({ type: RagQueryDto })
   query(@Body() body: RagQueryDto) {
-    return this.ragService.answerQuestion(body.question, body.topK);
+    return this.ragService.answerQuestion(
+      body.question,
+      this.buildQueryOptions(body),
+    );
   }
 
   @SkipTransform()
@@ -54,9 +58,22 @@ export class RagController {
   queryStream(
     @Query('question') question: string,
     @Query('topK') topK?: string,
+    @Query('conversationId') conversationId?: string,
+    @Query('conversationType') conversationType?: string,
+    @Query('participantId') participantId?: string,
   ): Observable<MessageEvent> {
     const parsedTopK = topK ? Number(topK) : undefined;
-    return from(this.ragService.streamAnswer(question, parsedTopK)).pipe(
+    return from(
+      this.ragService.streamAnswer(question, {
+        topK: parsedTopK,
+        session: {
+          channel: 'http',
+          conversationId,
+          conversationType,
+          participantId,
+        },
+      }),
+    ).pipe(
       map((event) => ({ type: event.type, data: event.data })),
       catchError((error) =>
         of({
@@ -67,6 +84,19 @@ export class RagController {
         }),
       ),
     );
+  }
+
+  private buildQueryOptions(body: RagQueryDto): RagQueryOptions {
+    return {
+      topK: body.topK,
+      session: {
+        channel: 'http',
+        conversationId: body.conversationId,
+        conversationType: body.conversationType,
+        participantId: body.participantId,
+        metadata: body.metadata,
+      },
+    };
   }
 
   @Get('documents')

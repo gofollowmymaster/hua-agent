@@ -133,7 +133,17 @@ describe('WecomRagBotService', () => {
       { tenantCode: 'aplus' },
       expect.any(Function),
     );
-    expect(ragService.streamAnswer).toHaveBeenCalledWith('什么是 VC？', 8);
+    expect(ragService.streamAnswer).toHaveBeenCalledWith('什么是 VC？', {
+      topK: 8,
+      session: {
+        channel: 'wecom',
+        conversationId: 'user-id',
+        conversationType: 'single',
+        participantId: 'user-id',
+        messageId: 'msg-id',
+        metadata: { reqId: 'req-id' },
+      },
+    });
     expect(mockReplyStreamNonBlocking).toHaveBeenNthCalledWith(
       1,
       expect.any(Object),
@@ -161,6 +171,41 @@ describe('WecomRagBotService', () => {
       '回答内容\n\n---\n来源：企业知识库检索结果。',
       true,
     );
+  });
+
+  it('maps group messages to generic channel session options', async () => {
+    const WecomRagBotService = getWecomRagBotService();
+    const service = new WecomRagBotService(
+      ragService as any,
+      logger as any,
+      tenantContext as any,
+    );
+    service.onModuleInit();
+    const handler = getHandler('message.text');
+
+    await handler({
+      headers: { req_id: 'group-req-id' },
+      body: {
+        msgid: 'group-msg-id',
+        msgtype: 'text',
+        chattype: 'group',
+        chatid: 'chat-id',
+        from: { userid: 'sender-user-id' },
+        text: { content: '群聊问题' },
+      },
+    });
+
+    expect(ragService.streamAnswer).toHaveBeenCalledWith('群聊问题', {
+      topK: 5,
+      session: {
+        channel: 'wecom',
+        conversationId: 'chat-id',
+        conversationType: 'group',
+        participantId: 'sender-user-id',
+        messageId: 'group-msg-id',
+        metadata: { reqId: 'group-req-id' },
+      },
+    });
   });
 
   it('replies tip for empty text messages', async () => {

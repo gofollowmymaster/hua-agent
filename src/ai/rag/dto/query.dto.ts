@@ -1,5 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  IsInt,
+  IsObject,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class RagQueryDto {
   @ApiProperty({ description: '用户问题' })
@@ -15,4 +22,24 @@ export class RagQueryDto {
   @Min(1)
   @Max(20)
   topK?: number;
+
+  @ApiPropertyOptional({ description: '渠道会话 ID，如群聊 ID、单聊 ID、页面会话 ID' })
+  @IsOptional()
+  @IsString()
+  conversationId?: string;
+
+  @ApiPropertyOptional({ description: '渠道会话类型，如 group、single、room' })
+  @IsOptional()
+  @IsString()
+  conversationType?: string;
+
+  @ApiPropertyOptional({ description: '提问用户或参与者 ID' })
+  @IsOptional()
+  @IsString()
+  participantId?: string;
+
+  @ApiPropertyOptional({ description: '渠道扩展上下文' })
+  @IsOptional()
+  @IsObject()
+  metadata?: Record<string, unknown>;
 }

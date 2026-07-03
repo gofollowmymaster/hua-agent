@@ -18,6 +18,7 @@ import { WecomRagBotService } from './rag/wecom-rag-bot.service';
 import { RagPrismaService } from './rag/services/prisma/rag-prisma.service';
 import { RagDocumentService } from './rag/services/rag-document.service';
 import { RagIngestService } from './rag/services/rag-ingest.service';
+import { RagMemoryService } from './rag/services/rag-memory.service';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { RagIngestService } from './rag/services/rag-ingest.service';
     RagPrismaService,
     RagIngestService,
     RagDocumentService,
+    RagMemoryService,
     DocumentLoaderService,
     WecomRagBotService,
   ],

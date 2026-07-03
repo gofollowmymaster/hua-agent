@@ -421,7 +421,6 @@ export class RagIngestService {
   }
 
   private currentTenant(): TenantCode {
-    console.log('[ this.tenantContext.tenant  ] >', this.tenantContext.tenant);
     return this.tenantContext.tenant ?? NodeConfigService.get('defaultTenant');
   }
 }

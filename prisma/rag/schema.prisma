@@ -47,3 +47,41 @@ model AplusChunk {
   @@index([tenantCode, documentId], map: "idx_aplus_chunks_tenant_document")
   @@map("aplus_chunks")
 }
+
+model AplusRagSession {
+  id               BigInt            @id @default(autoincrement())
+  tenantCode       String            @map("tenant_code") @db.Text
+  channel          String            @db.Text
+  sessionKey       String            @map("session_key") @db.Text
+  userId           String?           @map("user_id") @db.Text
+  conversationId   String?           @map("conversation_id") @db.Text
+  conversationType String?           @map("conversation_type") @db.Text
+  metadata         Json              @default("{}") @db.JsonB
+  createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime          @default(now()) @map("updated_at") @db.Timestamptz(6)
+  lastActiveAt     DateTime          @default(now()) @map("last_active_at") @db.Timestamptz(6)
+  messages         AplusRagMessage[]
+
+  @@unique([tenantCode, channel, sessionKey])
+  @@index([tenantCode, channel], map: "idx_aplus_rag_sessions_tenant_channel")
+  @@index([lastActiveAt], map: "idx_aplus_rag_sessions_last_active")
+  @@map("aplus_rag_sessions")
+}
+
+model AplusRagMessage {
+  id               BigInt          @id @default(autoincrement())
+  tenantCode       String          @map("tenant_code") @db.Text
+  sessionId        BigInt          @map("session_id")
+  role             String          @db.Text
+  content          String          @db.Text
+  senderId         String?         @map("sender_id") @db.Text
+  externalMessageId String?        @map("external_message_id") @db.Text
+  replyToMessageId String?         @map("reply_to_message_id") @db.Text
+  metadata         Json            @default("{}") @db.JsonB
+  createdAt        DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  session          AplusRagSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([tenantCode, sessionId, createdAt], map: "idx_aplus_rag_messages_tenant_session_created")
+  @@index([tenantCode, externalMessageId], map: "idx_aplus_rag_messages_external_message")
+  @@map("aplus_rag_messages")
+}

@@ -14,6 +14,7 @@ const AilyPrefix = RedisPrefix + '{tenant}:aily:';
 const FeishuUserTokenPrefix = RedisPrefix + '{tenant}:{module}:';
 const PushFeishuDocPrefix = RedisPrefix + 'push-feishu-doc:';
 const DevopsPrefix = RedisPrefix + 'devops:';
+const RagPrefix = RedisPrefix + '{tenant}:rag:';
 
 export enum RedisKeys {
   WIKI_DIRECTORY = RedisWikiPrefix + 'directory:{spaceId}',
@@ -33,4 +34,5 @@ export enum RedisKeys {
   SENTRY_API_CACHE = SentryApiPrefix + '{apiName}',
   DEVOPS_APP_PUBLISH_CACHE = DevopsPrefix + 'publish:{workflowTag}',
   DEVOPS_APP_PUBLISH_CARD = DevopsPrefix + 'publish-card:{id}',
+  RAG_SESSION_MEMORY = RagPrefix + 'memory:{channel}:{sessionKey}',
 }

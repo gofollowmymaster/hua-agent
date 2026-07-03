@@ -4,9 +4,14 @@ import { ChatOpenAI, OpenAIEmbeddings } from '@langchain/openai';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { NodeConfigService } from '@src/config/node-config.service';
-import { TenantCode } from '@src/config/tenant';
 import { RagPrismaService } from './services/prisma/rag-prisma.service';
-import type { RagStreamEvent, RetrievedChunk } from './types/rag.type';
+import { RagMemoryService } from './services/rag-memory.service';
+import type {
+  RagMemoryMessage,
+  RagQueryOptions,
+  RagStreamEvent,
+  RetrievedChunk,
+} from './types/rag.type';
 
 @Injectable()
 export class RagService {
@@ -18,6 +23,7 @@ export class RagService {
     private readonly ragPrisma: RagPrismaService,
     private readonly logger: LoggerService,
     private readonly tenantContext: TenantContext,
+    private readonly ragMemoryService: RagMemoryService,
   ) {
     this.logger.setContext(RagService.name);
 
@@ -43,12 +49,16 @@ export class RagService {
     });
   }
 
-  async answerQuestion(question: string, topK?: number) {
+  async answerQuestion(question: string, options: RagQueryOptions = {}) {
     this.assertQuestion(question);
-    const chunks = await this.retrieve(question, topK);
-    const answer = await this.generateAnswer(question, chunks);
+    const session = this.ragMemoryService.resolveSession(options);
+    const memory = await this.ragMemoryService.loadShortTermMemory(session);
+    const chunks = await this.retrieve(question, options.topK);
+    const answer = await this.generateAnswer(question, chunks, memory);
+    await this.ragMemoryService.appendTurn(session, question, answer);
 
     return {
+      sessionKey: session.sessionKey,
       answer,
       sources: this.buildSources(chunks),
       chunks,
@@ -57,47 +67,54 @@ export class RagService {
 
   async *streamAnswer(
     question: string,
-    topK?: number,
+    options: RagQueryOptions = {},
   ): AsyncGenerator<RagStreamEvent> {
     this.assertQuestion(question);
+    const session = this.ragMemoryService.resolveSession(options);
+    const memory = await this.ragMemoryService.loadShortTermMemory(session);
     yield {
       type: 'status',
       data: {
         stage: 'retrieve_start',
         message: '开始检索知识库',
-        topK,
+        sessionKey: session.sessionKey,
+        topK: options.topK,
       },
     };
 
-    const chunks = await this.retrieve(question, topK);
+    const chunks = await this.retrieve(question, options.topK);
     yield {
       type: 'status',
       data: {
         stage: 'retrieve_done',
         message: `检索完成，命中 ${chunks.length} 个片段`,
-        topK,
+        sessionKey: session.sessionKey,
+        topK: options.topK,
         chunks: chunks.length,
       },
     };
 
-    const prompt = await this.buildPrompt(question, chunks);
+    const prompt = await this.buildPrompt(question, chunks, memory);
     yield {
       type: 'status',
       data: {
         stage: 'generate_start',
         message: '开始生成答案',
-        topK,
+        sessionKey: session.sessionKey,
+        topK: options.topK,
         chunks: chunks.length,
       },
     };
 
     const stream = await this.model.stream(prompt);
     let hasText = false;
+    let answerContent = '';
 
     for await (const chunk of stream) {
       const text = this.extractContentText(chunk.content);
       if (text) {
         hasText = true;
+        answerContent += text;
         yield { type: 'answer', data: text };
       }
     }
@@ -109,7 +126,8 @@ export class RagService {
         {
           stage: 'rag_stream_empty_fallback',
           tenantCode: this.tenantContext.tenant,
-          topK,
+          sessionKey: session.sessionKey,
+          topK: options.topK,
           chunks: chunks.length,
         },
       );
@@ -118,7 +136,8 @@ export class RagService {
         data: {
           stage: 'fallback_start',
           message: '流式生成未返回文本，切换为普通生成',
-          topK,
+          sessionKey: session.sessionKey,
+          topK: options.topK,
           chunks: chunks.length,
         },
       };
@@ -127,8 +146,13 @@ export class RagService {
       const text =
         this.extractContentText(response.content) ||
         JSON.stringify(response.content);
-      if (text) yield { type: 'answer', data: text };
+      if (text) {
+        answerContent += text;
+        yield { type: 'answer', data: text };
+      }
     }
+
+    await this.ragMemoryService.appendTurn(session, question, answerContent);
 
     yield {
       type: 'done',
@@ -146,7 +170,6 @@ export class RagService {
     const tenantCode = this.tenantContext.tenant;
     const limit = Math.min(Math.max(Number(topK) || this.defaultTopK, 1), 20);
     const vector = await this.embeddings.embedQuery(question);
-    console.log('[ tenantCode ] >', tenantCode);
     const rows = await this.ragPrisma.$queryRaw<any[]>`
       SELECT c.id,
              c.tenant_code,
@@ -179,8 +202,12 @@ export class RagService {
     }));
   }
 
-  private async generateAnswer(question: string, chunks: RetrievedChunk[]) {
-    const prompt = await this.buildPrompt(question, chunks);
+  private async generateAnswer(
+    question: string,
+    chunks: RetrievedChunk[],
+    memory: RagMemoryMessage[],
+  ) {
+    const prompt = await this.buildPrompt(question, chunks, memory);
     const response = await this.model.invoke(prompt);
 
     return (
@@ -207,12 +234,20 @@ export class RagService {
       .join('');
   }
 
-  private async buildPrompt(question: string, chunks: RetrievedChunk[]) {
+  private async buildPrompt(
+    question: string,
+    chunks: RetrievedChunk[],
+    memory: RagMemoryMessage[],
+  ) {
     const prompt =
       PromptTemplate.fromTemplate(`你是企业知识库 RAG 问答助手。请只基于给定资料回答问题。
 
 如果资料中没有足够信息，请明确说“根据当前资料无法确认”，不要编造。
 回答应简洁、准确，并在必要时引用来源文件名。
+最近对话仅用于理解连续追问、代词和用户上下文；当最近对话与资料片段冲突时，以资料片段为准。
+
+最近对话：
+{memory}
 
 资料片段：
 {context}
@@ -223,6 +258,7 @@ export class RagService {
 
     const promptValue = await prompt.invoke({
       question,
+      memory: this.ragMemoryService.formatMemory(memory),
       context: this.formatContext(chunks),
     });
     return promptValue.toString();
