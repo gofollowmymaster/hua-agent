@@ -26,6 +26,16 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Monorepo Layout
+
+```text
+apps/api        NestJS API service
+apps/rag-admin  RAG admin console
+packages/shared Shared package boundary
+```
+
+Root scripts remain compatible and forward to workspace packages.
+
 ## Installation
 
 ```bash

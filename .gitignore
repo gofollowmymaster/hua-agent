@@ -1,6 +1,8 @@
 # compiled output
 /dist
+/apps/*/dist
 /node_modules
+**/node_modules
 /build
 .trae
 

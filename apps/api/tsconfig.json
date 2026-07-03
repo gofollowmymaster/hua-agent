@@ -23,12 +23,12 @@
       "@src/*": ["src/*"],
       "@mockServer/*": ["mockServer/*"]
     },
-    "typeRoots": ["node_modules/@types", "./type"]
+    "types": ["node", "jest", "multer"]
   },
   "include": [
     "src/**/*.ts",
     "scripts/**/*.ts",
-    "type/**/*.ts",
+    "src/type/**/*.ts",
     "ecosystem.config.js",
     "src/manage/supplier-diff/sensitive-word.service.ts"
   ],

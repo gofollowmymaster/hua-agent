@@ -1,6 +1,6 @@
 generator client {
   provider      = "prisma-client-js"
-  output        = "../../node_modules/@prisma/rag-client"
+  output        = "../../../node_modules/@prisma/rag-client"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 

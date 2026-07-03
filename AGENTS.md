@@ -2,7 +2,7 @@
 
 ## 技术栈
 
-- **框架**: NestJS + TypeScript
+- **框架**: NestJS + TypeScript（`apps/api`）+ Vue/Vite（`apps/rag-admin`）
 - **ORM**: Prisma (MySQL)
 - **包管理器**: pnpm
 - **缓存/队列**: Redis + BullMQ
@@ -57,7 +57,7 @@ pnpm format            # Prettier 写入格式化结果
 ### 测试
 
 ```bash
-pnpm test              # 单元测试（jest，来自 src/ 下的 *.spec.ts）
+pnpm test              # 单元测试（jest，来自 apps/api/src/ 下的 *.spec.ts）
 pnpm test:cov          # 带覆盖率的测试
 ```
 
@@ -71,9 +71,9 @@ pnpm test:cov          # 带覆盖率的测试
 
 ## 路径别名
 
-- `@src/*` → `src/*`
-- `@utils/*` → `src/utils/*`
-- `@mockServer/*` → `mockServer/*`
+- `@src/*` → `apps/api/src/*`（在 API app 内解析为 `src/*`）
+- `@utils/*` → `apps/api/src/utils/*`
+- `@mockServer/*` → `apps/api/mockServer/*`
 
 ## 架构
 
@@ -90,7 +90,13 @@ pnpm test:cov          # 带覆盖率的测试
 ### 模块结构
 
 ```
-src/
+apps/
+├── api/          # NestJS API 服务
+├── rag-admin/    # RAG 管理后台前端
+packages/
+└── shared/       # 共享类型/工具预留
+
+apps/api/src/
 ├── manage/       # 管理功能
 ├── robot/        # 飞书机器人集成
 ├── ai/           # AI 功能
@@ -119,7 +125,7 @@ src/
 
 ## Prisma
 
-- Schema: `prisma/schema.prisma`
+- Schema: `apps/api/prisma/schema.prisma`
 - 数据库: MySQL
 - 二进制目标: `native`, `debian-openssl-3.0.x`
 - Schema 变更后始终运行 `pnpm pg`
@@ -140,6 +146,5 @@ src/
 
 ## 测试说明
 
-- 仅发现 1 个 spec 文件（`src/alert/common/service/msg-alert.service.spec.ts`）
 - 测试使用 `@nestjs/testing` 和 `supertest`
-- 测试文件模式：src 目录下的 `*.spec.ts`
+- 测试文件模式：`apps/api/src` 目录下的 `*.spec.ts`

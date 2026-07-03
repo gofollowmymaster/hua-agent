@@ -19,6 +19,8 @@ import { RagPrismaService } from './rag/services/prisma/rag-prisma.service';
 import { RagDocumentService } from './rag/services/rag-document.service';
 import { RagIngestService } from './rag/services/rag-ingest.service';
 import { RagMemoryService } from './rag/services/rag-memory.service';
+import { RagAdminController } from './rag/rag-admin.controller';
+import { RagAdminService } from './rag/services/rag-admin.service';
 
 @Module({
   imports: [
@@ -37,10 +39,16 @@ import { RagMemoryService } from './rag/services/rag-memory.service';
     RagPrismaService,
     RagIngestService,
     RagDocumentService,
+    RagAdminService,
     RagMemoryService,
     DocumentLoaderService,
     WecomRagBotService,
   ],
-  controllers: [AilyController, LogOperatorController, RagController],
+  controllers: [
+    AilyController,
+    LogOperatorController,
+    RagController,
+    RagAdminController,
+  ],
 })
 export class AiModule {}

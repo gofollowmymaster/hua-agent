@@ -4,20 +4,22 @@
 
 ## 顶层目录
 
-- `src/`：应用源码，包含 NestJS 模块、公共基础设施、配置和类型。
-- `prisma/`：Prisma schema 和迁移元信息。Schema 相关命令见根目录 `AGENTS.md`。
+- `apps/api/src/`：NestJS API 应用源码，包含模块、公共基础设施、配置和类型。
+- `apps/api/prisma/`：API 应用 Prisma schema 和迁移元信息。Schema 相关命令见根目录 `AGENTS.md`。
+- `apps/rag-admin/`：RAG 管理后台前端，使用 Vue/Vite。
+- `packages/shared/`：共享类型和工具的 workspace 包预留。
 - `openspec/`：OpenSpec 项目说明、变更提案、归档记录和规范目录。涉及行为变化时先走这里。
-- `mockServer/`：静态 mock 资源目录，通过 `ServeStaticModule` 暴露；当前 `mock-server` API 已被中间件标记为废弃。
+- `apps/api/mockServer/`：静态 mock 资源目录，通过 `ServeStaticModule` 暴露；当前 `mock-server` API 已被中间件标记为废弃。
 - `docs/`：项目文档。`standard/` 沉淀项目开发规范，`ai-governance/` 沉淀 AI 治理方案，`architecture/` 沉淀项目架构说明。
 - `dist/`、`coverage/`、`logs/`：构建、覆盖率、日志等生成物。
 
-## src 顶层结构
+## API app src 顶层结构
 
-- `src/main.ts`：应用入口。
-- `src/app.module.ts`：根模块和全局中间件装配。
-- `src/config/`：全局配置、数据库配置、租户配置和 `NodeConfigService`。
-- `src/common/`：跨业务模块复用的基础设施、飞书集成、守卫、异常、中间件、拦截器、基础类和公共表格 adapter。
-- `src/type/`：全局类型定义，例如用户上下文。
+- `apps/api/src/main.ts`：应用入口。
+- `apps/api/src/app.module.ts`：根模块和全局中间件装配。
+- `apps/api/src/config/`：全局配置、数据库配置、租户配置和 `NodeConfigService`。
+- `apps/api/src/common/`：跨业务模块复用的基础设施、飞书集成、守卫、异常、中间件、拦截器、基础类和公共表格 adapter。
+- `apps/api/src/type/`：全局类型定义，例如用户上下文。
 
 ## 业务模块职责
 

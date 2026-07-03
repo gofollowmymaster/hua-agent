@@ -11,5 +11,5 @@ export function getGateWayName(url: string): string | null {
   return match ? match[1] : null;
 }
 export function getMockServerFilePath(gateWayName: string): string {
-  return join(__dirname, '..', 'mockServer', `${gateWayName}.json`);
+  return join(process.cwd(), 'mockServer', `${gateWayName}.json`);
 }
