@@ -77,6 +77,17 @@
 
 全局服务的注入和模块注册规范见 `docs/standard/module-design.md`。
 
+## 后台任务基础设施
+
+项目通过 `ScheduleModule.forRoot()` 启用定时任务能力，通过业务模块中的 `BullModule.forRoot(...)` 和 `BullModule.registerQueue(...)` 使用 BullMQ 队列。
+
+后台任务基础类位于 `src/common/base`：
+
+- `BaseSchedule`：定时任务基类，负责 cron 注册、租户上下文遍历和定时任务异常告警。
+- `BaseProcessor`：队列处理基类，负责 BullMQ job 处理入口、租户上下文建立、worker 事件日志和队列任务异常告警。
+
+定时任务与队列处理的开发规范见 `docs/standard/background-jobs.md`。
+
 ## 配置模型
 
 配置入口是 `src/config/index.ts`：

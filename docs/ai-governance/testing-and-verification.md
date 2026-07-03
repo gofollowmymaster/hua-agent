@@ -60,6 +60,18 @@
 - 批量删除是否有足够具体的 pattern、长度保护和范围保护。
 - 后台任务是否显式处理租户，而不是依赖请求上下文。
 
+## 定时任务与队列处理变更
+
+涉及定时任务、BullMQ 队列处理器、后台任务时，先读 `docs/standard/background-jobs.md`，并检查：
+
+- 定时任务是否继承 `BaseSchedule`，并配置稳定 `jobName`、明确 `cron` 和合适 `isOpen`。
+- 定时任务是否通过 `initContext()` 或默认 `tenantContextDatas` 明确租户上下文。
+- 手动触发路径是否确认 `force`、Guard、租户来源和异常处理。
+- 队列处理器是否继承 `BaseProcessor`，并只实现 `handle(data)`。
+- 入队 payload 是否包含 `tenantCode`，符合 `ProcessorBody`。
+- `BullModule.registerQueue` 是否配置队列名、重试、退避和完成保留策略。
+- 异常是否能触发基类告警，关键失败是否没有被吞掉。
+
 ## 飞书集成变更
 
 涉及飞书 API、表格、卡片、事件、回调时检查：

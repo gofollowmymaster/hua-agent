@@ -96,8 +96,8 @@ src/<module>/
 - 定时任务放业务模块内的 `common/schedule` 或既有 schedule 目录。
 - 后台处理器放业务模块内的 `common/processor` 或既有 processor 目录。
 - 定时任务和处理器应只负责触发和调度，复杂业务逻辑下沉到 Service。
-- 后台任务不能假设存在请求态 `TenantContext`；需要租户时显式传入或遍历租户。
 - 新增任务应通过对应模块 providers 注册，任务逻辑应保持可测试。
+- 定时任务与队列处理器的执行、租户上下文、异常告警和队列 payload 约定见 `background-jobs.md`。
 
 ## 新文件放置决策
 
@@ -106,7 +106,7 @@ src/<module>/
 - 新飞书表格访问：优先新增或复用 table adapter，不要在 Service 里直接拼表格请求。
 - 新租户配置：按 `configuration.md` 判断归属并维护类型。
 - 新缓存 key：先扩展 `RedisKeys`，再通过 `RedisService.buildCacheKey*` 构造；具体规则见 `redis.md`。
-- 新定时任务：放业务模块的 `common/schedule` 或已有 schedule 目录，复用基础 schedule 抽象。
+- 新定时任务或队列处理器：放业务模块的 `common/schedule`、`common/processor` 或已有目录，复用 `background-jobs.md` 中的统一基类。
 
 ## 模块落地检查
 

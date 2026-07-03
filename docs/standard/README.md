@@ -1,6 +1,6 @@
 # 项目开发规范
 
-`docs/standard/` 是项目开发规范说明书，回答“代码实现时必须遵守哪些工程规范”。本目录沉淀代码风格、模块设计、环境变量与项目配置、Redis key 与缓存使用规范；AI 工作流、OpenSpec 判断、测试验证和交付要求放在 `docs/ai-governance/`，项目架构事实放在 `docs/architecture/`。
+`docs/standard/` 是项目开发规范说明书，回答“代码实现时必须遵守哪些工程规范”。本目录沉淀代码风格、模块设计、环境变量与项目配置、Redis key 与缓存、定时任务与队列处理规范；AI 工作流、OpenSpec 判断、测试验证和交付要求放在 `docs/ai-governance/`，项目架构事实放在 `docs/architecture/`。
 
 本目录不是项目事实索引。架构背景、模块现状、飞书集成、权限与多租户等上下文，应到 `docs/architecture/` 的专题文档中读取。
 
@@ -13,6 +13,7 @@
    - `module-design.md`：新增模块、子功能、adapter、table、schedule 的放置规范。
    - `configuration.md`：环境变量和项目配置新增、读取、维护规范。
    - `redis.md`：Redis key、缓存、限流、幂等和批量删除使用规范。
+   - `background-jobs.md`：定时任务、BullMQ 队列处理器和后台任务使用规范。
 4. 需要确认验证和交付要求时，读 `docs/ai-governance/testing-and-verification.md`。
 5. 需要理解项目现状和模块职责时，再补读 `docs/architecture/` 对应专题。
 
@@ -25,6 +26,7 @@
 | 修改代码风格、分层、异常、日志、配置读取 | `code-style.md`、`module-design.md`、`configuration.md` | `docs/architecture/project-architecture.md`、`docs/architecture/auth-and-tenant.md` |
 | 新增或修改环境变量、项目配置、租户配置 | `configuration.md`、`module-design.md` | `docs/architecture/project-architecture.md`、`docs/architecture/auth-and-tenant.md` |
 | 新增或修改 Redis key、缓存、限流、幂等、批量删除 | `redis.md`、`module-design.md` | `docs/ai-governance/testing-and-verification.md`、`docs/architecture/auth-and-tenant.md` |
+| 新增或修改定时任务、队列 processor、后台任务 | `background-jobs.md`、`module-design.md` | `docs/ai-governance/testing-and-verification.md`、`docs/architecture/project-architecture.md`、`docs/architecture/auth-and-tenant.md` |
 | 修改测试、构建、验证策略或交付说明 | 无 | `docs/ai-governance/testing-and-verification.md`、`docs/ai-governance/development-workflow.md` |
 | 涉及飞书或外部系统集成 | `module-design.md` | `docs/ai-governance/testing-and-verification.md`、`docs/architecture/feishu-integration.md` |
 | 涉及 Prisma schema、租户、鉴权 | `module-design.md` | `docs/ai-governance/testing-and-verification.md`、`docs/ai-governance/development-workflow.md`、`docs/architecture/auth-and-tenant.md` |
@@ -44,13 +46,13 @@
 ## 与其他文档的分工
 
 - `AGENTS.md`：快速规则和常用命令，保持短而稳定。
-- `docs/standard/`：开发规范，规定代码风格、模块设计、配置维护、Redis key 与缓存使用必须遵守的做法。
+- `docs/standard/`：开发规范，规定代码风格、模块设计、配置维护、Redis key 与缓存、定时任务与队列处理必须遵守的做法。
 - `docs/ai-governance/`：AI 治理方案，规定 AI 如何读取上下文、判断风险、选择流程、验证交付。
 - `docs/architecture/`：项目架构说明，承载项目结构、模块职责、集成现状和基础设施事实。
 
 ## 维护规则
 
-- 新增长期代码风格、模块分层、文件放置、配置维护、Redis key 或缓存使用规则时，优先放到本目录。
+- 新增长期代码风格、模块分层、文件放置、配置维护、Redis key、缓存、定时任务或队列处理规则时，优先放到本目录。
 - 新增 AI 行为规则、开发工作流、风险分级、上下文读取策略、OpenSpec 判断规则、验证规则或交付要求时，放到 `docs/ai-governance/`。
 - 新增架构现状、模块职责、集成现状或基础设施事实时，放到 `docs/architecture/`。
 - 不要把架构现状文档写进本目录；项目事实上下文应沉淀到 `docs/architecture/`。
