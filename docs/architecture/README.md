@@ -8,9 +8,8 @@
 
 1. `project-architecture.md`：理解启动链路、根模块、请求生命周期、全局服务、配置、日志、异常与响应。
 2. `directory-structure.md`：理解顶层目录、`src` 顶层结构、`common`、`config`、`type` 等目录的现状。
-3. `business-modules.md`：理解当前业务模块职责和现有定时/后台处理分布。
-4. `feishu-integration.md`：理解当前飞书集成分层、客户端、helper、表格、卡片、事件入口和配置来源。
-5. `auth-and-tenant.md`：理解当前鉴权、多租户上下文、Guard、租户配置、Redis 租户 key 和飞书表格租户模型。
+3. `feishu-integration.md`：理解当前飞书集成分层、客户端、helper、表格、卡片、事件入口和配置来源。
+4. `auth-and-tenant.md`：理解当前鉴权、多租户上下文、Guard、租户配置、Redis 租户 key 和飞书表格租户模型。
 
 ## 与其他目录的分工
 

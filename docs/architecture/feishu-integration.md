@@ -1,10 +1,12 @@
 # 飞书集成分层
 
-本文说明项目中飞书能力的现有分层方式。新增或修改飞书能力的开发规范见 `docs/standard/integration-design.md`。
+本文说明项目中飞书能力的现有分层方式，以及新增或修改飞书能力时需要遵守的项目约定。
 
 ## 当前分层
 
 飞书集成代码集中在 `src/common/feishu`，业务模块通过 helper、table adapter、card builder 和 type 复用能力。
+
+不要在业务 Service 中直接散写飞书 OpenAPI URL、鉴权、分页、字段映射或卡片 JSON。底层细节应封装在 helper、table、adapter 或 card builder 中。
 
 ## 目录分层
 
@@ -51,6 +53,8 @@ FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AlertClient))
 - `FeishuOpenapiHelper`
 - `FeishuMediaHelper`
 
+新增模块需要飞书能力时，优先 imports `FeishuHelperModule.forRoot(...)`，再在 Service、table adapter 或 handler 中注入具体 helper。
+
 ## 飞书表格访问
 
 表格访问通常分两层：
@@ -65,6 +69,14 @@ FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AlertClient))
 - `src/admin/mtable/table`
 - `src/manage/common/table`
 - `src/demo-plugin/table`
+
+新增表格能力时：
+
+- 表格配置优先放 `src/config/index.ts` 或租户配置中。
+- 读取配置优先使用 `NodeConfigService.getFeishuTableConfig`。
+- 跨模块复用的表格 adapter 放 `src/common/table`。
+- 单业务域私有表格 adapter 放对应模块内。
+- 不要在 Service 中直接写 app token、table id 和字段名映射细节。
 
 ## 租户化飞书配置
 
@@ -81,6 +93,13 @@ FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AlertClient))
 
 卡片模板位于 `src/common/feishu/card`，消息发送能力由 `FeishuMessageHelper` 和相关消息服务封装。
 
+新增卡片时：
+
+- 优先参考现有 alert、warning、project publish、tip card。
+- 卡片结构应独立成可复用 builder 或模板。
+- 不要把大段卡片 JSON 写进业务流程。
+- 卡片交互回调应进入对应业务模块的 callback/event handler。
+
 ## 事件与回调
 
 现有飞书事件/回调入口包括：
@@ -88,3 +107,20 @@ FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AlertClient))
 - `src/alert/event`
 - `src/alert/feishu-callback`
 - `src/doc/event`
+
+新增事件处理时：
+
+- Controller 只做 challenge、请求接收、来源校验和 Service 调用。
+- 具体事件分发放 Service 或 handler。
+- 幂等处理优先复用 `RedisService.idempotent`。
+- 异常上报优先复用项目已有飞书异常通知工具。
+- 公开 webhook/callback 必须确认签名、challenge、来源校验、幂等和异常上报策略。
+
+## 新增飞书能力检查
+
+- 是否选对飞书应用客户端。
+- 是否需要租户化配置。
+- 是否已有 helper、table、adapter、type 可以复用。
+- 是否需要新增 table adapter 或 card builder。
+- 是否处理分页、幂等、异常上报和权限边界。
+- 是否避免在多个 Service 中复制签名、分页、字段映射、重试逻辑。

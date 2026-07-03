@@ -18,6 +18,9 @@
 - `src/config/`：全局配置、数据库配置、租户配置和 `NodeConfigService`。
 - `src/common/`：跨业务模块复用的基础设施、飞书集成、守卫、异常、中间件、拦截器、基础类和公共表格 adapter。
 - `src/type/`：全局类型定义，例如用户上下文。
+
+## 业务模块职责
+
 - `src/manage/`：管理类业务。
 - `src/robot/`：飞书机器人消息与表格操作入口。
 - `src/ai/`：AI、Aily、日志操作相关能力。
@@ -28,6 +31,16 @@
 - `src/devops/`：DevOps、云效发布通知和定时处理。
 - `src/demo-plugin/`：插件演示与 MID 相关能力。
 - `src/mock-server/`：历史 mock server 能力，当前访问会被 `DiscardMiddleware` 阻断。
+
+## 定时任务与后台处理
+
+项目已在 `AppModule` 中启用 `ScheduleModule.forRoot()`。现有定时/后台处理分布在：
+
+- `src/alert/common/schedule`
+- `src/devops/ali/common/schedule`
+- `src/doc/common/schedule`
+- `src/doc/common/processor`
+- `src/fd-copilot/common/processor`
 
 ## common 目录现状
 

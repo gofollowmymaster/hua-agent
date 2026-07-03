@@ -1,6 +1,6 @@
-# 开发工作流规范
+# 开发工作流治理
 
-本文规定从需求到交付的标准流程。AI 助手和开发者都应按此执行。
+本文规定 AI 助手从需求理解到交付说明的标准流程。具体代码风格、模块设计和验证口径见 `docs/standard/README.md`。
 
 ## 1. 判断是否需要 OpenSpec
 
@@ -21,7 +21,7 @@
 - 先用 `rg`、`find`、`sed` 等方式查找 controller、service、DTO、table adapter、helper、配置和测试。
 - 优先复用同模块既有结构。
 - 优先复用 `src/common` 中已有基础设施。
-- 不确定模块边界时，先读 `docs/architecture/directory-structure.md` 和 `docs/architecture/business-modules.md`。
+- 不确定模块边界时，先读 `docs/architecture/directory-structure.md`。
 
 不要在未理解现有实现的情况下直接新增平行方案。
 
@@ -45,7 +45,7 @@
 - 数据库、Redis、飞书、外部系统访问必须通过已有 Service、helper、table、adapter 分层。
 - 新增配置优先通过 `NodeConfigService` 读取，不在业务代码中散写配置读取逻辑。
 - 涉及租户时必须使用 `TenantContext` 或显式传入租户，不要隐式使用默认租户掩盖问题。
-- 飞书或外部系统集成规范见 `integration-design.md`。
+- 飞书集成分层与约定见 `docs/architecture/feishu-integration.md`。
 - 鉴权、租户和 Redis key 模型见 `docs/architecture/auth-and-tenant.md`。
 
 ## 5. 验证规则

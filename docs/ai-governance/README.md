@@ -16,8 +16,10 @@
 
 1. 先读根目录 `AGENTS.md`：获取技术栈、常用命令、环境加载、路径别名、OpenSpec 工作流等高频硬规则。
 2. 再读本文：确认 AI 任务分级、上下文读取路径、风险边界和交付要求。
-3. 涉及代码实现、模块设计或测试验证时，读 `docs/standard/README.md` 及其专题规范。
-4. 需要理解项目架构和模块现状时，读 `docs/architecture/README.md` 及其专题说明。
+3. 需要从需求推进到实现和交付时，读 `development-workflow.md`。
+4. 涉及代码实现或模块设计时，读 `docs/standard/README.md` 及其专题规范。
+5. 需要确认验证要求时，读 `testing-and-verification.md`。
+6. 需要理解项目架构和模块现状时，读 `docs/architecture/README.md` 及其专题说明。
 
 ## 任务分级
 
@@ -58,12 +60,12 @@
 - 数据库、Redis、租户、飞书变更：补充隔离、配置读取、幂等、异常路径和来源校验检查。
 - 交付说明必须包含修改内容、关键文件、已运行验证、未运行验证原因和残留风险。
 
-具体验证口径以 `docs/standard/testing-and-verification.md` 为准。
+完整工作流见 `development-workflow.md`，具体验证口径以 `testing-and-verification.md` 为准。
 
 ## 与其他文档的分工
 
 - `AGENTS.md`：短、快、稳定。承载必须遵守的命令、环境、代码风格和基础架构摘要。
-- `docs/standard/`：开发规范。承载开发流程、代码风格、模块设计、测试验证和交付格式。
+- `docs/standard/`：开发规范。承载代码风格和模块设计规范。
 - `docs/ai-governance/`：AI 治理方案。承载 AI 工作原则、任务分级、风险边界和上下文读取策略。
 - `docs/architecture/`：项目架构说明。承载项目结构、模块职责、集成现状和基础设施事实。
 
@@ -74,5 +76,5 @@
 - 明确当前任务是否需要 OpenSpec change；涉及新增接口、行为变更、数据库变更时，优先按 OpenSpec 流程推进。
 - 先搜索现有模块、Service、DTO、table adapter、helper，复用已有模式。
 - 不要把业务逻辑放进 Controller；不要在业务 Service 中散写外部系统底层调用。
-- 涉及租户、飞书表格、Redis key、鉴权时，必须阅读 `docs/architecture/auth-and-tenant.md`、`docs/architecture/feishu-integration.md` 与 `docs/standard/integration-design.md`。
-- 本项目命令需要按 `AGENTS.md` 的环境加载规则执行，具体验证要求见 `docs/standard/testing-and-verification.md`。
+- 涉及租户、飞书表格、Redis key、鉴权时，必须阅读 `docs/architecture/auth-and-tenant.md` 与 `docs/architecture/feishu-integration.md`。
+- 本项目命令需要按 `AGENTS.md` 的环境加载规则执行，具体验证要求见 `testing-and-verification.md`。
