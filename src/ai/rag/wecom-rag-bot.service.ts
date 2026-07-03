@@ -184,7 +184,13 @@ export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
             if (!token) continue;
 
             answerContent += token;
-            await this.replyStream(client, frame, streamId, answerContent, false);
+            await this.replyStream(
+              client,
+              frame,
+              streamId,
+              answerContent,
+              false,
+            );
           }
         },
       );
@@ -307,8 +313,7 @@ export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
     const tenantConfigs = NodeConfigService.get('tenantConfig');
     return Object.values(tenantCodeMap)
       .map((tenantCode) => {
-        const wecomBot =
-          tenantConfigs[tenantCode]?.wecomBot?.vcHelperClient;
+        const wecomBot = tenantConfigs[tenantCode]?.wecomBot?.vcHelperClient;
         return wecomBot ? { tenantCode, ...wecomBot } : undefined;
       })
       .filter(Boolean) as TenantWecomRagBotConfig[];

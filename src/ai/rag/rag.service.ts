@@ -146,6 +146,7 @@ export class RagService {
     const tenantCode = this.tenantContext.tenant;
     const limit = Math.min(Math.max(Number(topK) || this.defaultTopK, 1), 20);
     const vector = await this.embeddings.embedQuery(question);
+    console.log('[ tenantCode ] >', tenantCode);
     const rows = await this.ragPrisma.$queryRaw<any[]>`
       SELECT c.id,
              c.tenant_code,

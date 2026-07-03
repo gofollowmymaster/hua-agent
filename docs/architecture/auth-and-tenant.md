@@ -1,6 +1,6 @@
 # 权限与多租户
 
-本文说明项目中的鉴权、多租户上下文和租户配置模型。涉及接口权限、服务商差异、Redis key、飞书表格访问时必须阅读。
+本文说明项目中的鉴权、多租户上下文、租户配置、Redis key 和租户化飞书配置模型。涉及接口权限、服务商差异、Redis key、飞书表格访问时必须阅读。
 
 ## 核心模型
 
@@ -12,8 +12,6 @@
 - `user`：当前用户上下文。
 - `userId`：当前用户 ID。
 - `request`：当前 Express request。
-
-不要在业务逻辑中重复解析 header 或 JWT；优先使用 `TenantContext`。
 
 ## 租户来源
 
@@ -34,9 +32,9 @@
 
 非 dev 环境下，`TenantMiddleware` 会用租户配置中的 `hostTag` 校验请求 host 与 token 服务商是否匹配。
 
-如果请求头包含 `ignore-supplier-check: true`，会跳过该域名与服务商匹配检查。此能力应谨慎使用，只适合明确可信的内部场景。
+如果请求头包含 `ignore-supplier-check: true`，会跳过该域名与服务商匹配检查。
 
-## TenantContext 使用规则
+## TenantContext 使用场景
 
 适用场景：
 
@@ -44,12 +42,6 @@
 - 读取租户级飞书机器人或表格配置。
 - 根据当前用户做业务判断。
 - 需要当前 request 进行日志或上下文关联。
-
-注意事项：
-
-- `TenantContext` 依赖请求生命周期；异步任务或定时任务中不一定有 request 上下文。
-- 后台任务如需租户，应显式遍历或传入租户，不要假设上下文存在。
-- 公共工具函数不要隐式依赖 `TenantContext`，除非它本身就是可注入服务。
 
 ## Guard 类型
 
@@ -105,7 +97,7 @@
 
 适合场景：同一个接口既允许前端用户调用，也允许内部系统调用。
 
-## 新接口鉴权选择
+## 鉴权选择
 
 - 用户登录态接口：使用 `AuthGuard`。
 - 内部系统固定密钥接口：使用 `SecretAuthGuard`。
@@ -128,12 +120,20 @@
 - `robots`
 - `feishuTables`
 
-读取规则：
+现有读取入口：
 
 - 全局配置使用 `NodeConfigService.get` 或 `getOrThrow`。
 - 租户单项配置使用 `NodeConfigService.getTenantConfigItem`。
 - 机器人配置使用 `NodeConfigService.getRobotConfig`。
 - 表格配置使用 `NodeConfigService.getFeishuTableConfig`。
+
+配置归属规则：
+
+- 所有租户共用一个值时放全局配置。
+- 不同租户可能不同的值放 `src/config/tenant` 对应租户配置。
+- 敏感值优先来自环境变量，不新增硬编码 secret。
+
+涉及服务商差异时，不要写死 `aplus` 或某个 app token，除非该能力明确只服务单一租户并已在需求中说明。
 
 ## Redis key 与租户
 
@@ -144,9 +144,11 @@ Redis key 枚举位于 `src/common/const/redis-key.enum.ts`。
 - `RedisService.buildCacheKey`
 - `RedisService.buildCacheKeyWithTemplates`
 
-这些方法会替换 key 模板中的 `{tenant}`。不要在业务代码中手动拼接租户 key，避免跨租户缓存污染。
+这些方法会替换 key 模板中的 `{tenant}`。
 
-`RedisService.delByPattern` 对 pattern 长度有保护，避免误删过宽范围。新增批量删除能力时必须保留类似保护。
+`RedisService.delByPattern` 对 pattern 长度有保护，避免误删过宽范围。
+
+新增缓存 key 时先扩展 `RedisKeys`，租户化 key 使用 `RedisService.buildCacheKey` 或 `buildCacheKeyWithTemplates`。不要在业务代码中手动拼接租户 key，避免跨租户缓存污染。
 
 ## 飞书表格与租户
 
@@ -155,8 +157,6 @@ Redis key 枚举位于 `src/common/const/redis-key.enum.ts`。
 - `TenantMiddleware` 可通过固定 token 查询服务商。
 - `SecretAuthGuard` 使用 `ClientSecretTable` 校验 token 和模块权限。
 - 飞书 table adapter 应通过配置服务获取对应租户的 app token/table id。
-
-涉及服务商差异时，不要写死 `aplus` 或某个 app token，除非该能力明确只服务单一租户并已在需求中说明。
 
 ## 开发检查清单
 

@@ -16,7 +16,7 @@
 - 使用 `find docs -maxdepth 3 -type f | sort` 查看文档结构。
 - 检查新增链接路径是否真实存在。
 - 检查文档中引用的关键代码路径是否真实存在。
-- 确认文档职责没有重复冲突，例如 `docs/standard` 写规范，`docs/ai-agent` 写架构。
+- 确认文档职责没有重复冲突，例如 `docs/standard` 写开发规范，`docs/ai-governance` 写 AI 治理，`docs/architecture` 写项目架构说明。
 
 ## 普通代码变更
 
@@ -66,6 +66,16 @@
 - 是否复用或新增了 table adapter/card builder/type。
 - 是否处理 token、租户配置、分页、幂等和异常上报。
 - 回调类接口是否验证来源、challenge 或签名机制。
+
+## 安全与租户变更
+
+涉及鉴权、租户上下文、固定 token、Redis key、租户配置时检查：
+
+- Guard 是否符合 `docs/architecture/auth-and-tenant.md` 的选择规则。
+- 后台任务是否显式处理租户，而不是依赖请求上下文。
+- Redis key 是否租户隔离，批量删除是否有范围保护。
+- 租户化配置是否通过 `NodeConfigService` 读取。
+- 是否避免跨租户读取数据、污染缓存或错误发送飞书消息。
 
 ## 交付说明中的验证格式
 

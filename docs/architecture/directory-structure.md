@@ -1,6 +1,6 @@
 # 目录架构
 
-本文说明项目目录职责和边界，帮助 AI agent 判断新代码应该放在哪里。
+本文说明项目目录职责和边界。新文件放置规则见 `docs/standard/module-design.md`。
 
 ## 顶层目录
 
@@ -8,7 +8,7 @@
 - `prisma/`：Prisma schema 和迁移元信息。schema 变更后必须按 `AGENTS.md` 运行 `pnpm pg`。
 - `openspec/`：OpenSpec 项目说明、变更提案、归档记录和规范目录。涉及行为变化时先走这里。
 - `mockServer/`：静态 mock 资源目录，通过 `ServeStaticModule` 暴露；当前 `mock-server` API 已被中间件标记为废弃。
-- `docs/`：项目文档。本目录下 `ai-agent/` 专门沉淀 AI agent 长期开发知识。
+- `docs/`：项目文档。`standard/` 沉淀项目开发规范，`ai-governance/` 沉淀 AI 治理方案，`architecture/` 沉淀项目架构说明。
 - `dist/`、`coverage/`、`logs/`：构建、覆盖率、日志等生成物，不应作为源码设计依据。
 
 ## src 顶层结构
@@ -29,9 +29,9 @@
 - `src/demo-plugin/`：插件演示与 MID 相关能力。
 - `src/mock-server/`：历史 mock server 能力，当前访问会被 `DiscardMiddleware` 阻断。
 
-## common 目录边界
+## common 目录现状
 
-`src/common` 不是业务逻辑垃圾桶。只有满足跨模块复用、基础设施或明确横切关注点的代码才应放入。
+`src/common` 承载跨模块复用、基础设施或明确横切关注点的代码。
 
 推荐边界：
 
@@ -47,35 +47,13 @@
 - `table/`：跨业务复用的飞书表格 adapter。
 - `utils/`：确实无状态、无业务归属的小工具。新增前应先判断是否属于 helper、service、adapter 或具体业务模块。
 
-## config 目录边界
+## config 目录现状
 
 - `src/config/index.ts` 聚合全局配置。
 - `src/config/db.ts` 承载数据库/Redis 等基础配置。
 - `src/config/tenant/` 承载租户差异配置。
 - `src/config/node-config.service.ts` 是配置读取入口，业务代码优先使用它而不是直接读取深层配置对象。
 
-新增配置判断规则：
-
-- 所有租户都共用一个值：放全局配置。
-- 不同租户可能不同：放 `tenant/` 对应租户配置，并通过 `NodeConfigService` 读取。
-- 敏感值：优先来自环境变量，不要新增硬编码 secret。
-
-## type 目录边界
+## type 目录现状
 
 `src/type` 用于少量全局类型。局部 DTO、飞书响应类型、业务领域类型应放在对应模块或 `src/common/feishu/type` 中。
-
-新增类型默认放置规则：
-
-- 请求/响应参数：模块内 `dto/`。
-- 飞书 OpenAPI 数据结构：`src/common/feishu/type/`。
-- 业务模块内部类型：模块内 `type/`。
-- 跨模块共享且稳定的类型：再考虑 `src/type/` 或 `src/common` 下明确子目录。
-
-## 新文件放置决策
-
-- 新 HTTP 接口：优先在对应业务模块下新增 controller/service/dto。
-- 新飞书 API 封装：优先在 `src/common/feishu/helper` 或 `src/common/feishu/type` 扩展。
-- 新飞书表格访问：优先新增或复用 table adapter，不要在 Service 里直接拼表格请求。
-- 新租户配置：放 `src/config/tenant`，并通过 `NodeConfigService` 获取。
-- 新缓存 key：先扩展 `RedisKeys`，再通过 `RedisService.buildCacheKey*` 构造。
-- 新定时任务：放业务模块的 `common/schedule` 或已有 schedule 目录，复用基础 schedule 抽象。
