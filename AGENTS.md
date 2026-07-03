@@ -80,10 +80,10 @@ pnpm test:cov          # 带覆盖率的测试
 ### 长期文档与读取顺序
 
 - AI 任务默认先读：`docs/ai-governance/README.md`
-- 涉及代码实现、模块设计、测试验证时继续读：`docs/standard/README.md`
+- 涉及代码实现、模块设计、配置变更、Redis key 或缓存变更时继续读：`docs/standard/README.md`
 - 需要理解项目结构、模块组成、关键基础设施时读：`docs/architecture/README.md`
 - AI 工作原则、任务分级、OpenSpec 判断、开发工作流、测试验证、风险边界和交付要求沉淀在 `docs/ai-governance/`
-- 代码风格、模块设计规范沉淀在 `docs/standard/`
+- 代码风格、模块设计、配置规范、Redis key 与缓存使用规范沉淀在 `docs/standard/`
 - 项目架构、目录边界、业务模块、飞书集成、权限/多租户模型沉淀在 `docs/architecture/`
 - `AGENTS.md` 只保留高频硬规则、常用命令、路径入口和最短读取路径，避免与专题文档重复维护
 

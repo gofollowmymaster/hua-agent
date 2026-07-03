@@ -104,18 +104,18 @@ src/<module>/
 - 新 HTTP 接口：优先在对应业务模块下新增 controller、service、dto。
 - 新飞书 API 封装：优先在 `src/common/feishu/helper` 或 `src/common/feishu/type` 扩展。
 - 新飞书表格访问：优先新增或复用 table adapter，不要在 Service 里直接拼表格请求。
-- 新租户配置：放 `src/config/tenant`，并通过 `NodeConfigService` 获取。
-- 新缓存 key：先扩展 `RedisKeys`，再通过 `RedisService.buildCacheKey*` 构造。
+- 新租户配置：按 `configuration.md` 判断归属并维护类型。
+- 新缓存 key：先扩展 `RedisKeys`，再通过 `RedisService.buildCacheKey*` 构造；具体规则见 `redis.md`。
 - 新定时任务：放业务模块的 `common/schedule` 或已有 schedule 目录，复用基础 schedule 抽象。
 
-## 新功能落地检查
+## 模块落地检查
 
-- 是否需要 OpenSpec change。
 - 是否放在正确业务模块。
 - 是否复用了已有 DTO、table adapter、helper、异常和 Redis key。
 - 是否正确处理租户上下文。
 - 是否有合适 Guard。
-- 是否新增或更新测试；若不适合测试，需要在交付说明中说明原因。
+
+OpenSpec 判断和验证交付要求见 `docs/ai-governance/development-workflow.md` 与 `docs/ai-governance/testing-and-verification.md`。
 
 ## 模块注册
 

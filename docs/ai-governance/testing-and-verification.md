@@ -49,12 +49,15 @@
 
 ## Redis 与租户相关变更
 
-涉及 Redis key、缓存、限流、幂等、多租户时检查：
+涉及 Redis key、缓存、限流、幂等、多租户时，先读 `docs/standard/redis.md`，并检查：
 
 - Redis key 是否来自 `RedisKeys`。
 - 是否通过 `RedisService.buildCacheKey` 或 `buildCacheKeyWithTemplates` 构造租户 key。
 - 是否避免跨租户读取或删除缓存。
-- 批量删除是否有 pattern 长度或范围保护。
+- TTL 是否有明确业务语义，避免无意永久缓存。
+- `RedisService.limiter` 返回值是否按“超过阈值”为 true 使用。
+- `RedisService.idempotent` 的 tag 是否足够唯一，失败重试语义是否符合业务预期。
+- 批量删除是否有足够具体的 pattern、长度保护和范围保护。
 - 后台任务是否显式处理租户，而不是依赖请求上下文。
 
 ## 飞书集成变更
@@ -71,7 +74,7 @@
 
 涉及鉴权、租户上下文、固定 token、Redis key、租户配置时检查：
 
-- Guard 是否符合 `docs/architecture/auth-and-tenant.md` 的选择规则。
+- Guard 是否符合 `docs/architecture/auth-and-tenant.md` 中的鉴权使用现状。
 - 后台任务是否显式处理租户，而不是依赖请求上下文。
 - Redis key 是否租户隔离，批量删除是否有范围保护。
 - 租户化配置是否通过 `NodeConfigService` 读取。

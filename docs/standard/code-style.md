@@ -49,11 +49,8 @@ DTO：
 
 ## 配置规范
 
-- 全局配置通过 `NodeConfigService.get` 或 `getOrThrow`。
-- 租户配置通过 `NodeConfigService.getTenantConfigItem`。
-- 飞书机器人配置通过 `NodeConfigService.getRobotConfig`。
-- 飞书表格配置通过 `NodeConfigService.getFeishuTableConfig`。
-- 敏感配置优先来自环境变量，不新增硬编码 secret。
+- 配置新增、读取、类型维护和敏感信息处理统一见 `configuration.md`。
+- 业务代码不要散写环境变量读取、租户配置路径或敏感配置默认值。
 
 ## 命名规范
 

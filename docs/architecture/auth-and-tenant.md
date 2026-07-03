@@ -1,6 +1,6 @@
 # 权限与多租户
 
-本文说明项目中的鉴权、多租户上下文、租户配置、Redis key 和租户化飞书配置模型。涉及接口权限、服务商差异、Redis key、飞书表格访问时必须阅读。
+本文说明项目中的鉴权、多租户上下文、租户配置、Redis key 和租户化飞书配置模型，可作为理解接口权限、服务商差异、Redis key、飞书表格访问的架构上下文。
 
 ## 核心模型
 
@@ -97,15 +97,13 @@
 
 适合场景：同一个接口既允许前端用户调用，也允许内部系统调用。
 
-## 鉴权选择
+## 鉴权使用现状
 
-- 用户登录态接口：使用 `AuthGuard`。
-- 内部系统固定密钥接口：使用 `SecretAuthGuard`。
-- 第三方或 Aily 风格签名接口：使用 `SignAuthGuard`。
-- 同时兼容用户和系统调用：使用 `CompositeAuthOrSecretGuard`。
-- 公开 webhook/callback：必须确认来源校验、challenge 处理、幂等和异常上报策略。
-
-没有明确理由，不要新增裸奔接口。
+- 用户登录态接口通常使用 `AuthGuard`。
+- 内部系统固定密钥接口通常使用 `SecretAuthGuard`。
+- 第三方或 Aily 风格签名接口通常使用 `SignAuthGuard`。
+- 同时兼容用户和系统调用的接口通常使用 `CompositeAuthOrSecretGuard`。
+- 公开 webhook/callback 会结合来源校验、challenge 处理、幂等和异常上报策略。
 
 ## 租户配置
 
@@ -127,19 +125,13 @@
 - 机器人配置使用 `NodeConfigService.getRobotConfig`。
 - 表格配置使用 `NodeConfigService.getFeishuTableConfig`。
 
-配置归属规则：
-
-- 所有租户共用一个值时放全局配置。
-- 不同租户可能不同的值放 `src/config/tenant` 对应租户配置。
-- 敏感值优先来自环境变量，不新增硬编码 secret。
-
-涉及服务商差异时，不要写死 `aplus` 或某个 app token，除非该能力明确只服务单一租户并已在需求中说明。
+配置归属、读取方式、类型维护和敏感信息处理规范见 `docs/standard/configuration.md`。
 
 ## Redis key 与租户
 
 Redis key 枚举位于 `src/common/const/redis-key.enum.ts`。
 
-租户化 key 应使用：
+租户化 key 构造入口包括：
 
 - `RedisService.buildCacheKey`
 - `RedisService.buildCacheKeyWithTemplates`
@@ -148,7 +140,7 @@ Redis key 枚举位于 `src/common/const/redis-key.enum.ts`。
 
 `RedisService.delByPattern` 对 pattern 长度有保护，避免误删过宽范围。
 
-新增缓存 key 时先扩展 `RedisKeys`，租户化 key 使用 `RedisService.buildCacheKey` 或 `buildCacheKeyWithTemplates`。不要在业务代码中手动拼接租户 key，避免跨租户缓存污染。
+Redis key、缓存、限流、幂等和批量删除的开发规范见 `docs/standard/redis.md`。
 
 ## 飞书表格与租户
 
@@ -156,13 +148,11 @@ Redis key 枚举位于 `src/common/const/redis-key.enum.ts`。
 
 - `TenantMiddleware` 可通过固定 token 查询服务商。
 - `SecretAuthGuard` 使用 `ClientSecretTable` 校验 token 和模块权限。
-- 飞书 table adapter 应通过配置服务获取对应租户的 app token/table id。
+- 飞书 table adapter 通过配置服务读取对应租户的 app token/table id。
 
-## 开发检查清单
+## 相关规范入口
 
-- 是否正确选择 Guard。
-- 是否需要读取 `TenantContext`。
-- 是否考虑后台任务没有请求上下文。
-- Redis key 是否租户隔离。
-- 飞书配置是否通过 `NodeConfigService` 获取。
-- 是否避免跨租户数据读取、缓存污染或错误发送飞书消息。
+- 配置新增与读取规范：`docs/standard/configuration.md`
+- Redis key、缓存、限流、幂等和批量删除规范：`docs/standard/redis.md`
+- 模块分层、后台任务和 provider 注册规范：`docs/standard/module-design.md`
+- 鉴权、租户、Redis、飞书变更的验证要求：`docs/ai-governance/testing-and-verification.md`

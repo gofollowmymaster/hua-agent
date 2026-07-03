@@ -10,7 +10,7 @@
 
 - `src/main.ts` 是应用入口，负责创建 Nest 应用、注册全局 Filter/Interceptor/Pipe、配置 CORS、请求体大小和 dev 环境 Swagger。
 - `src/app.module.ts` 是根模块，负责装配全局服务、配置模块、静态资源、JWT、定时任务、守卫模块、异常模块和各业务模块。
-- `src/common` 承载跨模块基础设施，业务代码应优先复用其中已有服务和分层，不应把新公共能力随意堆到 utils。
+- `src/common` 承载跨模块基础设施、飞书集成、守卫、异常、中间件、拦截器、基础类和公共表格 adapter。
 
 ## 启动链路
 
@@ -48,7 +48,7 @@
 `AppModule.configure` 对所有路由应用中间件，顺序是：
 
 1. `LoggerMiddleware`：记录请求开始、headers、body 和响应耗时。
-2. `TenantMiddleware`：解析用户与租户上下文，必须在依赖租户上下文的逻辑之前运行。
+2. `TenantMiddleware`：解析用户与租户上下文，位于依赖租户上下文的逻辑之前。
 3. `DiscardMiddleware`：阻断废弃的 `mock-server` 功能访问。
 
 ## 请求生命周期
@@ -75,7 +75,7 @@
 - `TenantContext`：基于 `AsyncLocalStorage` 保存当前请求的租户、用户和 request。
 - `WikiFixedTokenService`：文档相关固定 token 能力。
 
-虽然这些服务全局可用，新增模块仍应通过构造函数注入，不要自行 new 基础设施服务。
+全局服务的注入和模块注册规范见 `docs/standard/module-design.md`。
 
 ## 配置模型
 
@@ -89,14 +89,14 @@
   - `getFeishuTableConfig` 同时兼容全局表格配置和租户表格配置。
   - `getTenantConfigItem` / `getTenantConfigItemAll` 读取租户级配置。
 
-新增配置时，应先判断是全局配置还是租户配置；租户相关配置不要硬编码在业务逻辑中。
+配置新增、读取、类型维护和敏感信息处理规范见 `docs/standard/configuration.md`。
 
 ## 日志、异常与响应
 
 - 请求日志由 `LoggerMiddleware` 和 `LoggingInterceptor` 共同承担。
 - 响应结构由 `TransformInterceptor` 统一处理。
-- 业务异常优先使用 `src/common/exception` 下已有异常类型。
+- 业务异常类型位于 `src/common/exception`。
 - 不需要飞书上报的异常可使用 `NotReportException`。
 - Prisma 唯一约束等数据库异常由专门 Filter 转换。
 
-新增异常类型前，先检查现有异常是否能表达当前语义。
+异常与错误处理的开发规范见 `docs/standard/code-style.md`。

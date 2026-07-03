@@ -32,49 +32,27 @@
 
 ## OpenSpec 判断
 
-以下情况优先走 OpenSpec change：
-
-- 新增业务接口。
-- 修改已有接口行为、鉴权、响应结构或错误语义。
-- 修改数据库 schema、迁移或持久化模型。
-- 调整跨模块公共能力。
-- 引入新的外部系统集成或重要配置。
-
-只改注释、文档、小范围 bugfix，且不改变既有行为时，可以不新增 OpenSpec，但交付说明中应写明验证方式。
+行为变化、接口、数据库、跨模块公共能力或重要外部集成变更，优先判断是否需要 OpenSpec change。具体判断和执行步骤见 `development-workflow.md`。
 
 ## 探索优先规则
 
-执行前必须先用 `rg`、`find`、`sed` 等方式确认现有实现：
-
-- 找到相关 controller、service、DTO、table adapter、helper、配置和测试。
-- 找到同模块已有风格，优先沿用。
-- 找到公共能力边界，避免把业务逻辑塞进 `src/common`。
-- 找到租户、飞书、Redis、鉴权相关路径后，再决定是否需要读取对应专题。
-
-不要用猜测替代搜索；不要为了当前需求做大范围顺手重构。
+执行前先用 `rg`、`find`、`sed` 等方式确认现有实现、模块风格、公共能力边界和相关测试。完整探索步骤见 `development-workflow.md`。
 
 ## 验证与交付
 
-- 文档变更：检查目录结构、旧路径残留、链接可达和职责边界。
-- 普通代码变更：优先运行相关测试；没有相关测试时至少运行构建或说明未运行原因。
-- 数据库、Redis、租户、飞书变更：补充隔离、配置读取、幂等、异常路径和来源校验检查。
-- 交付说明必须包含修改内容、关键文件、已运行验证、未运行验证原因和残留风险。
-
-完整工作流见 `development-workflow.md`，具体验证口径以 `testing-and-verification.md` 为准。
+验证范围按变更风险决定，交付说明必须说明修改内容、关键文件、已运行验证、未运行验证原因和残留风险。完整工作流见 `development-workflow.md`，具体验证口径以 `testing-and-verification.md` 为准。
 
 ## 与其他文档的分工
 
 - `AGENTS.md`：短、快、稳定。承载必须遵守的命令、环境、代码风格和基础架构摘要。
-- `docs/standard/`：开发规范。承载代码风格和模块设计规范。
+- `docs/standard/`：开发规范。承载代码风格、模块设计、配置维护、Redis key 与缓存使用规范。
 - `docs/ai-governance/`：AI 治理方案。承载 AI 工作原则、任务分级、风险边界和上下文读取策略。
 - `docs/architecture/`：项目架构说明。承载项目结构、模块职责、集成现状和基础设施事实。
 
 当多处信息发生冲突时，优先以代码实现为准；其次以 `AGENTS.md` 的硬性命令/约束为准；再以 `docs/standard/` 的实现规范、`docs/architecture/` 的事实说明和本目录治理说明为准。
 
-## AI 开发前检查
+## 高风险补读入口
 
-- 明确当前任务是否需要 OpenSpec change；涉及新增接口、行为变更、数据库变更时，优先按 OpenSpec 流程推进。
-- 先搜索现有模块、Service、DTO、table adapter、helper，复用已有模式。
-- 不要把业务逻辑放进 Controller；不要在业务 Service 中散写外部系统底层调用。
-- 涉及租户、飞书表格、Redis key、鉴权时，必须阅读 `docs/architecture/auth-and-tenant.md` 与 `docs/architecture/feishu-integration.md`。
-- 本项目命令需要按 `AGENTS.md` 的环境加载规则执行，具体验证要求见 `testing-and-verification.md`。
+- 涉及租户、鉴权、Redis key、飞书表格或飞书回调：读 `docs/architecture/auth-and-tenant.md`、`docs/architecture/feishu-integration.md` 和 `testing-and-verification.md`。
+- 涉及模块实现、配置或缓存规范：读 `docs/standard/README.md` 及相关专题。
+- 涉及命令执行和交付：按 `AGENTS.md` 的环境加载规则和 `development-workflow.md` 执行。

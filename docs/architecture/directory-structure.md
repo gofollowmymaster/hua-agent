@@ -5,11 +5,11 @@
 ## 顶层目录
 
 - `src/`：应用源码，包含 NestJS 模块、公共基础设施、配置和类型。
-- `prisma/`：Prisma schema 和迁移元信息。schema 变更后必须按 `AGENTS.md` 运行 `pnpm pg`。
+- `prisma/`：Prisma schema 和迁移元信息。Schema 相关命令见根目录 `AGENTS.md`。
 - `openspec/`：OpenSpec 项目说明、变更提案、归档记录和规范目录。涉及行为变化时先走这里。
 - `mockServer/`：静态 mock 资源目录，通过 `ServeStaticModule` 暴露；当前 `mock-server` API 已被中间件标记为废弃。
 - `docs/`：项目文档。`standard/` 沉淀项目开发规范，`ai-governance/` 沉淀 AI 治理方案，`architecture/` 沉淀项目架构说明。
-- `dist/`、`coverage/`、`logs/`：构建、覆盖率、日志等生成物，不应作为源码设计依据。
+- `dist/`、`coverage/`、`logs/`：构建、覆盖率、日志等生成物。
 
 ## src 顶层结构
 
@@ -58,15 +58,15 @@
 - `middleware/`：请求日志、租户上下文、废弃功能拦截等中间件。
 - `service/`：全局服务，如 Redis、Prisma、Logger、TenantContext。
 - `table/`：跨业务复用的飞书表格 adapter。
-- `utils/`：确实无状态、无业务归属的小工具。新增前应先判断是否属于 helper、service、adapter 或具体业务模块。
+- `utils/`：无状态、无明确业务归属的小工具。
 
 ## config 目录现状
 
 - `src/config/index.ts` 聚合全局配置。
 - `src/config/db.ts` 承载数据库/Redis 等基础配置。
 - `src/config/tenant/` 承载租户差异配置。
-- `src/config/node-config.service.ts` 是配置读取入口，业务代码优先使用它而不是直接读取深层配置对象。
+- `src/config/node-config.service.ts` 是配置读取入口。
 
 ## type 目录现状
 
-`src/type` 用于少量全局类型。局部 DTO、飞书响应类型、业务领域类型应放在对应模块或 `src/common/feishu/type` 中。
+`src/type` 用于少量全局类型。局部 DTO、飞书响应类型、业务领域类型通常位于对应模块或 `src/common/feishu/type` 中。

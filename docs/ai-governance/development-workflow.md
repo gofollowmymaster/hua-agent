@@ -1,6 +1,6 @@
 # 开发工作流治理
 
-本文规定 AI 助手从需求理解到交付说明的标准流程。具体代码风格、模块设计和验证口径见 `docs/standard/README.md`。
+本文规定 AI 助手从需求理解到交付说明的标准流程。具体代码风格和模块设计见 `docs/standard/README.md`，验证口径见 `testing-and-verification.md`。
 
 ## 1. 判断是否需要 OpenSpec
 
@@ -40,25 +40,12 @@
 - 不修改与任务无关的文件。
 - 不回退用户或其他 agent 已经做出的改动。
 - 不为了当前需求做大范围顺手重构。
-- Controller 只做协议层处理。
-- Service 负责业务编排。
-- 数据库、Redis、飞书、外部系统访问必须通过已有 Service、helper、table、adapter 分层。
-- 新增配置优先通过 `NodeConfigService` 读取，不在业务代码中散写配置读取逻辑。
-- 涉及租户时必须使用 `TenantContext` 或显式传入租户，不要隐式使用默认租户掩盖问题。
-- 飞书集成分层与约定见 `docs/architecture/feishu-integration.md`。
-- 鉴权、租户和 Redis key 模型见 `docs/architecture/auth-and-tenant.md`。
+- 代码实现遵守 `docs/standard/README.md` 及相关专题规范。
+- 需要项目事实或集成现状时，补读 `docs/architecture/README.md` 及对应专题。
 
 ## 5. 验证规则
 
-实现完成后必须按变更类型验证：
-
-- 文档变更：检查路径、链接、引用代码路径是否真实。
-- 普通代码变更：优先运行相关测试；没有相关测试时至少运行 TypeScript 构建或说明未运行原因。
-- DTO/接口变更：检查 Swagger 装饰器、DTO 校验和 Guard。
-- Prisma schema 变更：运行 `pnpm pg`，并按环境选择迁移命令。
-- Redis/租户/飞书变更：补充租户隔离、配置读取和异常路径验证。
-
-验证命令和未能执行的原因都应在交付说明中说明。
+实现完成后必须按变更类型验证，具体验证矩阵见 `testing-and-verification.md`。验证命令和未能执行的原因都应在交付说明中说明。
 
 ## 6. 交付说明
 

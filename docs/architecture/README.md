@@ -2,7 +2,7 @@
 
 `docs/architecture/` 用于承载项目架构说明，回答“项目现在是什么结构、模块如何组成、关键基础设施如何工作”。
 
-本目录只记录项目事实和上下文，不承载开发规范。新增代码应该怎么写、文件应该怎么放、如何验证，请阅读 `docs/standard/README.md`。AI 如何读取上下文、判断风险和交付，请阅读 `docs/ai-governance/README.md`。
+本目录只记录项目事实和上下文，不承载开发规范。新增代码怎么写、文件怎么放，请阅读 `docs/standard/README.md`；如何验证和交付，请阅读 `docs/ai-governance/testing-and-verification.md` 与 `docs/ai-governance/development-workflow.md`。
 
 ## 阅读顺序
 
@@ -14,7 +14,7 @@
 ## 与其他目录的分工
 
 - `docs/architecture/`：项目架构说明和上下文事实。
-- `docs/standard/`：开发规范、代码分层、集成、安全租户、测试验证和交付格式。
-- `docs/ai-governance/`：AI 工作原则、任务分级、OpenSpec 判断、风险边界和上下文读取策略。
+- `docs/standard/`：代码风格、模块设计、配置维护、Redis key 与缓存使用等开发规范。
+- `docs/ai-governance/`：AI 工作原则、任务分级、OpenSpec 判断、验证交付、风险边界和上下文读取策略。
 
 当架构文档与代码不一致时，以代码真实实现为准，并在当前变更中同步修正文档或说明差异。
