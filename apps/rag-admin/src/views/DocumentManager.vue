@@ -19,16 +19,20 @@
         </template>
       </AgGrid>
     </div>
+
+    <DocumentPreviewModal ref="previewModalRef" />
+    <DocumentChunkDrawer ref="chunkDrawerRef" />
   </section>
 </template>
 
 <script setup lang="ts">
 import { h, ref } from 'vue';
 import dayjs from 'dayjs';
-import { Modal, Space, message } from '@aplus-frontend/antdv';
+import { Space, message } from '@aplus-frontend/antdv';
 import {
   AgGrid,
   ApButton,
+  ApModal,
   ApTag,
   usePageListAgGrid,
   type AgGridColumnType,
@@ -39,8 +43,12 @@ import {
   pageDocumentsGrid,
   type RagDocumentItem,
 } from '@/api/rag-admin';
+import DocumentChunkDrawer from './components/DocumentChunkDrawer.vue';
+import DocumentPreviewModal from './components/DocumentPreviewModal.vue';
 
 const ingesting = ref(false);
+const previewModalRef = ref<InstanceType<typeof DocumentPreviewModal>>();
+const chunkDrawerRef = ref<InstanceType<typeof DocumentChunkDrawer>>();
 const statusValueEnum = {
   ready: { text: 'ready', color: '#12b76a' },
   failed: { text: 'failed', color: '#f04438' },
@@ -69,7 +77,15 @@ const columns: AgGridColumnType<RagDocumentItem>[] = [
     hideInSearch: true,
     customRender: ({ record }) =>
       h('div', [
-        h('div', { class: 'strong' }, record.fileName || '-'),
+        h(
+          ApButton,
+          {
+            class: 'file-name-link',
+            type: 'link',
+            onClick: () => previewModalRef.value?.show(record),
+          },
+          () => record.fileName || '-',
+        ),
         h('div', { class: 'muted path' }, record.sourcePath || '-'),
         record.error ? h('div', { class: 'error-text' }, record.error) : null,
       ]),
@@ -128,18 +144,32 @@ const columns: AgGridColumnType<RagDocumentItem>[] = [
     title: '操作',
     key: 'actions',
     dataIndex: 'actions',
-    width: 110,
+    width: 170,
     fixed: 'right',
     hideInSearch: true,
     customRender: ({ record }) =>
       h(
-        ApButton,
-        {
-          danger: true,
-          type: 'link',
-          onClick: () => remove(record),
-        },
-        () => '删除索引',
+        Space,
+        { size: 4 },
+        () => [
+          h(
+            ApButton,
+            {
+              type: 'link',
+              onClick: () => chunkDrawerRef.value?.show(record),
+            },
+            () => '切片实况',
+          ),
+          h(
+            ApButton,
+            {
+              danger: true,
+              type: 'link',
+              onClick: () => remove(record),
+            },
+            () => '删除索引',
+          ),
+        ],
       ),
   },
 ];
@@ -157,7 +187,7 @@ const [gridProps, { reload }] = usePageListAgGrid({
     height: '100%',
   },
   scroll: {
-    x: 980,
+    x: 1060,
   },
 });
 
@@ -177,7 +207,7 @@ async function runIngest(force: boolean) {
 }
 
 function remove(item: RagDocumentItem) {
-  Modal.confirm({
+  ApModal.confirm({
     title: '确认删除索引？',
     content: `删除后将移除 ${item.fileName} 的已索引内容。`,
     okText: '删除',
@@ -201,4 +231,17 @@ function formatSize(value: string | number) {
   if (size > 1024) return `${(size / 1024).toFixed(1)} KB`;
   return `${size} B`;
 }
+
 </script>
+
+<style scoped>
+.file-name-link {
+  height: auto;
+  max-width: 100%;
+  padding: 0;
+  font-weight: 700;
+  line-height: 20px;
+  white-space: normal;
+  text-align: left;
+}
+</style>

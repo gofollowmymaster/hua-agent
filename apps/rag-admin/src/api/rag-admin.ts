@@ -1,4 +1,4 @@
-import { del, get, post } from './http';
+import { del, get, getBlob, post } from './http';
 
 export interface PageResult<T> {
   list: T[];
@@ -25,6 +25,15 @@ export interface RagDocumentItem {
   createdAt: string;
   updatedAt: string;
   ingestedAt?: string;
+}
+
+export interface RagDocumentChunkItem {
+  id: string | number;
+  documentId: string | number;
+  chunkIndex: number;
+  content: string;
+  metadata: Record<string, unknown>;
+  createdAt: string;
 }
 
 export interface RagSessionItem {
@@ -69,6 +78,20 @@ export async function pageDocumentsGrid(params: Record<string, unknown>) {
 
 export function deleteDocument(id: string | number) {
   return del(`/ai/rag/admin/documents/${id}`);
+}
+
+export function getDocumentPreviewFile(id: string | number) {
+  return getBlob(`/ai/rag/admin/documents/${id}/preview`);
+}
+
+export function pageDocumentChunks(
+  id: string | number,
+  params: Record<string, unknown>,
+) {
+  return post<PageResult<RagDocumentChunkItem>>(
+    `/ai/rag/admin/documents/${id}/chunks/page`,
+    params,
+  );
 }
 
 export function ingestDocuments(force: boolean) {

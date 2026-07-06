@@ -49,6 +49,8 @@ export class RagAdminDocumentPageDto extends RagAdminPageDto {
   updatedTo?: string;
 }
 
+export class RagAdminDocumentChunkPageDto extends RagAdminPageDto {}
+
 export class RagAdminIngestDto {
   @ApiPropertyOptional({
     description: '是否强制重新索引 hash 未变化的文档',

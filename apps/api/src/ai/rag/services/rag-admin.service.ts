@@ -1,9 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/rag-client';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import { NodeConfigService } from '@src/config/node-config.service';
 import type { TenantCode } from '@src/config/tenant';
 import {
+  RagAdminDocumentChunkPageDto,
   RagAdminDocumentPageDto,
   RagAdminIngestDto,
   RagAdminSessionPageDto,
@@ -81,6 +84,82 @@ export class RagAdminService {
         tenantCode: document.tenantCode,
         sourcePath: document.sourcePath,
       },
+    };
+  }
+
+  async pageDocumentChunks(
+    documentId: number,
+    params: RagAdminDocumentChunkPageDto,
+  ) {
+    const { page, pageSize, skip } = this.resolvePage(params);
+    const tenantCode = this.currentTenant();
+    const document = await this.ragPrisma.aplusDocument.findUnique({
+      where: { id: documentId },
+      select: { id: true, tenantCode: true },
+    });
+
+    if (!document || document.tenantCode !== tenantCode) {
+      throw new BadRequestException(`Document #${documentId} not found`);
+    }
+
+    const where: Prisma.AplusChunkWhereInput = {
+      tenantCode,
+      documentId,
+    };
+    const [total, chunks] = await Promise.all([
+      this.ragPrisma.aplusChunk.count({ where }),
+      this.ragPrisma.aplusChunk.findMany({
+        where,
+        orderBy: { chunkIndex: 'asc' },
+        skip,
+        take: pageSize,
+      }),
+    ]);
+
+    return {
+      list: chunks.map((chunk) => ({
+        id: this.serializeBigInt(chunk.id),
+        tenantCode: chunk.tenantCode,
+        documentId: this.serializeBigInt(chunk.documentId),
+        chunkIndex: chunk.chunkIndex,
+        content: chunk.content,
+        metadata: chunk.metadata,
+        createdAt: chunk.createdAt,
+      })),
+      total,
+      page,
+      pageSize,
+    };
+  }
+
+  async getDocumentPreviewFile(id: number) {
+    const tenantCode = this.currentTenant();
+    const document = await this.ragPrisma.aplusDocument.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        tenantCode: true,
+        sourcePath: true,
+        fileName: true,
+        fileType: true,
+        fileSize: true,
+      },
+    });
+
+    if (!document || document.tenantCode !== tenantCode) {
+      throw new BadRequestException(`Document #${id} not found`);
+    }
+
+    const file = await this.resolvePreviewFilePath(
+      tenantCode,
+      document.sourcePath,
+    );
+
+    return {
+      absolutePath: file.absolutePath,
+      fileName: document.fileName,
+      fileType: document.fileType,
+      fileSize: file.fileSize,
     };
   }
 
@@ -269,7 +348,12 @@ export class RagAdminService {
     };
   }
 
-  private resolvePage(params: RagAdminDocumentPageDto | RagAdminSessionPageDto) {
+  private resolvePage(
+    params:
+      | RagAdminDocumentPageDto
+      | RagAdminDocumentChunkPageDto
+      | RagAdminSessionPageDto,
+  ) {
     const page = params.page ?? 1;
     const pageSize = params.pageSize ?? 20;
     return {
@@ -283,8 +367,48 @@ export class RagAdminService {
     return this.tenantContext.tenant ?? NodeConfigService.get('defaultTenant');
   }
 
+  private async resolvePreviewFilePath(
+    tenantCode: TenantCode,
+    sourcePath: string,
+  ) {
+    const rawRoot = path.resolve(
+      process.cwd(),
+      NodeConfigService.get('vcHelper').rawDir,
+    );
+    const tenantRawDir = path.join(rawRoot, tenantCode);
+    const candidates = [
+      path.resolve(tenantRawDir, sourcePath),
+      path.resolve(process.cwd(), sourcePath),
+    ];
+
+    for (const candidate of candidates) {
+      if (!this.isPathInside(candidate, tenantRawDir)) continue;
+
+      try {
+        const stat = await fs.stat(candidate);
+        if (stat.isFile()) {
+          return {
+            absolutePath: candidate,
+            fileSize: stat.size,
+          };
+        }
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+      }
+    }
+
+    throw new BadRequestException('Document preview file not found');
+  }
+
+  private isPathInside(filePath: string, parentDir: string) {
+    const relativePath = path.relative(parentDir, filePath);
+    return (
+      relativePath === '' ||
+      (!relativePath.startsWith('..') && !path.isAbsolute(relativePath))
+    );
+  }
+
   private serializeBigInt(value: bigint | number | string) {
     return typeof value === 'bigint' ? value.toString() : value;
   }
-
 }

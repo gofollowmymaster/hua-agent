@@ -1,10 +1,14 @@
 import { BadRequestException } from '@nestjs/common';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import { RagAdminService } from './rag-admin.service';
 
 jest.mock('@src/config/node-config.service', () => ({
   NodeConfigService: {
     get: jest.fn((key: string) => {
       if (key === 'defaultTenant') return 'aplus';
+      if (key === 'vcHelper') return { rawDir: 'raw' };
       return undefined;
     }),
   },
@@ -17,6 +21,10 @@ describe('RagAdminService', () => {
       findMany: jest.Mock;
       findUnique: jest.Mock;
       delete: jest.Mock;
+    };
+    aplusChunk: {
+      count: jest.Mock;
+      findMany: jest.Mock;
     };
     aplusRagSession: {
       count: jest.Mock;
@@ -55,6 +63,20 @@ describe('RagAdminService', () => {
         ]),
         findUnique: jest.fn(),
         delete: jest.fn().mockResolvedValue({}),
+      },
+      aplusChunk: {
+        count: jest.fn().mockResolvedValue(1),
+        findMany: jest.fn().mockResolvedValue([
+          {
+            id: BigInt(101),
+            tenantCode: 'aplus',
+            documentId: BigInt(1),
+            chunkIndex: 0,
+            content: 'chunk content',
+            metadata: { page: 1, sourcePath: 'a.md' },
+            createdAt: new Date('2026-01-02T00:00:00.000Z'),
+          },
+        ]),
       },
       aplusRagSession: {
         count: jest.fn().mockResolvedValue(1),
@@ -156,6 +178,110 @@ describe('RagAdminService', () => {
       BadRequestException,
     );
     expect(ragPrisma.aplusDocument.delete).not.toHaveBeenCalled();
+  });
+
+  it('pages document chunks for current tenant document', async () => {
+    ragPrisma.aplusDocument.findUnique.mockResolvedValue({
+      id: BigInt(1),
+      tenantCode: 'aplus',
+    });
+
+    const result = await service.pageDocumentChunks(1, {
+      page: 2,
+      pageSize: 10,
+    });
+
+    expect(ragPrisma.aplusChunk.count).toHaveBeenCalledWith({
+      where: {
+        tenantCode: 'aplus',
+        documentId: 1,
+      },
+    });
+    expect(ragPrisma.aplusChunk.findMany).toHaveBeenCalledWith({
+      where: {
+        tenantCode: 'aplus',
+        documentId: 1,
+      },
+      orderBy: { chunkIndex: 'asc' },
+      skip: 10,
+      take: 10,
+    });
+    expect(result).toMatchObject({
+      total: 1,
+      page: 2,
+      pageSize: 10,
+      list: [
+        {
+          id: '101',
+          tenantCode: 'aplus',
+          documentId: '1',
+          chunkIndex: 0,
+          content: 'chunk content',
+          metadata: { page: 1, sourcePath: 'a.md' },
+        },
+      ],
+    });
+    expect(() => JSON.stringify(result)).not.toThrow();
+  });
+
+  it('blocks cross tenant document chunk paging', async () => {
+    ragPrisma.aplusDocument.findUnique.mockResolvedValue({
+      id: BigInt(1),
+      tenantCode: 'boat',
+    });
+
+    await expect(service.pageDocumentChunks(1, {})).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
+    expect(ragPrisma.aplusChunk.findMany).not.toHaveBeenCalled();
+  });
+
+  it('resolves preview file for current tenant document', async () => {
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'rag-admin-'));
+    const originalCwd = process.cwd();
+    try {
+      process.chdir(root);
+      await fs.mkdir(path.join(root, 'raw', 'aplus'), { recursive: true });
+      await fs.writeFile(path.join(root, 'raw', 'aplus', 'a.md'), '# demo');
+      ragPrisma.aplusDocument.findUnique.mockResolvedValue({
+        id: BigInt(1),
+        tenantCode: 'aplus',
+        sourcePath: 'a.md',
+        fileName: 'a.md',
+        fileType: 'md',
+        fileSize: BigInt(0),
+      });
+
+      const result = await service.getDocumentPreviewFile(1);
+
+      const expectedPath = await fs.realpath(
+        path.join(root, 'raw', 'aplus', 'a.md'),
+      );
+      expect(result).toMatchObject({
+        absolutePath: expectedPath,
+        fileName: 'a.md',
+        fileType: 'md',
+        fileSize: 6,
+      });
+    } finally {
+      process.chdir(originalCwd);
+      await fs.rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it('blocks preview files outside current tenant raw directory', async () => {
+    ragPrisma.aplusDocument.findUnique.mockResolvedValue({
+      id: BigInt(1),
+      tenantCode: 'aplus',
+      sourcePath: '../boat/a.md',
+      fileName: 'a.md',
+      fileType: 'md',
+      fileSize: BigInt(6),
+    });
+
+    await expect(service.getDocumentPreviewFile(1)).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
   });
 
   it('forwards force ingest option', async () => {

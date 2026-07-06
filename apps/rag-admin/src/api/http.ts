@@ -56,3 +56,7 @@ export function get<T>(url: string) {
 export function del<T>(url: string) {
   return http.delete<unknown, T>(url);
 }
+
+export function getBlob(url: string) {
+  return http.get<unknown, Blob>(url, { responseType: 'blob' });
+}
