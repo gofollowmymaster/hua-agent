@@ -36,6 +36,10 @@ packages/shared Shared package boundary
 
 Root scripts remain compatible and forward to workspace packages.
 
+## Environment Files
+
+API environment files live in `apps/api/.env*`. RAG admin environment files live in `apps/rag-admin/.env*` and only expose `VITE_` variables to browser code.
+
 ## Installation
 
 ```bash

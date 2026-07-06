@@ -63,11 +63,18 @@ pnpm test:cov          # 带覆盖率的测试
 
 ## 环境文件
 
-环境变量按以下顺序加载（后加载的会覆盖先加载的）：
+后端环境变量位于 `apps/api/`，通过根目录兼容脚本或 API app 脚本加载。`dotenv-cli` 按下列顺序读取，已存在变量不会被后续文件覆盖，因此本地文件优先：
 
-- `dev`: `.env` → `.env.dev` → `.env.dev.local`
-- `test`: `.env` → `.env.test` → `.env.test.local`
-- `prod`: `.env` → `.env.prod` → `.env.prod.local`
+- `dev`: `apps/api/.env.dev.local` → `apps/api/.env.dev` → `apps/api/.env`
+- `test`: `apps/api/.env.test.local` → `apps/api/.env.test` → `apps/api/.env`
+- `prod`: `apps/api/.env.prod.local` → `apps/api/.env.prod` → `apps/api/.env`
+
+前端环境变量位于 `apps/rag-admin/`，仅使用 `VITE_` 前缀变量：
+
+- 通用：`apps/rag-admin/.env`
+- 开发：`apps/rag-admin/.env.development`，本地覆盖使用 `apps/rag-admin/.env.local`
+- 测试：`apps/rag-admin/.env.test`
+- 生产：`apps/rag-admin/.env.production`
 
 ## 路径别名
 

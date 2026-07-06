@@ -7,6 +7,11 @@ export interface PageResult<T> {
   pageSize: number;
 }
 
+export interface GridPageResult<T> {
+  records: T[];
+  total: number;
+}
+
 export interface RagDocumentItem {
   id: string | number;
   sourcePath: string;
@@ -53,6 +58,15 @@ export function pageDocuments(params: Record<string, unknown>) {
   return post<PageResult<RagDocumentItem>>('/ai/rag/admin/documents/page', params);
 }
 
+export async function pageDocumentsGrid(params: Record<string, unknown>) {
+  const result = await pageDocuments(normalizeGridPageParams(params));
+
+  return {
+    records: result.list,
+    total: result.total,
+  } satisfies GridPageResult<RagDocumentItem>;
+}
+
 export function deleteDocument(id: string | number) {
   return del(`/ai/rag/admin/documents/${id}`);
 }
@@ -65,6 +79,34 @@ export function pageSessions(params: Record<string, unknown>) {
   return post<PageResult<RagSessionItem>>('/ai/rag/admin/sessions/page', params);
 }
 
+export async function pageSessionsGrid(params: Record<string, unknown>) {
+  const result = await pageSessions(normalizeGridPageParams(params));
+
+  return {
+    records: result.list,
+    total: result.total,
+  } satisfies GridPageResult<RagSessionItem>;
+}
+
 export function listSessionMessages(id: string | number) {
   return get<RagMessageItem[]>(`/ai/rag/admin/sessions/${id}/messages`);
+}
+
+function normalizeGridPageParams(params: Record<string, unknown>) {
+  return Object.entries(params).reduce<Record<string, unknown>>((result, [key, value]) => {
+    if (value === undefined || value === null || value === '') return result;
+    if (isEmptyObject(value)) return result;
+
+    result[key === 'current' ? 'page' : key] = value;
+    return result;
+  }, {});
+}
+
+function isEmptyObject(value: unknown) {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    !Array.isArray(value) &&
+    Object.keys(value).length === 0
+  );
 }

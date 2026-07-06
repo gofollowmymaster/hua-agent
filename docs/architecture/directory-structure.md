@@ -6,7 +6,9 @@
 
 - `apps/api/src/`：NestJS API 应用源码，包含模块、公共基础设施、配置和类型。
 - `apps/api/prisma/`：API 应用 Prisma schema 和迁移元信息。Schema 相关命令见根目录 `AGENTS.md`。
+- `apps/api/.env*`：API 应用环境变量文件，根目录兼容命令会转发并读取这些文件。
 - `apps/rag-admin/`：RAG 管理后台前端，使用 Vue/Vite。
+- `apps/rag-admin/.env*`：RAG 管理后台前端环境变量文件，仅承载 `VITE_` 前缀配置。
 - `packages/shared/`：共享类型和工具的 workspace 包预留。
 - `openspec/`：OpenSpec 项目说明、变更提案、归档记录和规范目录。涉及行为变化时先走这里。
 - `apps/api/mockServer/`：静态 mock 资源目录，通过 `ServeStaticModule` 暴露；当前 `mock-server` API 已被中间件标记为废弃。

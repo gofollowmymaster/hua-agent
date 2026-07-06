@@ -16,7 +16,7 @@ packages/
 
 - `apps/api` 保留现有后端目录结构，包括 `src`、`prisma`、`mockServer`、`public`、`scripts`。
 - `apps/api/package.json` 承接当前后端依赖和脚本。
-- 环境加载脚本从根目录读取 `.env*`：`dotenv -e ../../.env.dev.local -e ../../.env.dev -e ../../.env`。
+- 环境加载脚本从 API app 内读取 `.env*`：`dotenv -e .env.dev.local -e .env.dev -e .env`；根目录兼容脚本读取 `apps/api/.env*`。
 - Prisma 命令在 `apps/api` 工作目录内执行，schema 路径保持 `prisma/schema.prisma` 与 `prisma/rag/schema.prisma`。
 - 根目录旧脚本通过 `pnpm --filter @aplus-sql/api ...` 转发。
 

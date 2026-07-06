@@ -41,13 +41,13 @@ export class RagAdminService {
 
     return {
       list: documents.map((document) => ({
-        id: document.id,
+        id: this.serializeBigInt(document.id),
         tenantCode: document.tenantCode,
         sourcePath: document.sourcePath,
         fileName: document.fileName,
         fileType: document.fileType,
         fileHash: document.fileHash,
-        fileSize: document.fileSize,
+        fileSize: this.serializeBigInt(document.fileSize),
         chunkCount: document.chunkCount,
         actualChunkCount: document._count.chunks,
         status: document.status,
@@ -77,7 +77,7 @@ export class RagAdminService {
 
     return {
       deleted: {
-        id: document.id,
+        id: this.serializeBigInt(document.id),
         tenantCode: document.tenantCode,
         sourcePath: document.sourcePath,
       },
@@ -120,7 +120,7 @@ export class RagAdminService {
 
     return {
       list: sessions.map((session) => ({
-        id: session.id,
+        id: this.serializeBigInt(session.id),
         tenantCode: session.tenantCode,
         channel: session.channel,
         sessionKey: session.sessionKey,
@@ -129,7 +129,14 @@ export class RagAdminService {
         conversationType: session.conversationType,
         metadata: session.metadata,
         messageCount: session._count.messages,
-        latestMessage: session.messages[0] ?? null,
+        latestMessage: session.messages[0]
+          ? {
+              id: this.serializeBigInt(session.messages[0].id),
+              role: session.messages[0].role,
+              content: session.messages[0].content,
+              createdAt: session.messages[0].createdAt,
+            }
+          : null,
         createdAt: session.createdAt,
         updatedAt: session.updatedAt,
         lastActiveAt: session.lastActiveAt,
@@ -160,9 +167,9 @@ export class RagAdminService {
     });
 
     return messages.map((message) => ({
-      id: message.id,
+      id: this.serializeBigInt(message.id),
       tenantCode: message.tenantCode,
-      sessionId: message.sessionId,
+      sessionId: this.serializeBigInt(message.sessionId),
       role: message.role,
       content: message.content,
       senderId: message.senderId,
@@ -270,5 +277,9 @@ export class RagAdminService {
 
   private currentTenant(): TenantCode {
     return this.tenantContext.tenant ?? NodeConfigService.get('defaultTenant');
+  }
+
+  private serializeBigInt(value: bigint | number | string) {
+    return typeof value === 'bigint' ? value.toString() : value;
   }
 }

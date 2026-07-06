@@ -6,9 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "env:dev": "dotenv -e .env.dev.local -e .env.dev -e .env",
-    "env:test": "dotenv -e .env.test.local -e .env.test -e .env",
-    "env:prod": "dotenv -e .env.prod.local -e .env.prod -e .env",
+    "env:dev": "dotenv -e apps/api/.env.dev.local -e apps/api/.env.dev -e apps/api/.env",
+    "env:test": "dotenv -e apps/api/.env.test.local -e apps/api/.env.test -e apps/api/.env",
+    "env:prod": "dotenv -e apps/api/.env.prod.local -e apps/api/.env.prod -e apps/api/.env",
     "build:dev": "pnpm --filter @aplus-sql/api build:dev",
     "build:test": "pnpm --filter @aplus-sql/api build:test",
     "build:prod": "pnpm --filter @aplus-sql/api build:prod",
@@ -35,7 +35,10 @@
     "rag:db:init": "pnpm --filter @aplus-sql/api rag:db:init",
     "admin:dev": "pnpm --filter @aplus-sql/rag-admin dev",
     "admin:build": "pnpm --filter @aplus-sql/rag-admin build",
-    "admin:preview": "pnpm --filter @aplus-sql/rag-admin preview"
+    "admin:preview": "pnpm --filter @aplus-sql/rag-admin preview",
+    "rag-admin:dev": "pnpm --filter @aplus-sql/rag-admin dev",
+    "rag-admin:build": "pnpm --filter @aplus-sql/rag-admin build",
+    "rag-admin:preview": "pnpm --filter @aplus-sql/rag-admin preview"
   },
   "devDependencies": {
     "dotenv-cli": "^7.4.2"

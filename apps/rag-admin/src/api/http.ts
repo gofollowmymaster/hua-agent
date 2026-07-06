@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { getToken, setToken } from '@/auth/token';
-import { logout } from '@/auth/auth';
+import { getToken } from '@/auth/token';
+import { useUserStore } from '@/stores/modules/user';
 
 interface ApiResponse<T> {
   code: number;
@@ -14,7 +14,8 @@ export const http = axios.create({
 });
 
 http.interceptors.request.use((config) => {
-  const token = getToken();
+  const userStore = useUserStore();
+  const token = userStore.token || getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -26,8 +27,7 @@ http.interceptors.response.use(
     const data = response.data as ApiResponse<unknown>;
     if (data && typeof data === 'object' && 'code' in data) {
       if (data.code === 401) {
-        setToken(undefined);
-        logout();
+        useUserStore().logout();
       }
       if (data.code !== 200) {
         return Promise.reject(new Error(data.message || '请求失败'));
@@ -39,8 +39,7 @@ http.interceptors.response.use(
   },
   (error) => {
     if (error?.response?.status === 401) {
-      setToken(undefined);
-      logout();
+      useUserStore().logout();
     }
     return Promise.reject(error);
   },

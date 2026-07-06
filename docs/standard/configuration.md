@@ -10,13 +10,15 @@
 - 测试环境：`pnpm env:test -- <command>`
 - 生产环境：`pnpm env:prod -- <command>`
 
-环境文件加载顺序由 `package.json` 中的 `dotenv-cli` 脚本决定，后加载的文件会覆盖先加载的文件：
+后端环境文件位于 `apps/api/`。环境文件加载顺序由 `package.json` 中的 `dotenv-cli` 脚本决定，已存在变量不会被后续文件覆盖，因此本地文件优先：
 
-- `dev`：`.env` → `.env.dev` → `.env.dev.local`
-- `test`：`.env` → `.env.test` → `.env.test.local`
-- `prod`：`.env` → `.env.prod` → `.env.prod.local`
+- `dev`：`apps/api/.env.dev.local` → `apps/api/.env.dev` → `apps/api/.env`
+- `test`：`apps/api/.env.test.local` → `apps/api/.env.test` → `apps/api/.env`
+- `prod`：`apps/api/.env.prod.local` → `apps/api/.env.prod` → `apps/api/.env`
 
 不要绕过 `pnpm env:<env> -- ...` 直接执行依赖环境变量的命令。
+
+前端 `apps/rag-admin` 使用 Vite 自身的环境加载机制，环境文件放在 `apps/rag-admin/` 下。只有 `VITE_` 前缀变量会进入浏览器构建产物，不要把后端数据库、机器人 secret、JWT secret 等敏感配置写入前端环境文件。
 
 ## 配置归属判断
 
@@ -67,7 +69,7 @@
 
 真实密钥、token、数据库连接串、机器人 secret 等敏感信息应来自 `.env.*.local` 或部署环境变量。
 
-模板文件只放占位值或安全默认值。新增本地必填变量时，同步维护 `.env.dev.local.template`，并说明用途和默认值含义。
+模板文件只放占位值或安全默认值。新增后端本地必填变量时，同步维护 `apps/api/.env.dev.local.template`；新增前端本地变量时，同步维护 `apps/rag-admin/.env.local.template`，并说明用途和默认值含义。
 
 不要新增硬编码 secret。若历史代码中已有固定值，新增能力不要继续复制该模式；优先迁移到环境变量或租户配置。
 
@@ -77,6 +79,6 @@
 - 是否通过 `src/config/index.ts` 或 `src/config/tenant/` 聚合，而不是在业务代码中散读环境变量。
 - 是否同步更新 `GlobalConfigType`、`TenantConfig` 或相关类型。
 - 是否使用 `NodeConfigService` 的正确读取方法。
-- 是否维护 `.env.dev.local.template`。
+- 是否维护对应 app 的环境模板，例如 `apps/api/.env.dev.local.template` 或 `apps/rag-admin/.env.local.template`。
 - 是否避免输出、提交或复制真实密钥。
 - 是否按任务类型阅读 `docs/ai-governance/testing-and-verification.md` 并完成静态检查。

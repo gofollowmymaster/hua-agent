@@ -136,10 +136,13 @@ describe('RagAdminService', () => {
     );
     expect(result.total).toBe(1);
     expect(result.list[0]).toMatchObject({
+      id: '1',
       tenantCode: 'aplus',
       fileName: 'a.md',
+      fileSize: '12',
       actualChunkCount: 2,
     });
+    expect(() => JSON.stringify(result)).not.toThrow();
   });
 
   it('blocks cross tenant document deletion', async () => {
@@ -186,9 +189,15 @@ describe('RagAdminService', () => {
       },
     });
     expect(result.list[0]).toMatchObject({
+      id: '10',
       channel: 'wecom',
       messageCount: 2,
+      latestMessage: expect.objectContaining({
+        id: '99',
+        role: 'assistant',
+      }),
     });
+    expect(() => JSON.stringify(result)).not.toThrow();
   });
 
   it('lists messages only for current tenant session', async () => {
@@ -206,6 +215,12 @@ describe('RagAdminService', () => {
       },
       orderBy: { createdAt: 'asc' },
     });
-    expect(result[0]).toMatchObject({ role: 'user', content: 'hello' });
+    expect(result[0]).toMatchObject({
+      id: '1',
+      sessionId: '10',
+      role: 'user',
+      content: 'hello',
+    });
+    expect(() => JSON.stringify(result)).not.toThrow();
   });
 });
