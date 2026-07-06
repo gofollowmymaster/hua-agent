@@ -8,20 +8,22 @@
     wrap-class-name="document-preview-modal"
     @cancel="close"
   >
-    <div v-if="loading" class="preview-state">文件加载中...</div>
-    <div v-else-if="errorText" class="preview-state error-text">{{ errorText }}</div>
-    <OpenFileViewer
-      v-else-if="previewFile"
-      :file="previewFile"
-      :file-name="previewFile.name"
-      height="70vh"
-      fit="contain"
-      theme="light"
-      toolbar
-      :plugins="viewerPlugins"
-      @error="handlePreviewError"
-      @unsupported="handlePreviewUnsupported"
-    />
+    <div class="document-preview-viewport">
+      <div v-if="loading" class="preview-state">文件加载中...</div>
+      <div v-else-if="errorText" class="preview-state error-text">{{ errorText }}</div>
+      <OpenFileViewer
+        v-else-if="previewFile"
+        :file="previewFile"
+        :file-name="previewFile.name"
+        height="100%"
+        fit="contain"
+        theme="light"
+        toolbar
+        :plugins="viewerPlugins"
+        @error="handlePreviewError"
+        @unsupported="handlePreviewUnsupported"
+      />
+    </div>
   </ApModal>
 </template>
 
@@ -32,12 +34,18 @@ import { OpenFileViewer } from '@open-file-viewer/vue';
 import { imagePlugin, officePlugin, pdfPlugin, textPlugin } from '@open-file-viewer/core';
 import '@open-file-viewer/core/style.css';
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.mjs?url';
-import { getDocumentPreviewFile, type RagDocumentItem } from '@/api/rag-admin';
+import { getDocumentPreviewFile } from '@/api/rag-admin';
+
+interface PreviewDocumentItem {
+  id: string | number;
+  fileName: string;
+  fileType: string;
+}
 
 const open = ref(false);
 const loading = ref(false);
 const errorText = ref('');
-const previewItem = ref<RagDocumentItem | null>(null);
+const previewItem = ref<PreviewDocumentItem | null>(null);
 const previewFile = ref<File | null>(null);
 const viewerPlugins = [
   imagePlugin(),
@@ -47,7 +55,7 @@ const viewerPlugins = [
 ];
 const previewTitle = computed(() => previewItem.value?.fileName || '文件预览');
 
-async function show(item: RagDocumentItem) {
+async function show(item: PreviewDocumentItem) {
   open.value = true;
   loading.value = true;
   errorText.value = '';
@@ -106,3 +114,50 @@ function isJsonBlob(blob: Blob) {
 
 defineExpose({ show });
 </script>
+
+<style>
+.document-preview-modal .ant-modal {
+  top: 16px;
+  max-width: calc(100vw - 32px);
+  padding-bottom: 16px;
+}
+
+.document-preview-modal .ant-modal-content {
+  display: flex;
+  max-height: calc(100vh - 32px);
+  flex-direction: column;
+}
+
+.document-preview-modal .ant-modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.document-preview-viewport {
+  height: min(72vh, calc(100vh - 132px));
+  min-height: 360px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.document-preview-viewport .ofv-root,
+.document-preview-viewport .ofv-host {
+  height: 100%;
+  min-height: 0;
+}
+
+.document-preview-viewport .ofv-viewport,
+.document-preview-viewport .ofv-pdf {
+  min-height: 0;
+  overflow: auto;
+}
+
+.preview-state {
+  display: flex;
+  min-height: 220px;
+  align-items: center;
+  justify-content: center;
+  color: #667386;
+}
+</style>

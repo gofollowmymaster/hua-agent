@@ -56,6 +56,7 @@ describe('RagService', () => {
           content: '资料内容',
           metadata: {},
           file_name: 'doc.md',
+          file_type: 'md',
           source_path: 'doc.md',
           similarity: 0.9,
         },
@@ -112,6 +113,12 @@ describe('RagService', () => {
       expect.objectContaining({ sessionKey: 'conversation:conv-1:user-1' }),
       '问题',
       '模型答案',
+    );
+    expect((service as any).model.invoke).toHaveBeenCalledWith(
+      expect.stringContaining('RAG 问答助手“晓晓”'),
+    );
+    expect((service as any).model.invoke).toHaveBeenCalledWith(
+      expect.stringContaining('/ai/rag/admin/documents/2/preview'),
     );
   });
 

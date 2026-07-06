@@ -21,6 +21,7 @@ export interface RetrievedChunk {
   tenantCode: string;
   documentId: string;
   fileName: string;
+  fileType: string;
   sourcePath: string;
   chunkIndex: number;
   content: string;

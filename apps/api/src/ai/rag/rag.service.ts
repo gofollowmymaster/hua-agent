@@ -249,6 +249,7 @@ export class RagService {
              c.content,
              c.metadata,
              d.file_name,
+             d.file_type,
              d.source_path,
              1 - (c.embedding <=> ${JSON.stringify(vector)}::vector) AS similarity
       FROM aplus_chunks c
@@ -265,6 +266,7 @@ export class RagService {
       tenantCode: row.tenant_code,
       documentId: String(row.document_id),
       fileName: row.file_name,
+      fileType: row.file_type,
       sourcePath: row.source_path,
       chunkIndex: Number(row.chunk_index),
       content: row.content,
@@ -311,10 +313,12 @@ export class RagService {
     memory: RagMemoryMessage[],
   ) {
     const prompt =
-      PromptTemplate.fromTemplate(`你是企业知识库 RAG 问答助手。请只基于给定资料回答问题。
+      PromptTemplate.fromTemplate(`你是企业知识库 RAG 问答助手“晓晓”。请只基于给定资料回答问题。
 
 如果资料中没有足够信息，请明确说“根据当前资料无法确认”，不要编造。
-回答应简洁、准确，并在必要时引用来源文件名。
+你的语气像一位在公司里靠谱、友好、愿意把事情讲清楚的同事：自然、有温度、不生硬，但不要夸张卖萌，也不要使用与问题无关的寒暄。
+回答应简洁、准确，先直接回答结论，再补充关键依据或步骤。
+当答案参考了资料片段时，请在相关段落或答案末尾使用 Markdown 链接引用来源文件，格式为 [文件名](预览链接)。链接必须使用资料片段中给出的“预览链接”，不要自己编造链接。
 最近对话仅用于理解连续追问、代词和用户上下文；当最近对话与资料片段冲突时，以资料片段为准。
 
 最近对话：
@@ -345,6 +349,7 @@ export class RagService {
         const location = this.formatLocation(chunk.metadata);
         return `[片段 ${index + 1}]
 来源：${chunk.fileName}${location ? `（${location}）` : ''}
+预览链接：${this.buildPreviewLink(chunk.documentId)}
 相似度：${chunk.similarity.toFixed(4)}
 内容：
 ${chunk.content}`;
@@ -360,6 +365,7 @@ ${chunk.content}`;
         sourceMap.set(key, {
           documentId: chunk.documentId,
           fileName: chunk.fileName,
+          fileType: chunk.fileType,
           sourcePath: chunk.sourcePath,
           location: this.formatLocation(chunk.metadata),
           bestSimilarity: chunk.similarity,
@@ -375,6 +381,10 @@ ${chunk.content}`;
     if (metadata.sheet) return `工作表 ${metadata.sheet}`;
     if (metadata.slide) return `第 ${metadata.slide} 页幻灯片`;
     return '';
+  }
+
+  private buildPreviewLink(documentId: string) {
+    return `/ai/rag/admin/documents/${encodeURIComponent(documentId)}/preview`;
   }
 
   private assertQuestion(question: string) {

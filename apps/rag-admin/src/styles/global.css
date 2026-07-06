@@ -483,8 +483,53 @@ input {
   background: #f8fafc;
   color: #202633;
   line-height: 1.7;
-  white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+.assistant-markdown.md-editor-preview-wrapper {
+  padding: 0;
+  background: transparent;
+}
+
+.assistant-markdown .md-editor-preview {
+  color: inherit;
+  font-size: 14px;
+  line-height: 1.7;
+  word-break: break-word;
+}
+
+.assistant-markdown .md-editor-preview > :first-child {
+  margin-top: 0;
+}
+
+.assistant-markdown .md-editor-preview > :last-child {
+  margin-bottom: 0;
+}
+
+.assistant-markdown .md-editor-preview p,
+.assistant-markdown .md-editor-preview ul,
+.assistant-markdown .md-editor-preview ol,
+.assistant-markdown .md-editor-preview blockquote,
+.assistant-markdown .md-editor-preview pre,
+.assistant-markdown .md-editor-preview table {
+  margin-bottom: 10px;
+}
+
+.assistant-markdown .md-editor-preview pre,
+.assistant-markdown .md-editor-preview table {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.assistant-markdown .md-editor-preview a {
+  color: #1769e0;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.assistant-markdown .md-editor-preview a:hover {
+  color: #0f56bd;
 }
 
 .assistant-message--user .assistant-text {

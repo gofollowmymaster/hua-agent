@@ -65,9 +65,17 @@
             </div>
             <div class="assistant-message-body">
               <template v-for="(part, index) in message.parts" :key="`${message.id}-${index}`">
-                <p v-if="part.type === 'text'" class="assistant-text">
-                  {{ part.text }}
-                </p>
+                <div v-if="part.type === 'text'" class="assistant-text">
+                  <MdPreview
+                    :id="`rag-markdown-${message.id}-${index}`"
+                    class="assistant-markdown"
+                    :model-value="part.text"
+                    theme="light"
+                    preview-theme="github"
+                    no-katex
+                    @click.capture="handleMarkdownClick"
+                  />
+                </div>
                 <div
                   v-else-if="part.type === 'data-status'"
                   class="assistant-status-card"
@@ -102,6 +110,7 @@
         </form>
       </div>
     </div>
+    <DocumentPreviewModal ref="previewModalRef" />
   </section>
 </template>
 
@@ -111,6 +120,8 @@ import { computed, nextTick, onMounted, ref, shallowRef, watch } from 'vue';
 import { Chat } from '@ai-sdk/vue';
 import { DefaultChatTransport, type UIMessage } from 'ai';
 import { ApButton } from '@aplus-frontend/ui';
+import { MdPreview } from 'md-editor-v3';
+import 'md-editor-v3/lib/preview.css';
 import { getToken } from '@/auth/token';
 import {
   listSessionMessages,
@@ -119,6 +130,7 @@ import {
   type RagSessionItem,
 } from '@/api/rag-admin';
 import { useUserStore } from '@/stores/modules/user';
+import DocumentPreviewModal from './components/DocumentPreviewModal.vue';
 
 interface RagStatusData {
   stage?: string;
@@ -132,11 +144,17 @@ interface RagAssistantDataParts {
 }
 
 type RagAssistantMessage = UIMessage<unknown, RagAssistantDataParts>;
+interface PreviewDocumentItem {
+  id: string | number;
+  fileName: string;
+  fileType: string;
+}
 
 const HISTORY_PAGE_SIZE = 20;
 
 const userStore = useUserStore();
 const messagePaneRef = ref<HTMLElement>();
+const previewModalRef = ref<InstanceType<typeof DocumentPreviewModal>>();
 const input = ref('');
 const sessions = ref<RagSessionItem[]>([]);
 const selectedSessionId = ref('');
@@ -315,6 +333,37 @@ function formatStatus(data: unknown) {
     return `${statusData.message || '状态更新'} · ${statusData.chunks} 个片段`;
   }
   return statusData.message || statusData.stage || '状态更新';
+}
+
+function handleMarkdownClick(event: MouseEvent) {
+  const link = (event.target as HTMLElement | null)?.closest('a');
+  if (!link) return;
+
+  const previewItem = resolvePreviewDocument({
+    href: link.getAttribute('href') || '',
+    label: link.textContent || '',
+  });
+  if (!previewItem) return;
+
+  event.preventDefault();
+  previewModalRef.value?.show(previewItem);
+}
+
+function resolvePreviewDocument(segment: { href: string; label: string }) {
+  const match = segment.href.match(/^\/ai\/rag\/admin\/documents\/([^/]+)\/preview$/);
+  if (!match) return null;
+
+  const fileName = segment.label.trim() || '引用文件';
+  return {
+    id: decodeURIComponent(match[1]),
+    fileName,
+    fileType: inferFileType(fileName),
+  } satisfies PreviewDocumentItem;
+}
+
+function inferFileType(fileName: string) {
+  const extension = fileName.split('.').pop()?.toLowerCase();
+  return extension && extension !== fileName.toLowerCase() ? extension : '';
 }
 
 function formatTime(value?: string) {
