@@ -1,5 +1,41 @@
 import { DocumentLoaderService } from './document-loader.service';
 
+declare global {
+  // eslint-disable-next-line no-var
+  var __mockPdfLoad: jest.Mock;
+  // eslint-disable-next-line no-var
+  var __mockDocxLoad: jest.Mock;
+  // eslint-disable-next-line no-var
+  var __mockPptxLoad: jest.Mock;
+  // eslint-disable-next-line no-var
+  var __mockPdfLoader: jest.Mock;
+  // eslint-disable-next-line no-var
+  var __mockDocxLoader: jest.Mock;
+  // eslint-disable-next-line no-var
+  var __mockPptxLoader: jest.Mock;
+}
+
+jest.mock('@langchain/community/document_loaders/fs/pdf', () => ({
+  PDFLoader: jest.fn().mockImplementation((...args) => {
+    globalThis.__mockPdfLoader(...args);
+    return { load: globalThis.__mockPdfLoad };
+  }),
+}));
+
+jest.mock('@langchain/community/document_loaders/fs/docx', () => ({
+  DocxLoader: jest.fn().mockImplementation((...args) => {
+    globalThis.__mockDocxLoader(...args);
+    return { load: globalThis.__mockDocxLoad };
+  }),
+}));
+
+jest.mock('@langchain/community/document_loaders/fs/pptx', () => ({
+  PPTXLoader: jest.fn().mockImplementation((...args) => {
+    globalThis.__mockPptxLoader(...args);
+    return { load: globalThis.__mockPptxLoad };
+  }),
+}));
+
 jest.mock('@src/config/node-config.service', () => ({
   NodeConfigService: {
     get: jest.fn((key: string) => {
@@ -11,9 +47,98 @@ jest.mock('@src/config/node-config.service', () => ({
 
 describe('DocumentLoaderService', () => {
   let service: DocumentLoaderService;
+  let mockPdfLoad: jest.Mock;
+  let mockDocxLoad: jest.Mock;
+  let mockPptxLoad: jest.Mock;
+  let mockPdfLoader: jest.Mock;
+  let mockDocxLoader: jest.Mock;
+  let mockPptxLoader: jest.Mock;
 
   beforeEach(() => {
+    mockPdfLoad = jest.fn();
+    mockDocxLoad = jest.fn();
+    mockPptxLoad = jest.fn();
+    mockPdfLoader = jest.fn();
+    mockDocxLoader = jest.fn();
+    mockPptxLoader = jest.fn();
+    globalThis.__mockPdfLoad = mockPdfLoad;
+    globalThis.__mockDocxLoad = mockDocxLoad;
+    globalThis.__mockPptxLoad = mockPptxLoad;
+    globalThis.__mockPdfLoader = mockPdfLoader;
+    globalThis.__mockDocxLoader = mockDocxLoader;
+    globalThis.__mockPptxLoader = mockPptxLoader;
     service = new DocumentLoaderService();
+  });
+
+  it('loads PDF pages with LangChain community loader and keeps page metadata', async () => {
+    mockPdfLoad.mockResolvedValue([
+      {
+        pageContent:
+          '新 品 K P I 计 划 表\n供 应 商 单 品 牌 年 G M V ≥ 3 0 0 w 美 金',
+        metadata: {
+          source: '/private/raw/boat/demo.pdf',
+          loc: { pageNumber: 5 },
+          pdf: { totalPages: 11 },
+        },
+      },
+    ]);
+
+    const result = await service.loadDocument({
+      absolutePath: '/private/raw/boat/demo.pdf',
+      sourcePath: 'demo.pdf',
+      fileName: 'demo.pdf',
+      fileType: 'pdf',
+      fileSize: 100,
+      fileHash: 'hash',
+    });
+
+    expect(mockPdfLoader).toHaveBeenCalledWith('/private/raw/boat/demo.pdf', {
+      splitPages: true,
+      parsedItemSeparator: '',
+    });
+    expect(result.segments).toEqual([
+      {
+        text: '新品KPI计划表\n供应商单品牌年GMV≥300w美金',
+        metadata: { page: 5 },
+      },
+    ]);
+  });
+
+  it('loads DOCX and PPTX with LangChain community loaders', async () => {
+    mockDocxLoad.mockResolvedValue([
+      {
+        pageContent: 'docx content',
+        metadata: { source: '/private/raw/a.docx' },
+      },
+    ]);
+    mockPptxLoad.mockResolvedValue([
+      {
+        pageContent: 'pptx content',
+        metadata: { source: '/private/raw/a.pptx' },
+      },
+    ]);
+
+    const docx = await service.loadDocument({
+      absolutePath: '/private/raw/a.docx',
+      sourcePath: 'a.docx',
+      fileName: 'a.docx',
+      fileType: 'docx',
+      fileSize: 100,
+      fileHash: 'hash',
+    });
+    const pptx = await service.loadDocument({
+      absolutePath: '/private/raw/a.pptx',
+      sourcePath: 'a.pptx',
+      fileName: 'a.pptx',
+      fileType: 'pptx',
+      fileSize: 100,
+      fileHash: 'hash',
+    });
+
+    expect(mockDocxLoader).toHaveBeenCalledWith('/private/raw/a.docx');
+    expect(mockPptxLoader).toHaveBeenCalledWith('/private/raw/a.pptx');
+    expect(docx.segments).toEqual([{ text: 'docx content', metadata: {} }]);
+    expect(pptx.segments).toEqual([{ text: 'pptx content', metadata: {} }]);
   });
 
   it('normalizes split text extracted from PDF pages', () => {
@@ -51,6 +176,154 @@ describe('DocumentLoaderService', () => {
     expect(result).toContain('客单价<150美金的，30+reviews');
     expect(result).toContain('最低28个reviews');
     expect(result).toContain('次月海外仓有1.5个月的在库库存+0.5个月的在途库存');
+  });
+
+  it('compacts PDF content extracted as one character per line', () => {
+    const text = [
+      '8',
+      '抽',
+      '屉',
+      '可',
+      '调',
+      '节',
+      '分',
+      '隔',
+      '条',
+      '4',
+      '–',
+      '8',
+      '条',
+      'P',
+      'P',
+      '/',
+      'A',
+      'B',
+      'S',
+      '装',
+      '袋',
+      '+',
+      '彩',
+      '盒',
+      '',
+      '1',
+      '7',
+      '烘',
+      '干',
+      '机',
+      '羊',
+      '毛',
+      '球',
+      '6',
+      '–',
+      '8',
+      '个',
+      '装',
+      '1',
+      '0',
+      '0',
+      '%',
+      '新',
+      '西',
+      '兰',
+      '羊',
+      '毛',
+    ].join('\n');
+
+    const result = (service as any).normalizePdfText(text);
+
+    expect(result).toContain('8抽屉可调节分隔条4–8条PP/ABS装袋+彩盒');
+    expect(result).toContain('17烘干机羊毛球6–8个装100%新西兰羊毛');
+  });
+
+  it('compacts sparse one-character PDF lines with blank lines', () => {
+    const text = [
+      '3',
+      '',
+      '户',
+      '外',
+      '花',
+      '盆',
+      '套',
+      '组',
+      '',
+      '3',
+      '',
+      '件',
+      '陶',
+      '瓷',
+      '',
+      '+',
+      '',
+      '塑',
+      '料',
+      '内',
+      '托',
+      '',
+      '+',
+      '',
+      '纸',
+      '箱',
+      '',
+      '6',
+      '',
+      '户',
+      '外',
+      '折',
+      '叠',
+      '桌',
+      '',
+      '6',
+      '0',
+      'x',
+      '4',
+      '0',
+      'x',
+      '5',
+      '0',
+      'c',
+      'm',
+      '',
+      '铝',
+      '',
+      '+',
+      '',
+      '木',
+      '板',
+      '袋',
+      '装',
+      '',
+      '+',
+      '',
+      '纸',
+      '箱',
+      '',
+      '1',
+      '3',
+      '',
+      '草',
+      '坪',
+      '装',
+      '饰',
+      '灯',
+      '',
+      '3',
+      '',
+      '件',
+      '',
+      'A',
+      'B',
+      'S',
+      '+',
+      'L',
+      'E',
+      'D',
+    ].join('\n');
+
+    const result = (service as any).normalizePdfText(text);
+
+    expect(result).toContain('3户外花盆套组3件陶瓷+塑料内托+纸箱');
+    expect(result).toContain('6户外折叠桌60x40x50cm铝+木板袋装+纸箱');
+    expect(result).toContain('13草坪装饰灯3件ABS+LED');
   });
 
   it('keeps regular PDF text readable', () => {

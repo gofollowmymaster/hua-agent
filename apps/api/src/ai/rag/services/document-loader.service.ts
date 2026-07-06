@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import type { Document } from '@langchain/core/documents';
+import { DocxLoader } from '@langchain/community/document_loaders/fs/docx';
+import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf';
+import { PPTXLoader } from '@langchain/community/document_loaders/fs/pptx';
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { XMLParser } from 'fast-xml-parser';
-import JSZip from 'jszip';
-import mammoth from 'mammoth';
-import pdfParse from 'pdf-parse';
 import xlsx from 'xlsx';
 import { TenantCode } from '@src/config/tenant';
 import { NodeConfigService } from '@src/config/node-config.service';
@@ -119,28 +119,21 @@ export class DocumentLoaderService {
   }
 
   private async loadPdf(filePath: string): Promise<LoadedSegment[]> {
-    const pages: string[] = [];
-    const buffer = await fs.readFile(filePath);
-    await pdfParse(buffer, {
-      pagerender: async (pageData) => {
-        const textContent = await pageData.getTextContent();
-        const text = textContent.items
-          .map((item: { str?: string }) => item.str ?? '')
-          .join('\n');
-        pages.push(this.normalizePdfText(text));
-        return text;
-      },
+    const loader = new PDFLoader(filePath, {
+      splitPages: true,
+      parsedItemSeparator: '',
     });
+    const documents = await loader.load();
 
-    return pages.map((text, index) => ({
-      text,
-      metadata: { page: index + 1 },
-    }));
+    return this.mapLangchainDocuments(documents, (document) =>
+      this.normalizePdfText(document.pageContent),
+    );
   }
 
   private normalizePdfText(text: string): string {
-    let normalized = text
-      .replace(/\r\n/g, '\n')
+    let normalized = this.compactSingleCharacterLineBlocks(
+      text.replace(/\r\n/g, '\n'),
+    )
       .replace(/\b(?:[A-Za-z][ \t]+)+[A-Za-z]\b/g, (value) =>
         value.replace(/[ \t]+/g, ''),
       )
@@ -184,18 +177,49 @@ export class DocumentLoaderService {
           new RegExp(`([\\u4e00-\\u9fa50-9]) ${token}`, 'g'),
           `$1${token}`,
         )
-        .replace(
-          new RegExp(`${token} (?=[\\u4e00-\\u9fa50-9])`, 'g'),
-          token,
-        );
+        .replace(new RegExp(`${token} (?=[\\u4e00-\\u9fa50-9])`, 'g'), token);
     }
 
     return normalized;
   }
 
+  private compactSingleCharacterLineBlocks(text: string): string {
+    const pageLines = text.split('\n').map((line) => line.trim());
+    const pageContentLines = pageLines.filter(Boolean);
+    if (this.isSingleCharacterLineDominant(pageContentLines)) {
+      return pageContentLines.join('');
+    }
+
+    return text
+      .split(/\n{2,}/)
+      .map((block) => {
+        const lines = block.split('\n');
+        const contentLines = lines.map((line) => line.trim()).filter(Boolean);
+        return this.isSingleCharacterLineDominant(contentLines)
+          ? contentLines.join('')
+          : block;
+      })
+      .join('\n\n');
+  }
+
+  private isSingleCharacterLineDominant(lines: string[]): boolean {
+    if (lines.length < 6) return false;
+
+    const lengths = lines.map((line) => Array.from(line).length);
+    const singleCharacterLines = lengths.filter((length) => length === 1);
+    const shortLines = lengths.filter((length) => length <= 2);
+    const averageLength =
+      lengths.reduce((sum, length) => sum + length, 0) / lengths.length;
+
+    return (
+      singleCharacterLines.length / lines.length >= 0.65 ||
+      (shortLines.length / lines.length >= 0.8 && averageLength <= 2.5)
+    );
+  }
+
   private async loadDocx(filePath: string): Promise<LoadedSegment[]> {
-    const result = await mammoth.extractRawText({ path: filePath });
-    return [{ text: result.value, metadata: {} }];
+    const loader = new DocxLoader(filePath);
+    return this.mapLangchainDocuments(await loader.load());
   }
 
   private async loadXlsx(filePath: string): Promise<LoadedSegment[]> {
@@ -224,27 +248,8 @@ export class DocumentLoaderService {
   }
 
   private async loadPptx(filePath: string): Promise<LoadedSegment[]> {
-    const buffer = await fs.readFile(filePath);
-    const zip = await JSZip.loadAsync(buffer);
-    const parser = new XMLParser({ ignoreAttributes: false });
-    const slidePaths = Object.keys(zip.files)
-      .filter((name) => /^ppt\/slides\/slide\d+\.xml$/.test(name))
-      .sort((a, b) => this.slideNumber(a) - this.slideNumber(b));
-
-    const segments: LoadedSegment[] = [];
-    for (const slidePath of slidePaths) {
-      const xml = await zip.files[slidePath].async('text');
-      const parsed = parser.parse(xml);
-      const texts: string[] = [];
-      this.collectText(parsed, texts);
-
-      segments.push({
-        text: texts.join('\n'),
-        metadata: { slide: this.slideNumber(slidePath) },
-      });
-    }
-
-    return segments;
+    const loader = new PPTXLoader(filePath);
+    return this.mapLangchainDocuments(await loader.load());
   }
 
   private async loadLegacyPpt(filePath: string): Promise<LoadedSegment[]> {
@@ -268,27 +273,25 @@ export class DocumentLoaderService {
     return [{ text: await fs.readFile(filePath, 'utf8'), metadata: {} }];
   }
 
-  private slideNumber(slidePath: string): number {
-    const match = /slide(\d+)\.xml$/.exec(slidePath);
-    return match ? Number(match[1]) : 0;
+  private mapLangchainDocuments(
+    documents: Document[],
+    normalizeContent: (document: Document) => string = (document) =>
+      document.pageContent,
+  ): LoadedSegment[] {
+    return documents.map((document) => ({
+      text: normalizeContent(document),
+      metadata: this.sanitizeLangchainMetadata(document.metadata),
+    }));
   }
 
-  private collectText(node: unknown, output: string[]) {
-    if (!node || typeof node !== 'object') return;
-
-    if (Array.isArray(node)) {
-      for (const child of node) this.collectText(child, output);
-      return;
+  private sanitizeLangchainMetadata(metadata: Record<string, unknown>) {
+    const location: Record<string, unknown> = {};
+    const loc = metadata.loc as Record<string, unknown> | undefined;
+    const pageNumber = loc?.pageNumber;
+    if (typeof pageNumber === 'number') {
+      location.page = pageNumber;
     }
 
-    const record = node as Record<string, unknown>;
-    for (const [key, value] of Object.entries(record)) {
-      if (key === 'a:t' && typeof value === 'string') {
-        const text = value.trim();
-        if (text) output.push(text);
-      } else {
-        this.collectText(value, output);
-      }
-    }
+    return location;
   }
 }
