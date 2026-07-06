@@ -126,8 +126,8 @@ export class DocumentLoaderService {
         const textContent = await pageData.getTextContent();
         const text = textContent.items
           .map((item: { str?: string }) => item.str ?? '')
-          .join(' ');
-        pages.push(text);
+          .join('\n');
+        pages.push(this.normalizePdfText(text));
         return text;
       },
     });
@@ -136,6 +136,61 @@ export class DocumentLoaderService {
       text,
       metadata: { page: index + 1 },
     }));
+  }
+
+  private normalizePdfText(text: string): string {
+    let normalized = text
+      .replace(/\r\n/g, '\n')
+      .replace(/\b(?:[A-Za-z][ \t]+)+[A-Za-z]\b/g, (value) =>
+        value.replace(/[ \t]+/g, ''),
+      )
+      .replace(/\b(?:[0-9][ \t]+)+[0-9]\b/g, (value) =>
+        value.replace(/[ \t]+/g, ''),
+      )
+      .replace(/([A-Za-z0-9])\s+([./%+~$])/g, '$1$2')
+      .replace(/([./%+~$])\s+(?=[A-Za-z0-9])/g, '$1')
+      .replace(/[ \t]*([≤≥<>＝=])[ \t]*/g, '$1')
+      .replace(/([\u4e00-\u9fa5A-Za-z0-9])\s+([（(【\[])/g, '$1$2')
+      .replace(/[ \t]+([）)】\]，。；：、！？])/g, '$1')
+      .replace(/([（(【\[])[ \t]+/g, '$1')
+      .replace(/([）)】\]])\s+(?=[\u4e00-\u9fa5A-Za-z0-9])/g, '$1')
+      .replace(/([，。；：、！？])[ \t]+(?=[\u4e00-\u9fa5A-Za-z0-9])/g, '$1')
+      .replace(/([\u4e00-\u9fa5A-Za-z0-9])\s+([+])(?=[0-9])/g, '$1$2')
+      .replace(/([0-9])\s+([wW万年月日周天个件分])/g, '$1$2')
+      .replace(/([0-9wW万%])\s+(?=[美分])/g, '$1')
+      .replace(/([\u4e00-\u9fa5])[ \t]+(?=[0-9])/g, '$1')
+      .replace(/([\u4e00-\u9fa5])[ \t]+(?=[\u4e00-\u9fa5])/g, '$1')
+      .replace(/[ \t\f\v]+/g, ' ')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+
+    const compactTokens = [
+      'ASIN',
+      'ASP',
+      'FBA',
+      'GMV',
+      'KPI',
+      'MSRP',
+      'SC',
+      'VC',
+      'VRP',
+      'listing',
+      'offer',
+      'reviews',
+    ];
+    for (const token of compactTokens) {
+      normalized = normalized
+        .replace(
+          new RegExp(`([\\u4e00-\\u9fa50-9]) ${token}`, 'g'),
+          `$1${token}`,
+        )
+        .replace(
+          new RegExp(`${token} (?=[\\u4e00-\\u9fa50-9])`, 'g'),
+          token,
+        );
+    }
+
+    return normalized;
   }
 
   private async loadDocx(filePath: string): Promise<LoadedSegment[]> {
