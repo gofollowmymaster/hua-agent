@@ -6,9 +6,6 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "env:dev": "dotenv -e apps/api/.env.dev.local -e apps/api/.env.dev -e apps/api/.env",
-    "env:test": "dotenv -e apps/api/.env.test.local -e apps/api/.env.test -e apps/api/.env",
-    "env:prod": "dotenv -e apps/api/.env.prod.local -e apps/api/.env.prod -e apps/api/.env",
     "build:dev": "pnpm --filter @aplus-sql/api build:dev",
     "build:test": "pnpm --filter @aplus-sql/api build:test",
     "build:prod": "pnpm --filter @aplus-sql/api build:prod",

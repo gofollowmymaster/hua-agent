@@ -1,6 +1,6 @@
 # 开发工作流治理
 
-本文规定 AI 助手在 monorepo 中从需求理解到交付说明的标准流程。各子项目代码风格和模块设计见 `docs/standard/`，验证口径见 `testing-and-verification.md`。
+本文规定 AI 助手在 monorepo 中从需求理解到交付说明的标准流程。各子项目代码风格和模块设计见对应子项目的 `docs/standard/`，验证口径见 `testing-and-verification.md`。
 
 ## 1. 判断任务范围
 
@@ -38,13 +38,13 @@
 - shared 任务：查找 `packages/shared` 导出和所有 workspace 消费者。
 - cross-app 任务：同时查后端 DTO/Controller/Service 和前端 API client/页面调用方。
 
-优先复用对应子项目既有结构。不确定边界时，先读对应 `docs/architecture/<scope>/README.md`。
+优先复用对应子项目既有结构。不确定边界时，先读对应子项目的 `docs/architecture/README.md`。
 
 ## 4. 命令执行规则
 
 所有项目命令必须遵循 `AGENTS.md` 的环境加载规则：
 
-- API 后端依赖环境变量的命令使用 `pnpm env:dev -- ...`、`pnpm env:test -- ...` 或 `pnpm env:prod -- ...`。
+- API 后端优先使用根目录已有兼容脚本，例如 `pnpm build:dev`、`pnpm start:dev`、`pnpm migrate:dev`。直接在 `apps/api` 内执行依赖环境变量的底层命令时，才使用 API app 的 `pnpm env:dev -- ...`、`pnpm env:test -- ...` 或 `pnpm env:prod -- ...`。
 - RAG Admin 前端命令使用 `pnpm rag-admin:*` 或 `pnpm --filter @aplus-sql/rag-admin ...`，不要套 API 的 dotenv 加载器。
 - shared 命令按实际 package 脚本执行；当前没有脚本时不要虚构。
 
@@ -55,8 +55,8 @@
 - 不修改与任务无关的文件。
 - 不回退用户或其他 agent 已经做出的改动。
 - 不为了当前需求做大范围顺手重构。
-- 代码实现遵守对应子项目规范：`docs/standard/api/`、`docs/standard/rag-admin/`、`docs/standard/shared/` 或 `docs/standard/workspace.md`。
-- 需要项目事实或集成现状时，补读对应 `docs/architecture/` 专题。
+- 代码实现遵守对应子项目规范：`apps/api/docs/standard/`、`apps/rag-admin/docs/standard/`、`packages/shared/docs/standard/` 或 `AGENTS.md`。
+- 需要项目事实或集成现状时，补读对应子项目的 `docs/architecture/` 专题。
 - 跨 app 变更必须同时维护契约两端，不能只改前端或只改后端。
 
 ## 6. 验证规则

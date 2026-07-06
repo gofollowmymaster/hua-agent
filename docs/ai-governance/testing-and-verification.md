@@ -1,6 +1,6 @@
 # 测试与验证治理
 
-本文规定 AI 助手交付不同类型变更时的验证要求。代码风格和模块设计规范见 `docs/standard/`。
+本文规定 AI 助手交付不同类型变更时的验证要求。代码风格和模块设计规范见对应子项目的 `docs/standard/`。
 
 ## 基本原则
 
@@ -13,10 +13,10 @@
 
 只修改 Markdown 文档时，不需要运行单元测试或构建，但必须做静态校验：
 
-- 使用 `find docs -maxdepth 4 -type f | sort` 查看文档结构。
+- 使用 `find apps packages docs -maxdepth 5 -type f -name '*.md' | sort` 查看文档结构。
 - 检查新增链接路径是否真实存在。
 - 检查文档中引用的关键代码路径是否真实存在。
-- 确认文档职责没有重复冲突，例如 `docs/standard/api` 写 API 规范，`docs/standard/rag-admin` 写前端规范，`docs/architecture/*` 写架构事实，`docs/ai-governance` 写 AI 治理。
+- 确认文档职责没有重复冲突，例如 `apps/api/docs/standard` 写 API 规范，`apps/rag-admin/docs/standard` 写前端规范，`packages/shared/docs/standard` 写 shared 规范，`docs/ai-governance` 写 AI 治理。
 
 ## Workspace 变更
 
@@ -25,7 +25,7 @@
 - 根 `package.json`、`pnpm-workspace.yaml` 和受影响 app 的 `package.json` 是否一致。
 - API 命令是否正确使用环境加载器。
 - RAG Admin 命令是否使用前端脚本，不混用 API dotenv。
-- 跨包引用是否符合 `docs/standard/workspace.md`。
+- 跨包引用是否符合 `AGENTS.md`。
 - 根据受影响子项目追加 API、RAG Admin 或 shared 验证。
 
 ## API 代码变更
@@ -33,8 +33,8 @@
 优先验证：
 
 - 相关单元测试。
-- `pnpm env:test -- pnpm test` 或更小范围测试命令。
-- 必要时运行 `pnpm env:dev -- pnpm build:dev`。
+- `pnpm test` 或更小范围 API 测试命令。
+- 必要时运行 `pnpm build:dev`。
 
 若测试无法运行，需要在交付说明中写明原因，例如依赖环境变量、数据库、Redis 或外部服务不可用。
 
@@ -51,7 +51,7 @@
 
 修改 `packages/shared` 时检查：
 
-- 是否符合 `docs/standard/shared/package-design.md` 的导出和依赖边界。
+- 是否符合 `packages/shared/docs/standard/package-design.md` 的导出和依赖边界。
 - 是否搜索并更新所有消费者。
 - API 消费者受影响时运行相关 API 验证。
 - RAG Admin 消费者受影响时运行 `pnpm rag-admin:build`。
@@ -87,7 +87,7 @@
 
 ## Redis 与租户相关变更
 
-涉及 Redis key、缓存、限流、幂等、多租户时，先读 `docs/standard/api/redis.md`，并检查：
+涉及 Redis key、缓存、限流、幂等、多租户时，先读 `apps/api/docs/standard/redis.md`，并检查：
 
 - Redis key 是否来自 `RedisKeys`。
 - 是否通过 `RedisService.buildCacheKey` 或 `buildCacheKeyWithTemplates` 构造租户 key。
@@ -100,7 +100,7 @@
 
 ## 定时任务与队列处理变更
 
-涉及定时任务、BullMQ 队列处理器、后台任务时，先读 `docs/standard/api/background-jobs.md`，并检查：
+涉及定时任务、BullMQ 队列处理器、后台任务时，先读 `apps/api/docs/standard/background-jobs.md`，并检查：
 
 - 定时任务是否继承 `BaseSchedule`，并配置稳定 `jobName`、明确 `cron` 和合适 `isOpen`。
 - 定时任务是否通过 `initContext()` 或默认 `tenantContextDatas` 明确租户上下文。
@@ -124,7 +124,7 @@
 
 涉及鉴权、租户上下文、固定 token、Redis key、租户配置、前端登录 token 时检查：
 
-- API Guard 是否符合 `docs/architecture/api/auth-and-tenant.md` 中的鉴权使用现状。
+- API Guard 是否符合 `apps/api/docs/architecture/auth-and-tenant.md` 中的鉴权使用现状。
 - RAG Admin token 读取、保存和请求头注入是否集中在 `src/auth` 与 `src/api`。
 - 后台任务是否显式处理租户，而不是依赖请求上下文。
 - Redis key 是否租户隔离，批量删除是否有范围保护。
@@ -138,7 +138,7 @@
 ```text
 验证：
 - 已运行：pnpm rag-admin:build
-- 未运行：pnpm env:test -- pnpm test（原因：本次仅修改前端样式）
+- 未运行：pnpm test（原因：本次仅修改前端样式）
 ```
 
 如果只做文档静态检查，也应说明检查过的命令或内容。
