@@ -12,6 +12,11 @@ export const adminMenus = [
     name: 'sessions',
     title: '消息对话记录',
   },
+  {
+    path: '/assistant',
+    name: 'assistant',
+    title: '问答助手',
+  },
 ] as const;
 
 export const routes: RouteRecordRaw[] = [
@@ -36,6 +41,15 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           title: '消息对话记录',
           menuTitle: '消息对话记录',
+        },
+      },
+      {
+        path: 'assistant',
+        name: 'assistant',
+        component: () => import('@/views/AssistantDemo.vue'),
+        meta: {
+          title: '问答助手',
+          menuTitle: '问答助手',
         },
       },
     ],

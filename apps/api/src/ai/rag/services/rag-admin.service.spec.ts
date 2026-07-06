@@ -28,6 +28,7 @@ describe('RagAdminService', () => {
     };
   };
   let ragIngestService: { ingest: jest.Mock };
+  let ragService: { streamAnswer: jest.Mock };
   let tenantContext: { tenant?: string };
   let service: RagAdminService;
 
@@ -102,11 +103,13 @@ describe('RagAdminService', () => {
       },
     };
     ragIngestService = { ingest: jest.fn().mockResolvedValue({ ok: true }) };
+    ragService = { streamAnswer: jest.fn() };
     tenantContext = { tenant: 'aplus' };
     service = new RagAdminService(
       ragPrisma as any,
       ragIngestService as any,
       tenantContext as any,
+      ragService as any,
     );
   });
 
@@ -223,4 +226,73 @@ describe('RagAdminService', () => {
     });
     expect(() => JSON.stringify(result)).not.toThrow();
   });
+
+  it('streams AGUI chat chunks from latest user text', async () => {
+    ragService.streamAnswer.mockImplementation(async function* () {
+      yield {
+        type: 'status',
+        data: { stage: 'retrieve_start', message: '开始检索知识库' },
+      };
+      yield { type: 'answer', data: '答案' };
+      yield { type: 'done', data: { stage: 'done', message: '生成完成' } };
+    });
+
+    const stream = service.createChatStream({
+      id: 'demo-chat',
+      participantId: 'alice',
+      messages: [
+        {
+          id: 'm1',
+          role: 'user',
+          parts: [{ type: 'text', text: '怎么使用知识库？' }],
+        },
+      ],
+    });
+
+    const chunks = await readStream(stream);
+
+    expect(ragService.streamAnswer).toHaveBeenCalledWith('怎么使用知识库？', {
+      session: expect.objectContaining({
+        channel: 'web',
+        conversationId: 'demo-chat',
+        conversationType: 'rag-admin-demo',
+        participantId: 'alice',
+      }),
+    });
+    expect(chunks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: 'text-delta', delta: '答案' }),
+        expect.objectContaining({
+          type: 'data-status',
+          data: expect.objectContaining({ stage: 'retrieve_start' }),
+        }),
+        expect.objectContaining({
+          type: 'data-status',
+          data: expect.objectContaining({ stage: 'done' }),
+        }),
+      ]),
+    );
+  });
+
+  it('rejects AGUI chat without user text before model call', () => {
+    expect(() =>
+      service.createChatStream({
+        messages: [{ id: 'm1', role: 'user', parts: [] }],
+      }),
+    ).toThrow(BadRequestException);
+    expect(ragService.streamAnswer).not.toHaveBeenCalled();
+  });
 });
+
+async function readStream(stream: ReadableStream) {
+  const reader = stream.getReader();
+  const chunks: unknown[] = [];
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
+
+  return chunks;
+}

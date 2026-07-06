@@ -53,6 +53,7 @@
     "@nestjs/swagger": "8.1.0",
     "@prisma/client": "5.16.1",
     "@wecom/aibot-node-sdk": "^1.0.7",
+    "ai": "6.0.148",
     "axios": "^1.9.0",
     "body-parser": "^1.20.3",
     "bullmq": "^5.63.0",

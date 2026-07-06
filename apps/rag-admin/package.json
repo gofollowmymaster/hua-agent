@@ -11,10 +11,12 @@
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
+    "@ai-sdk/vue": "3.0.148",
     "@aplus-frontend/antdv": "2.2.0",
     "@aplus-frontend/aplus-auth-sdk": "2.1.4",
     "@aplus-frontend/ui": "7.26.8",
     "@vitejs/plugin-vue": "^5.2.1",
+    "ai": "6.0.148",
     "axios": "^1.10.0",
     "dayjs": "^1.11.13",
     "js-cookie": "^3.0.5",
