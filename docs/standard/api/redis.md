@@ -1,6 +1,6 @@
 # Redis key 与缓存使用规范
 
-本文规定新增和使用 Redis key、缓存、限流、幂等、批量扫描删除时必须遵守的规则。Redis 与租户隔离的架构背景见 `docs/architecture/auth-and-tenant.md`。
+本文规定新增和使用 Redis key、缓存、限流、幂等、批量扫描删除时必须遵守的规则。Redis 与租户隔离的架构背景见 `docs/architecture/api/auth-and-tenant.md`。
 
 ## 基础入口
 
@@ -76,7 +76,7 @@ const key = this.redisService.buildCacheKeyWithTemplates(
 - 遍历多租户任务时，每个租户分别构造 key。
 - 不要依赖默认租户掩盖缺失上下文问题。
 
-涉及权限、租户来源和默认租户规则时，先读 `docs/architecture/auth-and-tenant.md`。
+涉及权限、租户来源和默认租户规则时，先读 `docs/architecture/api/auth-and-tenant.md`。
 
 ## TTL 与值类型
 

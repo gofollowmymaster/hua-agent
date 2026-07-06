@@ -1,6 +1,6 @@
 # 定时任务与队列处理规范
 
-本文规定新增或修改定时任务、BullMQ 队列处理器、后台处理逻辑时必须遵守的规则。后台任务的架构事实见 `docs/architecture/project-architecture.md`，租户上下文模型见 `docs/architecture/auth-and-tenant.md`。
+本文规定新增或修改定时任务、BullMQ 队列处理器、后台处理逻辑时必须遵守的规则。后台任务的架构事实见 `docs/architecture/api/project-architecture.md`，租户上下文模型见 `docs/architecture/api/auth-and-tenant.md`。
 
 ## 基础入口
 

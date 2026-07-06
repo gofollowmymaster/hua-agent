@@ -125,7 +125,7 @@
 - 机器人配置使用 `NodeConfigService.getRobotConfig`。
 - 表格配置使用 `NodeConfigService.getFeishuTableConfig`。
 
-配置归属、读取方式、类型维护和敏感信息处理规范见 `docs/standard/configuration.md`。
+配置归属、读取方式、类型维护和敏感信息处理规范见 `docs/standard/api/configuration.md`。
 
 ## Redis key 与租户
 
@@ -140,7 +140,7 @@ Redis key 枚举位于 `src/common/const/redis-key.enum.ts`。
 
 `RedisService.delByPattern` 对 pattern 长度有保护，避免误删过宽范围。
 
-Redis key、缓存、限流、幂等和批量删除的开发规范见 `docs/standard/redis.md`。
+Redis key、缓存、限流、幂等和批量删除的开发规范见 `docs/standard/api/redis.md`。
 
 ## 飞书表格与租户
 
@@ -152,7 +152,7 @@ Redis key、缓存、限流、幂等和批量删除的开发规范见 `docs/stan
 
 ## 相关规范入口
 
-- 配置新增与读取规范：`docs/standard/configuration.md`
-- Redis key、缓存、限流、幂等和批量删除规范：`docs/standard/redis.md`
-- 模块分层、后台任务和 provider 注册规范：`docs/standard/module-design.md`
+- 配置新增与读取规范：`docs/standard/api/configuration.md`
+- Redis key、缓存、限流、幂等和批量删除规范：`docs/standard/api/redis.md`
+- 模块分层、后台任务和 provider 注册规范：`docs/standard/api/module-design.md`
 - 鉴权、租户、Redis、飞书变更的验证要求：`docs/ai-governance/testing-and-verification.md`

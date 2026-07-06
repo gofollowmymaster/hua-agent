@@ -6,7 +6,7 @@
 
 飞书集成代码集中在 `src/common/feishu`，业务模块通过 helper、table adapter、card builder 和 type 复用能力。
 
-底层 OpenAPI、鉴权、分页、字段映射和卡片结构当前主要封装在 helper、table、adapter 或 card builder 中；开发规范见 `docs/standard/module-design.md`。
+底层 OpenAPI、鉴权、分页、字段映射和卡片结构当前主要封装在 helper、table、adapter 或 card builder 中；开发规范见 `docs/standard/api/module-design.md`。
 
 ## 目录分层
 
@@ -70,7 +70,7 @@ FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AlertClient))
 - `src/manage/common/table`
 - `src/demo-plugin/table`
 
-表格配置来源和 adapter 放置规范见 `docs/standard/configuration.md` 与 `docs/standard/module-design.md`。
+表格配置来源和 adapter 放置规范见 `docs/standard/api/configuration.md` 与 `docs/standard/api/module-design.md`。
 
 ## 租户化飞书配置
 
@@ -87,7 +87,7 @@ FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AlertClient))
 
 卡片模板位于 `src/common/feishu/card`，消息发送能力由 `FeishuMessageHelper` 和相关消息服务封装。
 
-现有卡片包括 alert、warning、project publish、tip card 等类型。卡片模板放置和业务分层规范见 `docs/standard/module-design.md`。
+现有卡片包括 alert、warning、project publish、tip card 等类型。卡片模板放置和业务分层规范见 `docs/standard/api/module-design.md`。
 
 ## 事件与回调
 
@@ -97,11 +97,11 @@ FeishuHelperModule.forRoot(ClientFactory.create(FeishuApp.AlertClient))
 - `src/alert/feishu-callback`
 - `src/doc/event`
 
-事件处理分层、幂等、异常上报和公开 callback 的验证要求见 `docs/standard/module-design.md`、`docs/standard/redis.md` 和 `docs/ai-governance/testing-and-verification.md`。
+事件处理分层、幂等、异常上报和公开 callback 的验证要求见 `docs/standard/api/module-design.md`、`docs/standard/api/redis.md` 和 `docs/ai-governance/testing-and-verification.md`。
 
 ## 相关规范入口
 
-- 飞书 helper、table、adapter、card 的放置规则：`docs/standard/module-design.md`
-- 飞书机器人、表格和租户化配置规则：`docs/standard/configuration.md`
-- 幂等和 Redis key 规则：`docs/standard/redis.md`
+- 飞书 helper、table、adapter、card 的放置规则：`docs/standard/api/module-design.md`
+- 飞书机器人、表格和租户化配置规则：`docs/standard/api/configuration.md`
+- 幂等和 Redis key 规则：`docs/standard/api/redis.md`
 - 飞书 API、事件、回调变更验证要求：`docs/ai-governance/testing-and-verification.md`

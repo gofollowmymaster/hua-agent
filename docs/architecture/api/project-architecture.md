@@ -75,7 +75,7 @@
 - `TenantContext`：基于 `AsyncLocalStorage` 保存当前请求的租户、用户和 request。
 - `WikiFixedTokenService`：文档相关固定 token 能力。
 
-全局服务的注入和模块注册规范见 `docs/standard/module-design.md`。
+全局服务的注入和模块注册规范见 `docs/standard/api/module-design.md`。
 
 ## 后台任务基础设施
 
@@ -86,7 +86,7 @@
 - `BaseSchedule`：定时任务基类，负责 cron 注册、租户上下文遍历和定时任务异常告警。
 - `BaseProcessor`：队列处理基类，负责 BullMQ job 处理入口、租户上下文建立、worker 事件日志和队列任务异常告警。
 
-定时任务与队列处理的开发规范见 `docs/standard/background-jobs.md`。
+定时任务与队列处理的开发规范见 `docs/standard/api/background-jobs.md`。
 
 ## 配置模型
 
@@ -100,7 +100,7 @@
   - `getFeishuTableConfig` 同时兼容全局表格配置和租户表格配置。
   - `getTenantConfigItem` / `getTenantConfigItemAll` 读取租户级配置。
 
-配置新增、读取、类型维护和敏感信息处理规范见 `docs/standard/configuration.md`。
+配置新增、读取、类型维护和敏感信息处理规范见 `docs/standard/api/configuration.md`。
 
 ## 日志、异常与响应
 
@@ -110,4 +110,4 @@
 - 不需要飞书上报的异常可使用 `NotReportException`。
 - Prisma 唯一约束等数据库异常由专门 Filter 转换。
 
-异常与错误处理的开发规范见 `docs/standard/code-style.md`。
+异常与错误处理的开发规范见 `docs/standard/api/code-style.md`。

@@ -1,6 +1,6 @@
 # 环境变量与项目配置规范
 
-本文规定新增、读取和维护环境变量与项目配置时必须遵守的规则。项目配置架构说明见 `docs/architecture/project-architecture.md`，权限、租户与租户化配置模型见 `docs/architecture/auth-and-tenant.md`。
+本文规定新增、读取和维护环境变量与项目配置时必须遵守的规则。项目配置架构说明见 `docs/architecture/api/project-architecture.md`，权限、租户与租户化配置模型见 `docs/architecture/api/auth-and-tenant.md`。
 
 ## 环境加载
 

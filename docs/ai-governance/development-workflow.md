@@ -1,53 +1,69 @@
 # 开发工作流治理
 
-本文规定 AI 助手从需求理解到交付说明的标准流程。具体代码风格和模块设计见 `docs/standard/README.md`，验证口径见 `testing-and-verification.md`。
+本文规定 AI 助手在 monorepo 中从需求理解到交付说明的标准流程。各子项目代码风格和模块设计见 `docs/standard/`，验证口径见 `testing-and-verification.md`。
 
-## 1. 判断是否需要 OpenSpec
+## 1. 判断任务范围
+
+实现前先把任务归入一个或多个范围：
+
+- `workspace`：根脚本、pnpm workspace、依赖、部署、构建边界。
+- `api`：`apps/api` 后端能力。
+- `rag-admin`：`apps/rag-admin` 前端能力。
+- `shared`：`packages/shared` 共享包。
+- `cross-app`：前后端接口契约、登录链路、静态资源发布、shared 消费。
+- `docs-only`：只修改文档。
+
+分类后按 `docs/ai-governance/README.md` 的矩阵读取对应架构和规范。
+
+## 2. 判断是否需要 OpenSpec
 
 以下情况优先走 OpenSpec change：
 
 - 新增业务接口。
 - 修改已有接口行为、鉴权、响应结构或错误语义。
 - 修改数据库 schema、迁移或持久化模型。
-- 调整跨模块公共能力。
+- 调整跨模块、跨 app 或 shared 公共能力。
+- 修改 RAG Admin 与 API 的接口契约、登录 token 链路、静态资源发布路径或构建输出目录。
 - 引入新的外部系统集成或重要配置。
 
 只改注释、文档、小范围 bugfix，且不改变既有行为时，可以不新增 OpenSpec，但交付说明中应说清楚验证方式。
 
-## 2. 开发前先探索
+## 3. 开发前先探索
 
 实现前必须先搜索和阅读相关现有代码：
 
-- 先用 `rg`、`find`、`sed` 等方式查找 controller、service、DTO、table adapter、helper、配置和测试。
-- 优先复用同模块既有结构。
-- 优先复用 `src/common` 中已有基础设施。
-- 不确定模块边界时，先读 `docs/architecture/directory-structure.md`。
+- workspace 任务：检查根 `package.json`、`pnpm-workspace.yaml`、受影响 app 的 `package.json` 和相关部署配置。
+- API 任务：查找 controller、service、DTO、table adapter、helper、配置、测试和相关规范。
+- RAG Admin 任务：查找 router、view、layout、store、API client、auth、样式和 Vite 配置。
+- shared 任务：查找 `packages/shared` 导出和所有 workspace 消费者。
+- cross-app 任务：同时查后端 DTO/Controller/Service 和前端 API client/页面调用方。
 
-不要在未理解现有实现的情况下直接新增平行方案。
+优先复用对应子项目既有结构。不确定边界时，先读对应 `docs/architecture/<scope>/README.md`。
 
-## 3. 命令执行规则
+## 4. 命令执行规则
 
 所有项目命令必须遵循 `AGENTS.md` 的环境加载规则：
 
-- 开发环境命令使用 `pnpm env:dev -- ...`。
-- 测试环境命令使用 `pnpm env:test -- ...`。
-- 生产环境命令使用 `pnpm env:prod -- ...`。
+- API 后端依赖环境变量的命令使用 `pnpm env:dev -- ...`、`pnpm env:test -- ...` 或 `pnpm env:prod -- ...`。
+- RAG Admin 前端命令使用 `pnpm rag-admin:*` 或 `pnpm --filter @aplus-sql/rag-admin ...`，不要套 API 的 dotenv 加载器。
+- shared 命令按实际 package 脚本执行；当前没有脚本时不要虚构。
 
-不要绕过环境加载直接执行依赖环境变量的命令。格式化和 lint 命令会修改文件，执行前应确认这是当前任务的一部分。
+格式化和 lint 命令会修改文件，执行前应确认这是当前任务的一部分。
 
-## 4. 实现规则
+## 5. 实现规则
 
 - 不修改与任务无关的文件。
 - 不回退用户或其他 agent 已经做出的改动。
 - 不为了当前需求做大范围顺手重构。
-- 代码实现遵守 `docs/standard/README.md` 及相关专题规范。
-- 需要项目事实或集成现状时，补读 `docs/architecture/README.md` 及对应专题。
+- 代码实现遵守对应子项目规范：`docs/standard/api/`、`docs/standard/rag-admin/`、`docs/standard/shared/` 或 `docs/standard/workspace.md`。
+- 需要项目事实或集成现状时，补读对应 `docs/architecture/` 专题。
+- 跨 app 变更必须同时维护契约两端，不能只改前端或只改后端。
 
-## 5. 验证规则
+## 6. 验证规则
 
 实现完成后必须按变更类型验证，具体验证矩阵见 `testing-and-verification.md`。验证命令和未能执行的原因都应在交付说明中说明。
 
-## 6. 交付说明
+## 7. 交付说明
 
 最终交付应包含：
 

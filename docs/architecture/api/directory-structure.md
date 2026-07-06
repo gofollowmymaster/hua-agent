@@ -1,6 +1,6 @@
 # 目录架构
 
-本文说明项目目录职责和边界。新文件放置规则见 `docs/standard/module-design.md`。
+本文说明项目目录职责和边界。新文件放置规则见 `docs/standard/api/module-design.md`。
 
 ## 顶层目录
 

@@ -1,6 +1,6 @@
 # 模块设计规范
 
-本文规定新增或修改模块时的结构规范。现有模块职责说明见 `docs/architecture/directory-structure.md`。
+本文规定新增或修改模块时的结构规范。现有模块职责说明见 `docs/architecture/api/directory-structure.md`。
 
 ## 模块边界
 
