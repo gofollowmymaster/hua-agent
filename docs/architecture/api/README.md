@@ -2,6 +2,8 @@
 
 `docs/architecture/api/` 记录 `apps/api` 的后端架构事实。这里不承载 RAG Admin 前端规范，也不承载代码实现规则；实现规则见 `docs/standard/api/README.md`。
 
+本文档目录中的 `src/` 默认指 `apps/api/src/`，`prisma/` 默认指 `apps/api/prisma/`。
+
 ## 阅读顺序
 
 1. `project-architecture.md`：理解启动链路、根模块、请求生命周期、全局服务、配置、日志、异常与响应。

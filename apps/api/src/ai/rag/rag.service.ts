@@ -1,6 +1,8 @@
+import { randomUUID } from 'node:crypto';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { ChatOpenAI, OpenAIEmbeddings } from '@langchain/openai';
+import { createUIMessageStream, type UIMessage } from 'ai';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { NodeConfigService } from '@src/config/node-config.service';
@@ -12,6 +14,12 @@ import type {
   RagStreamEvent,
   RetrievedChunk,
 } from './types/rag.type';
+
+export interface RagChatRequest {
+  id?: string;
+  messages?: UIMessage[];
+  participantId?: string;
+}
 
 @Injectable()
 export class RagService {
@@ -106,17 +114,29 @@ export class RagService {
       },
     };
 
-    const stream = await this.model.stream(prompt);
     let hasText = false;
     let answerContent = '';
 
-    for await (const chunk of stream) {
-      const text = this.extractContentText(chunk.content);
-      if (text) {
-        hasText = true;
-        answerContent += text;
-        yield { type: 'answer', data: text };
+    try {
+      const stream = await this.model.stream(prompt);
+
+      for await (const chunk of stream) {
+        const text = this.extractContentText(chunk.content);
+        if (text) {
+          hasText = true;
+          answerContent += text;
+          yield { type: 'answer', data: text };
+        }
       }
+    } catch (error) {
+      this.logger.warn('RAG stream failed, fallback to invoke', undefined, {
+        stage: 'rag_stream_failed_fallback',
+        tenantCode: this.tenantContext.tenant,
+        sessionKey: session.sessionKey,
+        topK: options.topK,
+        chunks: chunks.length,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
 
     if (!hasText) {
@@ -161,6 +181,57 @@ export class RagService {
         message: '生成完成',
       },
     };
+  }
+
+  createChatStream(params: RagChatRequest) {
+    const question = this.extractLatestUserText(params?.messages);
+    const conversationId = params?.id?.trim() || randomUUID();
+    const participantId = params?.participantId?.trim() || undefined;
+    const textId = randomUUID();
+
+    return createUIMessageStream({
+      execute: async ({ writer }) => {
+        writer.write({
+          type: 'text-start',
+          id: textId,
+        });
+
+        try {
+          for await (const event of this.streamAnswer(question, {
+            session: {
+              channel: 'web',
+              conversationId,
+              conversationType: 'rag-chat',
+              participantId,
+              metadata: {
+                source: 'rag-chat',
+              },
+            },
+          })) {
+            if (event.type === 'answer') {
+              writer.write({
+                type: 'text-delta',
+                id: textId,
+                delta: event.data,
+              });
+              continue;
+            }
+
+            writer.write({
+              type: 'data-status',
+              data: event.data,
+            });
+          }
+        } finally {
+          writer.write({
+            type: 'text-end',
+            id: textId,
+          });
+        }
+      },
+      onError: (error) =>
+        error instanceof Error ? error.message : String(error),
+    });
   }
 
   private async retrieve(
@@ -310,5 +381,26 @@ ${chunk.content}`;
     if (!question || !question.trim()) {
       throw new BadRequestException('question is required');
     }
+  }
+
+  private extractLatestUserText(messages?: UIMessage[]) {
+    if (!Array.isArray(messages) || messages.length === 0) {
+      throw new BadRequestException('messages is required');
+    }
+
+    const latestUserMessage = [...messages]
+      .reverse()
+      .find((message) => message?.role === 'user');
+    const question = latestUserMessage?.parts
+      ?.filter((part) => part?.type === 'text')
+      .map((part) => ('text' in part ? part.text : ''))
+      .join('')
+      .trim();
+
+    if (!question) {
+      throw new BadRequestException('question text is required');
+    }
+
+    return question;
   }
 }

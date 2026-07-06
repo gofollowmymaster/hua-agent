@@ -9,15 +9,18 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  Res,
   Sse,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import type { Response } from 'express';
+import { pipeUIMessageStreamToResponse } from 'ai';
 import { catchError, from, map, Observable, of } from 'rxjs';
 import { SkipTransform } from '@src/common/decorator/skip-transform.decorator';
 import { RagIngestDto } from './dto/ingest.dto';
 import { RagQueryDto } from './dto/query.dto';
-import { RagService } from './rag.service';
+import { RagService, type RagChatRequest } from './rag.service';
 import { RagDocumentService } from './services/rag-document.service';
 import { RagIngestService } from './services/rag-ingest.service';
 import { AuthGuard } from '@src/common/guard/auth';
@@ -48,6 +51,21 @@ export class RagController {
       body.question,
       this.buildQueryOptions(body),
     );
+  }
+
+  @SkipTransform()
+  @Post('chat')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'AGUI 协议 RAG 问答' })
+  chat(
+    @Body() body: RagChatRequest,
+    @Res({ passthrough: false }) res: Response,
+  ) {
+    const stream = this.ragService.createChatStream(body ?? {});
+    pipeUIMessageStreamToResponse({
+      response: res,
+      stream,
+    });
   }
 
   @SkipTransform()

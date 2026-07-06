@@ -48,7 +48,7 @@ const globalConfig: GlobalConfigType = Object.freeze({
     chunkSize: numberEnv('RAG_CHUNK_SIZE', 800),
     chunkOverlap: numberEnv('RAG_CHUNK_OVERLAP', 120),
     embeddingBatchSize: maxNumberEnv('RAG_EMBEDDING_BATCH_SIZE', 10, 10),
-    defaultTopK: numberEnv('RAG_DEFAULT_TOP_K', 5),
+    defaultTopK: numberEnv('RAG_DEFAULT_TOP_K', 8),
   },
 
   feishuTables: {

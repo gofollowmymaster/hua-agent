@@ -1,7 +1,5 @@
-import { randomUUID } from 'node:crypto';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/rag-client';
-import { createUIMessageStream, type UIMessage } from 'ai';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import { NodeConfigService } from '@src/config/node-config.service';
 import type { TenantCode } from '@src/config/tenant';
@@ -12,13 +10,6 @@ import {
 } from '../dto/rag-admin.dto';
 import { RagIngestService } from './rag-ingest.service';
 import { RagPrismaService } from './prisma/rag-prisma.service';
-import { RagService } from '../rag.service';
-
-export interface RagAdminChatRequest {
-  id?: string;
-  messages?: UIMessage[];
-  participantId?: string;
-}
 
 @Injectable()
 export class RagAdminService {
@@ -26,7 +17,6 @@ export class RagAdminService {
     private readonly ragPrisma: RagPrismaService,
     private readonly ragIngestService: RagIngestService,
     private readonly tenantContext: TenantContext,
-    private readonly ragService: RagService,
   ) {}
 
   async pageDocuments(params: RagAdminDocumentPageDto) {
@@ -190,57 +180,6 @@ export class RagAdminService {
     }));
   }
 
-  createChatStream(params: RagAdminChatRequest) {
-    const question = this.extractLatestUserText(params?.messages);
-    const conversationId = params?.id?.trim() || randomUUID();
-    const participantId = params?.participantId?.trim() || undefined;
-    const textId = randomUUID();
-
-    return createUIMessageStream({
-      execute: async ({ writer }) => {
-        writer.write({
-          type: 'text-start',
-          id: textId,
-        });
-
-        try {
-          for await (const event of this.ragService.streamAnswer(question, {
-            session: {
-              channel: 'web',
-              conversationId,
-              conversationType: 'rag-admin-demo',
-              participantId,
-              metadata: {
-                source: 'rag-admin-assistant',
-              },
-            },
-          })) {
-            if (event.type === 'answer') {
-              writer.write({
-                type: 'text-delta',
-                id: textId,
-                delta: event.data,
-              });
-              continue;
-            }
-
-            writer.write({
-              type: 'data-status',
-              data: event.data,
-            });
-          }
-        } finally {
-          writer.write({
-            type: 'text-end',
-            id: textId,
-          });
-        }
-      },
-      onError: (error) =>
-        error instanceof Error ? error.message : String(error),
-    });
-  }
-
   private buildDocumentWhere(
     params: RagAdminDocumentPageDto,
     tenantCode: TenantCode,
@@ -283,6 +222,10 @@ export class RagAdminService {
         contains: params.conversationId.trim(),
         mode: 'insensitive',
       };
+    }
+
+    if (params.conversationType?.trim()) {
+      where.conversationType = params.conversationType.trim();
     }
 
     if (params.userId?.trim()) {
@@ -344,24 +287,4 @@ export class RagAdminService {
     return typeof value === 'bigint' ? value.toString() : value;
   }
 
-  private extractLatestUserText(messages?: UIMessage[]) {
-    if (!Array.isArray(messages) || messages.length === 0) {
-      throw new BadRequestException('messages is required');
-    }
-
-    const latestUserMessage = [...messages]
-      .reverse()
-      .find((message) => message?.role === 'user');
-    const question = latestUserMessage?.parts
-      ?.filter((part) => part?.type === 'text')
-      .map((part) => ('text' in part ? part.text : ''))
-      .join('')
-      .trim();
-
-    if (!question) {
-      throw new BadRequestException('question text is required');
-    }
-
-    return question;
-  }
 }

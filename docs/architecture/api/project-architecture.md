@@ -1,16 +1,16 @@
-# 项目整体架构
+# API 项目架构
 
-本文说明项目的运行链路和全局基础设施。技术栈、常用命令、环境文件加载顺序、路径别名等快速规则见根目录 `AGENTS.md`，本文不重复展开。
+本文说明 `apps/api` 的运行链路和全局基础设施。技术栈、常用命令、环境文件加载顺序、路径别名等快速规则见根目录 `AGENTS.md`，本文不重复展开。
 
 ## 项目定位
 
-本项目是基于 NestJS + TypeScript 的后端服务，核心能力围绕飞书生态、告警处理、文档检查、DevOps 通知、管理配置和 AI 助手接口展开。
+`apps/api` 是基于 NestJS + TypeScript 的后端服务，核心能力围绕飞书生态、告警处理、文档检查、DevOps 通知、管理配置和 AI 助手接口展开。
 
-项目采用模块化 NestJS 结构：
+API app 采用模块化 NestJS 结构：
 
-- `src/main.ts` 是应用入口，负责创建 Nest 应用、注册全局 Filter/Interceptor/Pipe、配置 CORS、请求体大小和 dev 环境 Swagger。
-- `src/app.module.ts` 是根模块，负责装配全局服务、配置模块、静态资源、JWT、定时任务、守卫模块、异常模块和各业务模块。
-- `src/common` 承载跨模块基础设施、飞书集成、守卫、异常、中间件、拦截器、基础类和公共表格 adapter。
+- `apps/api/src/main.ts` 是应用入口，负责创建 Nest 应用、注册全局 Filter/Interceptor/Pipe、配置 CORS、请求体大小和 dev 环境 Swagger。
+- `apps/api/src/app.module.ts` 是根模块，负责装配全局服务、配置模块、静态资源、JWT、定时任务、守卫模块、异常模块和各业务模块。
+- `apps/api/src/common` 承载跨模块基础设施、飞书集成、守卫、异常、中间件、拦截器、基础类和公共表格 adapter。
 
 ## 启动链路
 
@@ -37,7 +37,7 @@
 `AppModule` 的核心 imports：
 
 - `GlobalServiceModule`：全局服务模块，导出 Redis、Logger、Prisma、TenantContext 等。
-- `ConfigModule.forRoot({ isGlobal: true, load: [() => configuration] })`：加载 `src/config/index.ts` 组装后的配置。
+- `ConfigModule.forRoot({ isGlobal: true, load: [() => configuration] })`：加载 `apps/api/src/config/index.ts` 组装后的配置。
 - `ServeStaticModule`：将 `mockServer` 作为静态资源目录。
 - `DevtoolsModule`：注册 Nest devtools，端口 `3001`。
 - `JwtModule.register({ global: true })`：使用 `configuration.jwtSecret` 初始化全局 JWT。
@@ -81,7 +81,7 @@
 
 项目通过 `ScheduleModule.forRoot()` 启用定时任务能力，通过业务模块中的 `BullModule.forRoot(...)` 和 `BullModule.registerQueue(...)` 使用 BullMQ 队列。
 
-后台任务基础类位于 `src/common/base`：
+后台任务基础类位于 `apps/api/src/common/base`：
 
 - `BaseSchedule`：定时任务基类，负责 cron 注册、租户上下文遍历和定时任务异常告警。
 - `BaseProcessor`：队列处理基类，负责 BullMQ job 处理入口、租户上下文建立、worker 事件日志和队列任务异常告警。
@@ -90,10 +90,10 @@
 
 ## 配置模型
 
-配置入口是 `src/config/index.ts`：
+配置入口是 `apps/api/src/config/index.ts`：
 
-- 全局配置来自环境变量、`src/config/db.ts`、固定配置和租户配置。
-- 租户配置来自 `src/config/tenant/index.ts`，当前租户码包括 `aplus`、`boat`、`yurex`。
+- 全局配置来自环境变量、`apps/api/src/config/db.ts`、固定配置和租户配置。
+- 租户配置来自 `apps/api/src/config/tenant/index.ts`，当前租户码包括 `aplus`、`boat`、`yurex`。
 - `NodeConfigService` 提供静态读取方法：
   - `get` / `getOrThrow` 读取全局配置。
   - `getRobotConfig` 同时兼容全局机器人配置和租户机器人配置。
@@ -106,7 +106,7 @@
 
 - 请求日志由 `LoggerMiddleware` 和 `LoggingInterceptor` 共同承担。
 - 响应结构由 `TransformInterceptor` 统一处理。
-- 业务异常类型位于 `src/common/exception`。
+- 业务异常类型位于 `apps/api/src/common/exception`。
 - 不需要飞书上报的异常可使用 `NotReportException`。
 - Prisma 唯一约束等数据库异常由专门 Filter 转换。
 

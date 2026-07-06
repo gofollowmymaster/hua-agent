@@ -2,6 +2,8 @@
 
 `docs/standard/api/` 记录 `apps/api` 后端实现规范。后端架构事实见 `docs/architecture/api/README.md`，AI 工作流和验证要求见 `docs/ai-governance/README.md`。
 
+本文档中的 `src/` 默认指 `apps/api/src/`，`prisma/` 默认指 `apps/api/prisma/`。
+
 ## 阅读顺序
 
 1. `code-style.md`：TypeScript/NestJS 代码风格、异常、日志和装饰器写法。

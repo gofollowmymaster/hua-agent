@@ -70,6 +70,11 @@ export class RagAdminSessionPageDto extends RagAdminPageDto {
   @IsString()
   conversationId?: string;
 
+  @ApiPropertyOptional({ description: '会话类型，如 rag-chat' })
+  @IsOptional()
+  @IsString()
+  conversationType?: string;
+
   @ApiPropertyOptional({ description: '用户 ID' })
   @IsOptional()
   @IsString()

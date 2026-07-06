@@ -314,8 +314,107 @@ input {
   gap: 8px;
 }
 
+.assistant-workspace {
+  display: grid;
+  min-height: 0;
+  flex: 1 1 auto;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 16px;
+}
+
+.assistant-history {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e1e7ef;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.assistant-history-head {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border-bottom: 1px solid #e1e7ef;
+}
+
+.assistant-history-head h2 {
+  margin: 0;
+  color: #202633;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.assistant-history-head p {
+  margin: 4px 0 0;
+  color: #667386;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.assistant-history-list {
+  min-height: 0;
+  flex: 1 1 auto;
+  padding: 8px;
+  overflow: auto;
+}
+
+.assistant-history-item {
+  display: flex;
+  width: 100%;
+  min-height: 70px;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 6px;
+  padding: 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #202633;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.assistant-history-item:hover {
+  background: #f4f7fa;
+}
+
+.assistant-history-item.active {
+  border-color: #8ad7b4;
+  background: #ecf8f1;
+}
+
+.assistant-history-title {
+  display: -webkit-box;
+  overflow: hidden;
+  font-weight: 700;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.assistant-history-meta {
+  color: #667386;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.assistant-history-empty {
+  display: grid;
+  min-height: 160px;
+  place-items: center;
+  color: #667386;
+}
+
 .assistant-shell {
   display: flex;
+  min-width: 0;
   min-height: 0;
   flex: 1 1 auto;
   flex-direction: column;
@@ -475,6 +574,15 @@ input {
   .split-page {
     grid-template-columns: 1fr;
     overflow: auto;
+  }
+
+  .assistant-workspace {
+    grid-template-columns: 1fr;
+    overflow: auto;
+  }
+
+  .assistant-history {
+    min-height: 260px;
   }
 
   .page-header {

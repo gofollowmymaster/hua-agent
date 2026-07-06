@@ -1,6 +1,6 @@
 # 环境变量与项目配置规范
 
-本文规定新增、读取和维护环境变量与项目配置时必须遵守的规则。项目配置架构说明见 `docs/architecture/api/project-architecture.md`，权限、租户与租户化配置模型见 `docs/architecture/api/auth-and-tenant.md`。
+本文规定 `apps/api` 新增、读取和维护环境变量与项目配置时必须遵守的规则。项目配置架构说明见 `docs/architecture/api/project-architecture.md`，权限、租户与租户化配置模型见 `docs/architecture/api/auth-and-tenant.md`。
 
 ## 环境加载
 
@@ -18,7 +18,7 @@
 
 不要绕过 `pnpm env:<env> -- ...` 直接执行依赖环境变量的命令。
 
-前端 `apps/rag-admin` 使用 Vite 自身的环境加载机制，环境文件放在 `apps/rag-admin/` 下。只有 `VITE_` 前缀变量会进入浏览器构建产物，不要把后端数据库、机器人 secret、JWT secret 等敏感配置写入前端环境文件。
+前端 `apps/rag-admin` 使用 Vite 自身的环境加载机制，具体规则见 `docs/architecture/rag-admin/build-and-runtime.md` 与 `docs/standard/rag-admin/README.md`。不要把后端数据库、机器人 secret、JWT secret 等敏感配置写入前端环境文件。
 
 ## 配置归属判断
 
@@ -69,7 +69,7 @@
 
 真实密钥、token、数据库连接串、机器人 secret 等敏感信息应来自 `.env.*.local` 或部署环境变量。
 
-模板文件只放占位值或安全默认值。新增后端本地必填变量时，同步维护 `apps/api/.env.dev.local.template`；新增前端本地变量时，同步维护 `apps/rag-admin/.env.local.template`，并说明用途和默认值含义。
+模板文件只放占位值或安全默认值。新增后端本地必填变量时，同步维护 `apps/api/.env.dev.local.template`，并说明用途和默认值含义。新增前端本地变量时，按 RAG Admin 规范维护前端环境模板。
 
 不要新增硬编码 secret。若历史代码中已有固定值，新增能力不要继续复制该模式；优先迁移到环境变量或租户配置。
 
@@ -79,6 +79,6 @@
 - 是否通过 `src/config/index.ts` 或 `src/config/tenant/` 聚合，而不是在业务代码中散读环境变量。
 - 是否同步更新 `GlobalConfigType`、`TenantConfig` 或相关类型。
 - 是否使用 `NodeConfigService` 的正确读取方法。
-- 是否维护对应 app 的环境模板，例如 `apps/api/.env.dev.local.template` 或 `apps/rag-admin/.env.local.template`。
+- 是否维护 API app 的环境模板，例如 `apps/api/.env.dev.local.template`。
 - 是否避免输出、提交或复制真实密钥。
 - 是否按任务类型阅读 `docs/ai-governance/testing-and-verification.md` 并完成静态检查。
