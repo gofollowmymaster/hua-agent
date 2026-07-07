@@ -22,6 +22,25 @@
 
     <DocumentPreviewModal ref="previewModalRef" />
     <DocumentChunkDrawer ref="chunkDrawerRef" />
+    <ApModal
+      v-model:open="metadataModalOpen"
+      title="编辑文档元数据"
+      :confirm-loading="metadataSaving"
+      destroy-on-close
+      @ok="saveMetadata"
+      @cancel="closeMetadataModal"
+    >
+      <div class="metadata-form">
+        <label class="metadata-field">
+          <span>type</span>
+          <input v-model="metadataForm.type" class="metadata-input" placeholder="业务分类" />
+        </label>
+        <label class="metadata-field">
+          <span>tag</span>
+          <input v-model="metadataForm.tag" class="metadata-input" placeholder="标签" />
+        </label>
+      </div>
+    </ApModal>
   </section>
 </template>
 
@@ -41,12 +60,20 @@ import {
   deleteDocument,
   ingestDocuments,
   pageDocumentsGrid,
+  updateDocumentMetadata,
   type RagDocumentItem,
 } from '@/api/rag-admin';
 import DocumentChunkDrawer from './components/DocumentChunkDrawer.vue';
 import DocumentPreviewModal from './components/DocumentPreviewModal.vue';
 
 const ingesting = ref(false);
+const metadataModalOpen = ref(false);
+const metadataSaving = ref(false);
+const editingDocument = ref<RagDocumentItem | null>(null);
+const metadataForm = ref({
+  type: '',
+  tag: '',
+});
 const previewModalRef = ref<InstanceType<typeof DocumentPreviewModal>>();
 const chunkDrawerRef = ref<InstanceType<typeof DocumentChunkDrawer>>();
 const statusValueEnum = {
@@ -91,11 +118,27 @@ const columns: AgGridColumnType<RagDocumentItem>[] = [
       ]),
   },
   {
-    title: '类型',
+    title: '扩展名',
     key: 'fileType',
     dataIndex: 'fileType',
     width: 100,
     hideInSearch: true,
+  },
+  {
+    title: 'type',
+    key: 'type',
+    dataIndex: 'type',
+    width: 120,
+    hideInSearch: true,
+    customRender: ({ record }) => record.type || '-',
+  },
+  {
+    title: 'tag',
+    key: 'tag',
+    dataIndex: 'tag',
+    minWidth: 160,
+    hideInSearch: true,
+    customRender: ({ record }) => record.tag || '-',
   },
   {
     title: '状态',
@@ -156,6 +199,14 @@ const columns: AgGridColumnType<RagDocumentItem>[] = [
             ApButton,
             {
               type: 'link',
+              onClick: () => editMetadata(record),
+            },
+            () => '编辑',
+          ),
+          h(
+            ApButton,
+            {
+              type: 'link',
               onClick: () => chunkDrawerRef.value?.show(record),
             },
             () => '切片实况',
@@ -187,7 +238,7 @@ const [gridProps, { reload }] = usePageListAgGrid({
     height: '100%',
   },
   scroll: {
-    x: 1060,
+    x: 1280,
   },
 });
 
@@ -221,6 +272,41 @@ function remove(item: RagDocumentItem) {
   });
 }
 
+function editMetadata(item: RagDocumentItem) {
+  editingDocument.value = item;
+  metadataForm.value = {
+    type: item.type || '',
+    tag: item.tag || '',
+  };
+  metadataModalOpen.value = true;
+}
+
+async function saveMetadata() {
+  if (!editingDocument.value) return;
+
+  metadataSaving.value = true;
+  try {
+    await updateDocumentMetadata(editingDocument.value.id, {
+      type: metadataForm.value.type,
+      tag: metadataForm.value.tag,
+    });
+    message.success('文档元数据已更新');
+    closeMetadataModal();
+    reload();
+  } finally {
+    metadataSaving.value = false;
+  }
+}
+
+function closeMetadataModal() {
+  metadataModalOpen.value = false;
+  editingDocument.value = null;
+  metadataForm.value = {
+    type: '',
+    tag: '',
+  };
+}
+
 function formatTime(value?: string) {
   return value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-';
 }
@@ -243,5 +329,36 @@ function formatSize(value: string | number) {
   line-height: 20px;
   white-space: normal;
   text-align: left;
+}
+
+.metadata-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.metadata-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #344054;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.metadata-input {
+  height: 36px;
+  padding: 6px 11px;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  color: #101828;
+  font-size: 14px;
+  line-height: 22px;
+  outline: none;
+}
+
+.metadata-input:focus {
+  border-color: #1677ff;
+  box-shadow: 0 0 0 2px rgb(22 119 255 / 12%);
 }
 </style>

@@ -17,6 +17,7 @@ import { AuthGuard } from '@src/common/guard/auth';
 import { SkipTransform } from '@src/common/decorator/skip-transform.decorator';
 import {
   RagAdminDocumentChunkPageDto,
+  RagAdminDocumentMetadataDto,
   RagAdminDocumentPageDto,
   RagAdminIngestDto,
   RagAdminSessionPageDto,
@@ -40,6 +41,16 @@ export class RagAdminController {
   @ApiOperation({ summary: '删除 RAG 文档索引' })
   deleteDocument(@Param('id', ParseIntPipe) id: number) {
     return this.ragAdminService.deleteDocument(id);
+  }
+
+  @Post('documents/:id/metadata')
+  @ApiOperation({ summary: '更新 RAG 文档元数据' })
+  @ApiBody({ type: RagAdminDocumentMetadataDto })
+  updateDocumentMetadata(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: RagAdminDocumentMetadataDto,
+  ) {
+    return this.ragAdminService.updateDocumentMetadata(id, body);
   }
 
   @Post('documents/:id/chunks/page')

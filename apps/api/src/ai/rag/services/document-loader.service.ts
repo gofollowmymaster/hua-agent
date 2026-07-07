@@ -25,6 +25,8 @@ const SUPPORTED_EXTENSIONS = new Set([
   '.txt',
   '.md',
 ]);
+const PAGE_MARGIN_LINE_LIMIT = 4;
+const MAX_REPEATED_MARGIN_LINE_LENGTH = 180;
 
 @Injectable()
 export class DocumentLoaderService {
@@ -53,6 +55,7 @@ export class DocumentLoaderService {
         sourcePath,
         fileName: path.basename(absolutePath),
         fileType: ext.slice(1),
+        documentType: this.resolveDocumentType(sourcePath),
         fileSize: stat.size,
         fileHash: await this.hashFile(absolutePath),
       });
@@ -80,6 +83,8 @@ export class DocumentLoaderService {
     } else {
       throw new BadRequestException(`Unsupported file type: ${ext}`);
     }
+
+    segments = this.removeRepeatedPageMargins(segments);
 
     return {
       ...file,
@@ -116,6 +121,11 @@ export class DocumentLoaderService {
   private async hashFile(filePath: string): Promise<string> {
     const file = await fs.readFile(filePath);
     return crypto.createHash('sha256').update(file).digest('hex');
+  }
+
+  private resolveDocumentType(sourcePath: string) {
+    const parts = sourcePath.split(path.sep).filter(Boolean);
+    return parts.length > 1 ? parts[0] : '';
   }
 
   private async loadPdf(filePath: string): Promise<LoadedSegment[]> {
@@ -271,6 +281,124 @@ export class DocumentLoaderService {
 
   private async loadText(filePath: string): Promise<LoadedSegment[]> {
     return [{ text: await fs.readFile(filePath, 'utf8'), metadata: {} }];
+  }
+
+  private removeRepeatedPageMargins(
+    segments: LoadedSegment[],
+  ): LoadedSegment[] {
+    if (segments.length < 2) return segments;
+
+    const segmentMarginLines = segments.map((segment) =>
+      this.getMarginLines(segment.text),
+    );
+    const minOccurrences = Math.max(2, Math.ceil(segments.length * 0.6));
+    const repeatedTopKeys = this.getRepeatedMarginKeys(
+      segmentMarginLines.map((marginLines) => marginLines.top),
+      minOccurrences,
+    );
+    const repeatedBottomKeys = this.getRepeatedMarginKeys(
+      segmentMarginLines.map((marginLines) => marginLines.bottom),
+      minOccurrences,
+    );
+
+    return segments.map((segment, segmentIndex) => {
+      const lines = segment.text.replace(/\r\n/g, '\n').split('\n');
+      const topIndexes = new Set(
+        segmentMarginLines[segmentIndex].top.map((line) => line.index),
+      );
+      const bottomIndexes = new Set(
+        segmentMarginLines[segmentIndex].bottom.map((line) => line.index),
+      );
+      const text = lines
+        .filter((line, lineIndex) => {
+          const key = this.normalizeMarginLine(line);
+          if (!key) return true;
+
+          const isTopMargin = topIndexes.has(lineIndex);
+          const isBottomMargin = bottomIndexes.has(lineIndex);
+          if (
+            isTopMargin &&
+            (repeatedTopKeys.has(key) || this.isLabeledPageNumberLine(key))
+          ) {
+            return false;
+          }
+
+          if (
+            isBottomMargin &&
+            (repeatedBottomKeys.has(key) || this.isPageNumberLine(key))
+          ) {
+            return false;
+          }
+
+          return true;
+        })
+        .join('\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+
+      return { ...segment, text };
+    });
+  }
+
+  private getMarginLines(text: string): {
+    top: Array<{ index: number; key: string }>;
+    bottom: Array<{ index: number; key: string }>;
+  } {
+    const lines = text.replace(/\r\n/g, '\n').split('\n');
+    const contentLines = lines
+      .map((line, index) => ({
+        index,
+        key: this.normalizeMarginLine(line),
+      }))
+      .filter(
+        (line): line is { index: number; key: string } =>
+          Boolean(line.key) &&
+          line.key.length <= MAX_REPEATED_MARGIN_LINE_LENGTH,
+      );
+
+    return {
+      top: contentLines.slice(0, PAGE_MARGIN_LINE_LIMIT),
+      bottom: contentLines.slice(-PAGE_MARGIN_LINE_LIMIT),
+    };
+  }
+
+  private getRepeatedMarginKeys(
+    marginLinesBySegment: Array<Array<{ key: string }>>,
+    minOccurrences: number,
+  ): Set<string> {
+    const counts = new Map<string, number>();
+    for (const marginLines of marginLinesBySegment) {
+      const segmentKeys = new Set(marginLines.map((line) => line.key));
+      for (const key of segmentKeys) {
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+      }
+    }
+
+    return new Set(
+      [...counts.entries()]
+        .filter(([, count]) => count >= minOccurrences)
+        .map(([key]) => key),
+    );
+  }
+
+  private normalizeMarginLine(line: string): string {
+    return line.trim().replace(/\s+/g, ' ');
+  }
+
+  private isLabeledPageNumberLine(line: string): boolean {
+    return (
+      /^第\s*\d+\s*(?:页|\/)\s*(?:共\s*)?\d*\s*页?$/.test(line) ||
+      /^页码[:：]?\s*\d+(?:\s*\/\s*\d+)?$/.test(line) ||
+      /^page\s*\d+(?:\s*(?:of|\/)\s*\d+)?$/i.test(line)
+    );
+  }
+
+  private isPageNumberLine(line: string): boolean {
+    return (
+      this.isLabeledPageNumberLine(line) ||
+      /^[-–—]?\s*\d+\s*[-–—]?$/.test(line) ||
+      /^\d+\s*(?:\/|of)\s*\d+$/i.test(line)
+    );
   }
 
   private mapLangchainDocuments(

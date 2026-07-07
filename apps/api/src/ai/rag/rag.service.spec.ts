@@ -114,12 +114,12 @@ describe('RagService', () => {
       '问题',
       '模型答案',
     );
-    expect((service as any).model.invoke).toHaveBeenCalledWith(
-      expect.stringContaining('RAG 问答助手“晓晓”'),
-    );
-    expect((service as any).model.invoke).toHaveBeenCalledWith(
-      expect.stringContaining('/ai/rag/admin/documents/2/preview'),
-    );
+    const prompt = (service as any).model.invoke.mock.calls[0][0];
+    expect(prompt).toContain('企业微信群里的 VC 业务答疑助手“晓晓”');
+    expect(prompt).toContain('参考文档：');
+    expect(prompt).toContain('【知识库检索结果】');
+    expect(prompt).toContain('标题：doc.md');
+    expect(prompt).toContain('链接：/ai/rag/admin/documents/2/preview');
   });
 
   it('keeps old call shape usable without options', async () => {

@@ -8,6 +8,7 @@ export interface RawDocumentFile {
   sourcePath: string;
   fileName: string;
   fileType: string;
+  documentType: string;
   fileSize: number;
   fileHash: string;
 }

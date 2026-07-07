@@ -208,6 +208,7 @@ export class RagIngestService {
             sourcePath: document.sourcePath,
             fileName: document.fileName,
             fileType: document.fileType,
+            type: document.documentType,
             tenantCode,
           },
         });
@@ -323,12 +324,14 @@ export class RagIngestService {
   ): Promise<string> {
     const result = await client.$queryRaw<Array<{ id: bigint }>>`
       INSERT INTO aplus_documents
-        (tenant_code, source_path, file_name, file_type, file_hash, file_size, status, updated_at)
+        (tenant_code, source_path, file_name, file_type, "type", tag, file_hash, file_size, status, updated_at)
       VALUES (
         ${tenantCode},
         ${document.sourcePath},
         ${document.fileName},
         ${document.fileType},
+        ${document.documentType},
+        '',
         ${document.fileHash},
         ${document.fileSize},
         'processing',
@@ -359,6 +362,7 @@ export class RagIngestService {
       sourcePath: string;
       fileName: string;
       fileType: string;
+      documentType: string;
       fileHash: string;
       fileSize: number;
     },
@@ -366,12 +370,14 @@ export class RagIngestService {
   ) {
     await this.ragPrisma.$executeRaw`
       INSERT INTO aplus_documents
-        (tenant_code, source_path, file_name, file_type, file_hash, file_size, chunk_count, status, error, updated_at)
+        (tenant_code, source_path, file_name, file_type, "type", tag, file_hash, file_size, chunk_count, status, error, updated_at)
       VALUES (
         ${tenantCode},
         ${file.sourcePath},
         ${file.fileName},
         ${file.fileType},
+        ${file.documentType},
+        '',
         ${file.fileHash},
         ${file.fileSize},
         0,

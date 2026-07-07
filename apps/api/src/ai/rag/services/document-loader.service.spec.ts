@@ -1,4 +1,8 @@
 import { DocumentLoaderService } from './document-loader.service';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { TenantCode } from '@src/config/tenant';
 
 declare global {
   // eslint-disable-next-line no-var
@@ -88,6 +92,7 @@ describe('DocumentLoaderService', () => {
       sourcePath: 'demo.pdf',
       fileName: 'demo.pdf',
       fileType: 'pdf',
+      documentType: '',
       fileSize: 100,
       fileHash: 'hash',
     });
@@ -123,6 +128,7 @@ describe('DocumentLoaderService', () => {
       sourcePath: 'a.docx',
       fileName: 'a.docx',
       fileType: 'docx',
+      documentType: '',
       fileSize: 100,
       fileHash: 'hash',
     });
@@ -131,6 +137,7 @@ describe('DocumentLoaderService', () => {
       sourcePath: 'a.pptx',
       fileName: 'a.pptx',
       fileType: 'pptx',
+      documentType: '',
       fileSize: 100,
       fileHash: 'hash',
     });
@@ -139,6 +146,73 @@ describe('DocumentLoaderService', () => {
     expect(mockPptxLoader).toHaveBeenCalledWith('/private/raw/a.pptx');
     expect(docx.segments).toEqual([{ text: 'docx content', metadata: {} }]);
     expect(pptx.segments).toEqual([{ text: 'pptx content', metadata: {} }]);
+  });
+
+  it('removes repeated headers, footers, and page numbers from loaded segments', async () => {
+    mockPdfLoad.mockResolvedValue([
+      {
+        pageContent:
+          'Cloud Boat 内部资料\n报价政策\n首批订单需要完成质检。\n1/3',
+        metadata: { loc: { pageNumber: 1 } },
+      },
+      {
+        pageContent:
+          'Cloud Boat 内部资料\n履约要求\n海外仓发货前需要核对库存。\n2/3',
+        metadata: { loc: { pageNumber: 2 } },
+      },
+      {
+        pageContent:
+          'Cloud Boat 内部资料\n售后要求\n客服需要在 24 小时内响应。\n3/3',
+        metadata: { loc: { pageNumber: 3 } },
+      },
+    ]);
+
+    const result = await service.loadDocument({
+      absolutePath: '/private/raw/boat/demo.pdf',
+      sourcePath: 'demo.pdf',
+      fileName: 'demo.pdf',
+      fileType: 'pdf',
+      documentType: '',
+      fileSize: 100,
+      fileHash: 'hash',
+    });
+
+    expect(result.segments).toEqual([
+      { text: '报价政策\n首批订单需要完成质检。', metadata: { page: 1 } },
+      { text: '履约要求\n海外仓发货前需要核对库存。', metadata: { page: 2 } },
+      { text: '售后要求\n客服需要在24 小时内响应。', metadata: { page: 3 } },
+    ]);
+  });
+
+  it('derives document type from first directory under tenant raw directory', async () => {
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'rag-loader-'));
+    const originalCwd = process.cwd();
+    try {
+      process.chdir(root);
+      await fs.mkdir(path.join(root, 'raw', 'aplus', 'policy'), {
+        recursive: true,
+      });
+      await fs.writeFile(path.join(root, 'raw', 'aplus', 'policy', 'a.md'), '# a');
+      await fs.writeFile(path.join(root, 'raw', 'aplus', 'root.md'), '# root');
+
+      service = new DocumentLoaderService();
+      const result = await service.scanRawFiles('aplus' as TenantCode);
+
+      expect(
+        result.map((file) => ({
+          sourcePath: file.sourcePath,
+          documentType: file.documentType,
+        })),
+      ).toEqual(
+        expect.arrayContaining([
+          { sourcePath: path.join('policy', 'a.md'), documentType: 'policy' },
+          { sourcePath: 'root.md', documentType: '' },
+        ]),
+      );
+    } finally {
+      process.chdir(originalCwd);
+      await fs.rm(root, { recursive: true, force: true });
+    }
   });
 
   it('normalizes split text extracted from PDF pages', () => {

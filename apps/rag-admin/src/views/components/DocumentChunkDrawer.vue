@@ -33,12 +33,27 @@
         />
         <div v-else-if="!errorText" class="chunk-list">
           <article v-for="chunk in chunks" :key="String(chunk.id)" class="chunk-card">
-            <header class="chunk-card-header">
-              <span>#{{ chunk.chunkIndex }}</span>
+            <header
+              class="chunk-card-header"
+              role="button"
+              tabindex="0"
+              :aria-expanded="isChunkExpanded(chunk)"
+              @click="toggleChunk(chunk)"
+              @keydown.enter.prevent="toggleChunk(chunk)"
+              @keydown.space.prevent="toggleChunk(chunk)"
+            >
+              <span class="chunk-card-title">
+                <span class="chunk-chevron" :class="{ expanded: isChunkExpanded(chunk) }">
+                  ›
+                </span>
+                #{{ chunk.chunkIndex }}
+              </span>
               <span>{{ formatTime(chunk.createdAt) }}</span>
             </header>
-            <pre class="chunk-content">{{ chunk.content }}</pre>
-            <pre class="chunk-metadata">{{ formatMetadata(chunk.metadata) }}</pre>
+            <div v-if="isChunkExpanded(chunk)" class="chunk-card-body">
+              <pre class="chunk-content">{{ chunk.content }}</pre>
+              <pre class="chunk-metadata">{{ formatMetadata(chunk.metadata) }}</pre>
+            </div>
           </article>
         </div>
       </Spin>
@@ -72,6 +87,7 @@ const loading = ref(false);
 const errorText = ref('');
 const documentItem = ref<RagDocumentItem | null>(null);
 const chunks = ref<RagDocumentChunkItem[]>([]);
+const expandedChunkKeys = ref<Set<string>>(new Set());
 const page = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
@@ -81,6 +97,7 @@ async function show(item: RagDocumentItem) {
   documentItem.value = item;
   page.value = 1;
   chunks.value = [];
+  expandedChunkKeys.value = new Set();
   await loadChunks();
 }
 
@@ -95,6 +112,7 @@ async function loadChunks() {
       pageSize: pageSize.value,
     });
     chunks.value = result.list;
+    expandedChunkKeys.value = new Set();
     total.value = result.total;
     page.value = result.page;
     pageSize.value = result.pageSize;
@@ -116,8 +134,30 @@ function changePage(nextPage: number) {
 function close() {
   documentItem.value = null;
   chunks.value = [];
+  expandedChunkKeys.value = new Set();
   errorText.value = '';
   total.value = 0;
+}
+
+function getChunkKey(chunk: RagDocumentChunkItem) {
+  return String(chunk.id);
+}
+
+function isChunkExpanded(chunk: RagDocumentChunkItem) {
+  return expandedChunkKeys.value.has(getChunkKey(chunk));
+}
+
+function toggleChunk(chunk: RagDocumentChunkItem) {
+  const key = getChunkKey(chunk);
+  const nextKeys = new Set(expandedChunkKeys.value);
+
+  if (nextKeys.has(key)) {
+    nextKeys.delete(key);
+  } else {
+    nextKeys.add(key);
+  }
+
+  expandedChunkKeys.value = nextKeys;
 }
 
 function formatTime(value?: string) {
@@ -180,11 +220,45 @@ defineExpose({ show });
   color: #667085;
   background: #f9fafb;
   font-size: 12px;
+  cursor: pointer;
+  user-select: none;
 }
 
-.chunk-card-header span:first-child {
+.chunk-card-header:hover {
+  background: #f2f4f7;
+}
+
+.chunk-card-header:focus-visible {
+  outline: 2px solid #1677ff;
+  outline-offset: -2px;
+}
+
+.chunk-card-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   color: #344054;
   font-weight: 600;
+}
+
+.chunk-chevron {
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+  align-items: center;
+  justify-content: center;
+  color: #667085;
+  font-size: 16px;
+  line-height: 14px;
+  transition: transform 0.16s ease;
+}
+
+.chunk-chevron.expanded {
+  transform: rotate(90deg);
+}
+
+.chunk-card-body {
+  border-top: 1px solid #eaecf0;
 }
 
 .chunk-content,

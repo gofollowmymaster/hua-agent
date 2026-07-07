@@ -17,6 +17,8 @@ export interface RagDocumentItem {
   sourcePath: string;
   fileName: string;
   fileType: string;
+  type: string;
+  tag: string;
   fileSize: string | number;
   chunkCount: number;
   actualChunkCount: number;
@@ -78,6 +80,13 @@ export async function pageDocumentsGrid(params: Record<string, unknown>) {
 
 export function deleteDocument(id: string | number) {
   return del(`/ai/rag/admin/documents/${id}`);
+}
+
+export function updateDocumentMetadata(
+  id: string | number,
+  params: { type: string; tag: string },
+) {
+  return post(`/ai/rag/admin/documents/${id}/metadata`, params);
 }
 
 export function getDocumentPreviewFile(id: string | number) {

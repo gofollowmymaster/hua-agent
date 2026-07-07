@@ -20,6 +20,7 @@ describe('RagAdminService', () => {
       count: jest.Mock;
       findMany: jest.Mock;
       findUnique: jest.Mock;
+      update: jest.Mock;
       delete: jest.Mock;
     };
     aplusChunk: {
@@ -50,6 +51,8 @@ describe('RagAdminService', () => {
             sourcePath: 'raw/aplus/a.md',
             fileName: 'a.md',
             fileType: 'md',
+            type: 'policy',
+            tag: '重点',
             fileHash: 'hash',
             fileSize: BigInt(12),
             chunkCount: 2,
@@ -62,6 +65,13 @@ describe('RagAdminService', () => {
           },
         ]),
         findUnique: jest.fn(),
+        update: jest.fn().mockResolvedValue({
+          id: BigInt(1),
+          tenantCode: 'aplus',
+          type: 'policy',
+          tag: '重点',
+          updatedAt: new Date('2026-01-03T00:00:00.000Z'),
+        }),
         delete: jest.fn().mockResolvedValue({}),
       },
       aplusChunk: {
@@ -161,10 +171,58 @@ describe('RagAdminService', () => {
       id: '1',
       tenantCode: 'aplus',
       fileName: 'a.md',
+      type: 'policy',
+      tag: '重点',
       fileSize: '12',
       actualChunkCount: 2,
     });
     expect(() => JSON.stringify(result)).not.toThrow();
+  });
+
+  it('updates document metadata for current tenant and trims input', async () => {
+    ragPrisma.aplusDocument.findUnique.mockResolvedValue({
+      id: BigInt(1),
+      tenantCode: 'aplus',
+    });
+
+    const result = await service.updateDocumentMetadata(1, {
+      type: ' policy ',
+      tag: ' 重点 ',
+    });
+
+    expect(ragPrisma.aplusDocument.update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: {
+        type: 'policy',
+        tag: '重点',
+        updatedAt: expect.any(Date),
+      },
+      select: {
+        id: true,
+        tenantCode: true,
+        type: true,
+        tag: true,
+        updatedAt: true,
+      },
+    });
+    expect(result).toMatchObject({
+      id: '1',
+      tenantCode: 'aplus',
+      type: 'policy',
+      tag: '重点',
+    });
+  });
+
+  it('blocks cross tenant document metadata update', async () => {
+    ragPrisma.aplusDocument.findUnique.mockResolvedValue({
+      id: BigInt(1),
+      tenantCode: 'boat',
+    });
+
+    await expect(
+      service.updateDocumentMetadata(1, { type: 'policy', tag: '重点' }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    expect(ragPrisma.aplusDocument.update).not.toHaveBeenCalled();
   });
 
   it('blocks cross tenant document deletion', async () => {

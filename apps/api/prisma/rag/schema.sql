@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS aplus_documents (
   source_path TEXT NOT NULL,
   file_name TEXT NOT NULL,
   file_type TEXT NOT NULL,
+  "type" TEXT NOT NULL DEFAULT '',
+  tag TEXT NOT NULL DEFAULT '',
   file_hash TEXT NOT NULL,
   file_size BIGINT NOT NULL,
   chunk_count INTEGER NOT NULL DEFAULT 0,

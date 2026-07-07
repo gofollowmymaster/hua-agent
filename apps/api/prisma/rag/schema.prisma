@@ -15,6 +15,8 @@ model AplusDocument {
   sourcePath String       @map("source_path") @db.Text
   fileName   String       @map("file_name") @db.Text
   fileType   String       @map("file_type") @db.Text
+  type       String       @default("") @db.Text
+  tag        String       @default("") @db.Text
   fileHash   String       @map("file_hash") @db.Text
   fileSize   BigInt       @map("file_size")
   chunkCount Int          @default(0) @map("chunk_count")

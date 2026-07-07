@@ -7,6 +7,7 @@ import { NodeConfigService } from '@src/config/node-config.service';
 import type { TenantCode } from '@src/config/tenant';
 import {
   RagAdminDocumentChunkPageDto,
+  RagAdminDocumentMetadataDto,
   RagAdminDocumentPageDto,
   RagAdminIngestDto,
   RagAdminSessionPageDto,
@@ -49,6 +50,8 @@ export class RagAdminService {
         sourcePath: document.sourcePath,
         fileName: document.fileName,
         fileType: document.fileType,
+        type: document.type,
+        tag: document.tag,
         fileHash: document.fileHash,
         fileSize: this.serializeBigInt(document.fileSize),
         chunkCount: document.chunkCount,
@@ -62,6 +65,45 @@ export class RagAdminService {
       total,
       page,
       pageSize,
+    };
+  }
+
+  async updateDocumentMetadata(
+    id: number,
+    params: RagAdminDocumentMetadataDto,
+  ) {
+    const tenantCode = this.currentTenant();
+    const document = await this.ragPrisma.aplusDocument.findUnique({
+      where: { id },
+      select: { id: true, tenantCode: true },
+    });
+
+    if (!document || document.tenantCode !== tenantCode) {
+      throw new BadRequestException(`Document #${id} not found`);
+    }
+
+    const updated = await this.ragPrisma.aplusDocument.update({
+      where: { id },
+      data: {
+        type: this.normalizeMetadataValue(params.type),
+        tag: this.normalizeMetadataValue(params.tag),
+        updatedAt: new Date(),
+      },
+      select: {
+        id: true,
+        tenantCode: true,
+        type: true,
+        tag: true,
+        updatedAt: true,
+      },
+    });
+
+    return {
+      id: this.serializeBigInt(updated.id),
+      tenantCode: updated.tenantCode,
+      type: updated.type,
+      tag: updated.tag,
+      updatedAt: updated.updatedAt,
     };
   }
 
@@ -346,6 +388,10 @@ export class RagAdminService {
       ...(from ? { gte: new Date(from) } : {}),
       ...(to ? { lte: new Date(to) } : {}),
     };
+  }
+
+  private normalizeMetadataValue(value?: string) {
+    return value?.trim() ?? '';
   }
 
   private resolvePage(

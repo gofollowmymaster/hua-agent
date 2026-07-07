@@ -51,6 +51,18 @@ export class RagAdminDocumentPageDto extends RagAdminPageDto {
 
 export class RagAdminDocumentChunkPageDto extends RagAdminPageDto {}
 
+export class RagAdminDocumentMetadataDto {
+  @ApiPropertyOptional({ description: '文档业务分类' })
+  @IsOptional()
+  @IsString()
+  type?: string;
+
+  @ApiPropertyOptional({ description: '文档标签' })
+  @IsOptional()
+  @IsString()
+  tag?: string;
+}
+
 export class RagAdminIngestDto {
   @ApiPropertyOptional({
     description: '是否强制重新索引 hash 未变化的文档',

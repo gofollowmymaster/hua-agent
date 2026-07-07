@@ -29,6 +29,8 @@ export class RagDocumentService {
       source_path: document.sourcePath,
       file_name: document.fileName,
       file_type: document.fileType,
+      type: document.type,
+      tag: document.tag,
       file_hash: document.fileHash,
       file_size: document.fileSize,
       chunk_count: document.chunkCount,
