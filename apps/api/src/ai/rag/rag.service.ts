@@ -86,6 +86,7 @@ export class RagService {
     this.assertQuestion(question);
     const session = this.ragMemoryService.resolveSession(options);
     const memory = await this.ragMemoryService.loadShortTermMemory(session);
+    console.log('[ memory ] >', memory);
     await this.ragMemoryService.appendUserMessage(session, question);
     yield {
       type: 'status',
@@ -446,7 +447,7 @@ export class RagService {
 
 通过以上检查后再输出。
 
-最近对话：
+【最近对话】
 {memory}
 
 【知识库检索结果】
