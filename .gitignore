@@ -54,7 +54,7 @@ apps/*/.env.local
 # temp directory
 .temp
 .tmp
-apps/api/raw/
+apps/api/raw/*
 
 # Runtime data
 pids
