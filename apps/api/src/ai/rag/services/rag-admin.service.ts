@@ -12,7 +12,7 @@ import {
   RagAdminIngestDto,
   RagAdminSessionPageDto,
 } from '../dto/rag-admin.dto';
-import { RagIngestService } from './rag-ingest.service';
+import { RagIngestService } from './ingest/rag-ingest.service';
 import { RagPrismaService } from './prisma/rag-prisma.service';
 
 @Injectable()

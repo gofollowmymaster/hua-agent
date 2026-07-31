@@ -1,101 +1,36 @@
-jest.mock('@langchain/openai', () => ({
-  OpenAIEmbeddings: jest.fn().mockImplementation(() => ({
-    embedQuery: jest.fn().mockResolvedValue([0.1, 0.2, 0.3]),
-  })),
-  ChatOpenAI: jest.fn().mockImplementation(() => ({
-    invoke: jest.fn().mockResolvedValue({ content: '模型答案' }),
-    stream: jest.fn().mockResolvedValue(
-      (async function* () {
-        yield { content: '流式' };
-        yield { content: '答案' };
-      })(),
-    ),
-  })),
-}));
+import { RagService } from './rag.service';
 
-jest.mock('@src/config/node-config.service', () => ({
-  NodeConfigService: {
-    get: jest.fn((key: string) => {
-      const config = {
-        vcHelper: { defaultTopK: 5 },
-        embeddingsApiKey: 'embedding-key',
-        embeddingsModelName: 'embedding-model',
-        embeddingsDimensions: 1024,
-        embeddingsBaseUrl: 'https://embedding.example.com',
-        modelName: 'chat-model',
-        openAiApiKey: 'chat-key',
-        openAiBaseUrl: 'https://chat.example.com',
-      };
-      return config[key];
-    }),
-  },
-}));
-
-const { RagService } = require('./rag.service');
-
-describe('RagService', () => {
-  let ragPrisma: { $queryRaw: jest.Mock };
-  let logger: { setContext: jest.Mock; warn: jest.Mock };
-  let tenantContext: { tenant: string };
-  let ragMemoryService: {
-    resolveSession: jest.Mock;
-    loadShortTermMemory: jest.Mock;
-    appendUserMessage: jest.Mock;
-    appendAssistantMessage: jest.Mock;
-    appendTurn: jest.Mock;
-    formatMemory: jest.Mock;
+describe('RagService (Facade)', () => {
+  let mockQueryService: {
+    answerQuestion: jest.Mock;
+  };
+  let mockStreamService: {
+    streamAnswer: jest.Mock;
+    createChatStream: jest.Mock;
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    ragPrisma = {
-      $queryRaw: jest.fn().mockResolvedValue([
-        {
-          id: BigInt(1),
-          tenant_code: 'aplus',
-          document_id: BigInt(2),
-          chunk_index: 0,
-          content: '资料内容',
-          metadata: {},
-          file_name: 'doc.md',
-          file_type: 'md',
-          source_path: 'doc.md',
-          similarity: 0.9,
-        },
-      ]),
-    };
-    logger = {
-      setContext: jest.fn(),
-      warn: jest.fn(),
-    };
-    tenantContext = { tenant: 'aplus' };
-    ragMemoryService = {
-      resolveSession: jest.fn().mockReturnValue({
-        tenantCode: 'aplus',
-        channel: 'http',
+
+    mockQueryService = {
+      answerQuestion: jest.fn().mockResolvedValue({
         sessionKey: 'conversation:conv-1:user-1',
-        encodedSessionKey: 'encoded',
+        answer: '模型答案',
+        sources: [],
+        chunks: [],
       }),
-      loadShortTermMemory: jest.fn().mockResolvedValue([
-        {
-          role: 'user',
-          content: '上一问',
-          createdAt: '2026-07-03T00:00:00.000Z',
-        },
-      ]),
-      appendUserMessage: jest.fn().mockResolvedValue(undefined),
-      appendAssistantMessage: jest.fn().mockResolvedValue(undefined),
-      appendTurn: jest.fn().mockResolvedValue(undefined),
-      formatMemory: jest.fn().mockReturnValue('[1] 用户：上一问'),
+    };
+
+    mockStreamService = {
+      streamAnswer: jest.fn(),
+      createChatStream: jest.fn(),
     };
   });
 
-  it('answers with memory and returns sessionKey', async () => {
+  it('delegates answerQuestion to RagQueryService', async () => {
     const service = new RagService(
-      ragPrisma as any,
-      logger as any,
-      tenantContext as any,
-      ragMemoryService as any,
+      mockQueryService as any,
+      mockStreamService as any,
     );
 
     const result = await service.answerQuestion('问题', {
@@ -111,139 +46,90 @@ describe('RagService', () => {
       sessionKey: 'conversation:conv-1:user-1',
       answer: '模型答案',
     });
-    expect(ragMemoryService.loadShortTermMemory).toHaveBeenCalled();
-    expect(ragMemoryService.formatMemory).toHaveBeenCalled();
-    expect(ragMemoryService.appendUserMessage).toHaveBeenCalledWith(
-      expect.objectContaining({ sessionKey: 'conversation:conv-1:user-1' }),
-      '问题',
-    );
-    expect(ragMemoryService.appendAssistantMessage).toHaveBeenCalledWith(
-      expect.objectContaining({ sessionKey: 'conversation:conv-1:user-1' }),
-      '模型答案',
-    );
-    const prompt = (service as any).model.invoke.mock.calls[0][0];
-    expect(prompt).toContain('企业微信群里的 VC 业务答疑助手“晓晓”');
-    expect(prompt).toContain('参考文档：');
-    expect(prompt).toContain('【知识库检索结果】');
-    expect(prompt).toContain('标题：doc.md');
-    expect(prompt).toContain('链接：/ai/rag/admin/documents/2/preview');
+    expect(mockQueryService.answerQuestion).toHaveBeenCalledWith('问题', {
+      topK: 3,
+      session: {
+        channel: 'http',
+        conversationId: 'conv-1',
+        participantId: 'user-1',
+      },
+    });
   });
 
-  it('keeps old call shape usable without options', async () => {
+  it('delegates answerQuestion without options', async () => {
     const service = new RagService(
-      ragPrisma as any,
-      logger as any,
-      tenantContext as any,
-      ragMemoryService as any,
+      mockQueryService as any,
+      mockStreamService as any,
     );
 
     await service.answerQuestion('问题');
 
-    expect(ragMemoryService.resolveSession).toHaveBeenCalledWith({});
+    expect(mockQueryService.answerQuestion).toHaveBeenCalledWith('问题', {});
   });
 
-  it('records user question when sync answer generation fails', async () => {
+  it('returns error when queryService fails', async () => {
+    mockQueryService.answerQuestion.mockRejectedValue(
+      new Error('model failed'),
+    );
+
     const service = new RagService(
-      ragPrisma as any,
-      logger as any,
-      tenantContext as any,
-      ragMemoryService as any,
+      mockQueryService as any,
+      mockStreamService as any,
     );
-    (service as any).model.invoke = jest
-      .fn()
-      .mockRejectedValue(new Error('model failed'));
 
-    await expect(service.answerQuestion('问题')).rejects.toThrow('model failed');
-
-    expect(ragMemoryService.appendUserMessage).toHaveBeenCalledWith(
-      expect.objectContaining({ sessionKey: 'conversation:conv-1:user-1' }),
-      '问题',
+    await expect(service.answerQuestion('问题')).rejects.toThrow(
+      'model failed',
     );
-    expect(ragMemoryService.appendAssistantMessage).not.toHaveBeenCalled();
   });
 
-  it('falls back to invoke when stream generation fails', async () => {
+  it('delegates streamAnswer to RagStreamService', async () => {
+    const mockGenerator = (async function* () {
+      yield { type: 'answer' as const, data: '流式答案' };
+      yield { type: 'done' as const, data: { stage: 'done', message: '完成' } };
+    })();
+
+    mockStreamService.streamAnswer.mockReturnValue(mockGenerator);
+
     const service = new RagService(
-      ragPrisma as any,
-      logger as any,
-      tenantContext as any,
-      ragMemoryService as any,
+      mockQueryService as any,
+      mockStreamService as any,
     );
-    (service as any).model.stream = jest.fn().mockRejectedValue(new Error('failed'));
 
     const events = [];
     for await (const event of service.streamAnswer('问题')) {
       events.push(event);
     }
 
-    expect(logger.warn).toHaveBeenCalledWith(
-      'RAG stream failed, fallback to invoke',
-      undefined,
-      expect.objectContaining({
-        stage: 'rag_stream_failed_fallback',
-        error: 'failed',
-      }),
-    );
-    expect(events).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          type: 'status',
-          data: expect.objectContaining({ stage: 'fallback_start' }),
-        }),
-        { type: 'answer', data: '模型答案' },
-        expect.objectContaining({
-          type: 'done',
-        }),
-      ]),
-    );
-    expect(ragMemoryService.appendUserMessage).toHaveBeenCalledWith(
-      expect.any(Object),
-      '问题',
-    );
-    expect(ragMemoryService.appendAssistantMessage).toHaveBeenCalledWith(
-      expect.any(Object),
-      '模型答案',
-    );
-  });
-
-  it('records user question when stream retrieval fails', async () => {
-    const service = new RagService(
-      ragPrisma as any,
-      logger as any,
-      tenantContext as any,
-      ragMemoryService as any,
-    );
-    ragPrisma.$queryRaw.mockRejectedValue(new Error('retrieve failed'));
-
-    const events = [];
-    await expect(async () => {
-      for await (const event of service.streamAnswer('问题')) {
-        events.push(event);
-      }
-    }).rejects.toThrow('retrieve failed');
-
     expect(events).toEqual([
-      expect.objectContaining({
-        type: 'status',
-        data: expect.objectContaining({ stage: 'retrieve_start' }),
-      }),
+      { type: 'answer', data: '流式答案' },
+      { type: 'done', data: { stage: 'done', message: '完成' } },
     ]);
-    expect(ragMemoryService.appendUserMessage).toHaveBeenCalledWith(
-      expect.objectContaining({ sessionKey: 'conversation:conv-1:user-1' }),
-      '问题',
-    );
-    expect(ragMemoryService.appendAssistantMessage).not.toHaveBeenCalled();
+    expect(mockStreamService.streamAnswer).toHaveBeenCalledWith('问题', {});
   });
 
-  it('streams AGUI chat chunks from latest user text', async () => {
-    const service = new RagService(
-      ragPrisma as any,
-      logger as any,
-      tenantContext as any,
-      ragMemoryService as any,
+  it('delegates createChatStream to RagStreamService', () => {
+    mockStreamService.createChatStream.mockReturnValue(
+      new ReadableStream({}),
     );
 
-    const stream = service.createChatStream({
+    const service = new RagService(
+      mockQueryService as any,
+      mockStreamService as any,
+    );
+
+    service.createChatStream({
+      id: 'demo-chat',
+      participantId: 'alice',
+      messages: [
+        {
+          id: 'm1',
+          role: 'user',
+          parts: [{ type: 'text', text: '怎么使用知识库？' }],
+        } as any,
+      ],
+    });
+
+    expect(mockStreamService.createChatStream).toHaveBeenCalledWith({
       id: 'demo-chat',
       participantId: 'alice',
       messages: [
@@ -254,60 +140,22 @@ describe('RagService', () => {
         },
       ],
     });
-
-    const chunks = await readStream(stream);
-
-    expect(ragMemoryService.resolveSession).toHaveBeenCalledWith({
-      session: expect.objectContaining({
-        channel: 'web',
-        conversationId: 'demo-chat',
-        conversationType: 'rag-chat',
-        participantId: 'alice',
-        messageId: 'm1',
-      }),
-    });
-    expect(chunks).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ type: 'text-delta', delta: '流式' }),
-        expect.objectContaining({ type: 'text-delta', delta: '答案' }),
-        expect.objectContaining({
-          type: 'data-status',
-          data: expect.objectContaining({ stage: 'retrieve_start' }),
-        }),
-        expect.objectContaining({
-          type: 'data-status',
-          data: expect.objectContaining({ stage: 'done' }),
-        }),
-      ]),
-    );
   });
 
-  it('rejects AGUI chat without user text before retrieval', () => {
+  it('rejects createChatStream when streamService throws', () => {
+    mockStreamService.createChatStream.mockImplementation(() => {
+      throw new Error('question text is required');
+    });
+
     const service = new RagService(
-      ragPrisma as any,
-      logger as any,
-      tenantContext as any,
-      ragMemoryService as any,
+      mockQueryService as any,
+      mockStreamService as any,
     );
 
     expect(() =>
       service.createChatStream({
-        messages: [{ id: 'm1', role: 'user', parts: [] }],
+        messages: [{ id: 'm1', role: 'user', parts: [] } as any],
       }),
     ).toThrow('question text is required');
-    expect(ragPrisma.$queryRaw).not.toHaveBeenCalled();
   });
 });
-
-async function readStream(stream: ReadableStream) {
-  const reader = stream.getReader();
-  const chunks: unknown[] = [];
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    chunks.push(value);
-  }
-
-  return chunks;
-}

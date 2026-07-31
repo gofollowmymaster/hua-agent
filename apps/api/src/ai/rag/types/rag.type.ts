@@ -1,3 +1,5 @@
+import type { UIMessage } from 'ai';
+
 export interface LoadedSegment {
   text: string;
   metadata: Record<string, unknown>;
@@ -89,3 +91,28 @@ export type RagStreamEvent =
     }
   | { type: 'answer'; data: string }
   | { type: 'done'; data: { stage: string; message: string } };
+
+// ── RAG 问答相关类型 ──
+
+/** AGUI 协议流式问答请求 */
+export interface RagChatRequest {
+  id?: string;
+  messages?: UIMessage[];
+  participantId?: string;
+}
+
+/** 从 UIMessage[] 提取的用户问题 */
+export interface RagUserQuestion {
+  id?: string;
+  text: string;
+}
+
+/** 检索引用来源 */
+export interface SourceItem {
+  documentId: string;
+  fileName: string;
+  fileType: string;
+  sourcePath: string;
+  location: string;
+  bestSimilarity: number;
+}

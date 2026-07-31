@@ -10,8 +10,8 @@ import type {
   RagQueryOptions,
   RagResolvedSession,
   RagSessionInput,
-} from '../types/rag.type';
-import { RagPrismaService } from './prisma/rag-prisma.service';
+} from '../../types/rag.type';
+import { RagPrismaService } from '../prisma/rag-prisma.service';
 
 const RAG_MEMORY_TTL_SECONDS = 60 * 60 * 48;
 const RAG_MEMORY_MAX_MESSAGES = 20;
@@ -31,7 +31,9 @@ export class RagMemoryService {
 
   resolveSession(options?: RagQueryOptions): RagResolvedSession {
     const input = options?.session ?? { channel: DEFAULT_HTTP_CHANNEL };
-    const channel = this.normalizeSegment(input.channel || DEFAULT_HTTP_CHANNEL);
+    const channel = this.normalizeSegment(
+      input.channel || DEFAULT_HTTP_CHANNEL,
+    );
     const tenantCode = this.currentTenant();
     const sessionKey = this.buildSessionKey(input);
 
@@ -149,17 +151,6 @@ export class RagMemoryService {
     };
   }
 
-  formatMemory(messages: RagMemoryMessage[]) {
-    if (messages.length === 0) return '无最近对话。';
-
-    return messages
-      .map((message, index) => {
-        const role = message.role === 'user' ? '用户' : '助手';
-        return `[${index + 1}] ${role}：${message.content}`;
-      })
-      .join('\n');
-  }
-
   private async appendShortTermMemory(
     session: RagResolvedSession,
     messages: RagMemoryMessage[],
@@ -182,9 +173,7 @@ export class RagMemoryService {
 
   private async appendLongTermMessages(
     session: RagResolvedSession,
-    messages: Array<
-      Omit<Prisma.AplusRagMessageCreateManyInput, 'sessionId'>
-    >,
+    messages: Array<Omit<Prisma.AplusRagMessageCreateManyInput, 'sessionId'>>,
   ) {
     if (messages.length === 0) return;
 
@@ -313,7 +302,10 @@ export class RagMemoryService {
   }
 
   private normalizeSegment(value: string) {
-    return value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+    return value
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]/g, '-');
   }
 
   private currentTenant() {

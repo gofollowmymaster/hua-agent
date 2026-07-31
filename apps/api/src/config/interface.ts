@@ -11,6 +11,8 @@ export type RagConfig = {
   chunkOverlap: number;
   embeddingBatchSize: number;
   defaultTopK: number;
+  /** RAG 提示词版本，如 'v1'、'v2'。默认为 'v1' */
+  ragPromptVersion: string;
 };
 
 export type WecomRagBotConfig = {

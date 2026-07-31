@@ -49,6 +49,7 @@ const globalConfig: GlobalConfigType = Object.freeze({
     chunkOverlap: numberEnv('RAG_CHUNK_OVERLAP', 120),
     embeddingBatchSize: maxNumberEnv('RAG_EMBEDDING_BATCH_SIZE', 10, 10),
     defaultTopK: numberEnv('RAG_DEFAULT_TOP_K', 8),
+    ragPromptVersion: process.env.RAG_PROMPT_VERSION ?? 'v1',
   },
 
   feishuTables: {

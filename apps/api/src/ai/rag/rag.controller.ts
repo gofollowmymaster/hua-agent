@@ -22,7 +22,7 @@ import { RagIngestDto } from './dto/ingest.dto';
 import { RagQueryDto } from './dto/query.dto';
 import { RagService, type RagChatRequest } from './rag.service';
 import { RagDocumentService } from './services/rag-document.service';
-import { RagIngestService } from './services/rag-ingest.service';
+import { RagIngestService } from './services/ingest/rag-ingest.service';
 import { AuthGuard } from '@src/common/guard/auth';
 import type { RagQueryOptions } from './types/rag.type';
 

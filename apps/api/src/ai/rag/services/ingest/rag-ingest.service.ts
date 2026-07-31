@@ -10,9 +10,9 @@ import { TenantCode } from '@src/config/tenant';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import { NodeConfigService } from '@src/config/node-config.service';
-import type { IngestSummary, LoadedDocument } from '../types/rag.type';
+import type { IngestSummary, LoadedDocument } from '../../types/rag.type';
 import { DocumentLoaderService } from './document-loader.service';
-import { RagPrismaService } from './prisma/rag-prisma.service';
+import { RagPrismaService } from '../prisma/rag-prisma.service';
 
 @Injectable()
 export class RagIngestService {
