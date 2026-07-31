@@ -40,6 +40,8 @@ describe('RagService', () => {
   let ragMemoryService: {
     resolveSession: jest.Mock;
     loadShortTermMemory: jest.Mock;
+    appendUserMessage: jest.Mock;
+    appendAssistantMessage: jest.Mock;
     appendTurn: jest.Mock;
     formatMemory: jest.Mock;
   };
@@ -81,6 +83,8 @@ describe('RagService', () => {
           createdAt: '2026-07-03T00:00:00.000Z',
         },
       ]),
+      appendUserMessage: jest.fn().mockResolvedValue(undefined),
+      appendAssistantMessage: jest.fn().mockResolvedValue(undefined),
       appendTurn: jest.fn().mockResolvedValue(undefined),
       formatMemory: jest.fn().mockReturnValue('[1] 用户：上一问'),
     };
@@ -109,9 +113,12 @@ describe('RagService', () => {
     });
     expect(ragMemoryService.loadShortTermMemory).toHaveBeenCalled();
     expect(ragMemoryService.formatMemory).toHaveBeenCalled();
-    expect(ragMemoryService.appendTurn).toHaveBeenCalledWith(
+    expect(ragMemoryService.appendUserMessage).toHaveBeenCalledWith(
       expect.objectContaining({ sessionKey: 'conversation:conv-1:user-1' }),
       '问题',
+    );
+    expect(ragMemoryService.appendAssistantMessage).toHaveBeenCalledWith(
+      expect.objectContaining({ sessionKey: 'conversation:conv-1:user-1' }),
       '模型答案',
     );
     const prompt = (service as any).model.invoke.mock.calls[0][0];
@@ -133,6 +140,26 @@ describe('RagService', () => {
     await service.answerQuestion('问题');
 
     expect(ragMemoryService.resolveSession).toHaveBeenCalledWith({});
+  });
+
+  it('records user question when sync answer generation fails', async () => {
+    const service = new RagService(
+      ragPrisma as any,
+      logger as any,
+      tenantContext as any,
+      ragMemoryService as any,
+    );
+    (service as any).model.invoke = jest
+      .fn()
+      .mockRejectedValue(new Error('model failed'));
+
+    await expect(service.answerQuestion('问题')).rejects.toThrow('model failed');
+
+    expect(ragMemoryService.appendUserMessage).toHaveBeenCalledWith(
+      expect.objectContaining({ sessionKey: 'conversation:conv-1:user-1' }),
+      '问题',
+    );
+    expect(ragMemoryService.appendAssistantMessage).not.toHaveBeenCalled();
   });
 
   it('falls back to invoke when stream generation fails', async () => {
@@ -169,11 +196,43 @@ describe('RagService', () => {
         }),
       ]),
     );
-    expect(ragMemoryService.appendTurn).toHaveBeenCalledWith(
+    expect(ragMemoryService.appendUserMessage).toHaveBeenCalledWith(
       expect.any(Object),
       '问题',
+    );
+    expect(ragMemoryService.appendAssistantMessage).toHaveBeenCalledWith(
+      expect.any(Object),
       '模型答案',
     );
+  });
+
+  it('records user question when stream retrieval fails', async () => {
+    const service = new RagService(
+      ragPrisma as any,
+      logger as any,
+      tenantContext as any,
+      ragMemoryService as any,
+    );
+    ragPrisma.$queryRaw.mockRejectedValue(new Error('retrieve failed'));
+
+    const events = [];
+    await expect(async () => {
+      for await (const event of service.streamAnswer('问题')) {
+        events.push(event);
+      }
+    }).rejects.toThrow('retrieve failed');
+
+    expect(events).toEqual([
+      expect.objectContaining({
+        type: 'status',
+        data: expect.objectContaining({ stage: 'retrieve_start' }),
+      }),
+    ]);
+    expect(ragMemoryService.appendUserMessage).toHaveBeenCalledWith(
+      expect.objectContaining({ sessionKey: 'conversation:conv-1:user-1' }),
+      '问题',
+    );
+    expect(ragMemoryService.appendAssistantMessage).not.toHaveBeenCalled();
   });
 
   it('streams AGUI chat chunks from latest user text', async () => {
@@ -204,6 +263,7 @@ describe('RagService', () => {
         conversationId: 'demo-chat',
         conversationType: 'rag-chat',
         participantId: 'alice',
+        messageId: 'm1',
       }),
     });
     expect(chunks).toEqual(

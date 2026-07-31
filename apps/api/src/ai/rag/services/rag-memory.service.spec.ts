@@ -118,7 +118,7 @@ describe('RagMemoryService', () => {
     );
   });
 
-  it('appends redis queue with max length and ttl and writes long term history', async () => {
+  it('appends user message to redis queue and long term history', async () => {
     const session = service.resolveSession({
       session: {
         channel: 'wecom',
@@ -129,11 +129,10 @@ describe('RagMemoryService', () => {
       },
     });
 
-    await service.appendTurn(session, '问题', '答案');
+    await service.appendUserMessage(session, '问题');
 
     expect(redisClient.rpush).toHaveBeenCalledWith(
       expect.stringContaining('frontend-node:aplus:rag:memory:wecom:'),
-      expect.any(String),
       expect.any(String),
     );
     expect(redisClient.ltrim).toHaveBeenCalledWith(expect.any(String), -20, -1);
@@ -158,6 +157,29 @@ describe('RagMemoryService', () => {
           senderId: 'user-id',
           externalMessageId: 'msg-id',
         }),
+      ],
+    });
+  });
+
+  it('appends assistant message to redis queue and long term history', async () => {
+    const session = service.resolveSession({
+      session: {
+        channel: 'wecom',
+        conversationType: 'group',
+        conversationId: 'chat-id',
+        participantId: 'user-id',
+        messageId: 'msg-id',
+      },
+    });
+
+    await service.appendAssistantMessage(session, '答案');
+
+    expect(redisClient.rpush).toHaveBeenCalledWith(
+      expect.stringContaining('frontend-node:aplus:rag:memory:wecom:'),
+      expect.any(String),
+    );
+    expect(ragPrisma.aplusRagMessage.createMany).toHaveBeenCalledWith({
+      data: [
         expect.objectContaining({
           tenantCode: 'aplus',
           sessionId: BigInt(100),
@@ -167,6 +189,53 @@ describe('RagMemoryService', () => {
           metadata: expect.objectContaining({
             answeredParticipantId: 'user-id',
           }),
+        }),
+      ],
+    });
+  });
+
+  it('does not append assistant message when answer is blank', async () => {
+    const session = service.resolveSession({
+      session: { channel: 'http', conversationId: 'conv-1' },
+    });
+
+    await service.appendAssistantMessage(session, '   ');
+
+    expect(redisClient.rpush).not.toHaveBeenCalled();
+    expect(ragPrisma.aplusRagSession.upsert).not.toHaveBeenCalled();
+    expect(ragPrisma.aplusRagMessage.createMany).not.toHaveBeenCalled();
+  });
+
+  it('keeps appendTurn compatible by appending user then assistant messages', async () => {
+    const session = service.resolveSession({
+      session: {
+        channel: 'wecom',
+        conversationType: 'group',
+        conversationId: 'chat-id',
+        participantId: 'user-id',
+        messageId: 'msg-id',
+      },
+    });
+
+    await service.appendTurn(session, '问题', '答案');
+
+    expect(redisClient.rpush).toHaveBeenCalledTimes(2);
+    expect(ragPrisma.aplusRagMessage.createMany).toHaveBeenCalledTimes(2);
+    expect(ragPrisma.aplusRagMessage.createMany).toHaveBeenNthCalledWith(1, {
+      data: [
+        expect.objectContaining({
+          role: 'user',
+          content: '问题',
+          externalMessageId: 'msg-id',
+        }),
+      ],
+    });
+    expect(ragPrisma.aplusRagMessage.createMany).toHaveBeenNthCalledWith(2, {
+      data: [
+        expect.objectContaining({
+          role: 'assistant',
+          content: '答案',
+          replyToMessageId: 'msg-id',
         }),
       ],
     });

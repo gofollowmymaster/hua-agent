@@ -69,13 +69,58 @@ export class RagMemoryService {
     question: string,
     answer: string,
   ) {
+    await this.appendUserMessage(session, question);
+    await this.appendAssistantMessage(session, answer);
+  }
+
+  async appendUserMessage(session: RagResolvedSession, question: string) {
+    if (!question.trim()) return;
+
+    const userMessage = this.buildUserMemoryMessage(session, question);
+
+    await Promise.all([
+      this.appendShortTermMemory(session, [userMessage]),
+      this.appendLongTermMessages(session, [
+        {
+          tenantCode: session.tenantCode,
+          role: 'user',
+          content: question,
+          senderId: session.participantId,
+          externalMessageId: session.messageId,
+          metadata: this.buildUserMessageMetadata(session),
+        },
+      ]),
+    ]);
+  }
+
+  async appendAssistantMessage(session: RagResolvedSession, answer: string) {
     if (!answer.trim()) return;
 
-    const now = new Date().toISOString();
-    const userMessage: RagMemoryMessage = {
+    const assistantMessage = this.buildAssistantMemoryMessage(session, answer);
+
+    await Promise.all([
+      this.appendShortTermMemory(session, [assistantMessage]),
+      this.appendLongTermMessages(session, [
+        {
+          tenantCode: session.tenantCode,
+          role: 'assistant',
+          content: answer,
+          senderId: ASSISTANT_SENDER_ID,
+          replyToMessageId: session.messageId,
+          metadata: this.buildAssistantMessageMetadata(session),
+        },
+      ]),
+    ]);
+  }
+
+  private buildUserMemoryMessage(
+    session: RagResolvedSession,
+    question: string,
+  ): RagMemoryMessage {
+    return {
       role: 'user',
       content: question,
-      createdAt: now,
+      createdAt: new Date().toISOString(),
       metadata: {
         messageId: session.messageId,
         participantId: session.participantId,
@@ -84,7 +129,13 @@ export class RagMemoryService {
         channel: session.channel,
       },
     };
-    const assistantMessage: RagMemoryMessage = {
+  }
+
+  private buildAssistantMemoryMessage(
+    session: RagResolvedSession,
+    answer: string,
+  ): RagMemoryMessage {
+    return {
       role: 'assistant',
       content: answer,
       createdAt: new Date().toISOString(),
@@ -96,11 +147,6 @@ export class RagMemoryService {
         channel: session.channel,
       },
     };
-
-    await Promise.all([
-      this.appendShortTermMemory(session, [userMessage, assistantMessage]),
-      this.appendLongTermHistory(session, question, answer),
-    ]);
   }
 
   formatMemory(messages: RagMemoryMessage[]) {
@@ -134,34 +180,18 @@ export class RagMemoryService {
     }
   }
 
-  private async appendLongTermHistory(
+  private async appendLongTermMessages(
     session: RagResolvedSession,
-    question: string,
-    answer: string,
+    messages: Array<
+      Omit<Prisma.AplusRagMessageCreateManyInput, 'sessionId'>
+    >,
   ) {
+    if (messages.length === 0) return;
+
     try {
       const sessionId = await this.upsertSession(session);
       await this.ragPrisma.aplusRagMessage.createMany({
-        data: [
-          {
-            tenantCode: session.tenantCode,
-            sessionId,
-            role: 'user',
-            content: question,
-            senderId: session.participantId,
-            externalMessageId: session.messageId,
-            metadata: this.buildUserMessageMetadata(session),
-          },
-          {
-            tenantCode: session.tenantCode,
-            sessionId,
-            role: 'assistant',
-            content: answer,
-            senderId: ASSISTANT_SENDER_ID,
-            replyToMessageId: session.messageId,
-            metadata: this.buildAssistantMessageMetadata(session),
-          },
-        ],
+        data: messages.map((message) => ({ ...message, sessionId })),
       });
     } catch (error) {
       this.logger.error('Failed to append RAG long-term history', undefined, {

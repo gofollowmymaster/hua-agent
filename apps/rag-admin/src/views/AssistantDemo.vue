@@ -92,22 +92,16 @@
           <ApButton type="link" @click="clearError">关闭</ApButton>
         </div>
 
-        <form class="assistant-composer" @submit.prevent="send">
-          <textarea
-            v-model="input"
-            class="assistant-input"
-            :disabled="busy || messageLoading"
-            placeholder="输入问题，Enter 发送，Shift+Enter 换行"
-            rows="3"
-            @keydown="handleInputKeydown"
-          />
-          <div class="assistant-composer-footer">
-            <span class="assistant-state">{{ currentStateText }}</span>
-            <ApButton type="primary" html-type="submit" :disabled="!canSend">
-              发送
-            </ApButton>
-          </div>
-        </form>
+        <AssistantComposer
+          v-model="input"
+          :busy="busy"
+          :can-send="canSend"
+          :message-loading="messageLoading"
+          :state-text="currentStateText"
+          :stopping="stopping"
+          @send="send"
+          @stop="stopChat"
+        />
       </div>
     </div>
     <DocumentPreviewModal ref="previewModalRef" />
@@ -130,6 +124,7 @@ import {
   type RagSessionItem,
 } from '@/api/rag-admin';
 import { useUserStore } from '@/stores/modules/user';
+import AssistantComposer from './components/AssistantComposer.vue';
 import DocumentPreviewModal from './components/DocumentPreviewModal.vue';
 
 interface RagStatusData {
@@ -160,8 +155,10 @@ const sessions = ref<RagSessionItem[]>([]);
 const selectedSessionId = ref('');
 const historyLoading = ref(false);
 const messageLoading = ref(false);
+const stopping = ref(false);
 const currentChatId = ref(createLocalChatId());
 const chat = shallowRef(createChat(currentChatId.value));
+let stopPromise: Promise<void> | null = null;
 
 const participantId = computed(
   () =>
@@ -183,7 +180,8 @@ const canSend = computed(
 );
 const errorMessage = computed(() => error.value?.message || '');
 const statusText = computed(() => {
-  if (status.value === 'submitted') return '已发送';
+  if (stopping.value) return '正在中断';
+  if (status.value === 'submitted') return '等待响应';
   if (status.value === 'streaming') return '生成中';
   if (status.value === 'error') return '出错';
   return '就绪';
@@ -218,7 +216,7 @@ async function loadSessions() {
 
 async function selectSession(session: RagSessionItem) {
   if (busy.value) {
-    await chat.value.stop();
+    await stopChat();
   }
 
   selectedSessionId.value = String(session.id);
@@ -241,25 +239,33 @@ async function send() {
   if (!text || status.value !== 'ready' || messageLoading.value) return;
 
   input.value = '';
-  await chat.value.sendMessage({ text });
-  await loadSessions();
-  syncSelectedSession();
+  try {
+    await chat.value.sendMessage({ text });
+  } finally {
+    await loadSessions();
+    syncSelectedSession();
+  }
 }
 
-function handleInputKeydown(event: KeyboardEvent) {
-  if (event.key !== 'Enter' || event.shiftKey) return;
+async function stopChat() {
+  if (!busy.value) return;
+  if (stopPromise) {
+    await stopPromise;
+    return;
+  }
 
-  event.preventDefault();
-  void send();
-}
+  stopping.value = true;
+  stopPromise = chat.value.stop().finally(() => {
+    stopping.value = false;
+    stopPromise = null;
+  });
 
-function stopChat() {
-  void chat.value.stop();
+  await stopPromise;
 }
 
 function clearChat() {
   if (busy.value) {
-    void chat.value.stop();
+    void stopChat();
   }
   chat.value.messages = [];
   chat.value.clearError();
@@ -267,7 +273,7 @@ function clearChat() {
 
 async function startNewSession() {
   if (busy.value) {
-    await chat.value.stop();
+    await stopChat();
   }
 
   selectedSessionId.value = '';

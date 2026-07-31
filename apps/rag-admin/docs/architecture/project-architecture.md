@@ -26,9 +26,11 @@ Pinia 初始化位于 `src/stores/`，当前用户信息 store 位于 `src/store
 
 ## UI 与预览能力
 
-RAG Admin 优先使用 `@aplus-frontend/ui` 的组件；项目也引入了 `@aplus-frontend/antdv` 作为公司组件体系的一部分。文档预览相关能力来自 `@open-file-viewer/*` 和 `pdfjs-dist`。
+RAG Admin 页面开发强制优先使用 `@aplus-frontend/ui` 的组件。表格、表单、详情、弹窗、抽屉、分页、筛选、按钮、提示等后台常见场景，默认使用 aplus-ui 的成熟组件或项目中基于 aplus-ui 的既有封装。
 
-新增 UI 能力应优先复用现有组件库和已有页面模式，避免引入第二套同职责 UI 框架。
+项目也引入了 `@aplus-frontend/antdv` 作为公司组件体系的一部分，但它不是页面开发的首选组件来源。只有 aplus-ui 无法满足场景、项目已有 antdv 封装更合适，或存在明确技术限制时，才考虑使用 Ant Design Vue 能力。文档预览相关能力来自 `@open-file-viewer/*` 和 `pdfjs-dist`。
+
+新增 UI 能力应优先复用 aplus-ui 和已有页面模式，避免引入第二套同职责 UI 框架。
 
 ## 与 API app 的关系
 

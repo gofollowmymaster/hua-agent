@@ -21,6 +21,11 @@ export interface RagChatRequest {
   participantId?: string;
 }
 
+interface RagUserQuestion {
+  id?: string;
+  text: string;
+}
+
 @Injectable()
 export class RagService {
   private readonly embeddings: OpenAIEmbeddings;
@@ -61,9 +66,10 @@ export class RagService {
     this.assertQuestion(question);
     const session = this.ragMemoryService.resolveSession(options);
     const memory = await this.ragMemoryService.loadShortTermMemory(session);
+    await this.ragMemoryService.appendUserMessage(session, question);
     const chunks = await this.retrieve(question, options.topK);
     const answer = await this.generateAnswer(question, chunks, memory);
-    await this.ragMemoryService.appendTurn(session, question, answer);
+    await this.ragMemoryService.appendAssistantMessage(session, answer);
 
     return {
       sessionKey: session.sessionKey,
@@ -80,6 +86,7 @@ export class RagService {
     this.assertQuestion(question);
     const session = this.ragMemoryService.resolveSession(options);
     const memory = await this.ragMemoryService.loadShortTermMemory(session);
+    await this.ragMemoryService.appendUserMessage(session, question);
     yield {
       type: 'status',
       data: {
@@ -172,7 +179,7 @@ export class RagService {
       }
     }
 
-    await this.ragMemoryService.appendTurn(session, question, answerContent);
+    await this.ragMemoryService.appendAssistantMessage(session, answerContent);
 
     yield {
       type: 'done',
@@ -184,7 +191,7 @@ export class RagService {
   }
 
   createChatStream(params: RagChatRequest) {
-    const question = this.extractLatestUserText(params?.messages);
+    const question = this.extractLatestUserQuestion(params?.messages);
     const conversationId = params?.id?.trim() || randomUUID();
     const participantId = params?.participantId?.trim() || undefined;
     const textId = randomUUID();
@@ -197,12 +204,13 @@ export class RagService {
         });
 
         try {
-          for await (const event of this.streamAnswer(question, {
+          for await (const event of this.streamAnswer(question.text, {
             session: {
               channel: 'web',
               conversationId,
               conversationType: 'rag-chat',
               participantId,
+              messageId: question.id,
               metadata: {
                 source: 'rag-chat',
               },
@@ -511,7 +519,7 @@ ${chunk.content}`;
     }
   }
 
-  private extractLatestUserText(messages?: UIMessage[]) {
+  private extractLatestUserQuestion(messages?: UIMessage[]): RagUserQuestion {
     if (!Array.isArray(messages) || messages.length === 0) {
       throw new BadRequestException('messages is required');
     }
@@ -529,6 +537,9 @@ ${chunk.content}`;
       throw new BadRequestException('question text is required');
     }
 
-    return question;
+    return {
+      id: latestUserMessage?.id,
+      text: question,
+    };
   }
 }

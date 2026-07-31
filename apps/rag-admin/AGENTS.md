@@ -93,12 +93,15 @@ pnpm rag-admin:preview
 
 ## 前端实现规则
 
+- 页面开发强制优先使用 `@aplus-frontend/ui`。表格、表单、详情、弹窗、抽屉、分页、筛选、按钮、提示等常见后台场景，默认先查并使用 aplus-ui 的成熟组件。
+- 编写或改造 aplus-ui 组件前先查询组件 API 和示例，不凭记忆猜 props；必要时使用 `aplus info <Component> --format json`、`aplus demo <Component> ... --format json`。
+- 只有 aplus-ui 没有合适能力、现有业务封装已覆盖，或有明确技术原因时，才使用 `@aplus-frontend/antdv`、原生控件或新增自定义封装，并在代码/交付说明中说明取舍。
 - 页面级组件放 `src/views/`，跨页面布局放 `src/layouts/`。
 - 请求统一封装到 `src/api/`，复用 `src/api/http.ts`。
 - token 读写统一通过 `src/auth/token.ts`，登录流程集中在 `src/auth/` 或路由守卫。
 - 跨页面共享或需要缓存的数据才进入 Pinia；页面局部状态优先留在组件内。
 - 全局样式放 `src/styles/global.css`，页面私有样式优先放对应 `.vue` 文件。
-- 优先复用现有 UI 组件和交互风格，不新增第二套同职责 UI 框架。
+- 不新增第二套同职责 UI 框架。
 
 ## Cross-app 规则
 

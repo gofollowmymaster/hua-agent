@@ -14,7 +14,7 @@
     "migrate:test": "pnpm --filter @aplus-sql/api migrate:test",
     "migrate:prod": "pnpm --filter @aplus-sql/api migrate:prod",
     "start": "pnpm --filter @aplus-sql/api start",
-    "start:dev": "pnpm --filter @aplus-sql/api start:dev",
+    "start:dev": "pnpm --filter @aplus-sql/api start:dev  ",
     "start:test": "pnpm --filter @aplus-sql/api start:test",
     "start:debug": "pnpm --filter @aplus-sql/api start:debug",
     "docker:prod": "pnpm --filter @aplus-sql/api docker:prod",
@@ -32,10 +32,7 @@
     "rag:db:init": "pnpm --filter @aplus-sql/api rag:db:init",
     "admin:dev": "pnpm --filter @aplus-sql/rag-admin dev",
     "admin:build": "pnpm --filter @aplus-sql/rag-admin build",
-    "admin:preview": "pnpm --filter @aplus-sql/rag-admin preview",
-    "rag-admin:dev": "pnpm --filter @aplus-sql/rag-admin dev",
-    "rag-admin:build": "pnpm --filter @aplus-sql/rag-admin build",
-    "rag-admin:preview": "pnpm --filter @aplus-sql/rag-admin preview"
+    "admin:preview": "pnpm --filter @aplus-sql/rag-admin preview"
   },
   "devDependencies": {
     "dotenv-cli": "^7.4.2"

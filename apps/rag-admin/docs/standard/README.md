@@ -12,7 +12,9 @@
 
 ## 高频硬规则
 
-- 优先使用 `@aplus-frontend/ui` 组件；只有组件库不满足业务需要时才使用原生控件或新增封装。
+- 页面开发强制优先使用 `@aplus-frontend/ui`。表格、表单、详情、弹窗、抽屉、分页、筛选、按钮、提示等后台常见能力默认使用 aplus-ui 成熟组件。
+- 使用 aplus-ui 前先查组件 API、类型和示例；不要凭记忆猜 props。必要时使用 `aplus info <Component> --format json` 和 `aplus demo <Component> ... --format json`。
+- 只有 aplus-ui 不满足场景、项目已有封装更合适，或存在明确技术限制时，才使用 `@aplus-frontend/antdv`、原生控件或新增自定义组件，并说明原因。
 - 单个 `.vue`、`.ts` 文件不超过 400 行；接近上限时拆分组件、API 类型、工具函数或 store。
 - 遵循单一职责原则：页面负责组合和状态编排，API 文件负责请求，store 负责跨页面状态，组件负责展示和局部交互。
 - 命名和文件名遵循 `code-style.md` 与 `module-design.md`，不要新增同职责平行目录或随意缩写。
