@@ -153,8 +153,6 @@ export class RagQueryRewriteService {
       tenantCode: this.tenantContext.tenant,
       sessionKey: session.sessionKey,
       topK,
-      originalQuestion: result.originalQuestion,
-      rewrittenQuestion: result.rewrittenQuestion,
       usedRewrite: result.usedRewrite,
       rewriteReason: result.rewriteReason,
       fallbackReason: result.fallbackReason,

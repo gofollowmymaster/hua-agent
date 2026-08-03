@@ -78,7 +78,7 @@ describe('RagQueryRewriteService', () => {
     ];
   });
 
-  it('rewrites a query without memory', async () => {
+  it('keeps query rewrite disabled and falls back to the original question', async () => {
     mockModelInvoke.mockResolvedValue({
       content: JSON.stringify({
         rewrittenQuestion: '费用报销审批流程',
@@ -95,69 +95,32 @@ describe('RagQueryRewriteService', () => {
 
     expect(result).toEqual({
       originalQuestion: '审批呢？',
-      rewrittenQuestion: '费用报销审批流程',
-      usedRewrite: true,
-      rewriteReason: '补全连续追问中的费用报销对象',
+      rewrittenQuestion: '审批呢？',
+      usedRewrite: false,
+      rewriteReason: '查询改写模型调用失败，回退原问题',
+      fallbackReason: 'test',
     });
-    expect(promptRegistry.buildPrompt).toHaveBeenCalledWith('rewrite', {
-      question: '审批呢？',
-      chunks: [],
-      memory: 'formatted memory',
-      formatInstructions: expect.stringContaining('rewrittenQuestion'),
-    });
+    expect(promptRegistry.formatMemory).not.toHaveBeenCalled();
+    expect(promptRegistry.buildPrompt).not.toHaveBeenCalled();
+    expect(mockModelInvoke).not.toHaveBeenCalled();
     expect(logger.info).toHaveBeenCalledWith(
       'RAG query rewrite completed',
       undefined,
       expect.objectContaining({
         tenantCode: 'aplus',
         sessionKey: 'conversation:conv-1:user-1',
-        originalQuestion: '审批呢？',
-        rewrittenQuestion: '费用报销审批流程',
-        usedRewrite: true,
-        rewriteReason: '补全连续追问中的费用报销对象',
+        usedRewrite: false,
+        fallbackReason: 'test',
       }),
     );
+    const logMeta = logger.info.mock.calls[0][2];
+    expect(logMeta).not.toHaveProperty('originalQuestion');
+    expect(logMeta).not.toHaveProperty('rewrittenQuestion');
   });
 
-  it('passes formatted memory into the rewrite prompt', async () => {
-    mockModelInvoke.mockResolvedValue({
-      content: [
-        '```json',
-        JSON.stringify({
-          rewrittenQuestion: '费用报销审批要求',
-          rewriteReason: '根据最近对话补全费用报销对象',
-        }),
-        '```',
-      ].join('\n'),
-    });
-
-    await service.rewrite({
-      question: '那要求是什么？',
-      memory,
-      session,
-    });
-
-    expect(promptRegistry.formatMemory).toHaveBeenCalledWith(memory);
-    expect(promptRegistry.buildPrompt).toHaveBeenCalledWith(
-      'rewrite',
-      expect.objectContaining({
-        formatInstructions: expect.stringContaining('rewriteReason'),
-        memory: 'formatted memory',
-        question: '那要求是什么？',
-      }),
-    );
-  });
-
-  it('falls back to original question when model returns empty text', async () => {
-    mockModelInvoke.mockResolvedValue({
-      content: JSON.stringify({
-        rewrittenQuestion: '   ',
-        rewriteReason: '模型无法判断明确改写意图',
-      }),
-    });
-
+  it('normalizes the original question while rewrite remains disabled', async () => {
     const result = await service.rewrite({
-      question: '这个呢？',
+      question: '  这个呢？  ',
       memory,
       session,
     });
@@ -166,49 +129,8 @@ describe('RagQueryRewriteService', () => {
       originalQuestion: '这个呢？',
       rewrittenQuestion: '这个呢？',
       usedRewrite: false,
-      rewriteReason: '模型无法判断明确改写意图',
-      fallbackReason: 'empty_rewrite',
-    });
-  });
-
-  it('falls back to original question when model returns invalid schema', async () => {
-    mockModelInvoke.mockResolvedValue({
-      content: JSON.stringify({
-        rewrittenQuestion: 123,
-        rewriteReason: '类型错误',
-      }),
-    });
-
-    const result = await service.rewrite({
-      question: '审批呢？',
-      memory,
-      session,
-    });
-
-    expect(result).toMatchObject({
-      originalQuestion: '审批呢？',
-      rewrittenQuestion: '审批呢？',
-      usedRewrite: false,
-      rewriteReason: '查询改写结构化解析失败，回退原问题',
-    });
-    expect(result.fallbackReason).toEqual(expect.any(String));
-  });
-
-  it('falls back to original question when rewrite model fails', async () => {
-    mockModelInvoke.mockRejectedValue(new Error('model failed'));
-
-    const result = await service.rewrite({
-      question: '继续说',
-      memory,
-      session,
-    });
-
-    expect(result).toEqual({
-      originalQuestion: '继续说',
-      rewrittenQuestion: '继续说',
-      usedRewrite: false,
       rewriteReason: '查询改写模型调用失败，回退原问题',
-      fallbackReason: 'model failed',
+      fallbackReason: 'test',
     });
   });
 });

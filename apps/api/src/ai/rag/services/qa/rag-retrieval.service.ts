@@ -10,6 +10,11 @@ import type {
   RetrievedChunk,
 } from '../../types/rag.type';
 import type { RagRetrievalConfig } from '@src/config/interface';
+import type {
+  RagRerankResult,
+  RagRetrievalRouteResult,
+  RagStageStatus,
+} from './rag-workflow.type';
 
 type RagRetrievalRow = {
   id: bigint | number | string;
@@ -141,61 +146,40 @@ export class RagRetrievalService {
     sessionKey?: string;
   }): Promise<RetrievedChunk[]> {
     const tenantCode = this.tenantContext.tenant;
-    const limit = this.normalizeLimit(params.topK);
-    const [vectorCandidates, keywordCandidates] = await Promise.all([
-      this.retrieveByVector(params.query, tenantCode),
-      this.retrieveByKeyword(params.query, tenantCode),
+    const [vectorResult, keywordResult] = await Promise.all([
+      this.retrieveVector({ query: params.query, tenantCode }),
+      this.retrieveKeyword({ query: params.query, tenantCode }),
     ]);
     const fusedCandidates = this.fuseCandidates([
-      vectorCandidates,
-      keywordCandidates,
+      vectorResult.candidates,
+      keywordResult.candidates,
     ]);
-    const rerankTopN = Math.min(
-      Math.max(this.retrievalConfig.rerankTopN, limit),
-      100,
-    );
-    const rerankCandidates = fusedCandidates.slice(0, rerankTopN);
-    const reranker = this.resolveReranker();
 
-    try {
-      return (
-        await reranker.rerank({
-          query: params.query,
-          originalQuestion: params.originalQuestion ?? params.query,
-          candidates: rerankCandidates,
-          topK: limit,
-          tenantCode,
-          sessionKey: params.sessionKey,
-        })
-      ).map((candidate) => this.toRetrievedChunk(candidate));
-    } catch (error) {
-      this.logger.warn(
-        'RAG rerank failed, fallback to fused candidates',
-        undefined,
-        {
-          stage: 'rag_rerank_failed_fallback',
-          tenantCode,
-          sessionKey: params.sessionKey,
-          rerankMode: this.retrievalConfig.rerankMode,
-          error: error instanceof Error ? error.message : String(error),
-        },
-      );
-
-      return fusedCandidates
-        .slice(0, limit)
-        .map((candidate) => this.toRetrievedChunk(candidate));
-    }
+    return (
+      await this.rerankCandidates({
+        query: params.query,
+        originalQuestion: params.originalQuestion ?? params.query,
+        candidates: fusedCandidates,
+        topK: params.topK,
+        tenantCode,
+        sessionKey: params.sessionKey,
+      })
+    ).chunks;
   }
 
-  private async retrieveByVector(
-    query: string,
-    tenantCode: string,
-  ): Promise<RetrievalCandidate[]> {
+  async retrieveVector(params: {
+    query: string;
+    tenantCode: string;
+  }): Promise<RagRetrievalRouteResult> {
+    // 召回节点用显式状态区分“无命中、已禁用、执行失败”，避免都表现为空数组。
+    const startedAt = Date.now();
     const limit = this.normalizeCandidateLimit(this.retrievalConfig.vectorTopK);
-    if (limit <= 0) return [];
+    if (limit <= 0) {
+      return this.buildRouteResult('vector', 'disabled', [], startedAt);
+    }
 
     try {
-      const vector = await this.embeddings.embedQuery(query);
+      const vector = await this.embeddings.embedQuery(params.query);
       const rows = await this.ragPrisma.$queryRaw<RagRetrievalRow[]>`
         SELECT c.id,
                c.tenant_code,
@@ -210,35 +194,41 @@ export class RagRetrievalService {
         FROM aplus_chunks c
         JOIN aplus_documents d ON d.id = c.document_id
         WHERE c.embedding IS NOT NULL
-          AND c.tenant_code = ${tenantCode}
-          AND d.tenant_code = ${tenantCode}
+          AND c.tenant_code = ${params.tenantCode}
+          AND d.tenant_code = ${params.tenantCode}
         ORDER BY c.embedding <=> ${JSON.stringify(vector)}::vector
         LIMIT ${limit}
       `;
 
-      return rows.map((row, index) =>
-        this.toCandidate(row, 'vector', index + 1),
+      return this.buildRouteResult(
+        'vector',
+        'success',
+        rows.map((row, index) => this.toCandidate(row, 'vector', index + 1)),
+        startedAt,
       );
     } catch (error) {
       this.logger.warn('RAG vector retrieval failed', undefined, {
         stage: 'rag_vector_retrieval_failed',
-        tenantCode,
+        tenantCode: params.tenantCode,
         error: error instanceof Error ? error.message : String(error),
       });
 
-      return [];
+      return this.buildRouteResult('vector', 'failed', [], startedAt);
     }
   }
 
-  private async retrieveByKeyword(
-    query: string,
-    tenantCode: string,
-  ): Promise<RetrievalCandidate[]> {
+  async retrieveKeyword(params: {
+    query: string;
+    tenantCode: string;
+  }): Promise<RagRetrievalRouteResult> {
+    const startedAt = Date.now();
     const limit = this.normalizeCandidateLimit(
       this.retrievalConfig.keywordTopK,
     );
-    const normalizedQuery = query.trim();
-    if (limit <= 0 || !normalizedQuery) return [];
+    const normalizedQuery = params.query.trim();
+    if (limit <= 0 || !normalizedQuery) {
+      return this.buildRouteResult('keyword', 'disabled', [], startedAt);
+    }
 
     try {
       const rows = await this.ragPrisma.$queryRaw<RagRetrievalRow[]>`
@@ -265,29 +255,32 @@ export class RagRetrievalService {
         FROM aplus_chunks c
         JOIN aplus_documents d ON d.id = c.document_id
         CROSS JOIN keyword_query
-        WHERE c.tenant_code = ${tenantCode}
-          AND d.tenant_code = ${tenantCode}
+        WHERE c.tenant_code = ${params.tenantCode}
+          AND d.tenant_code = ${params.tenantCode}
           AND keyword_query.query IS NOT NULL
           AND to_tsvector('zhparser', c.content) @@ keyword_query.query
         ORDER BY score DESC, c.id ASC
         LIMIT ${limit}
       `;
 
-      return rows.map((row, index) =>
-        this.toCandidate(row, 'keyword', index + 1),
+      return this.buildRouteResult(
+        'keyword',
+        'success',
+        rows.map((row, index) => this.toCandidate(row, 'keyword', index + 1)),
+        startedAt,
       );
     } catch (error) {
       this.logger.warn('RAG keyword retrieval failed', undefined, {
         stage: 'rag_keyword_retrieval_failed',
-        tenantCode,
+        tenantCode: params.tenantCode,
         error: error instanceof Error ? error.message : String(error),
       });
 
-      return [];
+      return this.buildRouteResult('keyword', 'failed', [], startedAt);
     }
   }
 
-  private fuseCandidates(
+  fuseCandidates(
     candidateGroups: RetrievalCandidate[][],
   ): RetrievalCandidate[] {
     const candidateMap = new Map<string, RetrievalCandidate>();
@@ -349,6 +342,65 @@ export class RagRetrievalService {
     );
   }
 
+  async rerankCandidates(params: {
+    query: string;
+    originalQuestion: string;
+    candidates: RetrievalCandidate[];
+    topK?: number;
+    tenantCode: string;
+    sessionKey?: string;
+  }): Promise<RagRerankResult> {
+    // rerank 失败仍返回融合排序结果，保证单个后处理节点不会阻断问答。
+    const startedAt = Date.now();
+    const limit = this.normalizeLimit(params.topK);
+    const rerankTopN = Math.min(
+      Math.max(this.retrievalConfig.rerankTopN, limit),
+      100,
+    );
+    const rerankCandidates = params.candidates.slice(0, rerankTopN);
+    const reranker = this.resolveReranker();
+
+    try {
+      const chunks = (
+        await reranker.rerank({
+          query: params.query,
+          originalQuestion: params.originalQuestion,
+          candidates: rerankCandidates,
+          topK: limit,
+          tenantCode: params.tenantCode,
+          sessionKey: params.sessionKey,
+        })
+      ).map((candidate) => this.toRetrievedChunk(candidate));
+
+      return {
+        status:
+          this.retrievalConfig.rerankMode === 'none' ? 'disabled' : 'success',
+        chunks,
+        durationMs: Date.now() - startedAt,
+      };
+    } catch (error) {
+      this.logger.warn(
+        'RAG rerank failed, fallback to fused candidates',
+        undefined,
+        {
+          stage: 'rag_rerank_failed_fallback',
+          tenantCode: params.tenantCode,
+          sessionKey: params.sessionKey,
+          rerankMode: this.retrievalConfig.rerankMode,
+          error: error instanceof Error ? error.message : String(error),
+        },
+      );
+
+      return {
+        status: 'failed',
+        chunks: params.candidates
+          .slice(0, limit)
+          .map((candidate) => this.toRetrievedChunk(candidate)),
+        durationMs: Date.now() - startedAt,
+      };
+    }
+  }
+
   private resolveReranker(): RagReranker {
     if (this.retrievalConfig.rerankMode === 'none') {
       return this.noopReranker;
@@ -371,6 +423,20 @@ export class RagRetrievalService {
   private routeWeight(route: RagRetrievalRoute) {
     if (route === 'keyword') return 0.8;
     return 1;
+  }
+
+  private buildRouteResult(
+    route: RagRetrievalRoute,
+    status: RagStageStatus,
+    candidates: RetrievalCandidate[],
+    startedAt: number,
+  ): RagRetrievalRouteResult {
+    return {
+      route,
+      status,
+      candidates,
+      durationMs: Date.now() - startedAt,
+    };
   }
 
   private toCandidate(

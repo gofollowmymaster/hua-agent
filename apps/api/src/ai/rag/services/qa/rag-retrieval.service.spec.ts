@@ -40,6 +40,7 @@ describe('RagRetrievalService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    (NodeConfigService.get as jest.Mock).mockImplementation(defaultConfigGet);
     mockEmbedQuery.mockResolvedValue([0.1, 0.2, 0.3]);
     logger = {
       setContext: jest.fn(),
@@ -144,6 +145,29 @@ describe('RagRetrievalService', () => {
     );
   });
 
+  it('returns failed route diagnostics when keyword retrieval fails', async () => {
+    ragPrisma = {
+      $queryRaw: jest.fn().mockRejectedValue(new Error('zhparser unavailable')),
+    };
+    const service = new RagRetrievalService(
+      ragPrisma as any,
+      logger as any,
+      { tenant: 'aplus' } as any,
+    );
+
+    const result = await service.retrieveKeyword({
+      query: '差旅报销',
+      tenantCode: 'aplus',
+    });
+
+    expect(result).toMatchObject({
+      route: 'keyword',
+      status: 'failed',
+      candidates: [],
+    });
+    expect(result.durationMs).toBeGreaterThanOrEqual(0);
+  });
+
   it('supports none rerank mode through the reranker abstraction', async () => {
     (NodeConfigService.get as jest.Mock).mockImplementation((key: string) => {
       if (key === 'vcHelper') {
@@ -192,10 +216,73 @@ describe('RagRetrievalService', () => {
     expect(result[0].retrieval?.rerankMode).toBeUndefined();
   });
 
+  it('returns fused candidates with failed diagnostics when rerank fails', async () => {
+    ragPrisma = {
+      $queryRaw: jest.fn().mockResolvedValue([
+        buildRow({
+          id: 4,
+          score: 0.87,
+          content: '合同审批流程。',
+        }),
+      ]),
+    };
+    const service = new RagRetrievalService(
+      ragPrisma as any,
+      logger as any,
+      { tenant: 'aplus' } as any,
+    );
+    const vectorResult = await service.retrieveVector({
+      query: '合同审批',
+      tenantCode: 'aplus',
+    });
+    const fusedCandidates = service.fuseCandidates([vectorResult.candidates]);
+    jest
+      .spyOn((service as any).ruleBasedReranker, 'rerank')
+      .mockRejectedValue(new Error('rerank unavailable'));
+
+    const result = await service.rerankCandidates({
+      query: '合同审批',
+      originalQuestion: '合同怎么审批？',
+      candidates: fusedCandidates,
+      topK: 1,
+      tenantCode: 'aplus',
+      sessionKey: 'session-1',
+    });
+
+    expect(result.status).toBe('failed');
+    expect(result.chunks).toHaveLength(1);
+    expect(result.chunks[0].id).toBe('4');
+    expect(logger.warn).toHaveBeenCalledWith(
+      'RAG rerank failed, fallback to fused candidates',
+      undefined,
+      expect.objectContaining({ stage: 'rag_rerank_failed_fallback' }),
+    );
+  });
+
   afterAll(() => {
     (OpenAIEmbeddings as jest.Mock).mockClear();
   });
 });
+
+function defaultConfigGet(key: string) {
+  const values: Record<string, unknown> = {
+    vcHelper: {
+      defaultTopK: 8,
+      retrieval: {
+        vectorTopK: 4,
+        keywordTopK: 4,
+        fusionK: 60,
+        rerankMode: 'rule',
+        rerankTopN: 4,
+      },
+    },
+    embeddingsApiKey: 'embedding-key',
+    embeddingsModelName: 'text-embedding-v3',
+    embeddingsDimensions: 1024,
+    embeddingsBaseUrl: 'https://embedding.test',
+  };
+  return values[key];
+}
 
 function buildRow(params: { id: number; score: number; content: string }) {
   return {

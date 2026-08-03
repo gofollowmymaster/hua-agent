@@ -3,8 +3,6 @@ import { RagService } from './rag.service';
 describe('RagService (Facade)', () => {
   let mockQueryService: {
     answerQuestion: jest.Mock;
-  };
-  let mockStreamService: {
     streamAnswer: jest.Mock;
     createChatStream: jest.Mock;
   };
@@ -19,19 +17,13 @@ describe('RagService (Facade)', () => {
         sources: [],
         chunks: [],
       }),
-    };
-
-    mockStreamService = {
       streamAnswer: jest.fn(),
       createChatStream: jest.fn(),
     };
   });
 
   it('delegates answerQuestion to RagQueryService', async () => {
-    const service = new RagService(
-      mockQueryService as any,
-      mockStreamService as any,
-    );
+    const service = new RagService(mockQueryService as any);
 
     const result = await service.answerQuestion('问题', {
       topK: 3,
@@ -57,10 +49,7 @@ describe('RagService (Facade)', () => {
   });
 
   it('delegates answerQuestion without options', async () => {
-    const service = new RagService(
-      mockQueryService as any,
-      mockStreamService as any,
-    );
+    const service = new RagService(mockQueryService as any);
 
     await service.answerQuestion('问题');
 
@@ -72,28 +61,22 @@ describe('RagService (Facade)', () => {
       new Error('model failed'),
     );
 
-    const service = new RagService(
-      mockQueryService as any,
-      mockStreamService as any,
-    );
+    const service = new RagService(mockQueryService as any);
 
     await expect(service.answerQuestion('问题')).rejects.toThrow(
       'model failed',
     );
   });
 
-  it('delegates streamAnswer to RagStreamService', async () => {
+  it('delegates streamAnswer to RagQueryService', async () => {
     const mockGenerator = (async function* () {
       yield { type: 'answer' as const, data: '流式答案' };
       yield { type: 'done' as const, data: { stage: 'done', message: '完成' } };
     })();
 
-    mockStreamService.streamAnswer.mockReturnValue(mockGenerator);
+    mockQueryService.streamAnswer.mockReturnValue(mockGenerator);
 
-    const service = new RagService(
-      mockQueryService as any,
-      mockStreamService as any,
-    );
+    const service = new RagService(mockQueryService as any);
 
     const events = [];
     for await (const event of service.streamAnswer('问题')) {
@@ -104,18 +87,13 @@ describe('RagService (Facade)', () => {
       { type: 'answer', data: '流式答案' },
       { type: 'done', data: { stage: 'done', message: '完成' } },
     ]);
-    expect(mockStreamService.streamAnswer).toHaveBeenCalledWith('问题', {});
+    expect(mockQueryService.streamAnswer).toHaveBeenCalledWith('问题', {});
   });
 
-  it('delegates createChatStream to RagStreamService', () => {
-    mockStreamService.createChatStream.mockReturnValue(
-      new ReadableStream({}),
-    );
+  it('delegates createChatStream to RagQueryService', () => {
+    mockQueryService.createChatStream.mockReturnValue(new ReadableStream({}));
 
-    const service = new RagService(
-      mockQueryService as any,
-      mockStreamService as any,
-    );
+    const service = new RagService(mockQueryService as any);
 
     service.createChatStream({
       id: 'demo-chat',
@@ -129,7 +107,7 @@ describe('RagService (Facade)', () => {
       ],
     });
 
-    expect(mockStreamService.createChatStream).toHaveBeenCalledWith({
+    expect(mockQueryService.createChatStream).toHaveBeenCalledWith({
       id: 'demo-chat',
       participantId: 'alice',
       messages: [
@@ -142,15 +120,12 @@ describe('RagService (Facade)', () => {
     });
   });
 
-  it('rejects createChatStream when streamService throws', () => {
-    mockStreamService.createChatStream.mockImplementation(() => {
+  it('rejects createChatStream when queryService throws', () => {
+    mockQueryService.createChatStream.mockImplementation(() => {
       throw new Error('question text is required');
     });
 
-    const service = new RagService(
-      mockQueryService as any,
-      mockStreamService as any,
-    );
+    const service = new RagService(mockQueryService as any);
 
     expect(() =>
       service.createChatStream({
