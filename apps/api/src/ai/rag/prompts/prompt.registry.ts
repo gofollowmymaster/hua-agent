@@ -9,6 +9,7 @@ import type {
   IPromptVersion,
 } from './prompt.interface';
 import { qaV1 } from './qa/v1';
+import { rewriteV1 } from './rewrite/v1';
 
 /**
  * 提示词注册中心服务
@@ -44,9 +45,9 @@ export class PromptRegistryService {
 
     this.modules = {
       qa: { v1: qaV1 },
+      rewrite: { v1: rewriteV1 },
       // 未来扩展：
       // qa: { v1: qaV1, v2: qaV2 },
-      // rewrite: { v1: rewriteV1 },
     };
   }
 
@@ -63,12 +64,12 @@ export class PromptRegistryService {
   ): Promise<string> {
     const version = this.getActiveVersion(type);
     const template = this.loadTemplate(type, version);
-
     const prompt = PromptTemplate.fromTemplate(template.systemPrompt);
     const promptValue = await prompt.invoke({
       question: context.question,
       memory: context.memory,
       context: this.formatContext(context.chunks),
+      formatInstructions: context.formatInstructions ?? '',
     });
 
     return promptValue.toString();

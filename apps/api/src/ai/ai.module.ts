@@ -24,6 +24,7 @@ import { RagAdminService } from './rag/services/rag-admin.service';
 import { PromptRegistryService } from './rag/prompts/prompt.registry';
 import { RagQueryService } from './rag/services/qa/rag-query.service';
 import { RagStreamService } from './rag/services/qa/rag-stream.service';
+import { RagQueryRewriteService } from './rag/services/qa/rag-query-rewrite.service';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { RagStreamService } from './rag/services/qa/rag-stream.service';
     WikiFixedTokenService,
     RagService,
     PromptRegistryService,
+    RagQueryRewriteService,
     RagQueryService,
     RagStreamService,
     RagPrismaService,

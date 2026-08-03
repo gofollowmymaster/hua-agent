@@ -193,7 +193,7 @@ export class DevopsOptionService {
       },
       {
         appName: 'global-console',
-        workflowName: '正式环境',
+        workflowName: 'PROD环境',
         branch: 'master',
       },
 

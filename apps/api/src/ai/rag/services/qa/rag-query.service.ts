@@ -5,6 +5,7 @@ import { RagPrismaService } from '../prisma/rag-prisma.service';
 import { RagMemoryService } from './rag-memory.service';
 import { PromptRegistryService } from '../../prompts/prompt.registry';
 import { RagBaseService } from './rag-base.service';
+import { RagQueryRewriteService } from './rag-query-rewrite.service';
 import type {
   RagQueryOptions,
   RagMemoryMessage,
@@ -27,6 +28,7 @@ export class RagQueryService extends RagBaseService {
     tenantContext: TenantContext,
     ragMemoryService: RagMemoryService,
     promptRegistry: PromptRegistryService,
+    private readonly queryRewriteService: RagQueryRewriteService,
   ) {
     super(ragPrisma, logger, tenantContext, ragMemoryService, promptRegistry);
   }
@@ -44,7 +46,13 @@ export class RagQueryService extends RagBaseService {
     const session = this.ragMemoryService.resolveSession(options);
     const memory = await this.ragMemoryService.loadShortTermMemory(session);
     await this.ragMemoryService.appendUserMessage(session, question);
-    const chunks = await this.retrieve(question, options.topK);
+    const rewrite = await this.queryRewriteService.rewrite({
+      question,
+      memory,
+      session,
+      topK: options.topK,
+    });
+    const chunks = await this.retrieve(rewrite.rewrittenQuestion, options.topK);
     const answer = await this.generateAnswer(question, chunks, memory);
     await this.ragMemoryService.appendAssistantMessage(session, answer);
 

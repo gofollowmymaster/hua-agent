@@ -8,9 +8,11 @@ export interface IPromptBuildContext {
   /** 用户原始问题 */
   question: string;
   /** 向量检索返回的文档片段（未格式化） */
-  chunks: RetrievedChunk[];
+  chunks?: RetrievedChunk[];
   /** 已格式化的对话记忆文本（由 formatMemory() 生成） */
   memory: string;
+  /** 结构化输出格式说明，例如 StructuredOutputParser.getFormatInstructions() */
+  formatInstructions?: string;
 }
 
 /**
@@ -24,7 +26,8 @@ export interface IPromptVersion {
    *  使用 LangChain PromptTemplate 变量语法：
    *  - {question}  用户问题
    *  - {context}   格式化后的知识库检索结果
-   *  - {memory}    格式化后的对话记忆 */
+   *  - {memory}    格式化后的对话记忆
+   *  - {formatInstructions} 结构化输出格式说明 */
   systemPrompt: string;
   /** 该版本使用的大语言模型名称（可选，默认使用全局配置） */
   modelName?: string;

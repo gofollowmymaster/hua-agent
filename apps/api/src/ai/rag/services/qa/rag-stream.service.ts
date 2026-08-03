@@ -7,6 +7,7 @@ import { RagPrismaService } from '../prisma/rag-prisma.service';
 import { RagMemoryService } from './rag-memory.service';
 import { PromptRegistryService } from '../../prompts/prompt.registry';
 import { RagBaseService } from './rag-base.service';
+import { RagQueryRewriteService } from './rag-query-rewrite.service';
 import type {
   RagQueryOptions,
   RagStreamEvent,
@@ -30,6 +31,7 @@ export class RagStreamService extends RagBaseService {
     tenantContext: TenantContext,
     ragMemoryService: RagMemoryService,
     promptRegistry: PromptRegistryService,
+    private readonly queryRewriteService: RagQueryRewriteService,
   ) {
     super(ragPrisma, logger, tenantContext, ragMemoryService, promptRegistry);
   }
@@ -41,8 +43,23 @@ export class RagStreamService extends RagBaseService {
     this.assertQuestion(question);
     const session = this.ragMemoryService.resolveSession(options);
     const memory = await this.ragMemoryService.loadShortTermMemory(session);
-    console.log('[ memory ] >', memory);
     await this.ragMemoryService.appendUserMessage(session, question);
+    yield {
+      type: 'status',
+      data: {
+        stage: 'analyzing_start',
+        message: '开始分析问题',
+        sessionKey: session.sessionKey,
+        topK: options.topK,
+      },
+    };
+
+    const rewrite = await this.queryRewriteService.rewrite({
+      question,
+      memory,
+      session,
+      topK: options.topK,
+    });
     yield {
       type: 'status',
       data: {
@@ -52,8 +69,7 @@ export class RagStreamService extends RagBaseService {
         topK: options.topK,
       },
     };
-
-    const chunks = await this.retrieve(question, options.topK);
+    const chunks = await this.retrieve(rewrite.rewrittenQuestion, options.topK);
     yield {
       type: 'status',
       data: {
