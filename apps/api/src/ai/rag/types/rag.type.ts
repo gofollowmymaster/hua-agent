@@ -30,6 +30,26 @@ export interface RetrievedChunk {
   content: string;
   metadata: Record<string, unknown>;
   similarity: number;
+  score?: number;
+  retrieval?: RetrievedChunkTrace;
+}
+
+export type RagRetrievalRoute = 'vector' | 'keyword';
+
+export interface RetrievedChunkTrace {
+  routes: RagRetrievalRoute[];
+  vectorRank?: number;
+  keywordRank?: number;
+  vectorScore?: number;
+  keywordScore?: number;
+  fusedScore?: number;
+  rerankScore?: number;
+  rerankMode?: string;
+}
+
+export interface RetrievalCandidate extends RetrievedChunk {
+  retrieval: RetrievedChunkTrace;
+  score: number;
 }
 
 export interface IngestSummary {

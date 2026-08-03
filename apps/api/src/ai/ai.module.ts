@@ -25,6 +25,7 @@ import { PromptRegistryService } from './rag/prompts/prompt.registry';
 import { RagQueryService } from './rag/services/qa/rag-query.service';
 import { RagStreamService } from './rag/services/qa/rag-stream.service';
 import { RagQueryRewriteService } from './rag/services/qa/rag-query-rewrite.service';
+import { RagRetrievalService } from './rag/services/qa/rag-retrieval.service';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { RagQueryRewriteService } from './rag/services/qa/rag-query-rewrite.serv
     RagService,
     PromptRegistryService,
     RagQueryRewriteService,
+    RagRetrievalService,
     RagQueryService,
     RagStreamService,
     RagPrismaService,

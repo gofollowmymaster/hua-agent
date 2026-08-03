@@ -41,6 +41,7 @@ describe('RagQueryService', () => {
     formatLocation: jest.Mock;
   };
   let queryRewriteService: { rewrite: jest.Mock };
+  let ragRetrievalService: { retrieve: jest.Mock };
   let service: RagQueryService;
   let session: RagResolvedSession;
   let chunks: RetrievedChunk[];
@@ -92,6 +93,9 @@ describe('RagQueryService', () => {
         usedRewrite: true,
       }),
     };
+    ragRetrievalService = {
+      retrieve: jest.fn().mockResolvedValue(chunks),
+    };
 
     service = new RagQueryService(
       {} as any,
@@ -100,8 +104,8 @@ describe('RagQueryService', () => {
       ragMemoryService as any,
       promptRegistry as any,
       queryRewriteService as any,
+      ragRetrievalService as any,
     );
-    (service as any).retrieve = jest.fn().mockResolvedValue(chunks);
     (service as any).model = {
       invoke: jest.fn().mockResolvedValue({ content: '模型答案' }),
     };
@@ -125,7 +129,12 @@ describe('RagQueryService', () => {
       session,
       topK: 3,
     });
-    expect((service as any).retrieve).toHaveBeenCalledWith('报销审批流程', 3);
+    expect(ragRetrievalService.retrieve).toHaveBeenCalledWith({
+      query: '报销审批流程',
+      originalQuestion: '审批呢？',
+      topK: 3,
+      sessionKey: 'conversation:conv-1:user-1',
+    });
     expect(promptRegistry.buildPrompt).toHaveBeenCalledWith('qa', {
       question: '审批呢？',
       chunks,

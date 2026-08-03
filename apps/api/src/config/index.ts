@@ -50,6 +50,17 @@ const globalConfig: GlobalConfigType = Object.freeze({
     embeddingBatchSize: maxNumberEnv('RAG_EMBEDDING_BATCH_SIZE', 10, 10),
     defaultTopK: numberEnv('RAG_DEFAULT_TOP_K', 8),
     ragPromptVersion: process.env.RAG_PROMPT_VERSION ?? 'v1',
+    retrieval: {
+      vectorTopK: maxNumberEnv('RAG_VECTOR_TOP_K', 8, 100),
+      keywordTopK: maxNumberEnv('RAG_KEYWORD_TOP_K', 8, 100),
+      fusionK: numberEnv('RAG_FUSION_K', 60),
+      rerankMode: ['none', 'rule', 'model'].includes(
+        process.env.RAG_RERANK_MODE,
+      )
+        ? (process.env.RAG_RERANK_MODE as 'none' | 'rule' | 'model')
+        : 'rule',
+      rerankTopN: maxNumberEnv('RAG_RERANK_TOP_N', 30, 100),
+    },
   },
 
   feishuTables: {

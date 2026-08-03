@@ -41,6 +41,7 @@ describe('RagStreamService', () => {
     formatMemory: jest.Mock;
   };
   let queryRewriteService: { rewrite: jest.Mock };
+  let ragRetrievalService: { retrieve: jest.Mock };
   let logger: { setContext: jest.Mock; warn: jest.Mock };
   let service: RagStreamService;
   let session: RagResolvedSession;
@@ -92,6 +93,9 @@ describe('RagStreamService', () => {
         usedRewrite: true,
       }),
     };
+    ragRetrievalService = {
+      retrieve: jest.fn().mockResolvedValue(chunks),
+    };
     logger = {
       setContext: jest.fn(),
       warn: jest.fn(),
@@ -103,8 +107,8 @@ describe('RagStreamService', () => {
       ragMemoryService as any,
       promptRegistry as any,
       queryRewriteService as any,
+      ragRetrievalService as any,
     );
-    (service as any).retrieve = jest.fn().mockResolvedValue(chunks);
   });
 
   it('retrieves with rewritten question and streams answer with original prompt question', async () => {
@@ -135,7 +139,12 @@ describe('RagStreamService', () => {
       session,
       topK: 3,
     });
-    expect((service as any).retrieve).toHaveBeenCalledWith('报销审批流程', 3);
+    expect(ragRetrievalService.retrieve).toHaveBeenCalledWith({
+      query: '报销审批流程',
+      originalQuestion: '审批呢？',
+      topK: 3,
+      sessionKey: 'conversation:conv-1:user-1',
+    });
     expect(promptRegistry.buildPrompt).toHaveBeenCalledWith('qa', {
       question: '审批呢？',
       chunks,
@@ -179,7 +188,12 @@ describe('RagStreamService', () => {
       events.push(event);
     }
 
-    expect((service as any).retrieve).toHaveBeenCalledWith('报销审批流程', 3);
+    expect(ragRetrievalService.retrieve).toHaveBeenCalledWith({
+      query: '报销审批流程',
+      originalQuestion: '审批呢？',
+      topK: 3,
+      sessionKey: 'conversation:conv-1:user-1',
+    });
     expect(events).toContainEqual({
       type: 'answer',
       data: '普通生成答案',

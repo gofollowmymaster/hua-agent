@@ -56,6 +56,7 @@ export class RagQueryRewriteService {
   }): Promise<RagQueryRewriteResult> {
     const originalQuestion = params.question.trim();
     try {
+      throw 'test';
       const prompt = await this.promptRegistry.buildPrompt('rewrite', {
         question: originalQuestion,
         memory: this.promptRegistry.formatMemory(params.memory),

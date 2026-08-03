@@ -65,10 +65,11 @@ export class PromptRegistryService {
     const version = this.getActiveVersion(type);
     const template = this.loadTemplate(type, version);
     const prompt = PromptTemplate.fromTemplate(template.systemPrompt);
+
     const promptValue = await prompt.invoke({
       question: context.question,
       memory: context.memory,
-      context: this.formatContext(context.chunks),
+      context: context.chunks ? this.formatContext(context.chunks) : '',
       formatInstructions: context.formatInstructions ?? '',
     });
 

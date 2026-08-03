@@ -20,6 +20,8 @@ export class LoggerService {
   // 错误日志记录
 
   error(message: any, ctx?: any, meta?: Record<string, any>): Logger {
+    console.log('[ error message ] >', message);
+
     return this.logger.error({
       message,
       contextNmae: this.context,
@@ -31,6 +33,7 @@ export class LoggerService {
   // 警告日志记录
 
   warn(message: any, ctx?: any, meta?: Record<string, any>): Logger {
+    console.log('[ warn message ] >', message);
     return this.logger.warn({
       message: JSON.stringify(message),
       contextNmae: this.context,

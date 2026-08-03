@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
-import { ChatOpenAI, OpenAIEmbeddings } from '@langchain/openai';
+import { ChatOpenAI } from '@langchain/openai';
 import { NodeConfigService } from '@src/config/node-config.service';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import { LoggerService } from '@src/common/service/logger/logger.service';
@@ -20,8 +20,7 @@ import type {
  * RAG 问答抽象基类
  *
  * 提供所有 RAG 问答子类共享的能力：
- * - embeddings / model 初始化
- * - 向量检索 (retrieve)
+ * - model 初始化
  * - 引用来源构建 (buildSources)
  * - 工具方法 (assertQuestion / extractContentText / extractLatestUserQuestion)
  *
@@ -29,9 +28,7 @@ import type {
  * 子类构造函数需重复声明所有依赖（NestJS DI 限制）。
  */
 export abstract class RagBaseService {
-  protected readonly embeddings: OpenAIEmbeddings;
   protected readonly model: ChatOpenAI;
-  protected readonly defaultTopK: number;
 
   constructor(
     protected readonly ragPrisma: RagPrismaService,
@@ -42,18 +39,6 @@ export abstract class RagBaseService {
   ) {
     this.logger.setContext(this.constructor.name);
 
-    const ragConfig = NodeConfigService.get('vcHelper');
-    this.defaultTopK = ragConfig.defaultTopK;
-
-    this.embeddings = new OpenAIEmbeddings({
-      apiKey: NodeConfigService.get('embeddingsApiKey'),
-      model: NodeConfigService.get('embeddingsModelName'),
-      dimensions: NodeConfigService.get('embeddingsDimensions'),
-      configuration: {
-        baseURL: NodeConfigService.get('embeddingsBaseUrl'),
-      },
-    });
-
     this.model = new ChatOpenAI({
       temperature: 0,
       model: NodeConfigService.get('modelName'),
@@ -62,50 +47,6 @@ export abstract class RagBaseService {
         baseURL: NodeConfigService.get('openAiBaseUrl'),
       },
     });
-  }
-
-  /**
-   * PostgreSQL 向量余弦相似度检索
-   */
-  protected async retrieve(
-    question: string,
-    topK = this.defaultTopK,
-  ): Promise<RetrievedChunk[]> {
-    const tenantCode = this.tenantContext.tenant;
-    const limit = Math.min(Math.max(Number(topK) || this.defaultTopK, 1), 20);
-    const vector = await this.embeddings.embedQuery(question);
-    const rows = await this.ragPrisma.$queryRaw<any[]>`
-      SELECT c.id,
-             c.tenant_code,
-             c.document_id,
-             c.chunk_index,
-             c.content,
-             c.metadata,
-             d.file_name,
-             d.file_type,
-             d.source_path,
-             1 - (c.embedding <=> ${JSON.stringify(vector)}::vector) AS similarity
-      FROM aplus_chunks c
-      JOIN aplus_documents d ON d.id = c.document_id
-      WHERE c.embedding IS NOT NULL
-        AND c.tenant_code = ${tenantCode}
-        AND d.tenant_code = ${tenantCode}
-      ORDER BY c.embedding <=> ${JSON.stringify(vector)}::vector
-      LIMIT ${limit}
-    `;
-
-    return rows.map((row) => ({
-      id: String(row.id),
-      tenantCode: row.tenant_code,
-      documentId: String(row.document_id),
-      fileName: row.file_name,
-      fileType: row.file_type,
-      sourcePath: row.source_path,
-      chunkIndex: Number(row.chunk_index),
-      content: row.content,
-      metadata: row.metadata ?? {},
-      similarity: Number(row.similarity),
-    }));
   }
 
   /**

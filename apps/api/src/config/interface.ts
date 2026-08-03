@@ -13,6 +13,17 @@ export type RagConfig = {
   defaultTopK: number;
   /** RAG 提示词版本，如 'v1'、'v2'。默认为 'v1' */
   ragPromptVersion: string;
+  retrieval: RagRetrievalConfig;
+};
+
+export type RagRerankMode = 'none' | 'rule' | 'model';
+
+export type RagRetrievalConfig = {
+  vectorTopK: number;
+  keywordTopK: number;
+  fusionK: number;
+  rerankMode: RagRerankMode;
+  rerankTopN: number;
 };
 
 export type WecomRagBotConfig = {

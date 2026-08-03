@@ -8,6 +8,7 @@ import { RagMemoryService } from './rag-memory.service';
 import { PromptRegistryService } from '../../prompts/prompt.registry';
 import { RagBaseService } from './rag-base.service';
 import { RagQueryRewriteService } from './rag-query-rewrite.service';
+import { RagRetrievalService } from './rag-retrieval.service';
 import type {
   RagQueryOptions,
   RagStreamEvent,
@@ -32,6 +33,7 @@ export class RagStreamService extends RagBaseService {
     ragMemoryService: RagMemoryService,
     promptRegistry: PromptRegistryService,
     private readonly queryRewriteService: RagQueryRewriteService,
+    private readonly ragRetrievalService: RagRetrievalService,
   ) {
     super(ragPrisma, logger, tenantContext, ragMemoryService, promptRegistry);
   }
@@ -60,6 +62,7 @@ export class RagStreamService extends RagBaseService {
       session,
       topK: options.topK,
     });
+
     yield {
       type: 'status',
       data: {
@@ -69,7 +72,12 @@ export class RagStreamService extends RagBaseService {
         topK: options.topK,
       },
     };
-    const chunks = await this.retrieve(rewrite.rewrittenQuestion, options.topK);
+    const chunks = await this.ragRetrievalService.retrieve({
+      query: rewrite.rewrittenQuestion,
+      originalQuestion: question,
+      topK: options.topK,
+      sessionKey: session.sessionKey,
+    });
     yield {
       type: 'status',
       data: {

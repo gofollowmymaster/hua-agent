@@ -1,5 +1,20 @@
 CREATE EXTENSION IF NOT EXISTS vector;
 
+-- 启用 zhparser 中文分词扩展
+CREATE EXTENSION IF NOT EXISTS zhparser;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_ts_config WHERE cfgname = 'zhparser'
+  ) THEN
+    CREATE TEXT SEARCH CONFIGURATION zhparser (PARSER = zhparser);
+    ALTER TEXT SEARCH CONFIGURATION zhparser
+      ADD MAPPING FOR n,v,a,i,e,l,j WITH simple;
+  END IF;
+END
+$$;
+
 CREATE TABLE IF NOT EXISTS aplus_documents (
   id BIGSERIAL PRIMARY KEY,
   tenant_code TEXT NOT NULL,
@@ -45,6 +60,9 @@ CREATE INDEX IF NOT EXISTS idx_aplus_chunks_tenant_document
 
 CREATE INDEX IF NOT EXISTS idx_aplus_chunks_embedding
   ON aplus_chunks USING hnsw (embedding vector_cosine_ops);
+
+CREATE INDEX IF NOT EXISTS idx_aplus_chunks_content_fts
+  ON aplus_chunks USING gin (to_tsvector('zhparser', content));
 
 CREATE TABLE IF NOT EXISTS aplus_rag_sessions (
   id BIGSERIAL PRIMARY KEY,
