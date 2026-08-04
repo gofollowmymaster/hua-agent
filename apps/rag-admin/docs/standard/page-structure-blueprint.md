@@ -2,7 +2,7 @@
 
 ## 1. 适用范围
 
-本文档定义 RAG Admin 新增页面和复杂页面的目录标准。当前 `src/views/` 下的扁平 `PascalCase.vue` 页面属于存量页面，不要求兼容或迁移；只有实际改造这些页面、且拆分能降低复杂度时，才按本文档逐步迁移。
+本文档定义 RAG Admin 页面统一目录标准。当前页面已按 `views/<page>/index.vue` 组织；页面私有组件放页面同级 `components/`，跨页面稳定复用组件放 `views/components/`。
 
 本文档不负责顶层目录分层、历史兼容口径或 API 目录结构；这些内容由 `apps/rag-admin/AGENTS.md`、`module-design.md` 和 `api-client.md` 承接。
 
@@ -11,7 +11,7 @@
 新增单页复杂页面时，优先采用以下结构：
 
 ```text
-src/views/<Page>/
+src/views/<page>/
 ├── index.vue
 ├── hooks/
 │   └── use-xxx.ts
@@ -100,11 +100,11 @@ src/views/<Module>/
 - 路由 path：`kebab-case`。
 - 路由 name：`kebab-case` 或沿用同文件既有风格。
 
-## 7. 存量页面规则
+## 7. 页面迁移结果
 
-- 当前 `DocumentManager.vue`、`SessionRecords.vue`、`AssistantDemo.vue` 等扁平页面保持现状。
-- 不为了目录统一批量改写存量页面。
-- 存量页面新增复杂区块时，优先在页面同级目录拆 `components/`、`hooks/`、`sections/`，再把页面入口改为 `views/<Page>/index.vue`。
+- 存量扁平页面已迁移为 `views/<page>/index.vue` 目录结构。
+- 页面私有组件已下沉到对应页面 `components/`，跨页面稳定复用组件保留在 `views/components/`。
+- 文件、目录统一使用 `kebab-case`，不再创建扁平 `PascalCase.vue` 文件。
 
 ## 8. API 类型边界
 

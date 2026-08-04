@@ -25,9 +25,9 @@
 
 ## 文件命名
 
-- 页面组件文件使用 `PascalCase.vue`，例如 `DocumentManager.vue`、`SessionRecords.vue`。
-- 布局组件使用 `PascalCase.vue`，例如 `AdminLayout.vue`。
-- 页面域内子组件使用 `PascalCase.vue`，放在 `src/views/components/`。
+- 页面目录使用 `kebab-case`，页面入口统一为 `index.vue`，例如 `document-manager/index.vue`、`session-records/index.vue`。
+- 布局组件文件使用 `kebab-case.vue`，例如 `admin-layout.vue`。
+- 页面私有组件文件使用 `kebab-case.vue`，放在页面同级 `components/`；跨页面稳定复用组件放在 `src/views/components/`。
 - 普通 TypeScript 模块使用 `kebab-case.ts` 或沿用既有短语义命名，例如 `rag-admin.ts`、`http.ts`、`routes.ts`。
 - store 模块使用业务名命名，放在 `src/stores/modules/`，例如 `user.ts`。
 - 类型命名使用业务语义后缀，例如 `RagSessionItem`、`RagMessageItem`；避免 `Data`、`Info`、`Obj` 等空泛名称。

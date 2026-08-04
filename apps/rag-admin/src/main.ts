@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import App from './App.vue';
+import App from './app.vue';
 import { setupRouter } from './router';
 import { setupStore } from './stores';
 import '@aplus-frontend/antdv/dist/reset.css';

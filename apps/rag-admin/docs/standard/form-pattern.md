@@ -11,7 +11,7 @@
 新增表单页按 `page-structure-blueprint.md` 落地，推荐文件组织：
 
 ```text
-src/views/<Page>/
+src/views/<page>/
 ├── index.vue
 ├── hooks/
 │   └── use-form-handler.ts

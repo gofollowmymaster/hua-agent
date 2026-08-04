@@ -10,7 +10,9 @@
   >
     <div class="document-preview-viewport">
       <div v-if="loading" class="preview-state">文件加载中...</div>
-      <div v-else-if="errorText" class="preview-state error-text">{{ errorText }}</div>
+      <div v-else-if="errorText" class="preview-state error-text">
+        {{ errorText }}
+      </div>
       <OpenFileViewer
         v-else-if="previewFile"
         :file="previewFile"
@@ -31,7 +33,12 @@
 import { computed, ref } from 'vue';
 import { ApModal } from '@aplus-frontend/ui';
 import { OpenFileViewer } from '@open-file-viewer/vue';
-import { imagePlugin, officePlugin, pdfPlugin, textPlugin } from '@open-file-viewer/core';
+import {
+  imagePlugin,
+  officePlugin,
+  pdfPlugin,
+  textPlugin,
+} from '@open-file-viewer/core';
 import '@open-file-viewer/core/style.css';
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.mjs?url';
 import { getDocumentPreviewFile } from '@/api/rag-admin';

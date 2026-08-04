@@ -103,7 +103,7 @@ description: 根据需求文档、UI设计图和接口代码，在 RAG Admin（a
    - 优先同 app、同业务域；其次参考 `@aplus-frontend/ui` 的 API 和 demo。
 
 5. **实现与接线**
-   - 按 `page-structure-blueprint.md` 决定目录结构；新增复杂页面使用 `apps/rag-admin/src/views/<Page>/index.vue`，存量扁平页面不迁移。
+   - 按 `page-structure-blueprint.md` 决定目录结构；页面统一使用 `apps/rag-admin/src/views/<page>/index.vue`，文件、目录统一使用 `kebab-case`。
    - API 接线优先复用 `apps/rag-admin/src/api/` 和 `http.ts` 封装；缺接口、字段或签名时记录“待接口补齐”，不手工拼接 URL。
    - 列表页操作列使用 `valueType: 'action'` 和 `fieldProps.actions`，不用 `customRender` 手写按钮组。
    - 涉及行为、接口契约或 shared 类型变化时，同步检查后端 DTO、Controller、Service 和共享类型，并按 OpenSpec 流程处理。
@@ -124,7 +124,7 @@ description: 根据需求文档、UI设计图和接口代码，在 RAG Admin（a
 ### 列表页分支
 
 - 触发特征：搜索 + 表格 + 分页 + 批量操作 / 导出 / 多 Tab。
-- 组件签名：`AgGrid + usePageListAgGrid`；顶部操作用 `#title` 插槽和 `ApButton`/`Space`，按当前 `DocumentManager.vue` 模式。
+- 组件签名：`AgGrid + usePageListAgGrid`；顶部操作用 `#title` 插槽和 `ApButton`/`Space`，按当前 `document-manager/index.vue` 模式。
 - 操作列使用 `valueType: 'action'` 和 `fieldProps.actions`。
 - 按 `table-pattern.md` 落地。
 

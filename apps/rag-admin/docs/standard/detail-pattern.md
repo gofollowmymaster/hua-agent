@@ -18,7 +18,7 @@
 推荐文件组织：
 
 ```text
-src/views/<Page>/
+src/views/<page>/
 ├── index.vue
 ├── schema.ts
 ├── hooks/
@@ -46,11 +46,10 @@ src/views/<Page>/
 
 当前项目暂无独立详情页。可参考以下只读展示能力：
 
-- `src/views/components/DocumentPreviewModal.vue`：只读预览弹窗。
-- `src/views/components/DocumentChunkDrawer.vue`：只读抽屉 + 分页列表。
-- `src/views/SessionRecords.vue`：列表 + 右侧详情卡片。
+- `src/views/document-manager/components/document-chunk-drawer.vue`：只读抽屉 + 分页列表。
+- `src/views/session-records/index.vue`：列表 + 右侧详情卡片。
 
-新增详情页按蓝图目录落地，不要求现有组件目录结构变更。
+新增详情页按蓝图目录落地。
 
 ## 常见错误
 

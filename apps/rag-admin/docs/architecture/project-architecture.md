@@ -6,17 +6,17 @@
 
 前端入口位于 `apps/rag-admin/src/main.ts`。应用启动时创建 Vue app，注册路由、状态管理、全局样式和 UI 相关能力，然后挂载到页面根节点。
 
-`App.vue` 是前端根组件，路由页面通过 Vue Router 渲染。当前路由使用 hash 模式，适配由 API app 静态资源目录提供的访问方式。
+`app.vue` 是前端根组件，路由页面通过 Vue Router 渲染。当前路由使用 hash 模式，适配由 API app 静态资源目录提供的访问方式。
 
 ## 页面结构
 
 当前主要页面包括：
 
-- `DocumentManager.vue`：RAG 文档管理。
-- `SessionRecords.vue`：会话与消息记录查看。
-- `AssistantDemo.vue`：助手演示页面。
+- `document-manager/index.vue`：RAG 文档管理。
+- `session-records/index.vue`：会话与消息记录查看。
+- `assistant-demo/index.vue`：助手演示页面。
 
-页面私有复用组件位于 `src/views/components/`，例如文档片段抽屉和文档预览弹窗。后台布局位于 `src/layouts/AdminLayout.vue`，路由定义位于 `src/router/`。
+页面私有组件位于对应页面目录的 `components/`，跨页面复用组件位于 `src/views/components/`，例如文档预览弹窗。后台布局位于 `src/layouts/admin-layout.vue`，路由定义位于 `src/router/`。
 
 ## 状态与请求
 

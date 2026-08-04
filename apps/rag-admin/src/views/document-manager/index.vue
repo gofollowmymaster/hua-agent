@@ -80,9 +80,9 @@ import {
   updateDocumentMetadata,
   type RagDocumentItem,
 } from '@/api/rag-admin';
-import DocumentChunkDrawer from './components/DocumentChunkDrawer.vue';
-import DocumentPreviewModal from './components/DocumentPreviewModal.vue';
-import DocumentUploadModal from './components/DocumentUploadModal.vue';
+import DocumentChunkDrawer from './components/document-chunk-drawer.vue';
+import DocumentPreviewModal from '@/components/document-preview-modal.vue';
+import DocumentUploadModal from './components/document-upload-modal.vue';
 
 const ingesting = ref(false);
 const metadataModalOpen = ref(false);

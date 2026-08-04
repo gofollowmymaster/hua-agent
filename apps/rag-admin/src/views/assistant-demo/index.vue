@@ -132,42 +132,29 @@
 </template>
 
 <script setup lang="ts">
-import dayjs from 'dayjs';
 import { computed, nextTick, onMounted, ref, shallowRef, watch } from 'vue';
-import { Chat } from '@ai-sdk/vue';
-import { DefaultChatTransport, type UIMessage } from 'ai';
 import { ApButton } from '@aplus-frontend/ui';
 import { MdPreview } from 'md-editor-v3';
 import 'md-editor-v3/lib/preview.css';
-import { getToken } from '@/auth/token';
 import {
   listSessionMessages,
   pageSessions,
-  type RagMessageItem,
   type RagSessionItem,
 } from '@/api/rag-admin';
 import { useUserStore } from '@/stores/modules/user';
-import AssistantComposer from './components/AssistantComposer.vue';
-import AssistantReasoning from './components/AssistantReasoning.vue';
-import DocumentPreviewModal from './components/DocumentPreviewModal.vue';
-
-interface RagStatusData {
-  stage?: string;
-  message?: string;
-  chunks?: number;
-}
-
-interface RagAssistantDataParts {
-  status: RagStatusData;
-  [key: string]: unknown;
-}
-
-type RagAssistantMessage = UIMessage<unknown, RagAssistantDataParts>;
-interface PreviewDocumentItem {
-  id: string | number;
-  fileName: string;
-  fileType: string;
-}
+import {
+  createChatSession,
+  createLocalChatId,
+  formatStatus,
+  formatTime,
+  resolvePreviewDocument,
+  toUiMessages,
+  type PreviewDocumentItem,
+  type RagAssistantMessage,
+} from './hooks/use-chat';
+import AssistantComposer from './components/assistant-composer.vue';
+import AssistantReasoning from './components/assistant-reasoning.vue';
+import DocumentPreviewModal from '@/components/document-preview-modal.vue';
 
 const HISTORY_PAGE_SIZE = 20;
 
@@ -181,15 +168,16 @@ const historyLoading = ref(false);
 const messageLoading = ref(false);
 const stopping = ref(false);
 const currentChatId = ref(createLocalChatId());
-const chat = shallowRef(createChat(currentChatId.value));
-let stopPromise: Promise<void> | null = null;
-
 const participantId = computed(
   () =>
     userStore.userInfo.userId ||
     userStore.userInfo.email ||
     userStore.displayName,
 );
+const chat = shallowRef(
+  createChatSession(currentChatId.value, participantId.value),
+);
+let stopPromise: Promise<void> | null = null;
 const messages = computed(() => chat.value.messages);
 const status = computed(() => chat.value.status);
 const error = computed(() => chat.value.error);
@@ -245,7 +233,7 @@ async function selectSession(session: RagSessionItem) {
 
   selectedSessionId.value = String(session.id);
   currentChatId.value = session.conversationId || createLocalChatId();
-  const nextChat = createChat(currentChatId.value);
+  const nextChat = createChatSession(currentChatId.value, participantId.value);
   messageLoading.value = true;
 
   try {
@@ -302,46 +290,12 @@ async function startNewSession() {
 
   selectedSessionId.value = '';
   currentChatId.value = createLocalChatId();
-  chat.value = createChat(currentChatId.value);
+  chat.value = createChatSession(currentChatId.value, participantId.value);
   input.value = '';
 }
 
 function clearError() {
   chat.value.clearError();
-}
-
-function createChat(id: string) {
-  return new Chat<RagAssistantMessage>({
-    id,
-    transport: new DefaultChatTransport({
-      api: '/ai/rag/chat',
-      headers: () => {
-        const token = userStore.token || getToken();
-        const headers: Record<string, string> = {};
-        if (token) {
-          headers.Authorization = `Bearer ${token}`;
-        }
-        return headers;
-      },
-      body: () => ({
-        participantId: participantId.value,
-      }),
-    }),
-  });
-}
-
-function toUiMessages(
-  historyMessages: RagMessageItem[],
-): RagAssistantMessage[] {
-  return historyMessages
-    .filter(
-      (message) => message.role === 'user' || message.role === 'assistant',
-    )
-    .map((message) => ({
-      id: String(message.id),
-      role: message.role as 'user' | 'assistant',
-      parts: [{ type: 'text', text: message.content }],
-    }));
 }
 
 function syncSelectedSession() {
@@ -351,24 +305,6 @@ function syncSelectedSession() {
   selectedSessionId.value = matched
     ? String(matched.id)
     : selectedSessionId.value;
-}
-
-function createLocalChatId() {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return crypto.randomUUID();
-  }
-
-  return `rag-chat-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-}
-
-function formatStatus(data: unknown) {
-  if (!data || typeof data !== 'object') return '状态更新';
-
-  const statusData = data as RagStatusData;
-  if (statusData.chunks != null) {
-    return `${statusData.message || '状态更新'} · ${statusData.chunks} 个片段`;
-  }
-  return statusData.message || statusData.stage || '状态更新';
 }
 
 function handleMarkdownClick(event: MouseEvent) {
@@ -383,29 +319,6 @@ function handleMarkdownClick(event: MouseEvent) {
 
   event.preventDefault();
   previewModalRef.value?.show(previewItem);
-}
-
-function resolvePreviewDocument(segment: { href: string; label: string }) {
-  const match = segment.href.match(
-    /^\/ai\/rag\/admin\/documents\/([^/]+)\/preview$/,
-  );
-  if (!match) return null;
-
-  const fileName = segment.label.trim() || '引用文件';
-  return {
-    id: decodeURIComponent(match[1]),
-    fileName,
-    fileType: inferFileType(fileName),
-  } satisfies PreviewDocumentItem;
-}
-
-function inferFileType(fileName: string) {
-  const extension = fileName.split('.').pop()?.toLowerCase();
-  return extension && extension !== fileName.toLowerCase() ? extension : '';
-}
-
-function formatTime(value?: string) {
-  return value ? dayjs(value).format('MM-DD HH:mm') : '-';
 }
 
 watch(

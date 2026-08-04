@@ -8,7 +8,7 @@
 - 路由实例和全局守卫维护在 `src/router/index.ts`。
 - 当前前端使用 hash 路由，避免 API 静态资源服务下刷新路径失效。
 - 新增路由时确认页面标题、布局、鉴权要求和默认跳转行为。
-- 路由 `name` 使用稳定语义化名称，优先 `camelCase` 或同文件既有风格；页面组件文件使用 `PascalCase.vue`。
+- 路由 `name` 使用稳定语义化名称，优先 `camelCase` 或同文件既有风格；页面组件文件使用 `kebab-case.vue`。
 - 路由 path 使用短横线 kebab-case，避免拼音、无意义缩写或过深层级。
 
 ## 状态管理

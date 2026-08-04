@@ -1,5 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router';
-import AdminLayout from '@/layouts/AdminLayout.vue';
+import AdminLayout from '@/layouts/admin-layout.vue';
 
 export const adminMenus = [
   {
@@ -28,7 +28,7 @@ export const routes: RouteRecordRaw[] = [
       {
         path: 'documents',
         name: 'documents',
-        component: () => import('@/views/DocumentManager.vue'),
+        component: () => import('@/views/document-manager/index.vue'),
         meta: {
           title: '文档管理',
           menuTitle: '文档管理',
@@ -37,7 +37,7 @@ export const routes: RouteRecordRaw[] = [
       {
         path: 'sessions',
         name: 'sessions',
-        component: () => import('@/views/SessionRecords.vue'),
+        component: () => import('@/views/session-records/index.vue'),
         meta: {
           title: '消息对话记录',
           menuTitle: '消息对话记录',
@@ -46,7 +46,7 @@ export const routes: RouteRecordRaw[] = [
       {
         path: 'assistant',
         name: 'assistant',
-        component: () => import('@/views/AssistantDemo.vue'),
+        component: () => import('@/views/assistant-demo/index.vue'),
         meta: {
           title: '问答助手',
           menuTitle: '问答助手',

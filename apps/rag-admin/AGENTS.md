@@ -85,7 +85,7 @@ pnpm admin:preview
 ## 目录边界
 
 - `src/main.ts`：Vue app 入口。
-- `src/App.vue`：根组件。
+- `src/app.vue`：根组件。
 - `src/api/`：axios 实例和业务 API 方法。
 - `src/auth/`：登录中心、token cookie 和鉴权相关逻辑。
 - `src/layouts/`：布局组件。
@@ -93,7 +93,7 @@ pnpm admin:preview
 - `src/stores/`：Pinia store。
 - `src/styles/`：全局样式。
 - `src/views/`：页面级组件。
-- `src/views/<Page>/index.vue`：新增复杂页面目录结构，存量扁平 `PascalCase.vue` 页面保持现状。
+- `src/views/<page>/index.vue`：页面统一入口目录结构，页面私有逻辑放同级 `hooks/`、`components/`、`sections/`。
 
 页面组件不直接创建 axios 实例，不手动拼接 `Authorization`，不直接引用 `apps/api/src` 内部路径。
 
@@ -103,7 +103,7 @@ pnpm admin:preview
 - 编写或改造 aplus-ui 组件前先查询组件 API 和示例，不凭记忆猜 props；必要时使用 `aplus info <Component> --format json`、`aplus demo <Component> ... --format json`。
 - 只有 aplus-ui 没有合适能力、现有业务封装已覆盖，或有明确技术原因时，才使用 `@aplus-frontend/antdv`、原生控件或新增自定义封装，并在代码/交付说明中说明取舍。
 - 页面级组件放 `src/views/`，跨页面布局放 `src/layouts/`。
-- 新增复杂页面优先按 `docs/standard/page-structure-blueprint.md` 使用 `src/views/<Page>/index.vue`，页面私有逻辑放同级 `hooks/`、`components/`、`sections/`。
+- 页面统一按 `docs/standard/page-structure-blueprint.md` 使用 `src/views/<page>/index.vue`，页面私有逻辑放同级 `hooks/`、`components/`、`sections/`。
 - 跨页面稳定复用组件放 `src/views/components/`。
 - 请求统一封装到 `src/api/`，复用 `src/api/http.ts`。
 - token 读写统一通过 `src/auth/token.ts`，登录流程集中在 `src/auth/` 或路由守卫。

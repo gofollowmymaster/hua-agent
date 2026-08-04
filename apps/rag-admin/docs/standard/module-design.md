@@ -12,17 +12,16 @@
 - `stores/modules/`：按业务拆分 store 模块。
 - `styles/`：全局样式。
 - `views/`：页面级组件。
-- `views/components/`：页面域内复用组件。当前用于文档片段抽屉、文档预览弹窗等页面相关组件。
+- `views/components/`：跨页面稳定复用组件。当前用于文档预览弹窗等页面相关组件；页面私有组件位于对应页面 `components/`。
 
 ## 新增页面
 
 新增页面时：
 
-- 新增复杂页面优先放入 `views/<Page>/index.vue`，并按 `page-structure-blueprint.md` 组织同级 `hooks/`、`components/`、`sections/`。
-- 当前扁平的 `PascalCase.vue` 页面属于存量页面，不要求迁移；存量页面新增复杂区块时按同一拆分规则处理。
-- 跨页面稳定复用组件继续放 `views/components/`。
+- 页面统一放入 `views/<page>/index.vue`，并按 `page-structure-blueprint.md` 组织同级 `hooks/`、`components/`、`sections/`。
+- 页面私有组件放入页面 `components/`，跨页面稳定复用组件放入 `views/components/`。
 - 路由配置放入 `router/routes.ts`。
-- 需要统一布局时复用 `AdminLayout.vue` 或既有布局。
+- 需要统一布局时复用 `admin-layout.vue` 或既有布局。
 - 页面中的表格、表单、详情、弹窗、抽屉等后台标准交互优先使用 `@aplus-frontend/ui` 或基于 aplus-ui 的既有封装。
 - 页面调用 `api/` 中的业务方法，不直接散写 axios 请求。
 - 页面负责组合组件和编排局部状态，不承载多个独立业务职责。
@@ -32,9 +31,9 @@
 
 新增组件时：
 
-- 页面私有或页面域内复用组件放入 `views/components/`。
+- 页面私有组件放入页面 `components/`；跨页面稳定复用组件放入 `views/components/`。
 - 跨页面稳定复用后，再考虑新增更通用的组件目录；新增前必须确认真实复用需求。
-- 组件文件使用 `PascalCase.vue`。
+- 组件文件使用 `kebab-case.vue`。
 - 新增业务组件优先组合 aplus-ui 成熟组件；只有 aplus-ui 不满足职责时才从更底层控件实现。
 - 组件只负责一个明确展示或交互职责，例如一个抽屉、一个预览弹窗、一个筛选区域。
 - 子组件通过 props/emits 与页面协作，不直接绕过页面调用无关 store 或路由逻辑。
