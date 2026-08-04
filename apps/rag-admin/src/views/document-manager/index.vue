@@ -29,7 +29,6 @@
     </div>
 
     <DocumentPreviewModal ref="previewModalRef" />
-    <DocumentChunkDrawer ref="chunkDrawerRef" />
     <DocumentUploadModal ref="uploadModalRef" @uploaded="refresh" />
     <ApModal
       v-model:open="metadataModalOpen"
@@ -80,9 +79,10 @@ import {
   updateDocumentMetadata,
   type RagDocumentItem,
 } from '@/api/rag-admin';
-import DocumentChunkDrawer from './components/document-chunk-drawer.vue';
+import DocumentChunkPanel from './components/document-chunk-panel.vue';
 import DocumentPreviewModal from '@/components/document-preview-modal.vue';
 import DocumentUploadModal from './components/document-upload-modal.vue';
+import { useLayoutDrawerStore } from '@/stores/modules/layout-drawer';
 
 const ingesting = ref(false);
 const metadataModalOpen = ref(false);
@@ -92,8 +92,8 @@ const metadataForm = ref({
   type: '',
   tag: '',
 });
+const layoutDrawerStore = useLayoutDrawerStore();
 const previewModalRef = ref<InstanceType<typeof DocumentPreviewModal>>();
-const chunkDrawerRef = ref<InstanceType<typeof DocumentChunkDrawer>>();
 const uploadModalRef = ref<InstanceType<typeof DocumentUploadModal>>();
 const statusValueEnum = {
   ready: { text: 'ready', color: '#12b76a' },
@@ -223,7 +223,13 @@ const columns: AgGridColumnType<RagDocumentItem>[] = [
           },
           {
             text: '切片实况',
-            onClick: () => chunkDrawerRef.value?.show(record),
+            onClick: () =>
+              layoutDrawerStore.open({
+                component: DocumentChunkPanel,
+                data: {
+                  documentItem: record,
+                },
+              }),
           },
           {
             text: '删除',

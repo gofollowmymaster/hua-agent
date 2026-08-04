@@ -44,6 +44,7 @@
           </div>
           <RouterView v-else />
         </Spin>
+        <LayoutDrawer :width="'80%'" />
       </LayoutContent>
     </Layout>
   </Layout>
@@ -65,6 +66,7 @@ import {
   type MenuProps,
 } from '@aplus-frontend/antdv';
 import { ApButton } from '@aplus-frontend/ui';
+import LayoutDrawer from '@/layouts/layout-drawer.vue';
 import { adminMenus } from '@/router/routes';
 import { useUserStore } from '@/stores/modules/user';
 

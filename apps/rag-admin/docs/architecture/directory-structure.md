@@ -17,13 +17,15 @@
 - `api/`：axios 实例和业务 API 封装。
 - `auth/`：登录中心、token cookie 和鉴权相关前端逻辑。
 - `layouts/`：后台布局组件。
+- `layouts/layout-drawer.vue`：全局详情抽屉容器。
 - `router/`：路由实例和路由表。
 - `stores/`：Pinia store 入口和模块。
 - `stores/modules/`：按业务拆分的 Pinia store 模块。
+- `stores/modules/layout-drawer.ts`：全局抽屉状态 store。
 - `styles/`：全局样式。
 - `views/`：页面目录，页面入口统一为 `views/<page>/index.vue`。
 - `views/<page>/components/`：页面私有组件，例如文档片段抽屉、上传弹窗等。
-- `views/components/`：跨页面稳定复用组件，例如文档预览弹窗。
+- `components/`：跨页面稳定复用组件，例如文档预览弹窗。
 - `env.d.ts`：Vite/TypeScript 环境类型声明。
 
 ## 新增页面
@@ -31,7 +33,7 @@
 新增页面时：
 
 - 页面统一放入 `views/<page>/index.vue`，并按 `page-structure-blueprint.md` 组织同级 `hooks/`、`components/`、`sections/`。
-- 页面私有组件放入页面 `components/`，跨页面稳定复用组件放入 `views/components/`。
+- 页面私有组件放入页面 `components/`，跨页面稳定复用组件放入 `components/`。
 - 路由配置放入 `router/routes.ts`。
 - 需要统一布局时复用 `admin-layout.vue` 或既有布局。
 - 页面中的表格、表单、详情、弹窗、抽屉等后台标准交互优先使用 `@aplus-frontend/ui` 或基于 aplus-ui 的既有封装。
@@ -43,7 +45,7 @@
 
 新增组件时：
 
-- 页面私有组件放入页面 `components/`；跨页面稳定复用组件放入 `views/components/`。
+- 页面私有组件放入页面 `components/`；跨页面稳定复用组件放入 `components/`。
 - 跨页面稳定复用后，再考虑新增更通用的组件目录；新增前必须确认真实复用需求。
 - 组件文件使用 `kebab-case.vue`。
 - 新增业务组件优先组合 aplus-ui 成熟组件；只有 aplus-ui 不满足职责时才从更底层控件实现。

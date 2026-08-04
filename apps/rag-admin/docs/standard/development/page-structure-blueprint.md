@@ -2,7 +2,7 @@
 
 ## 1. 适用范围
 
-本文档定义 RAG Admin 页面统一目录标准。当前页面已按 `views/<page>/index.vue` 组织；页面私有组件放页面同级 `components/`，跨页面稳定复用组件放 `views/components/`。
+本文档定义 RAG Admin 页面统一目录标准。当前页面已按 `views/<page>/index.vue` 组织；页面私有组件放页面同级 `components/`，跨页面稳定复用组件放 `components/`。
 
 本文档不负责顶层目录分层、历史兼容口径或 API 目录结构；这些内容由 `apps/rag-admin/AGENTS.md`、`../../architecture/directory-structure.md` 和 `../../architecture/auth-and-api-client.md` 承接。
 
@@ -67,7 +67,7 @@ src/views/<Module>/
 
 ## 4. 跨页面复用边界
 
-- 跨页面稳定复用组件继续放在 `src/views/components/`。
+- 跨页面稳定复用组件继续放在 `src/components/`。
 - 页面私有实现不得反向污染模块公共层或其他页面。
 - 禁止页面之间直接引用彼此私有 `hooks/`、`components/` 或 `sections/`。
 - API 类型和请求封装继续放在 `src/api/`，页面不自行创建 axios 实例。
@@ -103,7 +103,7 @@ src/views/<Module>/
 ## 7. 页面迁移结果
 
 - 存量扁平页面已迁移为 `views/<page>/index.vue` 目录结构。
-- 页面私有组件已下沉到对应页面 `components/`，跨页面稳定复用组件保留在 `views/components/`。
+- 页面私有组件已下沉到对应页面 `components/`，跨页面稳定复用组件保留在 `src/components/`。
 - 文件、目录统一使用 `kebab-case`，不再创建扁平 `PascalCase.vue` 文件。
 
 ## 8. API 类型边界

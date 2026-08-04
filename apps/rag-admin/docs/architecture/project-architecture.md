@@ -16,7 +16,7 @@
 - `session-records/index.vue`：会话与消息记录查看。
 - `assistant-demo/index.vue`：助手演示页面。
 
-页面私有组件位于对应页面目录的 `components/`，跨页面复用组件位于 `src/views/components/`，例如文档预览弹窗。后台布局位于 `src/layouts/admin-layout.vue`，路由定义位于 `src/router/`。
+页面私有组件位于对应页面目录的 `components/`，跨页面复用组件位于 `src/components/`，例如文档预览弹窗。后台布局位于 `src/layouts/admin-layout.vue`，全局抽屉容器位于 `src/layouts/layout-drawer.vue`，路由定义位于 `src/router/`。
 
 ## 状态与请求
 

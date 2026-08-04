@@ -1,11 +1,5 @@
 <template>
-  <ApDrawer
-    v-model:open="open"
-    title="切片实况"
-    width="720"
-    destroy-on-close
-    @close="close"
-  >
+  <section class="chunk-panel">
     <template v-if="documentItem">
       <section class="chunk-summary">
         <div>
@@ -21,6 +15,7 @@
             :text="`${documentItem.actualChunkCount ?? documentItem.chunkCount ?? 0} 个切片`"
             color="#1677ff"
           />
+          <ApButton type="text" @click="close">关闭</ApButton>
         </Space>
       </section>
 
@@ -68,46 +63,53 @@
         @change="changePage"
       />
     </template>
-  </ApDrawer>
+  </section>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import dayjs from 'dayjs';
 import { Alert, Empty, Pagination, Space, Spin } from '@aplus-frontend/antdv';
-import { ApDrawer, ApTag } from '@aplus-frontend/ui';
+import { ApButton, ApTag } from '@aplus-frontend/ui';
 import {
   pageDocumentChunks,
   type RagDocumentChunkItem,
   type RagDocumentItem,
 } from '@/api/rag-admin';
+import { useLayoutDrawerStore } from '@/stores/modules/layout-drawer';
 
-const open = ref(false);
+const props = defineProps<{
+  documentItem: RagDocumentItem;
+}>();
+
+const layoutDrawerStore = useLayoutDrawerStore();
 const loading = ref(false);
 const errorText = ref('');
-const documentItem = ref<RagDocumentItem | null>(null);
 const chunks = ref<RagDocumentChunkItem[]>([]);
 const expandedChunkKeys = ref<Set<string>>(new Set());
 const page = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
 
-async function show(item: RagDocumentItem) {
-  open.value = true;
-  documentItem.value = item;
-  page.value = 1;
-  chunks.value = [];
-  expandedChunkKeys.value = new Set();
-  await loadChunks();
-}
+watch(
+  () => props.documentItem.id,
+  () => {
+    page.value = 1;
+    chunks.value = [];
+    expandedChunkKeys.value = new Set();
+    total.value = 0;
+    void loadChunks();
+  },
+  {
+    immediate: true,
+  },
+);
 
 async function loadChunks() {
-  if (!documentItem.value) return;
-
   loading.value = true;
   errorText.value = '';
   try {
-    const result = await pageDocumentChunks(documentItem.value.id, {
+    const result = await pageDocumentChunks(props.documentItem.id, {
       page: page.value,
       pageSize: pageSize.value,
     });
@@ -132,11 +134,7 @@ function changePage(nextPage: number) {
 }
 
 function close() {
-  documentItem.value = null;
-  chunks.value = [];
-  expandedChunkKeys.value = new Set();
-  errorText.value = '';
-  total.value = 0;
+  layoutDrawerStore.setVisible(false);
 }
 
 function getChunkKey(chunk: RagDocumentChunkItem) {
@@ -167,11 +165,13 @@ function formatTime(value?: string) {
 function formatMetadata(value: Record<string, unknown>) {
   return JSON.stringify(value || {}, null, 2);
 }
-
-defineExpose({ show });
 </script>
 
 <style scoped>
+.chunk-panel {
+  padding: 20px;
+}
+
 .chunk-summary {
   display: flex;
   align-items: flex-start;

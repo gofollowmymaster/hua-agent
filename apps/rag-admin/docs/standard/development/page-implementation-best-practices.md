@@ -8,7 +8,7 @@
 
 - 优先使用项目既有全局组件和 `@aplus-frontend/ui` 组件，避免使用原生 HTML 或 `@aplus-frontend/antdv` 组件重复实现已有业务能力。
 - 使用 `@aplus-frontend/ui` 前必须按 `aplus-ui` skill 查询组件 API / demo，不凭记忆猜 props。
-- 可复用业务能力优先沉淀到 `src/views/components/` 或模块 `components/`，页面私有展示区块放到页面 `sections/`。
+- 可复用业务能力优先沉淀到 `src/components/` 或模块 `components/`，页面私有展示区块放到页面 `sections/`。
 
 ## Hooks 与 utils
 
@@ -78,6 +78,7 @@
 ## 弹框
 
 - 普通确认、提示、表单、内容展示等弹框优先使用 `ApModal`，避免直接使用 `@aplus-frontend/antdv` 的 `Modal` 或手写弹框结构。
+- 路由级详情抽屉统一使用全局 `LayoutDrawer`（`src/layouts/layout-drawer.vue`）和 `useLayoutDrawerStore`，页面只通过 `layoutDrawerStore.open()` 打开，不再维护页面私有 `Drawer`。
 - 表格弹框使用 `useAgGridModal`，表格选择弹框使用 `useAgGridSelectModal`，避免用 `ApModal` + `AgGrid` 手写重复的弹框表格能力。
 - 表格选择弹框默认宽度设置为 `1200`，除非业务场景明确需要更窄或更宽的弹框。
 - 简单弹窗统一使用 `ApModal.*` 静态方法；复杂弹窗流使用 `ApModal.createModalStream`，整体封装为独立 section 或 component。
