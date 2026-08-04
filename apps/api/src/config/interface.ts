@@ -59,6 +59,7 @@ export type GlobalConfigType = {
   openAiApiKey: string;
   openAiBaseUrl?: string;
   modelName: string;
+  queryRewriteModelName: string;
   embeddingsApiKey: string;
   embeddingsBaseUrl?: string;
   embeddingsModelName: string;

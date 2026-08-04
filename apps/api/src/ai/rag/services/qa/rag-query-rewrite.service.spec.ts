@@ -1,4 +1,5 @@
 import { RagQueryRewriteService } from './rag-query-rewrite.service';
+import { ChatOpenAI } from '@langchain/openai';
 import type {
   RagMemoryMessage,
   RagResolvedSession,
@@ -17,6 +18,7 @@ jest.mock('@src/config/node-config.service', () => ({
     get: jest.fn((key: string) => {
       const values: Record<string, unknown> = {
         modelName: 'qwen-plus',
+        queryRewriteModelName: 'qwen-turbo',
         openAiApiKey: 'test-key',
         openAiBaseUrl: 'https://openai.test',
       };
@@ -78,7 +80,7 @@ describe('RagQueryRewriteService', () => {
     ];
   });
 
-  it('keeps query rewrite disabled and falls back to the original question', async () => {
+  it('uses the dedicated model and returns the parsed rewrite', async () => {
     mockModelInvoke.mockResolvedValue({
       content: JSON.stringify({
         rewrittenQuestion: '费用报销审批流程',
@@ -88,29 +90,37 @@ describe('RagQueryRewriteService', () => {
 
     const result = await service.rewrite({
       question: '审批呢？',
-      memory: [],
+      memory,
       session,
       topK: 5,
     });
 
     expect(result).toEqual({
       originalQuestion: '审批呢？',
-      rewrittenQuestion: '审批呢？',
-      usedRewrite: false,
-      rewriteReason: '查询改写模型调用失败，回退原问题',
-      fallbackReason: 'test',
+      rewrittenQuestion: '费用报销审批流程',
+      usedRewrite: true,
+      rewriteReason: '补全连续追问中的费用报销对象',
     });
-    expect(promptRegistry.formatMemory).not.toHaveBeenCalled();
-    expect(promptRegistry.buildPrompt).not.toHaveBeenCalled();
-    expect(mockModelInvoke).not.toHaveBeenCalled();
+    expect(ChatOpenAI).toHaveBeenCalledWith({
+      temperature: 0,
+      model: 'qwen-turbo',
+      apiKey: 'test-key',
+      configuration: { baseURL: 'https://openai.test' },
+    });
+    expect(promptRegistry.formatMemory).toHaveBeenCalledWith(memory);
+    expect(promptRegistry.buildPrompt).toHaveBeenCalledWith('rewrite', {
+      question: '审批呢？',
+      memory: 'formatted memory',
+      formatInstructions: expect.any(String),
+    });
+    expect(mockModelInvoke).toHaveBeenCalledWith('rewrite prompt');
     expect(logger.info).toHaveBeenCalledWith(
       'RAG query rewrite completed',
       undefined,
       expect.objectContaining({
         tenantCode: 'aplus',
         sessionKey: 'conversation:conv-1:user-1',
-        usedRewrite: false,
-        fallbackReason: 'test',
+        usedRewrite: true,
       }),
     );
     const logMeta = logger.info.mock.calls[0][2];
@@ -118,7 +128,9 @@ describe('RagQueryRewriteService', () => {
     expect(logMeta).not.toHaveProperty('rewrittenQuestion');
   });
 
-  it('normalizes the original question while rewrite remains disabled', async () => {
+  it('falls back to the normalized original question when the model fails', async () => {
+    mockModelInvoke.mockRejectedValue(new Error('model unavailable'));
+
     const result = await service.rewrite({
       question: '  这个呢？  ',
       memory,
@@ -130,7 +142,7 @@ describe('RagQueryRewriteService', () => {
       rewrittenQuestion: '这个呢？',
       usedRewrite: false,
       rewriteReason: '查询改写模型调用失败，回退原问题',
-      fallbackReason: 'test',
+      fallbackReason: 'model unavailable',
     });
   });
 });

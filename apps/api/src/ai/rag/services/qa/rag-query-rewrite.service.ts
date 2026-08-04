@@ -40,7 +40,7 @@ export class RagQueryRewriteService {
     this.logger.setContext(RagQueryRewriteService.name);
     this.model = new ChatOpenAI({
       temperature: 0,
-      model: NodeConfigService.get('modelName'),
+      model: NodeConfigService.get('queryRewriteModelName'),
       apiKey: NodeConfigService.get('openAiApiKey'),
       configuration: {
         baseURL: NodeConfigService.get('openAiBaseUrl'),

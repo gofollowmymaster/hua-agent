@@ -38,6 +38,7 @@ const globalConfig: GlobalConfigType = Object.freeze({
   openAiApiKey,
   openAiBaseUrl: process.env.OPENAI_BASE_URL,
   modelName: process.env.MODEL_NAME ?? 'qwen-plus',
+  queryRewriteModelName: process.env.RAG_QUERY_REWRITE_MODEL || 'qwen-turbo',
   embeddingsApiKey,
   embeddingsBaseUrl:
     process.env.EMBEDDINGS_BASE_URL ?? process.env.OPENAI_BASE_URL,
