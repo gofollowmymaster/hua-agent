@@ -1,10 +1,13 @@
 import { RagService } from './rag.service';
 
+jest.mock('ai', () => ({
+  createUIMessageStream: jest.fn((config) => config),
+}));
+
 describe('RagService (Facade)', () => {
   let mockQueryService: {
     answerQuestion: jest.Mock;
     streamAnswer: jest.Mock;
-    createChatStream: jest.Mock;
   };
 
   beforeEach(() => {
@@ -18,7 +21,6 @@ describe('RagService (Facade)', () => {
         chunks: [],
       }),
       streamAnswer: jest.fn(),
-      createChatStream: jest.fn(),
     };
   });
 
@@ -90,41 +92,74 @@ describe('RagService (Facade)', () => {
     expect(mockQueryService.streamAnswer).toHaveBeenCalledWith('问题', {});
   });
 
-  it('delegates createChatStream to RagQueryService', () => {
-    mockQueryService.createChatStream.mockReturnValue(new ReadableStream({}));
-
+  it('adapts workflow events to the existing AGUI writer protocol', async () => {
+    mockQueryService.streamAnswer.mockImplementation(async function* () {
+      yield {
+        type: 'status',
+        data: { stage: 'retrieve_start', message: '开始检索知识库' },
+      };
+      yield { type: 'reasoning', data: '思考过程' };
+      yield { type: 'answer', data: '模型答案' };
+      yield {
+        type: 'done',
+        data: { stage: 'done', message: '生成完成' },
+      };
+    });
     const service = new RagService(mockQueryService as any);
-
-    service.createChatStream({
-      id: 'demo-chat',
-      participantId: 'alice',
+    const stream = service.createChatStream({
+      id: 'conversation-1',
+      participantId: 'user-1',
       messages: [
         {
-          id: 'm1',
+          id: 'message-1',
           role: 'user',
-          parts: [{ type: 'text', text: '怎么使用知识库？' }],
+          parts: [{ type: 'text', text: '审批呢？' }],
         } as any,
       ],
-    });
+    }) as any;
+    const writer = { write: jest.fn() };
 
-    expect(mockQueryService.createChatStream).toHaveBeenCalledWith({
-      id: 'demo-chat',
-      participantId: 'alice',
-      messages: [
-        {
-          id: 'm1',
-          role: 'user',
-          parts: [{ type: 'text', text: '怎么使用知识库？' }],
-        },
-      ],
+    await stream.execute({ writer });
+
+    expect(mockQueryService.streamAnswer).toHaveBeenCalledWith('审批呢？', {
+      session: {
+        channel: 'web',
+        conversationId: 'conversation-1',
+        conversationType: 'rag-chat',
+        participantId: 'user-1',
+        messageId: 'message-1',
+        metadata: { source: 'rag-chat' },
+      },
     });
+    expect(writer.write).toHaveBeenCalledWith({
+      type: 'data-status',
+      data: { stage: 'retrieve_start', message: '开始检索知识库' },
+    });
+    expect(writer.write).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'text-delta', delta: '模型答案' }),
+    );
+    const writtenEvents = writer.write.mock.calls.map(([event]) => event);
+    const reasoningStartIndex = writtenEvents.findIndex(
+      (event) => event.type === 'reasoning-start',
+    );
+    const reasoningDeltaIndex = writtenEvents.findIndex(
+      (event) => event.type === 'reasoning-delta',
+    );
+    const reasoningEndIndex = writtenEvents.findIndex(
+      (event) => event.type === 'reasoning-end',
+    );
+    const textStartIndex = writtenEvents.findIndex(
+      (event) => event.type === 'text-start',
+    );
+    expect(reasoningStartIndex).toBeLessThan(reasoningDeltaIndex);
+    expect(reasoningDeltaIndex).toBeLessThan(reasoningEndIndex);
+    expect(reasoningEndIndex).toBeLessThan(textStartIndex);
+    expect(writer.write).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'text-end' }),
+    );
   });
 
-  it('rejects createChatStream when queryService throws', () => {
-    mockQueryService.createChatStream.mockImplementation(() => {
-      throw new Error('question text is required');
-    });
-
+  it('rejects AGUI requests without user question text', () => {
     const service = new RagService(mockQueryService as any);
 
     expect(() =>

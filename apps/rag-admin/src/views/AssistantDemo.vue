@@ -85,7 +85,8 @@
               >
                 <AssistantReasoning
                   v-if="part.type === 'reasoning'"
-                  :part="part"
+                  :state="part.state"
+                  :text="part.text"
                 />
                 <div v-if="part.type === 'text'" class="assistant-text">
                   <MdPreview

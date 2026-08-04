@@ -21,7 +21,7 @@
 
 ### 1. 单一 StateGraph 覆盖完整问答链路
 
-`RagQueryService` 持有编译后的图，节点依次处理会话、记忆、查询改写、检索、Prompt、生成、消息持久化和结果组装。同步入口调用图的 `invoke`；流式入口调用图的 `stream` `custom` 模式。同步、SSE 和 AGUI 入口集中在同一服务，避免为协议转发保留无业务职责的 Service。替代方案是只建立检索子图，但会继续保留两套问答编排。
+`RagQueryService` 持有编译后的图，节点依次处理会话、记忆、查询改写、检索、Prompt、生成、消息持久化和结果组装。同步入口调用图的 `invoke`；流式入口调用图的 `stream` `custom` 模式。`RagService` 作为公共 facade 和协议适配层，负责将 AGUI 请求转换为共享工作流输入，并将工作流事件映射为 UI Message Stream。这样 workflow service 只保留流程职责，同时避免恢复同步、流式两套问答编排。
 
 ### 2. 使用独立状态字段实现并行召回
 
@@ -39,7 +39,7 @@
 
 ### 5. 通过 custom stream 兼容现有协议
 
-图节点使用 runtime writer 输出既有 `RagStreamEvent`。生成节点在流式模式逐 token 写入 `answer`，异常或空流时输出既有 `fallback_start` 并调用 `invoke`；同步模式直接调用 `invoke`。`RagQueryService` 同时负责 AsyncGenerator 和 AGUI 协议转换。
+图节点使用 runtime writer 输出既有 `RagStreamEvent`。生成节点在流式模式逐 token 写入 `answer`，异常或空流时输出既有 `fallback_start` 并调用 `invoke`；同步模式直接调用 `invoke`。`RagQueryService` 只暴露同步和 custom stream 工作流入口；`RagService` 解析 AGUI 用户消息、构造 web 会话参数，并将 status、reasoning、answer 和 done 事件转换为现有 UI Message Stream 协议。
 
 ### 6. 复用现有业务持久化，不使用 checkpointer
 
@@ -60,7 +60,7 @@
 
 1. 增加依赖并注册持有共享工作流的 `RagQueryService`。
 2. 将检索阶段拆为图节点可调用的方法并补充测试。
-3. 切换同步、SSE 和 AGUI 入口到共享图。
+3. 切换同步、SSE 和 AGUI 入口到共享图，并由 `RagService` 承担 AGUI 协议适配。
 4. 运行 API 测试和构建；回滚时恢复原 Service 编排并移除新增依赖，不涉及数据回滚。
 
 ## Open Questions

@@ -1,19 +1,17 @@
 <template>
-  <details v-if="part.text" class="assistant-reasoning" :open="isStreaming">
+  <details class="assistant-reasoning" :open="state === 'streaming'">
     <summary>思考摘要</summary>
-    <div class="assistant-reasoning-content">{{ part.text }}</div>
+    <div class="assistant-reasoning-content">{{ text }}</div>
   </details>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import type { ReasoningUIPart } from 'ai';
 
-const props = defineProps<{
-  part: ReasoningUIPart;
+defineProps<{
+  text: string;
+  state?: ReasoningUIPart['state'];
 }>();
-
-const isStreaming = computed(() => props.part.state === 'streaming');
 </script>
 
 <style scoped>

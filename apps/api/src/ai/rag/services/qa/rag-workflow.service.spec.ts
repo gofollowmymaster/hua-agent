@@ -26,10 +26,6 @@ jest.mock('@langchain/openai', () => ({
   OpenAIEmbeddings: jest.fn(),
 }));
 
-jest.mock('ai', () => ({
-  createUIMessageStream: jest.fn((config) => config),
-}));
-
 jest.mock('@src/config/node-config.service', () => ({
   NodeConfigService: {
     get: jest.fn((key: string) => {
@@ -407,80 +403,6 @@ describe('RagQueryService', () => {
       session,
       '降级答案',
     );
-  });
-
-  it('maps workflow events to the existing AGUI writer protocol', async () => {
-    jest.spyOn(service, 'streamAnswer').mockImplementation(async function* () {
-      yield {
-        type: 'status',
-        data: { stage: 'retrieve_start', message: '开始检索知识库' },
-      };
-      yield { type: 'reasoning', data: '思考过程' };
-      yield { type: 'answer', data: '模型答案' };
-      yield {
-        type: 'done',
-        data: { stage: 'done', message: '生成完成' },
-      };
-    });
-    const stream = service.createChatStream({
-      id: 'conversation-1',
-      participantId: 'user-1',
-      messages: [
-        {
-          id: 'message-1',
-          role: 'user',
-          parts: [{ type: 'text', text: '审批呢？' }],
-        } as any,
-      ],
-    }) as any;
-    const writer = { write: jest.fn() };
-
-    await stream.execute({ writer });
-
-    expect(service.streamAnswer).toHaveBeenCalledWith('审批呢？', {
-      session: {
-        channel: 'web',
-        conversationId: 'conversation-1',
-        conversationType: 'rag-chat',
-        participantId: 'user-1',
-        messageId: 'message-1',
-        metadata: { source: 'rag-chat' },
-      },
-    });
-    expect(writer.write).toHaveBeenCalledWith({
-      type: 'data-status',
-      data: { stage: 'retrieve_start', message: '开始检索知识库' },
-    });
-    expect(writer.write).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'text-delta', delta: '模型答案' }),
-    );
-    const writtenEvents = writer.write.mock.calls.map(([event]) => event);
-    const reasoningStartIndex = writtenEvents.findIndex(
-      (event) => event.type === 'reasoning-start',
-    );
-    const reasoningDeltaIndex = writtenEvents.findIndex(
-      (event) => event.type === 'reasoning-delta',
-    );
-    const reasoningEndIndex = writtenEvents.findIndex(
-      (event) => event.type === 'reasoning-end',
-    );
-    const textStartIndex = writtenEvents.findIndex(
-      (event) => event.type === 'text-start',
-    );
-    expect(reasoningStartIndex).toBeLessThan(reasoningDeltaIndex);
-    expect(reasoningDeltaIndex).toBeLessThan(reasoningEndIndex);
-    expect(reasoningEndIndex).toBeLessThan(textStartIndex);
-    expect(writer.write).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'text-end' }),
-    );
-  });
-
-  it('rejects AGUI requests without user question text', () => {
-    expect(() =>
-      service.createChatStream({
-        messages: [{ id: 'message-1', role: 'user', parts: [] } as any],
-      }),
-    ).toThrow('question text is required');
   });
 });
 

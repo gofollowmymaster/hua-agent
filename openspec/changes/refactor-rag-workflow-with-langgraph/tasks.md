@@ -16,11 +16,12 @@
 - [x] 3.1 实现完整 RAG StateGraph 和并行召回 fan-out/fan-in
 - [x] 3.2 实现同步 invoke、custom 流输出、生成 fallback 和 trace 元数据
 - [x] 3.3 将同步、SSE、AGUI 与企微入口切换到共享工作流并完成 NestJS 注册
-- [x] 3.4 合并同步与流式协议适配服务，由 `RagQueryService` 统一持有共享工作流
+- [x] 3.4 合并同步与流式工作流编排，由 `RagQueryService` 统一持有共享工作流
+- [x] 3.5 将 AGUI 请求解析和 UI Message Stream 协议适配迁移到 `RagService`
 
 ## 4. 测试与验证
 
 - [x] 4.1 补充检索阶段诊断、单路失败、融合和 rerank 降级测试
 - [x] 4.2 补充图拓扑、同步结果、消息顺序、流式事件及 fallback 测试
 - [x] 4.3 运行相关 Jest、完整 API 测试和 `pnpm build:dev`
-- [ ] 4.4 运行拆分后的相关 Jest、完整 API 测试、类型检查和 `pnpm build:dev`
+- [x] 4.4 运行拆分后的相关 Jest、完整 API 测试、类型检查和 `pnpm build:dev`
