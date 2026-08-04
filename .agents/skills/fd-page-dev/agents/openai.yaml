@@ -1,0 +1,4 @@
+interface:
+  display_name: "RAG Admin 页面开发（需求到代码）"
+  short_description: "根据需求、UI 和接口完成 RAG Admin 列表 / 表单 / 详情页开发"
+  default_prompt: "使用 $fd-page-dev，根据提供的需求、UI设计图和接口代码在 RAG Admin 中完成页面开发，支持列表页、表单页、详情页及混合页。"

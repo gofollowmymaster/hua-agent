@@ -6,9 +6,14 @@
 
 1. `code-style.md`：Vue/TypeScript 基本写法、组件和错误处理规则。
 2. `module-design.md`：页面、布局、组件、API、auth、store、样式的放置规则和单一职责规则。
-3. `api-client.md`：axios、token、接口契约和错误处理规范。
-4. `routing-and-state.md`：路由和 Pinia 状态管理规范。
-5. `styling.md`：全局样式、组件样式和 UI 组件使用规范。
+3. `page-structure-blueprint.md`：新增和复杂页面的目录标准。
+4. `page-development.md`：页面开发通用规则和复用边界。
+5. `page-implementation-best-practices.md`：组件、hooks、AgGrid、表单、弹框、详情展示的推荐写法。
+6. `table-pattern.md` / `form-pattern.md` / `detail-pattern.md`：按页面类型落地的列表、表单、详情方案。
+7. `naming-conventions.md`：路由、页面、API、类型、常量和未来权限/埋点命名。
+8. `api-client.md`：axios、token、接口契约和错误处理规范。
+9. `routing-and-state.md`：路由和 Pinia 状态管理规范。
+10. `styling.md`：全局样式、组件样式和 UI 组件使用规范。
 
 ## 高频硬规则
 
@@ -24,7 +29,13 @@
 前端代码变更至少运行：
 
 ```bash
-pnpm rag-admin:build
+pnpm build
+```
+
+在根目录可运行：
+
+```bash
+pnpm admin:build
 ```
 
 涉及 API 契约时，同时运行或说明 API 侧验证。具体验证矩阵见 `docs/ai-governance/testing-and-verification.md`。

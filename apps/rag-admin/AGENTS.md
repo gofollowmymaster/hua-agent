@@ -22,6 +22,11 @@ RAG Admin 任务按需读取：
 - RAG Admin 开发规范：`docs/standard/README.md`
 - 前端构建与运行：`docs/architecture/build-and-runtime.md`
 - 前端 API client 规范：`docs/standard/api-client.md`
+- 页面结构与开发：`docs/standard/page-structure-blueprint.md`、`docs/standard/page-development.md`
+- 页面实现最佳实践：`docs/standard/page-implementation-best-practices.md`
+- 页面类型规范：`docs/standard/table-pattern.md`、`docs/standard/form-pattern.md`、`docs/standard/detail-pattern.md`
+- 命名规范：`docs/standard/naming-conventions.md`
+- 页面开发执行：`../../.agents/skills/fd-page-dev/SKILL.md`，涉及 `@aplus-frontend/ui` 时同时读 `../../.agents/skills/aplus-ui/SKILL.md`
 - 涉及后端接口契约时，补读 `../api/docs/architecture/README.md` 和 `../api/docs/standard/README.md`
 
 本文档中的 `src/` 默认指 `apps/rag-admin/src/`。
@@ -41,9 +46,9 @@ pnpm preview           # Vite preview
 根目录兼容命令：
 
 ```bash
-pnpm rag-admin:dev
-pnpm rag-admin:build
-pnpm rag-admin:preview
+pnpm admin:dev
+pnpm admin:build
+pnpm admin:preview
 ```
 
 ## 环境变量
@@ -88,6 +93,7 @@ pnpm rag-admin:preview
 - `src/stores/`：Pinia store。
 - `src/styles/`：全局样式。
 - `src/views/`：页面级组件。
+- `src/views/<Page>/index.vue`：新增复杂页面目录结构，存量扁平 `PascalCase.vue` 页面保持现状。
 
 页面组件不直接创建 axios 实例，不手动拼接 `Authorization`，不直接引用 `apps/api/src` 内部路径。
 
@@ -97,6 +103,8 @@ pnpm rag-admin:preview
 - 编写或改造 aplus-ui 组件前先查询组件 API 和示例，不凭记忆猜 props；必要时使用 `aplus info <Component> --format json`、`aplus demo <Component> ... --format json`。
 - 只有 aplus-ui 没有合适能力、现有业务封装已覆盖，或有明确技术原因时，才使用 `@aplus-frontend/antdv`、原生控件或新增自定义封装，并在代码/交付说明中说明取舍。
 - 页面级组件放 `src/views/`，跨页面布局放 `src/layouts/`。
+- 新增复杂页面优先按 `docs/standard/page-structure-blueprint.md` 使用 `src/views/<Page>/index.vue`，页面私有逻辑放同级 `hooks/`、`components/`、`sections/`。
+- 跨页面稳定复用组件放 `src/views/components/`。
 - 请求统一封装到 `src/api/`，复用 `src/api/http.ts`。
 - token 读写统一通过 `src/auth/token.ts`，登录流程集中在 `src/auth/` 或路由守卫。
 - 跨页面共享或需要缓存的数据才进入 Pinia；页面局部状态优先留在组件内。
@@ -114,7 +122,7 @@ pnpm rag-admin:preview
 
 ## 验证
 
-- 前端代码变更至少运行 `pnpm build`；在根目录可运行 `pnpm rag-admin:build`。
+- 前端代码变更至少运行 `pnpm build`；在根目录可运行 `pnpm admin:build`。
 - 涉及 test mode 行为时运行 `pnpm build:test`。
 - 涉及 dev server、proxy、登录跳转或运行时交互时，必要时运行 `pnpm dev` 并做人工验证。
 - 只改文档时不需要跑前端构建，但要做路径和引用静态校验。

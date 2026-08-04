@@ -26,8 +26,8 @@ pnpm start:dev          # 转发到 API 开发模式
 pnpm build:dev          # 转发到 API 构建
 pnpm test               # 转发到 API Jest
 pnpm pg                 # 转发到 API Prisma generate
-pnpm rag-admin:dev      # RAG Admin 开发服务
-pnpm rag-admin:build    # RAG Admin 类型检查和生产构建
+pnpm admin:dev          # RAG Admin 开发服务
+pnpm admin:build        # RAG Admin 类型检查和生产构建
 ```
 
 格式化和 lint 命令会改写文件，执行前确认这是当前任务的一部分：

@@ -29,8 +29,8 @@
 
 ## 运行方式
 
-- 开发：`pnpm rag-admin:dev`。
-- 构建：`pnpm rag-admin:build`。
-- 预览：`pnpm rag-admin:preview`。
+- 开发：`pnpm admin:dev`。
+- 构建：`pnpm admin:build`。
+- 预览：`pnpm admin:preview`。
 
 生产访问依赖 API app 提供 `apps/api/public/rag-admin` 下的静态文件。

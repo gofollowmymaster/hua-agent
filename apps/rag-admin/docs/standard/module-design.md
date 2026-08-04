@@ -18,7 +18,9 @@
 
 新增页面时：
 
-- 页面组件放入 `views/`。
+- 新增复杂页面优先放入 `views/<Page>/index.vue`，并按 `page-structure-blueprint.md` 组织同级 `hooks/`、`components/`、`sections/`。
+- 当前扁平的 `PascalCase.vue` 页面属于存量页面，不要求迁移；存量页面新增复杂区块时按同一拆分规则处理。
+- 跨页面稳定复用组件继续放 `views/components/`。
 - 路由配置放入 `router/routes.ts`。
 - 需要统一布局时复用 `AdminLayout.vue` 或既有布局。
 - 页面中的表格、表单、详情、弹窗、抽屉等后台标准交互优先使用 `@aplus-frontend/ui` 或基于 aplus-ui 的既有封装。
