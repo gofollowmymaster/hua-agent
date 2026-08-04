@@ -10,6 +10,8 @@ import type {
 } from './prompt.interface';
 import { qaV1 } from './qa/v1';
 import { rewriteV1 } from './rewrite/v1';
+import { routeV1 } from './route/v1';
+import { directV1 } from './direct/v1';
 
 /**
  * 提示词注册中心服务
@@ -46,6 +48,8 @@ export class PromptRegistryService {
     this.modules = {
       qa: { v1: qaV1 },
       rewrite: { v1: rewriteV1 },
+      route: { v1: routeV1 },
+      direct: { v1: directV1 },
       // 未来扩展：
       // qa: { v1: qaV1, v2: qaV2 },
     };

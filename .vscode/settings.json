@@ -99,15 +99,21 @@
   "gitlens.proxy": {},
   "references.preferredLocation": "view",
   "cSpell.words": [
+    "AGUI",
+    "aibot",
     "aplnk",
     "apptoken",
+    "chatid",
+    "chattype",
     "cloudboat",
+    "msgtype",
     "qwen",
     "rekog",
     "Reranker",
     "robotname",
     "streamable",
     "tableid",
+    "Wecom",
     "xiaol"
   ]
 }

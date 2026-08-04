@@ -13,6 +13,7 @@ import { NodeConfigService } from '@src/config/node-config.service';
 import { PromptRegistryService } from '../../prompts/prompt.registry';
 import { RagMemoryService } from './rag-memory.service';
 import { RagQueryRewriteService } from './rag-query-rewrite.service';
+import { RagQuestionRouterService } from './rag-question-router.service';
 import { RagRetrievalService } from './retrieval/rag-retrieval.service';
 import type {
   RagMemoryMessage,
@@ -25,6 +26,8 @@ import type {
 } from '../../types/rag.type';
 import type {
   RagAnswerGenerationResult,
+  RagQuestionRoute,
+  RagQuestionRouteResult,
   RagRerankResult,
   RagRetrievalRouteResult,
   RagWorkflowInput,
@@ -41,6 +44,7 @@ const RagWorkflowStateAnnotation = Annotation.Root({
   mode: Annotation<RagWorkflowMode>,
   session: Annotation<RagResolvedSession | undefined>,
   memory: Annotation<RagMemoryMessage[]>,
+  routeResult: Annotation<RagQuestionRouteResult | undefined>,
   rewrite: Annotation<RagQueryRewriteResult | undefined>,
   vectorResult: Annotation<RagRetrievalRouteResult | undefined>,
   keywordResult: Annotation<RagRetrievalRouteResult | undefined>,
@@ -71,6 +75,7 @@ export class RagQueryService {
     private readonly tenantContext: TenantContext,
     private readonly ragMemoryService: RagMemoryService,
     private readonly promptRegistry: PromptRegistryService,
+    private readonly questionRouterService: RagQuestionRouterService,
     private readonly queryRewriteService: RagQueryRewriteService,
     private readonly ragRetrievalService: RagRetrievalService,
   ) {
@@ -125,7 +130,7 @@ export class RagQueryService {
   }
 
   private buildGraph() {
-    // 两路召回从 rewrite_query 扇出，并通过数组起点 edge 形成 fan-in barrier。
+    // 路由后仅 RAG 分支扇出两路召回，并通过数组起点 edge 形成 fan-in barrier。
     return new StateGraph({
       state: RagWorkflowStateAnnotation,
       writer: writer<RagStreamEvent>,
@@ -133,12 +138,14 @@ export class RagQueryService {
       .addNode('resolve_session', this.resolveSessionNode.bind(this))
       .addNode('load_memory', this.loadMemoryNode.bind(this))
       .addNode('persist_user_message', this.persistUserMessageNode.bind(this))
+      .addNode('route_question', this.routeQuestionNode.bind(this))
       .addNode('rewrite_query', this.rewriteQueryNode.bind(this))
       .addNode('retrieve_vector', this.retrieveVectorNode.bind(this))
       .addNode('retrieve_keyword', this.retrieveKeywordNode.bind(this))
       .addNode('fuse_candidates', this.fuseCandidatesNode.bind(this))
       .addNode('rerank_candidates', this.rerankCandidatesNode.bind(this))
-      .addNode('build_prompt', this.buildPromptNode.bind(this))
+      .addNode('build_rag_prompt', this.buildRagPromptNode.bind(this))
+      .addNode('build_direct_prompt', this.buildDirectPromptNode.bind(this))
       .addNode('generate_answer', this.generateAnswerNode.bind(this))
       .addNode(
         'persist_assistant_message',
@@ -148,13 +155,22 @@ export class RagQueryService {
       .addEdge(START, 'resolve_session')
       .addEdge('resolve_session', 'load_memory')
       .addEdge('load_memory', 'persist_user_message')
-      .addEdge('persist_user_message', 'rewrite_query')
+      .addEdge('persist_user_message', 'route_question')
+      .addConditionalEdges(
+        'route_question',
+        this.selectQuestionRoute.bind(this),
+        {
+          rag: 'rewrite_query',
+          direct: 'build_direct_prompt',
+        },
+      )
       .addEdge('rewrite_query', 'retrieve_vector')
       .addEdge('rewrite_query', 'retrieve_keyword')
       .addEdge(['retrieve_vector', 'retrieve_keyword'], 'fuse_candidates')
       .addEdge('fuse_candidates', 'rerank_candidates')
-      .addEdge('rerank_candidates', 'build_prompt')
-      .addEdge('build_prompt', 'generate_answer')
+      .addEdge('rerank_candidates', 'build_rag_prompt')
+      .addEdge('build_rag_prompt', 'generate_answer')
+      .addEdge('build_direct_prompt', 'generate_answer')
       .addEdge('generate_answer', 'persist_assistant_message')
       .addEdge('persist_assistant_message', 'build_result')
       .addEdge('build_result', END)
@@ -182,29 +198,56 @@ export class RagQueryService {
     }));
   }
 
-  /** 持久化当前用户问题，并在流式模式下通知客户端开始分析。 */
+  /** 持久化当前用户问题；公开状态由路由结果决定，避免 direct 分支伪装成检索。 */
   private async persistUserMessageNode(
+    state: RagWorkflowGraphState,
+  ): Promise<RagWorkflowGraphUpdate> {
+    return this.runNode('persist_user_message', state, async () => {
+      await this.ragMemoryService.appendUserMessage(
+        state.session,
+        state.question,
+      );
+      return {};
+    });
+  }
+
+  /** 使用轻量模型进行保守路由；只有确认 direct 时才绕过知识库链路。 */
+  private async routeQuestionNode(
     state: RagWorkflowGraphState,
     runtime: RagWorkflowRuntime,
   ): Promise<RagWorkflowGraphUpdate> {
     const result = await this.runNode(
-      'persist_user_message',
+      'route_question',
       state,
-      async () => {
-        await this.ragMemoryService.appendUserMessage(
-          state.session,
-          state.question,
-        );
-        return {};
-      },
+      async () => ({
+        routeResult: await this.questionRouterService.route({
+          question: state.question,
+          memory: state.memory,
+          session: state.session,
+          topK: state.options?.topK,
+        }),
+      }),
+      (update) => ({
+        route: update.routeResult?.route,
+        routeStatus: update.routeResult?.status,
+        operationDurationMs: update.routeResult?.durationMs,
+        routeFallback: update.routeResult?.status === 'failed',
+      }),
     );
-    this.writeStatus(state, runtime, {
-      stage: 'analyzing_start',
-      message: '开始分析问题',
-      sessionKey: state.session.sessionKey,
-      topK: state.options?.topK,
-    });
+
+    if (result.routeResult?.route === 'rag') {
+      this.writeStatus(state, runtime, {
+        stage: 'analyzing_start',
+        message: '开始分析问题',
+        sessionKey: state.session.sessionKey,
+        topK: state.options?.topK,
+      });
+    }
     return result;
+  }
+
+  private selectQuestionRoute(state: RagWorkflowGraphState): RagQuestionRoute {
+    return state.routeResult?.route === 'direct' ? 'direct' : 'rag';
   }
 
   /** 结合原始问题与对话记忆生成检索问题，并通知客户端开始知识库检索。 */
@@ -320,11 +363,11 @@ export class RagQueryService {
   }
 
   /** 将问题、最终片段和对话记忆填充到 QA 模板，并通知客户端开始生成。 */
-  private async buildPromptNode(
+  private async buildRagPromptNode(
     state: RagWorkflowGraphState,
     runtime: RagWorkflowRuntime,
   ): Promise<RagWorkflowGraphUpdate> {
-    const result = await this.runNode('build_prompt', state, async () => ({
+    const result = await this.runNode('build_rag_prompt', state, async () => ({
       prompt: await this.promptRegistry.buildPrompt('qa', {
         question: state.question,
         chunks: state.chunks,
@@ -341,6 +384,37 @@ export class RagQueryService {
     return result;
   }
 
+  /** direct 分支只注入问题和短期记忆，不携带检索片段或引用信息。 */
+  private async buildDirectPromptNode(
+    state: RagWorkflowGraphState,
+    runtime: RagWorkflowRuntime,
+  ): Promise<RagWorkflowGraphUpdate> {
+    const result = await this.runNode(
+      'build_direct_prompt',
+      state,
+      async () => ({
+        prompt: await this.promptRegistry.buildPrompt('direct', {
+          question: state.question,
+          memory: this.promptRegistry.formatMemory(state.memory),
+        }),
+        vectorResult: undefined,
+        keywordResult: undefined,
+        fusedCandidates: [],
+        rerankResult: undefined,
+        chunks: [],
+        sources: [],
+      }),
+    );
+    this.writeStatus(state, runtime, {
+      stage: 'generate_start',
+      message: '开始生成答案',
+      sessionKey: state.session.sessionKey,
+      topK: state.options?.topK,
+      chunks: 0,
+    });
+    return result;
+  }
+
   /** 按工作流模式调用模型同步或流式生成答案，并将完整答案写回状态。 */
   private async generateAnswerNode(
     state: RagWorkflowGraphState,
@@ -350,8 +424,12 @@ export class RagQueryService {
       'generate_answer',
       state,
       async () => {
-        const result =
-          state.mode === 'stream'
+        const isDirect = state.routeResult?.route === 'direct';
+        const result = isDirect
+          ? state.mode === 'stream'
+            ? await this.generateDirectStreamAnswer(state, runtime)
+            : await this.generateDirectSyncAnswer(state)
+          : state.mode === 'stream'
             ? await this.generateStreamAnswer(state, runtime)
             : await this.generateSyncAnswer(state);
         return {
@@ -360,7 +438,11 @@ export class RagQueryService {
         };
       },
       (update) => ({
-        reasoningEffort: this.reasoningEffort,
+        route: state.routeResult?.route ?? 'rag',
+        reasoningEffort:
+          state.routeResult?.route === 'direct'
+            ? undefined
+            : this.reasoningEffort,
         reasoningFallback: update.reasoningFallback,
       }),
     );
@@ -413,6 +495,53 @@ export class RagQueryService {
       answer: await this.generateFallbackAnswer(state.prompt),
       reasoningFallback: true,
     };
+  }
+
+  private async generateDirectSyncAnswer(
+    state: RagWorkflowGraphState,
+  ): Promise<RagAnswerGenerationResult> {
+    return {
+      answer: await this.generateFallbackAnswer(state.prompt),
+      reasoningFallback: false,
+    };
+  }
+
+  private async generateDirectStreamAnswer(
+    state: RagWorkflowGraphState,
+    runtime: RagWorkflowRuntime,
+  ): Promise<RagAnswerGenerationResult> {
+    let answer = '';
+    let fallbackReason = 'direct_stream_empty';
+    try {
+      const stream = await this.fallbackModel.stream(state.prompt);
+      for await (const chunk of stream) {
+        const text = this.extractContentText(chunk.content);
+        if (!text) continue;
+        answer += text;
+        runtime.writer({ type: 'answer', data: text });
+      }
+      if (answer) return { answer, reasoningFallback: false };
+    } catch (error) {
+      fallbackReason = 'direct_stream_failed';
+      this.logDirectFallback(state, fallbackReason, error);
+    }
+
+    if (fallbackReason === 'direct_stream_empty') {
+      this.logDirectFallback(state, fallbackReason);
+    }
+    runtime.writer({
+      type: 'status',
+      data: {
+        stage: 'fallback_start',
+        message: '流式生成未返回文本，切换为普通生成',
+        sessionKey: state.session.sessionKey,
+        topK: state.options?.topK,
+        chunks: 0,
+      },
+    });
+    const text = await this.generateFallbackAnswer(state.prompt);
+    if (text) runtime.writer({ type: 'answer', data: text });
+    return { answer: text, reasoningFallback: true };
   }
 
   private async generateStreamAnswer(
@@ -500,6 +629,21 @@ export class RagQueryService {
     );
   }
 
+  private logDirectFallback(
+    state: RagWorkflowGraphState,
+    stage: string,
+    error?: unknown,
+  ) {
+    this.logger.warn('RAG direct stream fallback to invoke', undefined, {
+      stage,
+      tenantCode: state.session.tenantCode,
+      sessionKey: state.session.sessionKey,
+      topK: state.options?.topK,
+      route: 'direct',
+      errorType: error instanceof Error ? error.name : typeof error,
+    });
+  }
+
   private async runNode<T extends RagWorkflowGraphUpdate>(
     nodeName: string,
     state: RagWorkflowGraphState,
@@ -528,7 +672,8 @@ export class RagQueryService {
         durationMs: Date.now() - startedAt,
         tenantCode: state.session?.tenantCode ?? this.tenantContext.tenant,
         sessionKey: state.session?.sessionKey,
-        error: error instanceof Error ? error.message : String(error),
+        // 模型错误可能回显请求内容，结构化日志仅保留错误类型。
+        errorType: error instanceof Error ? error.name : typeof error,
       });
       throw error;
     }

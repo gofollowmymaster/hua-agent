@@ -55,6 +55,7 @@ describe('RagQueryService', () => {
     formatLocation: jest.Mock;
   };
   let queryRewriteService: { rewrite: jest.Mock };
+  let questionRouterService: { route: jest.Mock };
   let ragRetrievalService: {
     retrieveVector: jest.Mock;
     retrieveKeyword: jest.Mock;
@@ -115,6 +116,14 @@ describe('RagQueryService', () => {
         fallbackReason: 'test',
       }),
     };
+    questionRouterService = {
+      route: jest.fn().mockResolvedValue({
+        route: 'rag',
+        status: 'success',
+        durationMs: 1,
+        routeReason: '亚马逊业务问题',
+      }),
+    };
     ragRetrievalService = {
       retrieveVector: jest
         .fn()
@@ -143,6 +152,7 @@ describe('RagQueryService', () => {
       { tenant: 'aplus' } as any,
       ragMemoryService as any,
       promptRegistry as any,
+      questionRouterService as any,
       queryRewriteService as any,
       ragRetrievalService as any,
     );
@@ -256,6 +266,153 @@ describe('RagQueryService', () => {
       2,
       expect.not.objectContaining({ modelKwargs: expect.anything() }),
     );
+  });
+
+  it('answers a direct question without rewrite, retrieval, rerank, or reasoning', async () => {
+    questionRouterService.route.mockResolvedValue({
+      route: 'direct',
+      status: 'success',
+      durationMs: 1,
+      routeReason: '明确无关问题',
+    });
+    promptRegistry.buildPrompt.mockResolvedValue('direct prompt');
+    mockFallbackModelInvoke.mockResolvedValue({ content: '普通助手回答' });
+
+    const result = await service.answerQuestion('今天星期几？');
+
+    expect(questionRouterService.route).toHaveBeenCalledWith({
+      question: '今天星期几？',
+      memory: expect.any(Array),
+      session,
+      topK: undefined,
+    });
+    expect(promptRegistry.buildPrompt).toHaveBeenCalledWith('direct', {
+      question: '今天星期几？',
+      memory: 'formatted memory',
+    });
+    expect(queryRewriteService.rewrite).not.toHaveBeenCalled();
+    expect(ragRetrievalService.retrieveVector).not.toHaveBeenCalled();
+    expect(ragRetrievalService.retrieveKeyword).not.toHaveBeenCalled();
+    expect(ragRetrievalService.fuseCandidates).not.toHaveBeenCalled();
+    expect(ragRetrievalService.rerankCandidates).not.toHaveBeenCalled();
+    expect(mockReasoningModelInvoke).not.toHaveBeenCalled();
+    expect(mockFallbackModelInvoke).toHaveBeenCalledWith('direct prompt');
+    expect(result).toEqual({
+      sessionKey: session.sessionKey,
+      answer: '普通助手回答',
+      sources: [],
+      chunks: [],
+    });
+    expect(ragMemoryService.appendAssistantMessage).toHaveBeenCalledWith(
+      session,
+      '普通助手回答',
+    );
+  });
+
+  it('streams direct answers without retrieval or reasoning events', async () => {
+    questionRouterService.route.mockResolvedValue({
+      route: 'direct',
+      status: 'success',
+      durationMs: 1,
+    });
+    promptRegistry.buildPrompt.mockResolvedValue('direct prompt');
+    mockFallbackModelStream.mockResolvedValue(
+      (async function* () {
+        yield { content: '你好' };
+        yield { content: '，有什么可以帮你？' };
+      })(),
+    );
+
+    const events = [];
+    for await (const event of service.streamAnswer('你好')) events.push(event);
+
+    expect(
+      events
+        .filter((event) => event.type === 'status')
+        .map((event) => event.data.stage),
+    ).toEqual(['generate_start']);
+    expect(events).toEqual(
+      expect.arrayContaining([
+        { type: 'answer', data: '你好' },
+        { type: 'answer', data: '，有什么可以帮你？' },
+        { type: 'done', data: { stage: 'done', message: '生成完成' } },
+      ]),
+    );
+    expect(events.some((event) => event.type === 'reasoning')).toBe(false);
+    expect(queryRewriteService.rewrite).not.toHaveBeenCalled();
+    expect(mockReasoningModelStream).not.toHaveBeenCalled();
+  });
+
+  it('falls back to direct invoke when its ordinary stream is empty', async () => {
+    questionRouterService.route.mockResolvedValue({
+      route: 'direct',
+      status: 'success',
+      durationMs: 1,
+    });
+    mockFallbackModelStream.mockResolvedValue(
+      (async function* () {
+        yield { content: '' };
+      })(),
+    );
+    mockFallbackModelInvoke.mockResolvedValue({ content: '请补充具体问题' });
+
+    const events = [];
+    for await (const event of service.streamAnswer('？？？'))
+      events.push(event);
+
+    expect(events).toContainEqual({
+      type: 'status',
+      data: expect.objectContaining({ stage: 'fallback_start', chunks: 0 }),
+    });
+    expect(events).toContainEqual({
+      type: 'answer',
+      data: '请补充具体问题',
+    });
+  });
+
+  it('falls back to direct invoke when its ordinary stream fails', async () => {
+    questionRouterService.route.mockResolvedValue({
+      route: 'direct',
+      status: 'success',
+      durationMs: 1,
+    });
+    mockFallbackModelStream.mockRejectedValue(new Error('stream failed'));
+    mockFallbackModelInvoke.mockResolvedValue({ content: '普通降级答案' });
+
+    const events = [];
+    for await (const event of service.streamAnswer('你好')) events.push(event);
+
+    expect(events).toContainEqual({
+      type: 'status',
+      data: expect.objectContaining({ stage: 'fallback_start' }),
+    });
+    expect(events).toContainEqual({ type: 'answer', data: '普通降级答案' });
+    expect(logger.warn).toHaveBeenCalledWith(
+      'RAG direct stream fallback to invoke',
+      undefined,
+      expect.objectContaining({
+        stage: 'direct_stream_failed',
+        route: 'direct',
+        errorType: 'Error',
+      }),
+    );
+  });
+
+  it('uses the RAG branch when question routing falls back', async () => {
+    questionRouterService.route.mockResolvedValue({
+      route: 'rag',
+      status: 'failed',
+      durationMs: 1,
+      fallbackReason: 'Error',
+    });
+    mockReasoningModelInvoke.mockResolvedValue({ content: '知识库答案' });
+
+    await service.answerQuestion('这个呢？');
+
+    expect(queryRewriteService.rewrite).toHaveBeenCalled();
+    expect(ragRetrievalService.retrieveVector).toHaveBeenCalled();
+    expect(ragRetrievalService.retrieveKeyword).toHaveBeenCalled();
+    expect(mockReasoningModelInvoke).toHaveBeenCalled();
   });
 
   it('falls back to the ordinary model when sync reasoning fails', async () => {

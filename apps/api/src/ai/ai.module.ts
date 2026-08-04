@@ -32,6 +32,7 @@ import { RagRerankService } from './rag/services/qa/retrieval/rerank/rag-rerank.
 import { NoopReranker } from './rag/services/qa/retrieval/rerank/noop-reranker.service';
 import { RuleBasedReranker } from './rag/services/qa/retrieval/rerank/rule-based-reranker.service';
 import { Qwen3Reranker } from './rag/services/qa/retrieval/rerank/qwen3-reranker.service';
+import { RagQuestionRouterService } from './rag/services/qa/rag-question-router.service';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { Qwen3Reranker } from './rag/services/qa/retrieval/rerank/qwen3-reranker
     RagService,
     PromptRegistryService,
     RagQueryRewriteService,
+    RagQuestionRouterService,
     RagRetrievalService,
     RagVectorRetrieverService,
     RagFullTextRetrieverService,

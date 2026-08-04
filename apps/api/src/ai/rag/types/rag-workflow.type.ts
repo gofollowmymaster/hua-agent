@@ -9,6 +9,8 @@ import type { RagRerankMode } from '@src/config/interface';
 
 export type RagWorkflowMode = 'sync' | 'stream';
 
+export type RagQuestionRoute = 'rag' | 'direct';
+
 export type RagStageStatus = 'success' | 'disabled' | 'failed';
 
 export interface RagRetrievalRouteResult {
@@ -42,4 +44,13 @@ export interface RagWorkflowResult {
 export interface RagAnswerGenerationResult {
   answer: string;
   reasoningFallback: boolean;
+}
+
+export interface RagQuestionRouteResult {
+  route: RagQuestionRoute;
+  status: 'success' | 'failed';
+  durationMs: number;
+  /** 仅供内部诊断，不得写入结构化日志或公开响应。 */
+  routeReason?: string;
+  fallbackReason?: string;
 }
