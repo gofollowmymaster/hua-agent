@@ -9,10 +9,12 @@ import {
   type RagRetrieveInput,
 } from './rag-retriever';
 
+/** 通过问题向量与 pgvector 相似度检索当前租户的候选切片。 */
 @Injectable()
 export class RagVectorRetrieverService extends BaseRagRetriever {
   private readonly embeddings: OpenAIEmbeddings;
 
+  /** 从集中配置初始化向量检索策略和 Embeddings 客户端。 */
   constructor(
     private readonly ragPrisma: RagPrismaService,
     logger: LoggerService,
@@ -35,6 +37,7 @@ export class RagVectorRetrieverService extends BaseRagRetriever {
     });
   }
 
+  /** 生成问题向量并按余弦距离查询租户隔离的候选切片。 */
   protected async retrieveCandidates(input: RagRetrieveInput, limit: number) {
     const vector = await this.embeddings.embedQuery(input.query);
     const rows = await this.ragPrisma.$queryRaw<RagRetrievalRow[]>`

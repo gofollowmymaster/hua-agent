@@ -22,10 +22,12 @@ export type { RagChatRequest } from './types/rag.type';
 export class RagService {
   constructor(private readonly queryService: RagQueryService) {}
 
+  /** 委托问答工作流生成完整答案。 */
   async answerQuestion(question: string, options: RagQueryOptions = {}) {
     return this.queryService.answerQuestion(question, options);
   }
 
+  /** 委托问答工作流按事件流生成状态、推理内容和答案。 */
   streamAnswer(
     question: string,
     options: RagQueryOptions = {},
@@ -33,6 +35,7 @@ export class RagService {
     return this.queryService.streamAnswer(question, options);
   }
 
+  /** 将 AGUI 消息转换为问答事件并输出 UI Message 流。 */
   createChatStream(params: RagChatRequest) {
     const question = this.extractLatestUserQuestion(params?.messages);
     const conversationId = params?.id?.trim() || randomUUID();
@@ -103,6 +106,7 @@ export class RagService {
     });
   }
 
+  /** 从消息历史中提取最近一条有效的用户文本问题。 */
   private extractLatestUserQuestion(messages: RagChatRequest['messages']) {
     if (!Array.isArray(messages) || messages.length === 0) {
       throw new BadRequestException('messages is required');

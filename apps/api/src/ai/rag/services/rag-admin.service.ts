@@ -15,6 +15,7 @@ import {
 import { RagIngestService } from './ingest/rag-ingest.service';
 import { RagPrismaService } from './prisma/rag-prisma.service';
 
+/** 编排 RAG 管理后台的租户级文档、切片和会话数据操作。 */
 @Injectable()
 export class RagAdminService {
   constructor(
@@ -23,6 +24,7 @@ export class RagAdminService {
     private readonly tenantContext: TenantContext,
   ) {}
 
+  /** 按租户和筛选条件分页返回文档及实际切片数量。 */
   async pageDocuments(params: RagAdminDocumentPageDto) {
     const { page, pageSize, skip } = this.resolvePage(params);
     const tenantCode = this.currentTenant();
@@ -68,6 +70,7 @@ export class RagAdminService {
     };
   }
 
+  /** 校验文档归属后更新可维护的业务元数据。 */
   async updateDocumentMetadata(
     id: number,
     params: RagAdminDocumentMetadataDto,
@@ -107,6 +110,7 @@ export class RagAdminService {
     };
   }
 
+  /** 校验租户归属后删除文档及其关联数据。 */
   async deleteDocument(id: number) {
     const tenantCode = this.currentTenant();
     const document = await this.ragPrisma.aplusDocument.findUnique({
@@ -129,6 +133,7 @@ export class RagAdminService {
     };
   }
 
+  /** 校验文档归属后分页返回其切片内容。 */
   async pageDocumentChunks(
     documentId: number,
     params: RagAdminDocumentChunkPageDto,
@@ -174,6 +179,7 @@ export class RagAdminService {
     };
   }
 
+  /** 在租户原始目录内解析并校验可预览的文档文件。 */
   async getDocumentPreviewFile(id: number) {
     const tenantCode = this.currentTenant();
     const document = await this.ragPrisma.aplusDocument.findUnique({
@@ -205,10 +211,12 @@ export class RagAdminService {
     };
   }
 
+  /** 将管理端索引请求委托给摄取服务。 */
   ingest(params: RagAdminIngestDto) {
     return this.ragIngestService.ingest({ force: Boolean(params?.force) });
   }
 
+  /** 按租户和筛选条件分页返回会话及最近消息摘要。 */
   async pageSessions(params: RagAdminSessionPageDto) {
     const { page, pageSize, skip } = this.resolvePage(params);
     const tenantCode = this.currentTenant();
@@ -268,6 +276,7 @@ export class RagAdminService {
     };
   }
 
+  /** 校验会话归属后按时间顺序返回全部消息。 */
   async listSessionMessages(sessionId: number) {
     const tenantCode = this.currentTenant();
     const session = await this.ragPrisma.aplusRagSession.findUnique({
@@ -301,6 +310,7 @@ export class RagAdminService {
     }));
   }
 
+  /** 将文档管理筛选条件转换为租户隔离的 Prisma 查询条件。 */
   private buildDocumentWhere(
     params: RagAdminDocumentPageDto,
     tenantCode: TenantCode,
@@ -327,6 +337,7 @@ export class RagAdminService {
     return where;
   }
 
+  /** 将会话管理筛选条件转换为租户隔离的 Prisma 查询条件。 */
   private buildSessionWhere(
     params: RagAdminSessionPageDto,
     tenantCode: TenantCode,
@@ -382,6 +393,7 @@ export class RagAdminService {
     return where;
   }
 
+  /** 根据可选起止时间构造 Prisma 日期范围。 */
   private buildDateRange(from?: string, to?: string) {
     if (!from && !to) return undefined;
     return {
@@ -390,10 +402,12 @@ export class RagAdminService {
     };
   }
 
+  /** 清理可选元数据文本并统一空值表示。 */
   private normalizeMetadataValue(value?: string) {
     return value?.trim() ?? '';
   }
 
+  /** 规范分页参数并计算数据库偏移量。 */
   private resolvePage(
     params:
       | RagAdminDocumentPageDto
@@ -409,10 +423,12 @@ export class RagAdminService {
     };
   }
 
+  /** 获取请求租户，并在无请求上下文时回退到默认租户。 */
   private currentTenant(): TenantCode {
     return this.tenantContext.tenant ?? NodeConfigService.get('defaultTenant');
   }
 
+  /** 在租户原始目录内安全定位文档预览文件。 */
   private async resolvePreviewFilePath(
     tenantCode: TenantCode,
     sourcePath: string,
@@ -446,6 +462,7 @@ export class RagAdminService {
     throw new BadRequestException('Document preview file not found');
   }
 
+  /** 判断目标路径是否位于允许访问的父目录内。 */
   private isPathInside(filePath: string, parentDir: string) {
     const relativePath = path.relative(parentDir, filePath);
     return (
@@ -454,6 +471,7 @@ export class RagAdminService {
     );
   }
 
+  /** 将 JSON 不支持的 bigint 转换为可序列化字符串。 */
   private serializeBigInt(value: bigint | number | string) {
     return typeof value === 'bigint' ? value.toString() : value;
   }

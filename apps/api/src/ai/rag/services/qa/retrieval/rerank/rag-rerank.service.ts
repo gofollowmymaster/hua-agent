@@ -22,6 +22,7 @@ export type RagRerankCandidatesInput = {
   rerankMode?: RagRerankMode;
 };
 
+/** 按配置选择重排策略，并为模型或规则失败提供融合结果降级。 */
 @Injectable()
 export class RagRerankService {
   private readonly defaultTopK: number;
@@ -38,6 +39,7 @@ export class RagRerankService {
     this.defaultTopK = NodeConfigService.get('vcHelper').defaultTopK;
   }
 
+  /** 执行指定重排模式并统一输出阶段状态、耗时和最终切片。 */
   async rerankCandidates(
     input: RagRerankCandidatesInput,
   ): Promise<RagRerankResult> {
@@ -71,6 +73,7 @@ export class RagRerankService {
     }
   }
 
+  /** 优先执行模型重排，失败后依次回退到规则和融合排序。 */
   private async rerankWithModel(
     input: RagRerankCandidatesInput,
     candidates: RetrievalCandidate[],
@@ -131,6 +134,7 @@ export class RagRerankService {
     }
   }
 
+  /** 将统一输入转换为具体重排器契约并执行。 */
   private runReranker(
     reranker: RagReranker,
     input: RagRerankCandidatesInput,
@@ -147,6 +151,7 @@ export class RagRerankService {
     });
   }
 
+  /** 记录重排失败并以融合顺序返回有限数量的候选。 */
   private fallbackToFused(
     input: RagRerankCandidatesInput,
     mode: RagRerankMode,
@@ -179,10 +184,12 @@ export class RagRerankService {
     };
   }
 
+  /** 将未知异常归一为可记录的错误类型。 */
   private errorType(error: unknown) {
     return error instanceof Error ? error.constructor.name : typeof error;
   }
 
+  /** 将内部候选映射为问答工作流消费的检索切片。 */
   private toRetrievedChunk(candidate: RetrievalCandidate): RetrievedChunk {
     return {
       id: candidate.id,
@@ -200,6 +207,7 @@ export class RagRerankService {
     };
   }
 
+  /** 将请求数量规范到允许范围并应用默认值。 */
   private normalizeLimit(topK?: number) {
     return Math.min(Math.max(Number(topK) || this.defaultTopK, 1), 20);
   }

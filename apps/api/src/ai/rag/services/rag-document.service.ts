@@ -4,6 +4,7 @@ import { NodeConfigService } from '@src/config/node-config.service';
 import { TenantCode } from '@src/config/tenant';
 import { RagPrismaService } from './prisma/rag-prisma.service';
 
+/** 管理当前租户已索引文档的查询和删除。 */
 @Injectable()
 export class RagDocumentService {
   constructor(
@@ -11,6 +12,7 @@ export class RagDocumentService {
     private readonly tenantContext: TenantContext,
   ) {}
 
+  /** 查询当前租户文档及其实际切片数量。 */
   async listDocuments() {
     const tenantCode = this.currentTenant();
     const documents = await this.ragPrisma.aplusDocument.findMany({
@@ -43,6 +45,7 @@ export class RagDocumentService {
     }));
   }
 
+  /** 校验租户归属后删除指定文档及其关联切片。 */
   async deleteDocument(id: number) {
     const tenantCode = this.currentTenant();
     const document = await this.ragPrisma.aplusDocument.findUnique({
@@ -65,6 +68,7 @@ export class RagDocumentService {
     };
   }
 
+  /** 获取请求租户，并在无请求上下文时回退到默认租户。 */
   private currentTenant(): TenantCode {
     return this.tenantContext.tenant ?? NodeConfigService.get('defaultTenant');
   }

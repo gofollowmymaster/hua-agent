@@ -26,6 +26,7 @@ import { RagIngestService } from './services/ingest/rag-ingest.service';
 import { AuthGuard } from '@src/common/guard/auth';
 import type { RagQueryOptions } from './types/rag.type';
 
+/** 提供知识库索引、问答和文档管理的 HTTP 接口。 */
 @ApiTags('RAG 企业知识库')
 @Controller('ai/rag')
 export class RagController {
@@ -35,6 +36,7 @@ export class RagController {
     private readonly ragDocumentService: RagDocumentService,
   ) {}
 
+  /** 扫描租户原始文档目录并触发索引。 */
   @Post('ingest')
   @ApiOperation({ summary: '扫描 raw 目录并索引 RAG 文档' })
   @ApiBody({ type: RagIngestDto })
@@ -43,6 +45,7 @@ export class RagController {
     return this.ragIngestService.ingest({ force: Boolean(body?.force) });
   }
 
+  /** 执行一次同步知识库问答。 */
   @Post('query')
   @ApiOperation({ summary: 'RAG 同步问答' })
   @ApiBody({ type: RagQueryDto })
@@ -53,6 +56,7 @@ export class RagController {
     );
   }
 
+  /** 将 AGUI 聊天请求适配为 UI Message 流并写入 HTTP 响应。 */
   @SkipTransform()
   @Post('chat')
   @UseGuards(AuthGuard)
@@ -68,6 +72,7 @@ export class RagController {
     });
   }
 
+  /** 通过 SSE 持续推送问答状态、推理内容和答案。 */
   @SkipTransform()
   @Sse('query/stream')
   @Header('Cache-Control', 'no-cache, no-transform')
@@ -104,6 +109,7 @@ export class RagController {
     );
   }
 
+  /** 将查询 DTO 转换为工作流使用的检索与会话选项。 */
   private buildQueryOptions(body: RagQueryDto): RagQueryOptions {
     return {
       topK: body.topK,
@@ -117,12 +123,14 @@ export class RagController {
     };
   }
 
+  /** 返回当前租户已经建立索引的文档。 */
   @Get('documents')
   @ApiOperation({ summary: '获取 RAG 已索引文档列表' })
   documents() {
     return this.ragDocumentService.listDocuments();
   }
 
+  /** 删除当前租户指定文档及其索引数据。 */
   @Delete('documents/:id')
   @ApiOperation({ summary: '删除 RAG 已索引文档' })
   deleteDocument(@Param('id', ParseIntPipe) id: number) {

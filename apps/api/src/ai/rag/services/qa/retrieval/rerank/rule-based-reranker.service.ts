@@ -2,8 +2,10 @@ import { Injectable } from '@nestjs/common';
 import type { RetrievalCandidate } from '../../../../types/rag.type';
 import type { RagReranker, RagRerankInput } from './rag-reranker';
 
+/** 根据词项命中、多路召回和文档多样性规则重排候选。 */
 @Injectable()
 export class RuleBasedReranker implements RagReranker {
+  /** 计算规则加权分数并返回前 topK 个候选。 */
   async rerank(input: RagRerankInput): Promise<RetrievalCandidate[]> {
     const terms = this.extractTerms(input.query, input.originalQuestion);
     const documentCounts = new Map<string, number>();
@@ -39,6 +41,7 @@ export class RuleBasedReranker implements RagReranker {
       .slice(0, input.topK);
   }
 
+  /** 从改写查询和原问题中提取去重后的有效词项。 */
   private extractTerms(query: string, originalQuestion: string): string[] {
     const values = [query, originalQuestion]
       .flatMap((value) =>
@@ -53,6 +56,7 @@ export class RuleBasedReranker implements RagReranker {
     return Array.from(new Set(values)).slice(0, 12);
   }
 
+  /** 统计文本中包含的查询词项数量。 */
   private countHits(value: string, terms: string[]) {
     const normalized = value.toLowerCase();
     return terms.filter((term) => normalized.includes(term)).length;

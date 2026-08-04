@@ -5,6 +5,7 @@ import type {
   RetrievalCandidate,
 } from '../../../types/rag.type';
 
+/** 使用加权倒数排名融合多个检索路由的候选结果。 */
 @Injectable()
 export class RagFusionService {
   private readonly fusionK = Math.max(
@@ -12,6 +13,7 @@ export class RagFusionService {
     1,
   );
 
+  /** 合并同一切片的多路排名和分数，并按融合分数降序输出。 */
   fuseCandidates(
     candidateGroups: RetrievalCandidate[][],
   ): RetrievalCandidate[] {
@@ -69,6 +71,7 @@ export class RagFusionService {
     );
   }
 
+  /** 返回检索路由在融合计算中的业务权重。 */
   private routeWeight(route: RagRetrievalRoute) {
     if (route === 'keyword') return 0.8;
     return 1;

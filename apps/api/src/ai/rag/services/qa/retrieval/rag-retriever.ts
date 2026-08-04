@@ -31,7 +31,9 @@ export interface RagRetriever {
   retrieve(input: RagRetrieveInput): Promise<RagRetrievalRouteResult>;
 }
 
+/** 封装检索路由通用的限额、禁用判断、异常降级和结果映射。 */
 export abstract class BaseRagRetriever implements RagRetriever {
+  /** 注入具体检索策略的路由标识、候选上限和失败日志上下文。 */
   protected constructor(
     protected readonly logger: LoggerService,
     public readonly route: RagRetrievalRoute,
@@ -42,6 +44,7 @@ export abstract class BaseRagRetriever implements RagRetriever {
     this.logger.setContext(this.constructor.name);
   }
 
+  /** 执行具体检索策略并将禁用或异常统一转换为阶段结果。 */
   async retrieve(input: RagRetrieveInput): Promise<RagRetrievalRouteResult> {
     const startedAt = Date.now();
     const limit = this.normalizeCandidateLimit(this.candidateLimit);
@@ -62,15 +65,18 @@ export abstract class BaseRagRetriever implements RagRetriever {
     }
   }
 
+  /** 允许具体检索器根据输入动态关闭当前路由。 */
   protected isDisabled(_input: RagRetrieveInput): boolean {
     return false;
   }
 
+  /** 由具体检索器实现候选查询和初始排序。 */
   protected abstract retrieveCandidates(
     input: RagRetrieveInput,
     limit: number,
   ): Promise<RetrievalCandidate[]>;
 
+  /** 将数据库检索行转换为统一候选并记录路由排名与分数。 */
   protected toCandidate(
     row: RagRetrievalRow,
     rank: number,
@@ -96,6 +102,7 @@ export abstract class BaseRagRetriever implements RagRetriever {
     };
   }
 
+  /** 构造带阶段状态和耗时的检索路由结果。 */
   private buildResult(
     status: RagStageStatus,
     candidates: RetrievalCandidate[],
@@ -109,6 +116,7 @@ export abstract class BaseRagRetriever implements RagRetriever {
     };
   }
 
+  /** 将候选上限规范到数据库查询允许的安全范围。 */
   private normalizeCandidateLimit(value: number) {
     return Math.min(Math.max(Number(value) || 0, 0), 100);
   }

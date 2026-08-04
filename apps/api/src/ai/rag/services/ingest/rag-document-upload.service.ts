@@ -12,6 +12,7 @@ import type {
 import { DocumentLoaderService } from './document-loader.service';
 import { RagIngestService } from './rag-ingest.service';
 
+/** 负责租户文档的批量上传、去重、落盘和索引编排。 */
 @Injectable()
 export class RagDocumentUploadService {
   constructor(
@@ -20,6 +21,7 @@ export class RagDocumentUploadService {
     private readonly tenantContext: TenantContext,
   ) {}
 
+  /** 顺序处理上传文件并汇总索引、重复和失败结果。 */
   async uploadDocuments(
     files: Express.Multer.File[],
   ): Promise<RagDocumentUploadResult> {
@@ -50,6 +52,7 @@ export class RagDocumentUploadService {
     };
   }
 
+  /** 校验单个文件、执行批次与库内去重，并完成落盘索引。 */
   private async processFile(
     file: Express.Multer.File,
     tenantCode: TenantCode,
@@ -152,6 +155,7 @@ export class RagDocumentUploadService {
     }
   }
 
+  /** 将库内同哈希文档转换为上传接口的重复结果。 */
   private buildDuplicateResult(
     fileName: string,
     existing: { id: bigint | number | string; fileName: string },
@@ -167,6 +171,7 @@ export class RagDocumentUploadService {
     };
   }
 
+  /** 以排他复制方式将临时文件保存到租户原始目录并处理重名。 */
   private async saveToTenantRaw(
     tempPath: string,
     fileName: string,
@@ -192,6 +197,7 @@ export class RagDocumentUploadService {
     throw new BadRequestException('too many files with the same name');
   }
 
+  /** 清理上传文件名中的路径、控制字符和多余空白。 */
   private sanitizeFileName(value: string): string {
     return path
       .basename((value ?? '').replace(/\\/g, '/'))
@@ -200,6 +206,7 @@ export class RagDocumentUploadService {
       .trim();
   }
 
+  /** 删除临时或回滚文件，并按调用场景决定是否忽略清理失败。 */
   private async removeFileIfExists(
     filePath?: string,
     ignoreFailure = false,
@@ -217,6 +224,7 @@ export class RagDocumentUploadService {
     }
   }
 
+  /** 获取请求租户，并在无请求上下文时回退到默认租户。 */
   private currentTenant(): TenantCode {
     return this.tenantContext.tenant ?? NodeConfigService.get('defaultTenant');
   }

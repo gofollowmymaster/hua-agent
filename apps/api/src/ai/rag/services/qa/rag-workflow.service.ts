@@ -63,6 +63,7 @@ type RagWorkflowRuntime = {
   writer: (event: RagStreamEvent) => void;
 };
 
+/** 使用 LangGraph 编排会话、路由、检索、生成和消息持久化。 */
 @Injectable()
 export class RagQueryService {
   private readonly reasoningModel: ChatOpenAI;
@@ -70,6 +71,7 @@ export class RagQueryService {
   private readonly reasoningEffort: RagReasoningEffort;
   private readonly graph: ReturnType<RagQueryService['buildGraph']>;
 
+  /** 初始化推理与回退模型，并编译可复用的问答状态图。 */
   constructor(
     private readonly logger: LoggerService,
     private readonly tenantContext: TenantContext,
@@ -100,6 +102,7 @@ export class RagQueryService {
     this.graph = this.buildGraph();
   }
 
+  /** 同步运行完整问答图并返回答案、来源和最终切片。 */
   async answerQuestion(
     question: string,
     options: RagQueryOptions = {},
@@ -112,6 +115,7 @@ export class RagQueryService {
     return this.toResult(result);
   }
 
+  /** 以自定义事件模式运行问答图并逐步产出流式状态和内容。 */
   async *streamAnswer(
     question: string,
     options: RagQueryOptions = {},
@@ -129,6 +133,7 @@ export class RagQueryService {
     }
   }
 
+  /** 定义 direct 与 RAG 分支及双路检索汇合关系，并编译状态图。 */
   private buildGraph() {
     // 路由后仅 RAG 分支扇出两路召回，并通过数组起点 edge 形成 fan-in barrier。
     return new StateGraph({
@@ -246,6 +251,7 @@ export class RagQueryService {
     return result;
   }
 
+  /** 根据路由节点结果选择直接回答或知识库检索分支。 */
   private selectQuestionRoute(state: RagWorkflowGraphState): RagQuestionRoute {
     return state.routeResult?.route === 'direct' ? 'direct' : 'rag';
   }
@@ -478,6 +484,7 @@ export class RagQueryService {
     return result;
   }
 
+  /** 使用推理模型同步生成答案，失败或空结果时回退普通模型。 */
   private async generateSyncAnswer(
     state: RagWorkflowGraphState,
   ): Promise<RagAnswerGenerationResult> {
@@ -497,6 +504,7 @@ export class RagQueryService {
     };
   }
 
+  /** 使用普通模型为 direct 分支同步生成答案。 */
   private async generateDirectSyncAnswer(
     state: RagWorkflowGraphState,
   ): Promise<RagAnswerGenerationResult> {
@@ -506,6 +514,7 @@ export class RagQueryService {
     };
   }
 
+  /** 流式生成 direct 答案，并在无文本或异常时回退同步生成。 */
   private async generateDirectStreamAnswer(
     state: RagWorkflowGraphState,
     runtime: RagWorkflowRuntime,
@@ -544,6 +553,7 @@ export class RagQueryService {
     return { answer: text, reasoningFallback: true };
   }
 
+  /** 流式输出推理与答案内容，并在无正文时回退普通模型。 */
   private async generateStreamAnswer(
     state: RagWorkflowGraphState,
     runtime: RagWorkflowRuntime,
@@ -603,11 +613,13 @@ export class RagQueryService {
     return { answer: text, reasoningFallback: true };
   }
 
+  /** 使用普通模型执行一次非推理答案生成。 */
   private async generateFallbackAnswer(prompt: string): Promise<string> {
     const response = await this.fallbackModel.invoke(prompt);
     return this.extractContentText(response.content);
   }
 
+  /** 记录 RAG 推理模型回退普通生成的上下文。 */
   private logReasoningFallback(
     state: RagWorkflowGraphState,
     stage: string,
@@ -629,6 +641,7 @@ export class RagQueryService {
     );
   }
 
+  /** 记录 direct 流式生成回退同步调用的上下文。 */
   private logDirectFallback(
     state: RagWorkflowGraphState,
     stage: string,
@@ -644,6 +657,7 @@ export class RagQueryService {
     });
   }
 
+  /** 执行单个工作流节点并统一记录耗时、状态和安全日志元数据。 */
   private async runNode<T extends RagWorkflowGraphUpdate>(
     nodeName: string,
     state: RagWorkflowGraphState,
@@ -679,6 +693,7 @@ export class RagQueryService {
     }
   }
 
+  /** 从单路检索结果提取节点日志所需的状态和候选统计。 */
   private routeLogMeta(result?: RagRetrievalRouteResult) {
     return {
       nodeStatus: result?.status,
@@ -687,6 +702,7 @@ export class RagQueryService {
     };
   }
 
+  /** 仅在流式模式下向调用方写入状态事件。 */
   private writeStatus(
     state: RagWorkflowGraphState,
     runtime: RagWorkflowRuntime,
@@ -695,6 +711,7 @@ export class RagQueryService {
     if (state.mode === 'stream') runtime.writer({ type: 'status', data });
   }
 
+  /** 构造状态图运行所需的初始输入。 */
   private buildInput(
     question: string,
     options: RagQueryOptions,
@@ -703,6 +720,7 @@ export class RagQueryService {
     return { question, options, mode };
   }
 
+  /** 构造包含租户、会话和推理策略的 LangGraph 运行配置。 */
   private buildRunConfig(options: RagQueryOptions, mode: RagWorkflowMode) {
     const session = this.ragMemoryService.resolveSession(options);
     return {
@@ -720,6 +738,7 @@ export class RagQueryService {
     };
   }
 
+  /** 将最终图状态收敛为公共问答结果。 */
   private toResult(state: RagWorkflowGraphState): RagWorkflowResult {
     return {
       sessionKey: state.session.sessionKey,
@@ -729,6 +748,7 @@ export class RagQueryService {
     };
   }
 
+  /** 按文档和位置去重检索切片并汇总来源信息。 */
   private buildSources(chunks: RetrievedChunk[]): SourceItem[] {
     const sourceMap = new Map<string, SourceItem>();
     for (const chunk of chunks) {
@@ -748,6 +768,7 @@ export class RagQueryService {
     return Array.from(sourceMap.values());
   }
 
+  /** 从模型内容中提取正文并排除推理内容块。 */
   private extractContentText(content: unknown): string {
     if (typeof content === 'string') return content;
     if (!Array.isArray(content)) return '';
@@ -767,6 +788,7 @@ export class RagQueryService {
       .join('');
   }
 
+  /** 从模型附加字段或 reasoning 内容块中提取推理文本。 */
   private extractReasoningText(chunk: unknown): string {
     if (!chunk || typeof chunk !== 'object') return '';
 
@@ -792,6 +814,7 @@ export class RagQueryService {
       .join('');
   }
 
+  /** 拒绝空白问题，防止无效请求进入工作流。 */
   private assertQuestion(question: string): void {
     if (!question || !question.trim()) {
       throw new BadRequestException('question is required');

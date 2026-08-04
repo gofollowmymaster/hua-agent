@@ -18,6 +18,7 @@ const RAG_MEMORY_MAX_MESSAGES = 20;
 const DEFAULT_HTTP_CHANNEL = 'http';
 const ASSISTANT_SENDER_ID = 'rag-assistant';
 
+/** 管理租户问答会话标识、Redis 短期记忆和数据库长期消息。 */
 @Injectable()
 export class RagMemoryService {
   constructor(
@@ -29,6 +30,7 @@ export class RagMemoryService {
     this.logger.setContext(RagMemoryService.name);
   }
 
+  /** 规范会话输入并生成租户隔离的稳定会话标识。 */
   resolveSession(options?: RagQueryOptions): RagResolvedSession {
     const input = options?.session ?? { channel: DEFAULT_HTTP_CHANNEL };
     const channel = this.normalizeSegment(
@@ -46,6 +48,7 @@ export class RagMemoryService {
     };
   }
 
+  /** 从 Redis 加载最近对话，读取或解析失败时降级为空记忆。 */
   async loadShortTermMemory(
     session: RagResolvedSession,
   ): Promise<RagMemoryMessage[]> {
@@ -66,6 +69,7 @@ export class RagMemoryService {
     }
   }
 
+  /** 依次持久化一轮用户问题和助手答案。 */
   async appendTurn(
     session: RagResolvedSession,
     question: string,
@@ -75,6 +79,7 @@ export class RagMemoryService {
     await this.appendAssistantMessage(session, answer);
   }
 
+  /** 将有效用户问题并行写入短期记忆和长期消息。 */
   async appendUserMessage(session: RagResolvedSession, question: string) {
     if (!question.trim()) return;
 
@@ -95,6 +100,7 @@ export class RagMemoryService {
     ]);
   }
 
+  /** 将有效助手答案并行写入短期记忆和长期消息。 */
   async appendAssistantMessage(session: RagResolvedSession, answer: string) {
     if (!answer.trim()) return;
 
@@ -115,6 +121,7 @@ export class RagMemoryService {
     ]);
   }
 
+  /** 构造包含渠道与发送者上下文的用户短期记忆消息。 */
   private buildUserMemoryMessage(
     session: RagResolvedSession,
     question: string,
@@ -133,6 +140,7 @@ export class RagMemoryService {
     };
   }
 
+  /** 构造包含回复关系与渠道上下文的助手短期记忆消息。 */
   private buildAssistantMemoryMessage(
     session: RagResolvedSession,
     answer: string,
@@ -151,6 +159,7 @@ export class RagMemoryService {
     };
   }
 
+  /** 追加 Redis 消息，并限制窗口长度和刷新过期时间。 */
   private async appendShortTermMemory(
     session: RagResolvedSession,
     messages: RagMemoryMessage[],
@@ -171,6 +180,7 @@ export class RagMemoryService {
     }
   }
 
+  /** 确保会话存在后批量写入数据库长期消息，失败时记录但不中断问答。 */
   private async appendLongTermMessages(
     session: RagResolvedSession,
     messages: Array<Omit<Prisma.AplusRagMessageCreateManyInput, 'sessionId'>>,
@@ -192,6 +202,7 @@ export class RagMemoryService {
     }
   }
 
+  /** 新建或刷新租户会话，并返回后续消息关联所需的 ID。 */
   private async upsertSession(session: RagResolvedSession): Promise<bigint> {
     const result = await this.ragPrisma.aplusRagSession.upsert({
       where: {
@@ -225,6 +236,7 @@ export class RagMemoryService {
     return result.id;
   }
 
+  /** 使用统一模板构造带租户、渠道和会话标识的 Redis key。 */
   private buildRedisKey(session: RagResolvedSession) {
     return this.redisService.buildCacheKeyWithTemplates(
       RedisKeys.RAG_SESSION_MEMORY,
@@ -235,6 +247,7 @@ export class RagMemoryService {
     );
   }
 
+  /** 优先从渠道会话信息生成稳定 key，无标识时生成请求级临时 key。 */
   private buildSessionKey(input: RagSessionInput) {
     const conversationType = this.normalizeSegment(
       input.conversationType || 'conversation',
@@ -254,10 +267,12 @@ export class RagMemoryService {
     return `request:${Date.now()}:${Math.random().toString(36).slice(2, 10)}`;
   }
 
+  /** 将会话 key 编码为适合嵌入 Redis key 的 URL 安全文本。 */
   private encodeSessionKey(sessionKey: string) {
     return Buffer.from(sessionKey).toString('base64url');
   }
 
+  /** 解析并校验 Redis 中的短期记忆消息，坏数据会被忽略并记录。 */
   private parseMemoryMessage(
     value: string,
     session: RagResolvedSession,
@@ -278,6 +293,7 @@ export class RagMemoryService {
     }
   }
 
+  /** 汇总用户消息持久化所需的渠道和回复元数据。 */
   private buildUserMessageMetadata(session: RagResolvedSession) {
     return this.toJsonObject({
       ...(session.metadata ?? {}),
@@ -290,6 +306,7 @@ export class RagMemoryService {
     });
   }
 
+  /** 汇总助手消息持久化所需的渠道和回答对象元数据。 */
   private buildAssistantMessageMetadata(session: RagResolvedSession) {
     return this.toJsonObject({
       ...(session.metadata ?? {}),
@@ -301,6 +318,7 @@ export class RagMemoryService {
     });
   }
 
+  /** 将会话标识片段规范为小写且可安全拼接的字符集。 */
   private normalizeSegment(value: string) {
     return value
       .trim()
@@ -308,16 +326,19 @@ export class RagMemoryService {
       .replace(/[^a-z0-9_-]/g, '-');
   }
 
+  /** 获取请求租户，并在无请求上下文时回退到默认租户。 */
   private currentTenant() {
     return this.tenantContext.tenant ?? NodeConfigService.get('defaultTenant');
   }
 
+  /** 将普通对象转换为 Prisma 接受的 JSON 输入对象。 */
   private toJsonObject(
     value?: Record<string, unknown>,
   ): Prisma.InputJsonObject {
     return JSON.parse(JSON.stringify(value ?? {}));
   }
 
+  /** 将未知异常转换为适合结构化日志的消息。 */
   private formatError(error: unknown) {
     return error instanceof Error ? error.message : String(error);
   }

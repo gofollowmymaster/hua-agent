@@ -17,12 +17,14 @@ const questionRouteSchema = z.object({
   routeReason: z.string().trim().min(1),
 });
 
+/** 使用结构化模型输出判断问题应走知识库问答还是直接回答。 */
 @Injectable()
 export class RagQuestionRouterService {
   private readonly model: ChatOpenAI;
   private readonly outputParser =
     StructuredOutputParser.fromZodSchema(questionRouteSchema);
 
+  /** 初始化低随机性的路由模型及其结构化输出解析器。 */
   constructor(
     private readonly logger: LoggerService,
     private readonly tenantContext: TenantContext,
@@ -39,6 +41,7 @@ export class RagQuestionRouterService {
     });
   }
 
+  /** 结合问题和短期记忆选择问答路由，失败时安全回退到 RAG。 */
   async route(params: {
     question: string;
     memory: RagMemoryMessage[];
@@ -76,6 +79,7 @@ export class RagQuestionRouterService {
     }
   }
 
+  /** 记录路由结果、耗时和回退原因等诊断信息。 */
   private logResult(
     params: { session: RagResolvedSession; topK?: number },
     result: RagQuestionRouteResult,
@@ -93,10 +97,12 @@ export class RagQuestionRouterService {
     });
   }
 
+  /** 将未知异常归一为可记录的错误类型。 */
   private errorType(error: unknown): string {
     return error instanceof Error ? error.name : typeof error;
   }
 
+  /** 从模型可能返回的字符串或内容块中提取连续文本。 */
   private extractContentText(content: unknown): string {
     if (typeof content === 'string') return content;
     if (!Array.isArray(content)) return '';

@@ -15,10 +15,12 @@ type Qwen3RerankResponse = {
   };
 };
 
+/** 调用 Qwen3 外部模型按语义相关度重排检索候选。 */
 @Injectable()
 export class Qwen3Reranker implements RagReranker {
   constructor(private readonly httpService: HttpService) {}
 
+  /** 请求重排模型并严格校验候选索引与相关度分数。 */
   async rerank(input: RagRerankInput): Promise<RetrievalCandidate[]> {
     if (input.candidates.length === 0) return [];
 

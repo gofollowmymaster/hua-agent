@@ -26,12 +26,14 @@ const queryRewriteSchema = z.object({
 
 type RagQueryRewriteModelOutput = z.infer<typeof queryRewriteSchema>;
 
+/** 使用会话记忆将上下文相关问题改写为独立检索查询。 */
 @Injectable()
 export class RagQueryRewriteService {
   private readonly model: ChatOpenAI;
   private readonly outputParser =
     StructuredOutputParser.fromZodSchema(queryRewriteSchema);
 
+  /** 初始化低随机性的改写模型及其结构化输出解析器。 */
   constructor(
     private readonly logger: LoggerService,
     private readonly tenantContext: TenantContext,
@@ -48,6 +50,7 @@ export class RagQueryRewriteService {
     });
   }
 
+  /** 执行查询改写，并在模型或解析失败时回退到原问题。 */
   async rewrite(params: {
     question: string;
     memory: RagMemoryMessage[];
@@ -83,6 +86,7 @@ export class RagQueryRewriteService {
     }
   }
 
+  /** 校验模型改写结果并标记是否实际采用新查询。 */
   private buildResult(
     originalQuestion: string,
     modelOutput: RagQueryRewriteModelOutput,
@@ -121,6 +125,7 @@ export class RagQueryRewriteService {
     };
   }
 
+  /** 清理模型输出中的包装引号和说明性前缀。 */
   private normalizeRewrittenQuestion(value: string): string {
     return value
       .trim()
@@ -129,6 +134,7 @@ export class RagQueryRewriteService {
       .trim();
   }
 
+  /** 根据异常特征生成可读的改写回退原因。 */
   private buildFallbackRewriteReason(error: unknown): string {
     const message = error instanceof Error ? error.message : String(error);
     if (
@@ -142,6 +148,7 @@ export class RagQueryRewriteService {
     return '查询改写模型调用失败，回退原问题';
   }
 
+  /** 记录查询改写是否生效及其回退信息。 */
   private logRewriteResult(
     session: RagResolvedSession,
     topK: number | undefined,
@@ -158,6 +165,7 @@ export class RagQueryRewriteService {
     });
   }
 
+  /** 从模型可能返回的字符串或内容块中提取连续文本。 */
   private extractContentText(content: unknown): string {
     if (typeof content === 'string') return content;
     if (!Array.isArray(content)) return '';

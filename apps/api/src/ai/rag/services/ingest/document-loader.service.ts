@@ -28,6 +28,7 @@ export const RAG_SUPPORTED_DOCUMENT_EXTENSIONS = new Set([
 const PAGE_MARGIN_LINE_LIMIT = 4;
 const MAX_REPEATED_MARGIN_LINE_LENGTH = 180;
 
+/** 扫描、识别并解析租户原始目录中的受支持文档。 */
 @Injectable()
 export class DocumentLoaderService {
   private readonly rawDir: string;
@@ -39,6 +40,7 @@ export class DocumentLoaderService {
     );
   }
 
+  /** 递归扫描租户原始目录并构造可摄取文件描述。 */
   async scanRawFiles(tenantCode: TenantCode): Promise<RawDocumentFile[]> {
     const tenantRawDir = this.resolveTenantRawDir(tenantCode);
     const absolutePaths = await this.walk(tenantRawDir);
@@ -53,20 +55,24 @@ export class DocumentLoaderService {
     return files;
   }
 
+  /** 判断文件扩展名是否属于 RAG 支持的文档格式。 */
   isSupportedFileName(fileName: string): boolean {
     return RAG_SUPPORTED_DOCUMENT_EXTENSIONS.has(
       path.extname(fileName).toLowerCase(),
     );
   }
 
+  /** 返回当前支持的全部文档扩展名。 */
   getSupportedExtensions(): string[] {
     return [...RAG_SUPPORTED_DOCUMENT_EXTENSIONS];
   }
 
+  /** 解析指定租户的原始文档根目录。 */
   resolveTenantRawDir(tenantCode: TenantCode): string {
     return path.join(this.rawDir, tenantCode);
   }
 
+  /** 校验文件格式并收集路径、大小和哈希等摄取元数据。 */
   async buildRawDocumentFile(
     absolutePath: string,
     tenantCode: TenantCode,
@@ -92,11 +98,13 @@ export class DocumentLoaderService {
     };
   }
 
+  /** 计算文件内容的 SHA-256 哈希用于文档去重。 */
   async hashFile(filePath: string): Promise<string> {
     const file = await fs.readFile(filePath);
     return crypto.createHash('sha256').update(file).digest('hex');
   }
 
+  /** 按文件格式提取内容，并清理跨页面重复页眉页脚。 */
   async loadDocument(file: RawDocumentFile): Promise<LoadedDocument> {
     const ext = path.extname(file.absolutePath).toLowerCase();
     let segments: LoadedSegment[];
@@ -125,6 +133,7 @@ export class DocumentLoaderService {
     };
   }
 
+  /** 递归收集目录下的普通文件并忽略系统目录项。 */
   private async walk(dir: string): Promise<string[]> {
     let entries: Awaited<ReturnType<typeof fs.readdir>>;
     try {
@@ -151,11 +160,13 @@ export class DocumentLoaderService {
     return files;
   }
 
+  /** 从相对路径的首级目录推断文档业务分类。 */
   private resolveDocumentType(sourcePath: string) {
     const parts = sourcePath.split(path.sep).filter(Boolean);
     return parts.length > 1 ? parts[0] : '';
   }
 
+  /** 按页解析 PDF 并规范化提取文本。 */
   private async loadPdf(filePath: string): Promise<LoadedSegment[]> {
     const loader = new PDFLoader(filePath, {
       splitPages: true,
@@ -168,6 +179,7 @@ export class DocumentLoaderService {
     );
   }
 
+  /** 修复 PDF 提取产生的异常空格、断行和分散字符。 */
   private normalizePdfText(text: string): string {
     let normalized = this.compactSingleCharacterLineBlocks(
       text.replace(/\r\n/g, '\n'),
@@ -221,6 +233,7 @@ export class DocumentLoaderService {
     return normalized;
   }
 
+  /** 合并由 PDF 排版导致的连续单字符行块。 */
   private compactSingleCharacterLineBlocks(text: string): string {
     const pageLines = text.split('\n').map((line) => line.trim());
     const pageContentLines = pageLines.filter(Boolean);
@@ -240,6 +253,7 @@ export class DocumentLoaderService {
       .join('\n\n');
   }
 
+  /** 判断一组文本行是否主要由单字符或双字符行构成。 */
   private isSingleCharacterLineDominant(lines: string[]): boolean {
     if (lines.length < 6) return false;
 
@@ -255,11 +269,13 @@ export class DocumentLoaderService {
     );
   }
 
+  /** 使用 LangChain 加载 DOCX 文档并映射为统一片段。 */
   private async loadDocx(filePath: string): Promise<LoadedSegment[]> {
     const loader = new DocxLoader(filePath);
     return this.mapLangchainDocuments(await loader.load());
   }
 
+  /** 将 XLSX 的每个工作表转换为带行号的文本片段。 */
   private async loadXlsx(filePath: string): Promise<LoadedSegment[]> {
     const workbook = xlsx.readFile(filePath, { cellDates: true });
     return workbook.SheetNames.map((sheetName) => {
@@ -285,11 +301,13 @@ export class DocumentLoaderService {
     });
   }
 
+  /** 使用 LangChain 加载 PPTX 并映射为统一片段。 */
   private async loadPptx(filePath: string): Promise<LoadedSegment[]> {
     const loader = new PPTXLoader(filePath);
     return this.mapLangchainDocuments(await loader.load());
   }
 
+  /** 从旧版 PPT 二进制中尽力提取可检索文本。 */
   private async loadLegacyPpt(filePath: string): Promise<LoadedSegment[]> {
     const buffer = await fs.readFile(filePath);
     const text = buffer
@@ -307,10 +325,12 @@ export class DocumentLoaderService {
     return [{ text, metadata: { legacyPpt: true } }];
   }
 
+  /** 以 UTF-8 读取纯文本或 Markdown 文档。 */
   private async loadText(filePath: string): Promise<LoadedSegment[]> {
     return [{ text: await fs.readFile(filePath, 'utf8'), metadata: {} }];
   }
 
+  /** 删除在多数页面边缘重复出现的页眉、页脚和页码。 */
   private removeRepeatedPageMargins(
     segments: LoadedSegment[],
   ): LoadedSegment[] {
@@ -368,6 +388,7 @@ export class DocumentLoaderService {
     });
   }
 
+  /** 提取单个页面顶部和底部有限数量的候选边缘行。 */
   private getMarginLines(text: string): {
     top: Array<{ index: number; key: string }>;
     bottom: Array<{ index: number; key: string }>;
@@ -390,6 +411,7 @@ export class DocumentLoaderService {
     };
   }
 
+  /** 找出达到页面重复阈值的边缘文本。 */
   private getRepeatedMarginKeys(
     marginLinesBySegment: Array<Array<{ key: string }>>,
     minOccurrences: number,
@@ -409,10 +431,12 @@ export class DocumentLoaderService {
     );
   }
 
+  /** 统一边缘文本空白以便跨页面比较。 */
   private normalizeMarginLine(line: string): string {
     return line.trim().replace(/\s+/g, ' ');
   }
 
+  /** 判断文本是否为带“页”或 Page 标签的页码。 */
   private isLabeledPageNumberLine(line: string): boolean {
     return (
       /^第\s*\d+\s*(?:页|\/)\s*(?:共\s*)?\d*\s*页?$/.test(line) ||
@@ -421,6 +445,7 @@ export class DocumentLoaderService {
     );
   }
 
+  /** 判断文本是否属于受支持的纯数字或带标签页码格式。 */
   private isPageNumberLine(line: string): boolean {
     return (
       this.isLabeledPageNumberLine(line) ||
@@ -429,6 +454,7 @@ export class DocumentLoaderService {
     );
   }
 
+  /** 将 LangChain 文档映射为内部片段并收敛元数据。 */
   private mapLangchainDocuments(
     documents: Document[],
     normalizeContent: (document: Document) => string = (document) =>
@@ -440,6 +466,7 @@ export class DocumentLoaderService {
     }));
   }
 
+  /** 仅保留检索引用所需的 LangChain 页码元数据。 */
   private sanitizeLangchainMetadata(metadata: Record<string, unknown>) {
     const location: Record<string, unknown> = {};
     const loc = metadata.loc as Record<string, unknown> | undefined;

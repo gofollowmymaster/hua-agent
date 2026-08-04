@@ -8,8 +8,10 @@ import {
   type RagRetrieveInput,
 } from './rag-retriever';
 
+/** 使用 PostgreSQL 中文全文索引检索当前租户的候选切片。 */
 @Injectable()
 export class RagFullTextRetrieverService extends BaseRagRetriever {
+  /** 从集中配置初始化全文检索候选上限和失败上下文。 */
   constructor(
     private readonly ragPrisma: RagPrismaService,
     logger: LoggerService,
@@ -24,10 +26,12 @@ export class RagFullTextRetrieverService extends BaseRagRetriever {
     );
   }
 
+  /** 空查询不执行全文检索。 */
   protected isDisabled(input: RagRetrieveInput): boolean {
     return !input.query.trim();
   }
 
+  /** 分词后按全文相关度查询并映射租户隔离的候选切片。 */
   protected async retrieveCandidates(input: RagRetrieveInput, limit: number) {
     const normalizedQuery = input.query.trim();
     const rows = await this.ragPrisma.$queryRaw<RagRetrievalRow[]>`

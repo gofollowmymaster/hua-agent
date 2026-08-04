@@ -10,6 +10,7 @@ import {
   Min,
 } from 'class-validator';
 
+/** 定义 RAG 管理接口通用的分页参数。 */
 export class RagAdminPageDto {
   @ApiPropertyOptional({ description: '页码，从 1 开始', default: 1 })
   @IsOptional()
@@ -27,6 +28,7 @@ export class RagAdminPageDto {
   pageSize?: number = 20;
 }
 
+/** 定义管理后台筛选和分页查询知识库文档的条件。 */
 export class RagAdminDocumentPageDto extends RagAdminPageDto {
   @ApiPropertyOptional({ description: '文件名或来源路径关键词' })
   @IsOptional()
@@ -49,8 +51,10 @@ export class RagAdminDocumentPageDto extends RagAdminPageDto {
   updatedTo?: string;
 }
 
+/** 定义分页查询指定文档切片的参数。 */
 export class RagAdminDocumentChunkPageDto extends RagAdminPageDto {}
 
+/** 定义可由管理后台维护的文档业务元数据。 */
 export class RagAdminDocumentMetadataDto {
   @ApiPropertyOptional({ description: '文档业务分类' })
   @IsOptional()
@@ -63,6 +67,7 @@ export class RagAdminDocumentMetadataDto {
   tag?: string;
 }
 
+/** 定义管理后台触发文档索引时的执行策略。 */
 export class RagAdminIngestDto {
   @ApiPropertyOptional({
     description: '是否强制重新索引 hash 未变化的文档',
@@ -73,6 +78,7 @@ export class RagAdminIngestDto {
   force?: boolean;
 }
 
+/** 定义管理后台筛选和分页查询问答会话的条件。 */
 export class RagAdminSessionPageDto extends RagAdminPageDto {
   @ApiPropertyOptional({ description: '渠道，如 http、wecom' })
   @IsOptional()

@@ -8,6 +8,7 @@ import {
   Min,
 } from 'class-validator';
 
+/** 承载同步 RAG 问答所需的问题、检索和会话上下文。 */
 export class RagQueryDto {
   @ApiProperty({ description: '用户问题' })
   @IsString()

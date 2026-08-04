@@ -24,6 +24,7 @@ const RAG_UNAVAILABLE_TIP = '知识库问答暂时不可用，请稍后重试。
 const THINKING_TIP = '正在检索知识库，请稍候...\n\n';
 const WELCOME_TEXT = '您好，我是企业知识库问答助手。请直接发送文本问题。';
 
+/** 管理多租户企业微信 RAG 机器人的连接、消息处理和流式回复。 */
 @Injectable()
 export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
   private readonly configs: TenantWecomRagBotConfig[];
@@ -39,6 +40,7 @@ export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
     this.defaultTopK = NodeConfigService.get('vcHelper').defaultTopK;
   }
 
+  /** 为启用且配置完整的租户创建并连接企业微信 WebSocket 客户端。 */
   onModuleInit() {
     const enabledConfigs = this.configs.filter((config) => config.enabled);
     if (enabledConfigs.length === 0) {
@@ -68,6 +70,7 @@ export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
+  /** 在模块销毁时断开全部租户客户端并清理连接缓存。 */
   onModuleDestroy() {
     for (const client of this.clients.values()) {
       client.disconnect();
@@ -75,6 +78,7 @@ export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
     this.clients.clear();
   }
 
+  /** 绑定连接状态、进群事件和各类消息的处理逻辑。 */
   private bindEvents(client: WSClient, config: TenantWecomRagBotConfig) {
     client.on('connected', () => {
       this.logger.info('WeCom RAG bot websocket connected', undefined, {
@@ -124,6 +128,7 @@ export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
+  /** 回复用户进入会话时的使用引导，失败仅记录日志。 */
   private async replyWelcome(
     client: WSClient,
     config: TenantWecomRagBotConfig,
@@ -146,6 +151,7 @@ export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
+  /** 在对应租户上下文中执行流式问答并持续更新企业微信消息。 */
   private async handleTextMessage(
     client: WSClient,
     config: TenantWecomRagBotConfig,
@@ -234,6 +240,7 @@ export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
+  /** 记录非文本消息并回复当前支持的消息类型提示。 */
   private async handleUnsupportedMessage(
     client: WSClient,
     config: TenantWecomRagBotConfig,
@@ -249,6 +256,7 @@ export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
     await this.replyText(client, frame, UNSUPPORTED_MESSAGE_TIP, true);
   }
 
+  /** 从企业微信文本帧提取问答所需的会话和用户上下文。 */
   private buildMessageContext(
     frame: WecomTextMessageFrame,
   ): WecomRagMessageContext {
@@ -262,11 +270,13 @@ export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
+  /** 按群聊或单聊语义解析稳定会话 ID。 */
   private resolveChatId(body: WecomBaseMessageFrame['body']) {
     if (body?.chattype === 'group') return body.chatid ?? '';
     return body?.from?.userid ?? body?.chatid ?? '';
   }
 
+  /** 使用独立流标识发送一次性文本回复。 */
   private async replyText(
     client: WSClient,
     frame: WecomTextMessageFrame | WecomBaseMessageFrame,
@@ -282,6 +292,7 @@ export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
     );
   }
 
+  /** 通过非阻塞接口发送或更新企业微信流式消息。 */
   private async replyStream(
     client: WSClient,
     frame: WecomTextMessageFrame | WecomBaseMessageFrame,
@@ -292,6 +303,7 @@ export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
     await client.replyStreamNonBlocking(frame, streamId, content, finish);
   }
 
+  /** 将企业微信 SDK 日志桥接到项目日志并附加租户信息。 */
   private buildWecomLogger(config: TenantWecomRagBotConfig): WecomLogger {
     return {
       debug: (message: string, ...args: any[]) =>
@@ -317,10 +329,12 @@ export class WecomRagBotService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
+  /** 将未知异常转换为适合日志记录的消息。 */
   private formatError(error: unknown) {
     return error instanceof Error ? error.message : String(error);
   }
 
+  /** 汇总各租户已配置的企业微信知识库机器人参数。 */
   private getWecomRagBotConfigs(): TenantWecomRagBotConfig[] {
     const tenantConfigs = NodeConfigService.get('tenantConfig');
     return Object.values(tenantCodeMap)

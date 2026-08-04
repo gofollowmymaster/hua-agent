@@ -18,12 +18,14 @@ import type {
 import { DocumentLoaderService } from './document-loader.service';
 import { RagPrismaService } from '../prisma/rag-prisma.service';
 
+/** 编排租户文档扫描、解析、切片、向量化和索引持久化。 */
 @Injectable()
 export class RagIngestService {
   private readonly embeddings: OpenAIEmbeddings;
   private readonly splitter: RecursiveCharacterTextSplitter;
   private readonly embeddingBatchSize: number;
 
+  /** 根据集中配置初始化向量模型、批处理大小和文本切分策略。 */
   constructor(
     private readonly ragPrisma: RagPrismaService,
     private readonly loader: DocumentLoaderService,
@@ -51,6 +53,7 @@ export class RagIngestService {
     });
   }
 
+  /** 扫描当前租户原始目录并批量摄取其中的文档。 */
   async ingest(options: { force?: boolean } = {}): Promise<IngestSummary> {
     const tenantCode = this.currentTenant();
     const ingestStart = Date.now();
@@ -76,6 +79,7 @@ export class RagIngestService {
     });
   }
 
+  /** 逐个处理给定文件，并汇总索引、跳过和失败结果。 */
   async ingestFiles(
     files: RawDocumentFile[],
     options: {
@@ -298,6 +302,7 @@ export class RagIngestService {
     return summary;
   }
 
+  /** 按租户和内容哈希查找已存在的文档，用于跨路径去重。 */
   async findDocumentByHash(tenantCode: TenantCode, fileHash: string) {
     return this.ragPrisma.aplusDocument.findFirst({
       where: { tenantCode, fileHash },
@@ -310,6 +315,7 @@ export class RagIngestService {
     });
   }
 
+  /** 将文档片段切成检索块并附加来源与租户元数据。 */
   private async buildChunks(tenantCode: TenantCode, document: LoadedDocument) {
     const chunks: Array<{
       content: string;
@@ -338,6 +344,7 @@ export class RagIngestService {
     return chunks;
   }
 
+  /** 生成切片向量，并在事务中原子替换文档及其全部切片。 */
   private async replaceDocumentChunks(
     tenantCode: TenantCode,
     document: LoadedDocument,
@@ -423,6 +430,7 @@ export class RagIngestService {
     });
   }
 
+  /** 按配置的批量大小生成文本向量，避免单次请求过大。 */
   private async embedInBatches(texts: string[]) {
     const result: number[][] = [];
     for (
@@ -437,6 +445,7 @@ export class RagIngestService {
     return result;
   }
 
+  /** 新建或更新处理中的文档记录并返回稳定文档 ID。 */
   private async upsertProcessingDocument(
     client: Prisma.TransactionClient,
     tenantCode: TenantCode,
@@ -476,6 +485,7 @@ export class RagIngestService {
     return String(id);
   }
 
+  /** 将摄取异常持久化为可重试、可排查的失败文档状态。 */
   private async markDocumentFailed(
     tenantCode: TenantCode,
     file: {
@@ -517,6 +527,7 @@ export class RagIngestService {
     `;
   }
 
+  /** 按租户和来源路径查找文档当前哈希与索引状态。 */
   private async findDocumentBySourcePath(
     tenantCode: TenantCode,
     sourcePath: string,
@@ -539,6 +550,7 @@ export class RagIngestService {
     };
   }
 
+  /** 识别 Prisma 或 PostgreSQL 返回的文档哈希唯一键冲突。 */
   private isFileHashUniqueConflict(error: unknown): boolean {
     if (!error || typeof error !== 'object') return false;
     const value = error as {
@@ -554,6 +566,7 @@ export class RagIngestService {
     );
   }
 
+  /** 清除未定义字段后记录结构化摄取进度。 */
   private logIngestProgress(meta: Record<string, unknown>) {
     const cleanMeta = Object.fromEntries(
       Object.entries(meta).filter(([, value]) => value !== undefined),
@@ -561,6 +574,7 @@ export class RagIngestService {
     this.logger.info('RAG ingest progress' + meta.stage, undefined, cleanMeta);
   }
 
+  /** 获取请求租户，并在无请求上下文时回退到默认租户。 */
   private currentTenant(): TenantCode {
     return this.tenantContext.tenant ?? NodeConfigService.get('defaultTenant');
   }

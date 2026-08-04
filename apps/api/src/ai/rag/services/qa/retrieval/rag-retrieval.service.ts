@@ -17,6 +17,7 @@ import {
   type RagRerankCandidatesInput,
 } from './rerank/rag-rerank.service';
 
+/** 编排并行检索、候选融合和最终重排。 */
 @Injectable()
 export class RagRetrievalService {
   constructor(
@@ -27,6 +28,7 @@ export class RagRetrievalService {
     private readonly rerankService: RagRerankService,
   ) {}
 
+  /** 并行执行向量和全文检索，再融合并重排为最终切片。 */
   async retrieve(input: {
     query: string;
     originalQuestion?: string;
@@ -57,6 +59,7 @@ export class RagRetrievalService {
     ).chunks;
   }
 
+  /** 委托向量检索器生成一路候选结果。 */
   retrieveVector(input: {
     query: string;
     tenantCode: string;
@@ -64,6 +67,7 @@ export class RagRetrievalService {
     return this.vectorRetriever.retrieve(input);
   }
 
+  /** 委托全文检索器生成一路候选结果。 */
   retrieveKeyword(input: {
     query: string;
     tenantCode: string;
@@ -71,12 +75,14 @@ export class RagRetrievalService {
     return this.fullTextRetriever.retrieve(input);
   }
 
+  /** 委托融合服务合并多路候选。 */
   fuseCandidates(
     candidateGroups: RetrievalCandidate[][],
   ): RetrievalCandidate[] {
     return this.fusionService.fuseCandidates(candidateGroups);
   }
 
+  /** 委托重排服务筛选最终检索切片。 */
   rerankCandidates(input: RagRerankCandidatesInput): Promise<RagRerankResult> {
     return this.rerankService.rerankCandidates(input);
   }
