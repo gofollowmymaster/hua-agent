@@ -5,6 +5,7 @@ import type {
   RetrievedChunk,
   SourceItem,
 } from './rag.type';
+import type { RagRerankMode } from '@src/config/interface';
 
 export type RagWorkflowMode = 'sync' | 'stream';
 
@@ -19,6 +20,8 @@ export interface RagRetrievalRouteResult {
 
 export interface RagRerankResult {
   status: RagStageStatus;
+  mode: RagRerankMode;
+  fallbackMode?: Exclude<RagRerankMode, 'model'>;
   chunks: RetrievedChunk[];
   durationMs: number;
 }

@@ -14,6 +14,7 @@ function maxNumberEnv(key: string, fallback: number, max: number) {
 }
 
 const openAiApiKey = process.env.OPENAI_API_KEY ?? '';
+const embeddingsApiKey = process.env.EMBEDDINGS_API_KEY ?? openAiApiKey;
 
 const globalConfig: GlobalConfigType = Object.freeze({
   //node-server报警群
@@ -37,11 +38,15 @@ const globalConfig: GlobalConfigType = Object.freeze({
   openAiApiKey,
   openAiBaseUrl: process.env.OPENAI_BASE_URL,
   modelName: process.env.MODEL_NAME ?? 'qwen-plus',
-  embeddingsApiKey: process.env.EMBEDDINGS_API_KEY ?? openAiApiKey,
+  embeddingsApiKey,
   embeddingsBaseUrl:
     process.env.EMBEDDINGS_BASE_URL ?? process.env.OPENAI_BASE_URL,
   embeddingsModelName: process.env.EMBEDDINGS_MODEL_NAME ?? 'text-embedding-v3',
   embeddingsDimensions: numberEnv('EMBEDDINGS_DIMENSIONS', 1024),
+  rerankApiKey: process.env.RERANK_API_KEY || embeddingsApiKey,
+  rerankUrl: process.env.RERANK_URL || undefined,
+  rerankModel: process.env.RERANK_MODEL || 'qwen3-rerank',
+  rerankTimeoutMs: numberEnv('RERANK_TIMEOUT_MS', 10000),
 
   vcHelper: {
     rawDir: process.env.RAW_DIR ?? 'raw',

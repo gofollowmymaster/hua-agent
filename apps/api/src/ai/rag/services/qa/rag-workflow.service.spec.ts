@@ -117,6 +117,7 @@ describe('RagQueryService', () => {
         .mockReturnValue([vectorCandidate, keywordCandidate]),
       rerankCandidates: jest.fn().mockResolvedValue({
         status: 'success',
+        mode: 'model',
         chunks,
         durationMs: 2,
       }),
@@ -155,6 +156,7 @@ describe('RagQueryService', () => {
 
     const resultPromise = service.answerQuestion('审批呢？', {
       topK: 2,
+      rerankMode: 'model',
       session: {
         channel: 'http',
         conversationId: 'conv-1',
@@ -181,6 +183,9 @@ describe('RagQueryService', () => {
       [vectorCandidate],
       [keywordCandidate],
     ]);
+    expect(ragRetrievalService.rerankCandidates).toHaveBeenCalledWith(
+      expect.objectContaining({ rerankMode: 'model' }),
+    );
     expect(queryRewriteService.rewrite).toHaveBeenCalledWith({
       question: '审批呢？',
       memory: expect.any(Array),
@@ -214,8 +219,17 @@ describe('RagQueryService', () => {
         sessionKey: session.sessionKey,
         channel: 'http',
         topK: 2,
+        rerankMode: 'model',
       },
     });
+    expect(logger.info).toHaveBeenCalledWith(
+      'RAG workflow node completed',
+      undefined,
+      expect.objectContaining({
+        nodeName: 'rerank_candidates',
+        rerankMode: 'model',
+      }),
+    );
   });
 
   it('streams the existing status sequence and answer tokens', async () => {
@@ -358,10 +372,8 @@ function buildCandidate(
     score,
     retrieval: {
       routes: [route],
-      vectorRank: route === 'vector' ? 1 : undefined,
-      keywordRank: route === 'keyword' ? 1 : undefined,
-      vectorScore: route === 'vector' ? score : undefined,
-      keywordScore: route === 'keyword' ? score : undefined,
+      ranks: { [route]: 1 },
+      scores: { [route]: score },
     },
   };
 }

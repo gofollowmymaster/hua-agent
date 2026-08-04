@@ -27,19 +27,25 @@
 
 `retrieve_vector` 和 `retrieve_keyword` 分别写入 `vectorResult` 与 `keywordResult`，通过 LangGraph 多起点 edge 并行执行，并使用 waiting edge 在 `fuse_candidates` 汇合。不同字段避免并行更新冲突，也能在 LangSmith 中独立检查输出。
 
-### 3. 检索 Service 暴露阶段操作
+### 3. 检索 facade 委托独立阶段 Service
 
-保留 `RagRetrievalService` 对数据库、embedding、融合和 rerank 的所有权，但将阶段拆为公开方法。每路返回 `{ route, status, candidates, durationMs }`；失败仍记录 warn 并返回空候选，不中断另一召回节点。融合与重排算法保持不变。
+保留 `RagRetrievalService` 作为稳定 facade，并将向量召回、全文召回、RRF 融合和 rerank 分别委托给独立 NestJS Service。每路 Retriever 实现统一契约，返回 `{ route, status, candidates, durationMs }`；失败仍记录 warn 并返回空候选，不中断另一召回节点。工作流继续调用 facade 的阶段方法，保持节点拓扑和入口签名不变。
 
-### 4. 通过 custom stream 兼容现有协议
+候选诊断使用按 route 存储的 `ranks` 与 `scores`，避免新增检索方式时扩充专用 rank/score 字段。向量和全文检索仍分别使用 `vector` 与 `keyword` route，现有节点名和日志口径保持不变。
+
+### 4. 重排使用独立策略服务
+
+`RagRerankService` 负责候选截取、策略选择、诊断和失败回退；`NoopReranker` 与 `RuleBasedReranker` 通过统一接口注入。`model` 模式仍回退规则重排，不在本次实现模型调用。
+
+### 5. 通过 custom stream 兼容现有协议
 
 图节点使用 runtime writer 输出既有 `RagStreamEvent`。生成节点在流式模式逐 token 写入 `answer`，异常或空流时输出既有 `fallback_start` 并调用 `invoke`；同步模式直接调用 `invoke`。`RagQueryService` 同时负责 AsyncGenerator 和 AGUI 协议转换。
 
-### 5. 复用现有业务持久化，不使用 checkpointer
+### 6. 复用现有业务持久化，不使用 checkpointer
 
 图不配置 checkpointer。`RagMemoryService` 继续负责会话解析、短期记忆和消息写入，避免 LangGraph 状态与业务会话产生双重真源。
 
-### 6. Trace 元数据最小化
+### 7. Trace 元数据最小化
 
 图运行设置固定 run name、执行模式 tag，以及 tenant、session、channel、topK metadata。结构化日志仅记录节点、耗时、候选数和状态，不记录问题、回答或文档正文。
 

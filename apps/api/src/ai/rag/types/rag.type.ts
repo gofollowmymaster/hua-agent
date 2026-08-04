@@ -1,4 +1,5 @@
 import type { UIMessage } from 'ai';
+import type { RagRerankMode } from '@src/config/interface';
 
 export interface LoadedSegment {
   text: string;
@@ -38,13 +39,11 @@ export type RagRetrievalRoute = 'vector' | 'keyword';
 
 export interface RetrievedChunkTrace {
   routes: RagRetrievalRoute[];
-  vectorRank?: number;
-  keywordRank?: number;
-  vectorScore?: number;
-  keywordScore?: number;
+  ranks: Partial<Record<RagRetrievalRoute, number>>;
+  scores: Partial<Record<RagRetrievalRoute, number>>;
   fusedScore?: number;
   rerankScore?: number;
-  rerankMode?: string;
+  rerankMode?: RagRerankMode;
 }
 
 export interface RetrievalCandidate extends RetrievedChunk {
@@ -95,6 +94,7 @@ export interface RagMemoryMessage {
 
 export interface RagQueryOptions {
   topK?: number;
+  rerankMode?: RagRerankMode;
   session?: RagSessionInput;
 }
 

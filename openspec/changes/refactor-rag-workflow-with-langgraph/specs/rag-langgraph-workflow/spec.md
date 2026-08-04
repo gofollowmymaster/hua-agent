@@ -42,6 +42,22 @@ RAG 问答系统 SHALL 为工作流和独立节点提供稳定名称，并 SHALL
 - **THEN** 系统 SHALL 可分别识别向量召回、关键词召回、融合和重排节点
 - **AND** 结构化日志 MUST NOT 包含问题、回答或文档正文
 
+### Requirement: 检索方式可独立扩展
+
+RAG 问答系统 SHALL 通过统一 Retriever 契约实现各检索方式，并 SHALL 由检索 facade 提供稳定的阶段调用入口。候选的 route rank 与 score MUST 使用通用映射保存，不得为每种检索方式新增固定诊断字段。
+
+#### Scenario: 增加新的检索方式
+
+- **WHEN** 开发人员增加新的检索方式
+- **THEN** 系统 SHALL 允许通过新增 Retriever 实现和独立图节点接入
+- **AND** 现有向量 Retriever、全文 Retriever、融合与重排实现 SHALL 无需修改
+
+#### Scenario: 调用现有检索 facade
+
+- **WHEN** 工作流调用向量召回、关键词召回、融合或重排阶段
+- **THEN** `RagRetrievalService` SHALL 委托对应独立 Service 执行
+- **AND** 现有阶段方法签名和降级语义 MUST 保持不变
+
 ### Requirement: 会话状态单一来源
 
 RAG 工作流 MUST 继续使用现有 RAG 会话与消息持久化服务，且 MUST NOT 引入 LangGraph checkpointer 作为第二套会话状态来源。

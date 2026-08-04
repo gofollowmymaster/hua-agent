@@ -15,7 +15,7 @@ import { NodeConfigService } from '@src/config/node-config.service';
 import { PromptRegistryService } from '../../prompts/prompt.registry';
 import { RagMemoryService } from './rag-memory.service';
 import { RagQueryRewriteService } from './rag-query-rewrite.service';
-import { RagRetrievalService } from './rag-retrieval.service';
+import { RagRetrievalService } from './retrieval/rag-retrieval.service';
 import type {
   RagChatRequest,
   RagMemoryMessage,
@@ -191,6 +191,7 @@ export class RagQueryService {
       .compile({ name: 'rag_qa_workflow' });
   }
 
+  /** 校验问题并解析租户、会话标识等上下文，供后续节点统一使用。 */
   private async resolveSessionNode(
     state: RagWorkflowGraphState,
   ): Promise<RagWorkflowGraphUpdate> {
@@ -202,6 +203,7 @@ export class RagQueryService {
     });
   }
 
+  /** 根据已解析的会话加载短期对话记忆，为问题改写和提示词构建提供上下文。 */
   private async loadMemoryNode(
     state: RagWorkflowGraphState,
   ): Promise<RagWorkflowGraphUpdate> {
@@ -210,6 +212,7 @@ export class RagQueryService {
     }));
   }
 
+  /** 持久化当前用户问题，并在流式模式下通知客户端开始分析。 */
   private async persistUserMessageNode(
     state: RagWorkflowGraphState,
     runtime: RagWorkflowRuntime,
@@ -234,6 +237,7 @@ export class RagQueryService {
     return result;
   }
 
+  /** 结合原始问题与对话记忆生成检索问题，并通知客户端开始知识库检索。 */
   private async rewriteQueryNode(
     state: RagWorkflowGraphState,
     runtime: RagWorkflowRuntime,
@@ -255,6 +259,7 @@ export class RagQueryService {
     return result;
   }
 
+  /** 使用改写后的问题执行向量语义召回，将候选片段写入 vectorResult。 */
   private async retrieveVectorNode(
     state: RagWorkflowGraphState,
   ): Promise<RagWorkflowGraphUpdate> {
@@ -271,6 +276,7 @@ export class RagQueryService {
     );
   }
 
+  /** 使用改写后的问题执行关键词召回，将候选片段写入 keywordResult。 */
   private async retrieveKeywordNode(
     state: RagWorkflowGraphState,
   ): Promise<RagWorkflowGraphUpdate> {
@@ -287,6 +293,7 @@ export class RagQueryService {
     );
   }
 
+  /** 合并向量与关键词两路召回结果，去重并融合为统一候选集合。 */
   private async fuseCandidatesNode(
     state: RagWorkflowGraphState,
   ): Promise<RagWorkflowGraphUpdate> {
@@ -303,6 +310,7 @@ export class RagQueryService {
     );
   }
 
+  /** 对融合候选进行重排和 Top-K 截取，产出最终上下文片段并通知检索完成。 */
   private async rerankCandidatesNode(
     state: RagWorkflowGraphState,
     runtime: RagWorkflowRuntime,
@@ -318,6 +326,7 @@ export class RagQueryService {
           topK: state.options?.topK,
           tenantCode: state.session.tenantCode,
           sessionKey: state.session.sessionKey,
+          rerankMode: state.options?.rerankMode,
         });
         return { rerankResult, chunks: rerankResult.chunks };
       },
@@ -325,6 +334,8 @@ export class RagQueryService {
         nodeStatus: update.rerankResult?.status,
         candidateCount: update.chunks?.length ?? 0,
         operationDurationMs: update.rerankResult?.durationMs,
+        rerankMode: update.rerankResult?.mode,
+        fallbackMode: update.rerankResult?.fallbackMode,
       }),
     );
     const chunks = result.chunks ?? [];
@@ -338,6 +349,7 @@ export class RagQueryService {
     return result;
   }
 
+  /** 将问题、最终片段和对话记忆填充到 QA 模板，并通知客户端开始生成。 */
   private async buildPromptNode(
     state: RagWorkflowGraphState,
     runtime: RagWorkflowRuntime,
@@ -359,6 +371,7 @@ export class RagQueryService {
     return result;
   }
 
+  /** 按工作流模式调用模型同步或流式生成答案，并将完整答案写回状态。 */
   private async generateAnswerNode(
     state: RagWorkflowGraphState,
     runtime: RagWorkflowRuntime,
@@ -371,6 +384,7 @@ export class RagQueryService {
     }));
   }
 
+  /** 将模型生成的完整答案持久化为助手消息，补全当前会话记忆。 */
   private async persistAssistantMessageNode(
     state: RagWorkflowGraphState,
   ): Promise<RagWorkflowGraphUpdate> {
@@ -383,6 +397,7 @@ export class RagQueryService {
     });
   }
 
+  /** 从最终片段汇总去重后的来源信息，并在流式模式下发送完成事件。 */
   private async buildResultNode(
     state: RagWorkflowGraphState,
     runtime: RagWorkflowRuntime,
@@ -533,6 +548,7 @@ export class RagQueryService {
         sessionKey: session.sessionKey,
         channel: session.channel,
         topK: options.topK,
+        rerankMode: options.rerankMode,
       },
     };
   }

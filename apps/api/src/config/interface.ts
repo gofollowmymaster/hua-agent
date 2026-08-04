@@ -63,6 +63,10 @@ export type GlobalConfigType = {
   embeddingsBaseUrl?: string;
   embeddingsModelName: string;
   embeddingsDimensions: number;
+  rerankApiKey: string;
+  rerankUrl?: string;
+  rerankModel: string;
+  rerankTimeoutMs: number;
 
   vcHelper: RagConfig;
 

@@ -24,7 +24,14 @@ import { RagAdminService } from './rag/services/rag-admin.service';
 import { PromptRegistryService } from './rag/prompts/prompt.registry';
 import { RagQueryService } from './rag/services/qa/rag-workflow.service';
 import { RagQueryRewriteService } from './rag/services/qa/rag-query-rewrite.service';
-import { RagRetrievalService } from './rag/services/qa/rag-retrieval.service';
+import { RagRetrievalService } from './rag/services/qa/retrieval/rag-retrieval.service';
+import { RagVectorRetrieverService } from './rag/services/qa/retrieval/rag-vector-retriever.service';
+import { RagFullTextRetrieverService } from './rag/services/qa/retrieval/rag-full-text-retriever.service';
+import { RagFusionService } from './rag/services/qa/retrieval/rag-fusion.service';
+import { RagRerankService } from './rag/services/qa/retrieval/rerank/rag-rerank.service';
+import { NoopReranker } from './rag/services/qa/retrieval/rerank/noop-reranker.service';
+import { RuleBasedReranker } from './rag/services/qa/retrieval/rerank/rule-based-reranker.service';
+import { Qwen3Reranker } from './rag/services/qa/retrieval/rerank/qwen3-reranker.service';
 
 @Module({
   imports: [
@@ -43,6 +50,13 @@ import { RagRetrievalService } from './rag/services/qa/rag-retrieval.service';
     PromptRegistryService,
     RagQueryRewriteService,
     RagRetrievalService,
+    RagVectorRetrieverService,
+    RagFullTextRetrieverService,
+    RagFusionService,
+    RagRerankService,
+    NoopReranker,
+    RuleBasedReranker,
+    Qwen3Reranker,
     RagQueryService,
     RagPrismaService,
     RagIngestService,
