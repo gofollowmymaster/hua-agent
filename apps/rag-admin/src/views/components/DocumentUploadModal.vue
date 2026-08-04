@@ -47,6 +47,7 @@
           <div class="upload-result-row">
             <span class="upload-file-name">{{ item.fileName }}</span>
             <ApTag
+              class="upload-status-tag"
               :text="statusText(item.status)"
               :color="statusColor(item.status)"
             />
@@ -226,10 +227,15 @@ defineExpose({ show });
 }
 
 .upload-file-name {
+  flex: 1;
   min-width: 0;
   overflow-wrap: anywhere;
   color: #344054;
   font-weight: 600;
+}
+
+.upload-status-tag {
+  flex: 0 0 auto;
 }
 
 .upload-result-detail {

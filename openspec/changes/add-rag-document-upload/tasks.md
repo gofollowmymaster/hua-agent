@@ -18,6 +18,6 @@
 
 ## 4. 测试与验证
 
-- [ ] 4.1 补充迁移、格式、hash、重复、并发冲突、部分成功和文件清理相关测试
-- [ ] 4.2 运行相关 Jest、完整测试、API/RAG Admin 构建、OpenSpec strict validation 和 `git diff --check`
-- [ ] 4.3 在桌面和移动视口验证上传弹窗、长文件名和结果状态布局
+- [x] 4.1 补充迁移、格式、hash、重复、并发冲突、部分成功和文件清理相关测试
+- [x] 4.2 运行相关 Jest、完整测试、API/RAG Admin 构建、OpenSpec strict validation 和 `git diff --check`
+- [x] 4.3 在桌面和移动视口验证上传弹窗、长文件名和结果状态布局

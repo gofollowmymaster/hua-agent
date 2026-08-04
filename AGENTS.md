@@ -76,5 +76,6 @@ AI 任务默认先读：
 - Prettier: 单引号、尾随逗号
 - ESLint: TypeScript 推荐规则（关闭 no-explicit-any）
 - TypeScript: 关闭 strictNullChecks、关闭 noImplicitAny
+- AI 新增或实质修改类、类方法时，必须使用简洁 JSDoc 说明其职责；具体要求见 `docs/ai-governance/development-workflow.md`。
 - 不修改与任务无关的文件，不回退用户或其他 agent 的改动。
 - 文档和代码冲突时，以代码真实实现为准，并同步修正文档或在交付说明中说明差异。
