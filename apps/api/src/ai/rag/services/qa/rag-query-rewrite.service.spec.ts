@@ -80,6 +80,15 @@ describe('RagQueryRewriteService', () => {
     ];
   });
 
+  it('does not enable reasoning on the query rewrite model', () => {
+    expect(ChatOpenAI).toHaveBeenCalledWith(
+      expect.objectContaining({ model: 'qwen-turbo' }),
+    );
+    expect(ChatOpenAI).toHaveBeenCalledWith(
+      expect.not.objectContaining({ modelKwargs: expect.anything() }),
+    );
+  });
+
   it('uses the dedicated model and returns the parsed rewrite', async () => {
     mockModelInvoke.mockResolvedValue({
       content: JSON.stringify({

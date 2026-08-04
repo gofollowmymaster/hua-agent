@@ -68,6 +68,7 @@ describe('WecomRagBotService', () => {
           type: 'status',
           data: { stage: 'retrieve_start', message: '开始检索知识库' },
         };
+        yield { type: 'reasoning', data: '不应发送的思考过程' };
         yield { type: 'answer', data: '回答' };
         yield { type: 'answer', data: '内容' };
         yield { type: 'done', data: { stage: 'done', message: '生成完成' } };

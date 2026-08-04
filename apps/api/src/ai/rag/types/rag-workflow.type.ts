@@ -38,3 +38,8 @@ export interface RagWorkflowResult {
   sources: SourceItem[];
   chunks: RetrievedChunk[];
 }
+
+export interface RagAnswerGenerationResult {
+  answer: string;
+  reasoningFallback: boolean;
+}

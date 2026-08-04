@@ -27,12 +27,14 @@ import type {
   SourceItem,
 } from '../../types/rag.type';
 import type {
+  RagAnswerGenerationResult,
   RagRerankResult,
   RagRetrievalRouteResult,
   RagWorkflowInput,
   RagWorkflowMode,
   RagWorkflowResult,
 } from '../../types/rag-workflow.type';
+import type { RagReasoningEffort } from '@src/config/interface';
 import type { RagQueryRewriteResult } from './rag-query-rewrite.service';
 
 // 图状态按阶段保存中间结果，独立字段可避免并行召回节点写入冲突。
@@ -50,6 +52,7 @@ const RagWorkflowStateAnnotation = Annotation.Root({
   chunks: Annotation<RetrievedChunk[]>,
   prompt: Annotation<string | undefined>,
   answer: Annotation<string>,
+  reasoningFallback: Annotation<boolean>,
   sources: Annotation<SourceItem[]>,
 });
 
@@ -61,7 +64,9 @@ type RagWorkflowRuntime = {
 
 @Injectable()
 export class RagQueryService {
-  private readonly model: ChatOpenAI;
+  private readonly reasoningModel: ChatOpenAI;
+  private readonly fallbackModel: ChatOpenAI;
+  private readonly reasoningEffort: RagReasoningEffort;
   private readonly graph: ReturnType<RagQueryService['buildGraph']>;
 
   constructor(
@@ -73,14 +78,23 @@ export class RagQueryService {
     private readonly ragRetrievalService: RagRetrievalService,
   ) {
     this.logger.setContext(this.constructor.name);
-    this.model = new ChatOpenAI({
+    const modelConfig = {
       temperature: 0,
       model: NodeConfigService.get('modelName'),
       apiKey: NodeConfigService.get('openAiApiKey'),
       configuration: {
         baseURL: NodeConfigService.get('openAiBaseUrl'),
       },
+    };
+    this.reasoningEffort = NodeConfigService.get('ragReasoningEffort');
+    // Qwen 模型不会触发 LangChain 的 OpenAI 模型名识别，需通过 modelKwargs 强制透传。
+    this.reasoningModel = new ChatOpenAI({
+      ...modelConfig,
+      modelKwargs: {
+        reasoning_effort: this.reasoningEffort,
+      },
     });
+    this.fallbackModel = new ChatOpenAI(modelConfig);
     this.graph = this.buildGraph();
   }
 
@@ -118,10 +132,23 @@ export class RagQueryService {
     const conversationId = params?.id?.trim() || randomUUID();
     const participantId = params?.participantId?.trim() || undefined;
     const textId = randomUUID();
+    const reasoningId = randomUUID();
 
     return createUIMessageStream({
       execute: async ({ writer }) => {
-        writer.write({ type: 'text-start', id: textId });
+        let reasoningStarted = false;
+        let textStarted = false;
+        const endReasoning = () => {
+          if (!reasoningStarted) return;
+          writer.write({ type: 'reasoning-end', id: reasoningId });
+          reasoningStarted = false;
+        };
+        const startText = () => {
+          if (textStarted) return;
+          endReasoning();
+          writer.write({ type: 'text-start', id: textId });
+          textStarted = true;
+        };
 
         try {
           for await (const event of this.streamAnswer(question.text, {
@@ -135,6 +162,7 @@ export class RagQueryService {
             },
           })) {
             if (event.type === 'answer') {
+              startText();
               writer.write({
                 type: 'text-delta',
                 id: textId,
@@ -143,9 +171,24 @@ export class RagQueryService {
               continue;
             }
 
+            if (event.type === 'reasoning') {
+              if (!reasoningStarted) {
+                writer.write({ type: 'reasoning-start', id: reasoningId });
+                reasoningStarted = true;
+              }
+              writer.write({
+                type: 'reasoning-delta',
+                id: reasoningId,
+                delta: event.data,
+              });
+              continue;
+            }
+
             writer.write({ type: 'data-status', data: event.data });
           }
         } finally {
+          endReasoning();
+          startText();
           writer.write({ type: 'text-end', id: textId });
         }
       },
@@ -376,12 +419,24 @@ export class RagQueryService {
     state: RagWorkflowGraphState,
     runtime: RagWorkflowRuntime,
   ): Promise<RagWorkflowGraphUpdate> {
-    return this.runNode('generate_answer', state, async () => ({
-      answer:
-        state.mode === 'stream'
-          ? await this.generateStreamAnswer(state, runtime)
-          : await this.generateSyncAnswer(state.prompt),
-    }));
+    return this.runNode(
+      'generate_answer',
+      state,
+      async () => {
+        const result =
+          state.mode === 'stream'
+            ? await this.generateStreamAnswer(state, runtime)
+            : await this.generateSyncAnswer(state);
+        return {
+          answer: result.answer,
+          reasoningFallback: result.reasoningFallback,
+        };
+      },
+      (update) => ({
+        reasoningEffort: this.reasoningEffort,
+        reasoningFallback: update.reasoningFallback,
+      }),
+    );
   }
 
   /** 将模型生成的完整答案持久化为助手消息，补全当前会话记忆。 */
@@ -414,24 +469,39 @@ export class RagQueryService {
     return result;
   }
 
-  private async generateSyncAnswer(prompt: string): Promise<string> {
-    const response = await this.model.invoke(prompt);
-    return (
-      this.extractContentText(response.content) ||
-      JSON.stringify(response.content)
-    );
+  private async generateSyncAnswer(
+    state: RagWorkflowGraphState,
+  ): Promise<RagAnswerGenerationResult> {
+    try {
+      const response = await this.reasoningModel.invoke(state.prompt);
+      const answer = this.extractContentText(response.content);
+      if (answer) return { answer, reasoningFallback: false };
+
+      this.logReasoningFallback(state, 'rag_reasoning_sync_empty');
+    } catch (error) {
+      this.logReasoningFallback(state, 'rag_reasoning_sync_failed', error);
+    }
+
+    return {
+      answer: await this.generateFallbackAnswer(state.prompt),
+      reasoningFallback: true,
+    };
   }
 
   private async generateStreamAnswer(
     state: RagWorkflowGraphState,
     runtime: RagWorkflowRuntime,
-  ): Promise<string> {
+  ): Promise<RagAnswerGenerationResult> {
     let hasText = false;
     let answerContent = '';
 
     try {
-      const stream = await this.model.stream(state.prompt);
+      const stream = await this.reasoningModel.stream(state.prompt);
       for await (const chunk of stream) {
+        const reasoning = this.extractReasoningText(chunk);
+        if (reasoning) {
+          runtime.writer({ type: 'reasoning', data: reasoning });
+        }
         const text = this.extractContentText(chunk.content);
         if (!text) continue;
 
@@ -440,17 +510,12 @@ export class RagQueryService {
         runtime.writer({ type: 'answer', data: text });
       }
     } catch (error) {
-      this.logger.warn('RAG stream failed, fallback to invoke', undefined, {
-        stage: 'rag_stream_failed_fallback',
-        tenantCode: state.session.tenantCode,
-        sessionKey: state.session.sessionKey,
-        topK: state.options?.topK,
-        chunks: state.chunks.length,
-        error: error instanceof Error ? error.message : String(error),
-      });
+      this.logReasoningFallback(state, 'rag_reasoning_stream_failed', error);
     }
 
-    if (hasText) return answerContent;
+    if (hasText) {
+      return { answer: answerContent, reasoningFallback: false };
+    }
 
     // custom stream 没有产生文本时保持原协议：先发 fallback 状态，再一次性生成。
     this.logger.warn(
@@ -462,6 +527,8 @@ export class RagQueryService {
         sessionKey: state.session.sessionKey,
         topK: state.options?.topK,
         chunks: state.chunks.length,
+        reasoningEffort: this.reasoningEffort,
+        reasoningFallback: true,
       },
     );
     runtime.writer({
@@ -475,9 +542,35 @@ export class RagQueryService {
       },
     });
 
-    const text = await this.generateSyncAnswer(state.prompt);
+    const text = await this.generateFallbackAnswer(state.prompt);
     if (text) runtime.writer({ type: 'answer', data: text });
-    return text;
+    return { answer: text, reasoningFallback: true };
+  }
+
+  private async generateFallbackAnswer(prompt: string): Promise<string> {
+    const response = await this.fallbackModel.invoke(prompt);
+    return this.extractContentText(response.content);
+  }
+
+  private logReasoningFallback(
+    state: RagWorkflowGraphState,
+    stage: string,
+    error?: unknown,
+  ) {
+    this.logger.warn(
+      'RAG reasoning failed, fallback to ordinary generation',
+      undefined,
+      {
+        stage,
+        tenantCode: state.session.tenantCode,
+        sessionKey: state.session.sessionKey,
+        topK: state.options?.topK,
+        chunks: state.chunks.length,
+        reasoningEffort: this.reasoningEffort,
+        reasoningFallback: true,
+        errorType: error instanceof Error ? error.name : typeof error,
+      },
+    );
   }
 
   private async runNode<T extends RagWorkflowGraphUpdate>(
@@ -549,6 +642,8 @@ export class RagQueryService {
         channel: session.channel,
         topK: options.topK,
         rerankMode: options.rerankMode,
+        reasoningEffort: this.reasoningEffort,
+        reasoningFallback: false,
       },
     };
   }
@@ -591,10 +686,36 @@ export class RagQueryService {
         if (!part || typeof part !== 'object') return '';
 
         const item = part as Record<string, unknown>;
+        if (item.type === 'reasoning') return '';
         if (typeof item.text === 'string') return item.text;
         if (typeof item.content === 'string') return item.content;
 
         return '';
+      })
+      .join('');
+  }
+
+  private extractReasoningText(chunk: unknown): string {
+    if (!chunk || typeof chunk !== 'object') return '';
+
+    const value = chunk as Record<string, unknown>;
+    const additionalKwargs = value.additional_kwargs;
+    if (additionalKwargs && typeof additionalKwargs === 'object') {
+      const reasoningContent = (additionalKwargs as Record<string, unknown>)
+        .reasoning_content;
+      if (typeof reasoningContent === 'string' && reasoningContent) {
+        return reasoningContent;
+      }
+    }
+
+    if (!Array.isArray(value.content)) return '';
+    return value.content
+      .map((part) => {
+        if (!part || typeof part !== 'object') return '';
+        const item = part as Record<string, unknown>;
+        if (item.type !== 'reasoning') return '';
+        if (typeof item.reasoning === 'string') return item.reasoning;
+        return typeof item.text === 'string' ? item.text : '';
       })
       .join('');
   }

@@ -1,5 +1,5 @@
 import db from './db';
-import { GlobalConfigType } from './interface';
+import { GlobalConfigType, RagReasoningEffort } from './interface';
 import tenantConfig, { tenantCodeMap } from './tenant/index';
 
 const DEFAULT_RAG_DATABASE_URL = 'postgres://user:123456@localhost:5432/vc_rag';
@@ -15,6 +15,15 @@ function maxNumberEnv(key: string, fallback: number, max: number) {
 
 const openAiApiKey = process.env.OPENAI_API_KEY ?? '';
 const embeddingsApiKey = process.env.EMBEDDINGS_API_KEY ?? openAiApiKey;
+const ragReasoningEffort = [
+  'minimal',
+  'low',
+  'medium',
+  'high',
+  'xhigh',
+].includes(process.env.RAG_REASONING_EFFORT)
+  ? (process.env.RAG_REASONING_EFFORT as RagReasoningEffort)
+  : 'xhigh';
 
 const globalConfig: GlobalConfigType = Object.freeze({
   //node-server报警群
@@ -39,6 +48,7 @@ const globalConfig: GlobalConfigType = Object.freeze({
   openAiBaseUrl: process.env.OPENAI_BASE_URL,
   modelName: process.env.MODEL_NAME ?? 'qwen-plus',
   queryRewriteModelName: process.env.RAG_QUERY_REWRITE_MODEL || 'qwen-turbo',
+  ragReasoningEffort,
   embeddingsApiKey,
   embeddingsBaseUrl:
     process.env.EMBEDDINGS_BASE_URL ?? process.env.OPENAI_BASE_URL,

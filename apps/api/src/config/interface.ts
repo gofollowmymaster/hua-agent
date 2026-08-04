@@ -60,6 +60,7 @@ export type GlobalConfigType = {
   openAiBaseUrl?: string;
   modelName: string;
   queryRewriteModelName: string;
+  ragReasoningEffort: RagReasoningEffort;
   embeddingsApiKey: string;
   embeddingsBaseUrl?: string;
   embeddingsModelName: string;
@@ -99,3 +100,10 @@ export type GlobalConfigType = {
   defaultTenant: TenantCode;
 };
 export type GlobalConfigKey = keyof GlobalConfigType;
+
+export type RagReasoningEffort =
+  | 'minimal'
+  | 'low'
+  | 'medium'
+  | 'high'
+  | 'xhigh';

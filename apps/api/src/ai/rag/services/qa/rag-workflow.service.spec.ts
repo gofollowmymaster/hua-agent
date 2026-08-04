@@ -1,4 +1,5 @@
 import { RagQueryService } from './rag-workflow.service';
+import { ChatOpenAI } from '@langchain/openai';
 import type {
   RagResolvedSession,
   RetrievalCandidate,
@@ -6,14 +7,22 @@ import type {
 } from '../../types/rag.type';
 import type { RagRetrievalRouteResult } from '../../types/rag-workflow.type';
 
-const mockModelInvoke = jest.fn();
-const mockModelStream = jest.fn();
-
+const mockReasoningModelInvoke = jest.fn();
+const mockReasoningModelStream = jest.fn();
+const mockFallbackModelInvoke = jest.fn();
+const mockFallbackModelStream = jest.fn();
 jest.mock('@langchain/openai', () => ({
-  ChatOpenAI: jest.fn().mockImplementation(() => ({
-    invoke: mockModelInvoke,
-    stream: mockModelStream,
-  })),
+  ChatOpenAI: jest.fn().mockImplementation((config) =>
+    config.modelKwargs
+      ? {
+          invoke: mockReasoningModelInvoke,
+          stream: mockReasoningModelStream,
+        }
+      : {
+          invoke: mockFallbackModelInvoke,
+          stream: mockFallbackModelStream,
+        },
+  ),
   OpenAIEmbeddings: jest.fn(),
 }));
 
@@ -29,6 +38,7 @@ jest.mock('@src/config/node-config.service', () => ({
         modelName: 'qwen-plus',
         openAiApiKey: 'test-key',
         openAiBaseUrl: 'https://openai.test',
+        ragReasoningEffort: 'xhigh',
       };
       return values[key];
     }),
@@ -68,6 +78,10 @@ describe('RagQueryService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockReasoningModelInvoke.mockReset();
+    mockReasoningModelStream.mockReset();
+    mockFallbackModelInvoke.mockReset();
+    mockFallbackModelStream.mockReset();
     session = {
       channel: 'http',
       tenantCode: 'aplus',
@@ -151,7 +165,7 @@ describe('RagQueryService', () => {
         resolveKeyword = resolve;
       }),
     );
-    mockModelInvoke.mockResolvedValue({ content: '模型答案' });
+    mockReasoningModelInvoke.mockResolvedValue({ content: '模型答案' });
     const graphInvokeSpy = jest.spyOn((service as any).graph, 'invoke');
 
     const resultPromise = service.answerQuestion('审批呢？', {
@@ -220,6 +234,8 @@ describe('RagQueryService', () => {
         channel: 'http',
         topK: 2,
         rerankMode: 'model',
+        reasoningEffort: 'xhigh',
+        reasoningFallback: false,
       },
     });
     expect(logger.info).toHaveBeenCalledWith(
@@ -232,8 +248,50 @@ describe('RagQueryService', () => {
     );
   });
 
+  it('configures only the answer reasoning model with xhigh effort', () => {
+    expect(ChatOpenAI).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        model: 'qwen-plus',
+        modelKwargs: { reasoning_effort: 'xhigh' },
+      }),
+    );
+    expect(ChatOpenAI).toHaveBeenNthCalledWith(
+      2,
+      expect.not.objectContaining({ modelKwargs: expect.anything() }),
+    );
+  });
+
+  it('falls back to the ordinary model when sync reasoning fails', async () => {
+    mockReasoningModelInvoke.mockRejectedValue(new Error('unsupported'));
+    mockFallbackModelInvoke.mockResolvedValue({ content: '普通生成答案' });
+
+    const result = await service.answerQuestion('审批呢？');
+
+    expect(result.answer).toBe('普通生成答案');
+    expect(mockFallbackModelInvoke).toHaveBeenCalledWith('qa prompt');
+    expect(logger.warn).toHaveBeenCalledWith(
+      'RAG reasoning failed, fallback to ordinary generation',
+      undefined,
+      expect.objectContaining({
+        reasoningEffort: 'xhigh',
+        reasoningFallback: true,
+        errorType: 'Error',
+      }),
+    );
+  });
+
+  it('surfaces the ordinary model failure after sync reasoning fails', async () => {
+    mockReasoningModelInvoke.mockRejectedValue(new Error('unsupported'));
+    mockFallbackModelInvoke.mockRejectedValue(new Error('fallback failed'));
+
+    await expect(service.answerQuestion('审批呢？')).rejects.toThrow(
+      'fallback failed',
+    );
+  });
+
   it('streams the existing status sequence and answer tokens', async () => {
-    mockModelStream.mockResolvedValue(
+    mockReasoningModelStream.mockResolvedValue(
       (async function* () {
         yield { content: '模型' };
         yield { content: '答案' };
@@ -268,13 +326,49 @@ describe('RagQueryService', () => {
     );
   });
 
+  it('streams provider and standard reasoning separately from the answer', async () => {
+    mockReasoningModelStream.mockResolvedValue(
+      (async function* () {
+        yield {
+          content: '',
+          additional_kwargs: { reasoning_content: '先查制度。' },
+        };
+        yield {
+          content: [
+            { type: 'reasoning', reasoning: '再核对审批条件。' },
+            { type: 'text', text: '最终答案' },
+          ],
+          additional_kwargs: {},
+        };
+      })(),
+    );
+
+    const events = [];
+    for await (const event of service.streamAnswer('审批呢？')) {
+      events.push(event);
+    }
+
+    expect(events).toEqual(
+      expect.arrayContaining([
+        { type: 'reasoning', data: '先查制度。' },
+        { type: 'reasoning', data: '再核对审批条件。' },
+        { type: 'answer', data: '最终答案' },
+      ]),
+    );
+    expect(ragMemoryService.appendAssistantMessage).toHaveBeenCalledWith(
+      session,
+      '最终答案',
+    );
+    expect(mockFallbackModelInvoke).not.toHaveBeenCalled();
+  });
+
   it('falls back to invoke when the model stream is empty', async () => {
-    mockModelStream.mockResolvedValue(
+    mockReasoningModelStream.mockResolvedValue(
       (async function* () {
         yield { content: '' };
       })(),
     );
-    mockModelInvoke.mockResolvedValue({ content: '普通生成答案' });
+    mockFallbackModelInvoke.mockResolvedValue({ content: '普通生成答案' });
 
     const events = [];
     for await (const event of service.streamAnswer('审批呢？', { topK: 2 })) {
@@ -295,12 +389,33 @@ describe('RagQueryService', () => {
     );
   });
 
+  it('falls back to ordinary generation when the reasoning stream throws', async () => {
+    mockReasoningModelStream.mockRejectedValue(new Error('stream unsupported'));
+    mockFallbackModelInvoke.mockResolvedValue({ content: '降级答案' });
+
+    const events = [];
+    for await (const event of service.streamAnswer('审批呢？')) {
+      events.push(event);
+    }
+
+    expect(events).toContainEqual({ type: 'answer', data: '降级答案' });
+    expect(events).toContainEqual({
+      type: 'status',
+      data: expect.objectContaining({ stage: 'fallback_start' }),
+    });
+    expect(ragMemoryService.appendAssistantMessage).toHaveBeenCalledWith(
+      session,
+      '降级答案',
+    );
+  });
+
   it('maps workflow events to the existing AGUI writer protocol', async () => {
     jest.spyOn(service, 'streamAnswer').mockImplementation(async function* () {
       yield {
         type: 'status',
         data: { stage: 'retrieve_start', message: '开始检索知识库' },
       };
+      yield { type: 'reasoning', data: '思考过程' };
       yield { type: 'answer', data: '模型答案' };
       yield {
         type: 'done',
@@ -339,6 +454,22 @@ describe('RagQueryService', () => {
     expect(writer.write).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'text-delta', delta: '模型答案' }),
     );
+    const writtenEvents = writer.write.mock.calls.map(([event]) => event);
+    const reasoningStartIndex = writtenEvents.findIndex(
+      (event) => event.type === 'reasoning-start',
+    );
+    const reasoningDeltaIndex = writtenEvents.findIndex(
+      (event) => event.type === 'reasoning-delta',
+    );
+    const reasoningEndIndex = writtenEvents.findIndex(
+      (event) => event.type === 'reasoning-end',
+    );
+    const textStartIndex = writtenEvents.findIndex(
+      (event) => event.type === 'text-start',
+    );
+    expect(reasoningStartIndex).toBeLessThan(reasoningDeltaIndex);
+    expect(reasoningDeltaIndex).toBeLessThan(reasoningEndIndex);
+    expect(reasoningEndIndex).toBeLessThan(textStartIndex);
     expect(writer.write).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'text-end' }),
     );

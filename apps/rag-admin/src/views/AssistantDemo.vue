@@ -21,7 +21,9 @@
             <h2>历史会话</h2>
             <p>{{ historyLoading ? '加载中' : `${sessions.length} 个会话` }}</p>
           </div>
-          <ApButton :disabled="historyLoading" @click="loadSessions">刷新</ApButton>
+          <ApButton :disabled="historyLoading" @click="loadSessions"
+            >刷新</ApButton
+          >
         </div>
 
         <div class="assistant-history-list">
@@ -34,21 +36,34 @@
             @click="selectSession(session)"
           >
             <span class="assistant-history-title">
-              {{ session.latestMessage?.content || session.conversationId || '未命名会话' }}
+              {{
+                session.latestMessage?.content ||
+                session.conversationId ||
+                '未命名会话'
+              }}
             </span>
             <span class="assistant-history-meta">
-              {{ session.messageCount }} 条 · {{ formatTime(session.lastActiveAt) }}
+              {{ session.messageCount }} 条 ·
+              {{ formatTime(session.lastActiveAt) }}
             </span>
           </button>
 
-          <div v-if="!historyLoading && sessions.length === 0" class="assistant-history-empty">
+          <div
+            v-if="!historyLoading && sessions.length === 0"
+            class="assistant-history-empty"
+          >
             暂无历史会话
           </div>
         </div>
       </aside>
 
       <div class="assistant-shell">
-        <div ref="messagePaneRef" class="assistant-messages" role="log" aria-live="polite">
+        <div
+          ref="messagePaneRef"
+          class="assistant-messages"
+          role="log"
+          aria-live="polite"
+        >
           <div v-if="messages.length === 0" class="assistant-empty">
             <h2>输入问题开始演示</h2>
             <p>助手会检索已索引文档，并以流式方式返回答案。</p>
@@ -64,7 +79,14 @@
               {{ message.role === 'user' ? '你' : '助手' }}
             </div>
             <div class="assistant-message-body">
-              <template v-for="(part, index) in message.parts" :key="`${message.id}-${index}`">
+              <template
+                v-for="(part, index) in message.parts"
+                :key="`${message.id}-${index}`"
+              >
+                <AssistantReasoning
+                  v-if="part.type === 'reasoning'"
+                  :part="part"
+                />
                 <div v-if="part.type === 'text'" class="assistant-text">
                   <MdPreview
                     :id="`rag-markdown-${message.id}-${index}`"
@@ -125,6 +147,7 @@ import {
 } from '@/api/rag-admin';
 import { useUserStore } from '@/stores/modules/user';
 import AssistantComposer from './components/AssistantComposer.vue';
+import AssistantReasoning from './components/AssistantReasoning.vue';
 import DocumentPreviewModal from './components/DocumentPreviewModal.vue';
 
 interface RagStatusData {
@@ -306,9 +329,13 @@ function createChat(id: string) {
   });
 }
 
-function toUiMessages(historyMessages: RagMessageItem[]): RagAssistantMessage[] {
+function toUiMessages(
+  historyMessages: RagMessageItem[],
+): RagAssistantMessage[] {
   return historyMessages
-    .filter((message) => message.role === 'user' || message.role === 'assistant')
+    .filter(
+      (message) => message.role === 'user' || message.role === 'assistant',
+    )
     .map((message) => ({
       id: String(message.id),
       role: message.role as 'user' | 'assistant',
@@ -320,7 +347,9 @@ function syncSelectedSession() {
   const matched = sessions.value.find(
     (session) => session.conversationId === currentChatId.value,
   );
-  selectedSessionId.value = matched ? String(matched.id) : selectedSessionId.value;
+  selectedSessionId.value = matched
+    ? String(matched.id)
+    : selectedSessionId.value;
 }
 
 function createLocalChatId() {
@@ -356,7 +385,9 @@ function handleMarkdownClick(event: MouseEvent) {
 }
 
 function resolvePreviewDocument(segment: { href: string; label: string }) {
-  const match = segment.href.match(/^\/ai\/rag\/admin\/documents\/([^/]+)\/preview$/);
+  const match = segment.href.match(
+    /^\/ai\/rag\/admin\/documents\/([^/]+)\/preview$/,
+  );
   if (!match) return null;
 
   const fileName = segment.label.trim() || '引用文件';

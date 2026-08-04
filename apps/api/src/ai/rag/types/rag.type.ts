@@ -110,6 +110,7 @@ export type RagStreamEvent =
       };
     }
   | { type: 'answer'; data: string }
+  | { type: 'reasoning'; data: string }
   | { type: 'done'; data: { stage: string; message: string } };
 
 // ── RAG 问答相关类型 ──
