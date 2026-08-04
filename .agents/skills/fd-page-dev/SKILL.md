@@ -24,16 +24,17 @@ description: 根据需求文档、UI设计图和接口代码，在 RAG Admin（a
 - `apps/rag-admin/AGENTS.md`
 - `apps/rag-admin/docs/architecture/README.md`
 - `apps/rag-admin/docs/standard/README.md`
-- `apps/rag-admin/docs/standard/page-development.md`
-- `apps/rag-admin/docs/standard/page-structure-blueprint.md`
-- `apps/rag-admin/docs/standard/page-implementation-best-practices.md`
-- `apps/rag-admin/docs/standard/naming-conventions.md`
+- `apps/rag-admin/docs/standard/development/page-development.md`
+- `apps/rag-admin/docs/standard/development/page-structure-blueprint.md`
+- `apps/rag-admin/docs/standard/development/page-implementation-best-practices.md`
+- `apps/rag-admin/docs/standard/development/naming-conventions.md`
+- `apps/rag-admin/docs/standard/design/README.md`
 
 按页面类型追加：
 
-- 列表页：`apps/rag-admin/docs/standard/table-pattern.md`。
-- 表单页：`apps/rag-admin/docs/standard/form-pattern.md`。
-- 详情页：`apps/rag-admin/docs/standard/detail-pattern.md`。
+- 列表页：`apps/rag-admin/docs/standard/development/table-pattern.md`。
+- 表单页：`apps/rag-admin/docs/standard/development/form-pattern.md`。
+- 详情页：`apps/rag-admin/docs/standard/development/detail-pattern.md`。
 
 涉及 `AgGrid`、`ApForm`、`ApDescriptions`、`ApLabel`、`ApStatus` 等 `@aplus-frontend/ui` 能力时，同时使用 `aplus-ui` skill 查询 API / demo，不凭记忆猜 props。
 
@@ -153,10 +154,10 @@ description: 根据需求文档、UI设计图和接口代码，在 RAG Admin（a
 
 ## 参考资源
 
-- `apps/rag-admin/docs/standard/page-development.md`
-- `apps/rag-admin/docs/standard/page-structure-blueprint.md`
-- `apps/rag-admin/docs/standard/page-implementation-best-practices.md`
-- `apps/rag-admin/docs/standard/table-pattern.md`
-- `apps/rag-admin/docs/standard/form-pattern.md`
-- `apps/rag-admin/docs/standard/detail-pattern.md`
-- `apps/rag-admin/docs/standard/naming-conventions.md`
+- `apps/rag-admin/docs/standard/development/page-development.md`
+- `apps/rag-admin/docs/standard/development/page-structure-blueprint.md`
+- `apps/rag-admin/docs/standard/development/page-implementation-best-practices.md`
+- `apps/rag-admin/docs/standard/development/table-pattern.md`
+- `apps/rag-admin/docs/standard/development/form-pattern.md`
+- `apps/rag-admin/docs/standard/development/detail-pattern.md`
+- `apps/rag-admin/docs/standard/development/naming-conventions.md`

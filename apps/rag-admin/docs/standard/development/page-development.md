@@ -4,6 +4,8 @@
 
 本文档适用于 RAG Admin 的页面开发通用规则。它定义页面开发的稳定口径，不定义 AI 执行步骤；具体执行流程由 `fd-page-dev` skill 承接。
 
+当前项目架构事实见 `../../architecture/project-architecture.md` 和 `../../architecture/directory-structure.md`；本文只规定页面开发规则。
+
 ## 基本原则
 
 - 优先复用当前仓库、当前业务域的既有模式。
@@ -21,8 +23,8 @@
 2. `apps/rag-admin/AGENTS.md`
 3. `apps/rag-admin/docs/architecture/README.md`
 4. `apps/rag-admin/docs/standard/README.md`
-5. `apps/rag-admin/docs/standard/page-structure-blueprint.md`
-6. `apps/rag-admin/docs/standard/page-implementation-best-practices.md`
+5. `apps/rag-admin/docs/standard/development/page-structure-blueprint.md`
+6. `apps/rag-admin/docs/standard/development/page-implementation-best-practices.md`
 7. 本次页面类型对应的 pattern 文档
 8. 真实代码、配置文件与目录结构
 
@@ -36,18 +38,11 @@
 
 ## API 与类型
 
-- 请求统一封装到 `src/api/`，复用 `src/api/http.ts`。
-- 页面组件调用业务 API 方法，不直接散写 URL、请求头、token 注入或 axios 拦截器。
-- 类型定义覆盖当前页面实际使用的请求、响应、表单数据。
-- 类型导入使用 `import type`。
-- 涉及后端接口变化时，同步检查后端 DTO、Controller、Service 和 shared 类型。
-- 若接口字段暂未生成，页面可使用页面级适配类型承接，并在交付说明中标记“待接口补齐”。
+请求封装、类型和接口契约规则见 `../../architecture/auth-and-api-client.md`；页面适配类型边界见 `page-structure-blueprint.md`。
 
 ## 权限与命名
 
-- 当前项目路由由登录守卫统一控制，页面不自行实现登录或鉴权。
-- 若未来引入页面路由权限或按钮操作权限，遵循 `naming-conventions.md`，不临时发明权限常量。
-- 路由、页面、API、类型和常量命名遵循 `naming-conventions.md`。
+命名规则见 `naming-conventions.md`；当前登录和鉴权实现事实见 `../../architecture/auth-and-api-client.md`。
 
 ## 枚举与字典
 
@@ -57,17 +52,11 @@
 
 ## 缓存与状态
 
-- 页面局部状态优先留在组件内。
-- 跨页面共享或需要缓存的数据才进入 Pinia。
-- 当前项目没有多标签页缓存链路，不为统一而额外引入 localStorage、sessionStorage 或自定义缓存 hook。
+状态管理规则见 `../../architecture/project-architecture.md`。
 
 ## 复用边界
 
-- 页面内局部复用：放页面自己的 `hooks/`、`components/`、`sections/`。
-- 模块内跨页面复用：放模块级 `components/`、`helper/`。
-- 跨页面稳定复用：放 `src/views/components/`。
-- 页面之间不直接引用彼此私有 hooks 或 components。
-- 新增公共能力前，先确认 `@aplus-frontend/ui` 或项目内是否已有同名或相近能力。
+文件放置和复用边界见 `../../architecture/directory-structure.md` 与 `page-structure-blueprint.md`。
 
 ## 禁止做法
 

@@ -149,6 +149,6 @@ export const DOCUMENT_MANAGER_MENU_KEY =
 
 ## 11. 与其他规范的职责边界
 
-- 目录和模块如何命名、哪些目录属于历史兼容：查看 `module-design.md` 和 `page-structure-blueprint.md`。
-- 路由和状态管理：查看 `routing-and-state.md`。
+- 目录和模块如何命名、哪些目录属于历史兼容：查看 `../../architecture/directory-structure.md` 和 `page-structure-blueprint.md`。
+- 路由和状态管理：查看 `../../architecture/project-architecture.md`。
 - 当前任务到底该去哪个目录：查看对应层级 `AGENTS.md`。

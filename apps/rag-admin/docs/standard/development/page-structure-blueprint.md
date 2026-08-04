@@ -4,7 +4,7 @@
 
 本文档定义 RAG Admin 页面统一目录标准。当前页面已按 `views/<page>/index.vue` 组织；页面私有组件放页面同级 `components/`，跨页面稳定复用组件放 `views/components/`。
 
-本文档不负责顶层目录分层、历史兼容口径或 API 目录结构；这些内容由 `apps/rag-admin/AGENTS.md`、`module-design.md` 和 `api-client.md` 承接。
+本文档不负责顶层目录分层、历史兼容口径或 API 目录结构；这些内容由 `apps/rag-admin/AGENTS.md`、`../../architecture/directory-structure.md` 和 `../../architecture/auth-and-api-client.md` 承接。
 
 ## 2. 单复杂页面推荐结构
 

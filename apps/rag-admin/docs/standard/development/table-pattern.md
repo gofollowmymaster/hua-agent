@@ -61,7 +61,7 @@ src/views/<page>/
 ## 多 Tab 与缓存
 
 - 当前项目没有多标签页缓存链路，列表页依赖组件内局部状态，不额外引入缓存。
-- 若未来新增多 Tab 列表页，遵循 `routing-and-state.md` 的状态管理口径，并明确每个 tab 的查询参数边界。
+- 若未来新增多 Tab 列表页，遵循 `../../architecture/project-architecture.md` 的状态管理口径，并明确每个 tab 的查询参数边界。
 
 ## 参考页样例
 
