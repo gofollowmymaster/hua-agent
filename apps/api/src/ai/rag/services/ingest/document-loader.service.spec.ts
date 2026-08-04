@@ -275,6 +275,32 @@ describe('DocumentLoaderService', () => {
     expect(result).toContain('次月海外仓有1.5个月的在库库存+0.5个月的在途库存');
   });
 
+  it('collapses PDF lines whose glyphs are systematically duplicated', () => {
+    const text = [
+      '22002266//66//3300',
+      'QQ11：：化化妆妆品品可可以以接接吗吗？？',
+      '机机器器人人--QQAA补补充充',
+      'A：beauty品类可正常核价，但是否正常接入合作需要多方谨慎评估。',
+    ].join('\n');
+
+    const result = (service as any).normalizePdfText(text);
+
+    expect(result).toBe(
+      [
+        '2026/6/30',
+        'Q1：化妆品可以接吗？',
+        '机器人-QA补充',
+        'A：beauty品类可正常核价，但是否正常接入合作需要多方谨慎评估。',
+      ].join('\n'),
+    );
+  });
+
+  it('keeps normal lines containing occasional repeated characters', () => {
+    const text = '请看看商品详情，天天更新库存，并严格评估风险。';
+
+    expect((service as any).normalizePdfText(text)).toBe(text);
+  });
+
   it('compacts PDF content extracted as one character per line', () => {
     const text = [
       '8',

@@ -3,7 +3,7 @@
     <header class="page-header">
       <div>
         <h1>文档管理</h1>
-        <p>查看已索引文档，删除索引，或触发 raw 目录重新入库。</p>
+        <p>查看、维护或删除已索引文档，也可触发 raw 目录重新入库。</p>
       </div>
     </header>
 
@@ -207,37 +207,32 @@ const columns: AgGridColumnType<RagDocumentItem>[] = [
     title: '操作',
     key: 'actions',
     dataIndex: 'actions',
-    width: 170,
+    width: 240,
     fixed: 'right',
+    valueType: 'action',
     hideInSearch: true,
-    customRender: ({ record }) =>
-      h(Space, { size: 4 }, () => [
-        h(
-          ApButton,
+    fieldProps({ record }) {
+      if (!record) {
+        return {};
+      }
+      return {
+        actions: [
           {
-            type: 'link',
+            text: '编辑',
             onClick: () => editMetadata(record),
           },
-          () => '编辑',
-        ),
-        h(
-          ApButton,
           {
-            type: 'link',
+            text: '切片实况',
             onClick: () => chunkDrawerRef.value?.show(record),
           },
-          () => '切片实况',
-        ),
-        h(
-          ApButton,
           {
-            danger: true,
-            type: 'link',
+            text: '删除',
+            color: 'error',
             onClick: () => remove(record),
           },
-          () => '删除索引',
-        ),
-      ]),
+        ],
+      };
+    },
   },
 ];
 
@@ -274,15 +269,16 @@ async function runIngest(force: boolean) {
 }
 
 function remove(item: RagDocumentItem) {
+  const chunkCount = item.actualChunkCount ?? item.chunkCount ?? 0;
   ApModal.confirm({
-    title: '确认删除索引？',
-    content: `删除后将移除 ${item.fileName} 的已索引内容。`,
+    title: '确认删除文档？',
+    content: `将删除“${item.fileName}”及其 ${chunkCount} 个关联切片。raw 原文件会保留，后续扫描或强制重建可能重新入库。`,
     okText: '删除',
     okType: 'danger',
     cancelText: '取消',
     async onOk() {
       await deleteDocument(item.id);
-      message.success('索引已删除');
+      message.success('文档及关联切片已删除');
       reload();
     },
   });

@@ -199,11 +199,28 @@ export class RagDocumentUploadService {
 
   /** 清理上传文件名中的路径、控制字符和多余空白。 */
   private sanitizeFileName(value: string): string {
+    const decodedValue = this.decodeUtf8FileName(value ?? '');
     return path
-      .basename((value ?? '').replace(/\\/g, '/'))
+      .basename(decodedValue.replace(/\\/g, '/'))
       .normalize('NFC')
       .replace(/[\u0000-\u001f\u007f]/g, '')
       .trim();
+  }
+
+  /** 修复 multipart 将 UTF-8 文件名按 Latin-1 解码产生的乱码。 */
+  private decodeUtf8FileName(value: string): string {
+    if (
+      !/[\u0080-\u00ff]/.test(value) ||
+      Array.from(value).some((character) => character.charCodeAt(0) > 0xff)
+    ) {
+      return value;
+    }
+
+    const originalBytes = Buffer.from(value, 'latin1');
+    const decoded = originalBytes.toString('utf8');
+    if (decoded.includes('\ufffd')) return value;
+
+    return Buffer.from(decoded, 'utf8').equals(originalBytes) ? decoded : value;
   }
 
   /** 删除临时或回滚文件，并按调用场景决定是否忽略清理失败。 */

@@ -238,6 +238,36 @@ describe('RagAdminService', () => {
     expect(ragPrisma.aplusDocument.delete).not.toHaveBeenCalled();
   });
 
+  it('deletes a current tenant document and returns its existing response', async () => {
+    ragPrisma.aplusDocument.findUnique.mockResolvedValue({
+      id: BigInt(1),
+      tenantCode: 'aplus',
+      sourcePath: 'policy/a.md',
+    });
+
+    const result = await service.deleteDocument(1);
+
+    expect(ragPrisma.aplusDocument.delete).toHaveBeenCalledWith({
+      where: { id: 1 },
+    });
+    expect(result).toEqual({
+      deleted: {
+        id: '1',
+        tenantCode: 'aplus',
+        sourcePath: 'policy/a.md',
+      },
+    });
+  });
+
+  it('blocks deletion when the document does not exist', async () => {
+    ragPrisma.aplusDocument.findUnique.mockResolvedValue(undefined);
+
+    await expect(service.deleteDocument(999)).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
+    expect(ragPrisma.aplusDocument.delete).not.toHaveBeenCalled();
+  });
+
   it('pages document chunks for current tenant document', async () => {
     ragPrisma.aplusDocument.findUnique.mockResolvedValue({
       id: BigInt(1),

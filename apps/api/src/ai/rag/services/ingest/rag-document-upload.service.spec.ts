@@ -150,6 +150,34 @@ describe('RagDocumentUploadService', () => {
     expect(await fs.readdir(rawDir)).toEqual(['guide (1).md', 'guide.md']);
   });
 
+  it('restores a UTF-8 filename decoded as Latin-1 by multipart parsing', async () => {
+    const fileName = '亚马逊日报.pdf';
+    const mojibakeName = Buffer.from(fileName, 'utf8').toString('latin1');
+    const upload = await createUploadFile(mojibakeName, 'content');
+
+    const result = await service.uploadDocuments([upload]);
+
+    expect(result.files[0]).toMatchObject({
+      fileName,
+      sourcePath: fileName,
+      status: 'indexed',
+    });
+    expect(loader.buildRawDocumentFile).toHaveBeenCalledWith(
+      path.join(rawDir, fileName),
+      'boat',
+      { sourcePath: fileName, fileName },
+    );
+  });
+
+  it('keeps an already valid Unicode filename unchanged', async () => {
+    const fileName = '亚马逊日报.md';
+    const upload = await createUploadFile(fileName, 'content');
+
+    const result = await service.uploadDocuments([upload]);
+
+    expect(result.files[0].fileName).toBe(fileName);
+  });
+
   it('retains the raw file when indexing fails and removes the temporary file', async () => {
     const upload = await createUploadFile('../unsafe.md', 'content');
     ingest.ingestFiles.mockResolvedValue({

@@ -119,6 +119,9 @@ importers:
       mammoth:
         specifier: ^1.11.0
         version: 1.12.0
+      multer:
+        specifier: 1.4.4-lts.1
+        version: 1.4.4-lts.1
       officeparser:
         specifier: ^6.0.4
         version: 6.1.1

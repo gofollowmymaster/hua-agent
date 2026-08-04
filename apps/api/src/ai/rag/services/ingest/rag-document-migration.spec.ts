@@ -9,6 +9,10 @@ describe('RAG document file-hash migration', () => {
     ),
     'utf8',
   );
+  const schema = fs.readFileSync(
+    path.resolve(process.cwd(), 'prisma/rag/schema.sql'),
+    'utf8',
+  );
 
   it('atomically keeps the preferred document and deletes lower-ranked duplicates', () => {
     expect(migration).toMatch(/^BEGIN;/);
@@ -27,5 +31,11 @@ describe('RAG document file-hash migration', () => {
       'CONSTRAINT aplus_documents_tenant_code_file_hash_key',
     );
     expect(migration).toContain('UNIQUE (tenant_code, file_hash)');
+  });
+
+  it('cascades document deletion to associated chunks', () => {
+    expect(schema).toMatch(
+      /document_id BIGINT NOT NULL REFERENCES aplus_documents\(id\) ON DELETE CASCADE/,
+    );
   });
 });

@@ -184,6 +184,9 @@ export class DocumentLoaderService {
     let normalized = this.compactSingleCharacterLineBlocks(
       text.replace(/\r\n/g, '\n'),
     )
+      .split('\n')
+      .map((line) => this.collapseDuplicatedGlyphLine(line))
+      .join('\n')
       .replace(/\b(?:[A-Za-z][ \t]+)+[A-Za-z]\b/g, (value) =>
         value.replace(/[ \t]+/g, ''),
       )
@@ -231,6 +234,30 @@ export class DocumentLoaderService {
     }
 
     return normalized;
+  }
+
+  /** 折叠 PDF 文本层重复绘制形成的整行成对字形，保留普通局部叠词。 */
+  private collapseDuplicatedGlyphLine(line: string): string {
+    const characters = Array.from(line);
+    if (characters.length < 8) return line;
+
+    const collapsed: string[] = [];
+    let duplicatedPairs = 0;
+    for (let index = 0; index < characters.length; index += 1) {
+      collapsed.push(characters[index]);
+      if (
+        index + 1 < characters.length &&
+        characters[index] === characters[index + 1]
+      ) {
+        duplicatedPairs += 1;
+        index += 1;
+      }
+    }
+
+    const duplicatedCoverage = (duplicatedPairs * 2) / characters.length;
+    if (duplicatedPairs < 4 || duplicatedCoverage < 0.6) return line;
+
+    return collapsed.join('');
   }
 
   /** 合并由 PDF 排版导致的连续单字符行块。 */

@@ -166,16 +166,21 @@ const columns: AgGridColumnType<RagSessionItem>[] = [
     dataIndex: 'actions',
     width: 100,
     fixed: 'right',
+    valueType: 'action',
     hideInSearch: true,
-    customRender: ({ record }) =>
-      h(
-        ApButton,
-        {
-          type: 'link',
-          onClick: () => select(record),
-        },
-        () => '查看消息',
-      ),
+    fieldProps({ record }) {
+      if (!record) {
+        return {};
+      }
+      return {
+        actions: [
+          {
+            text: '查看消息',
+            onClick: () => select(record),
+          },
+        ],
+      };
+    },
   },
 ];
 
