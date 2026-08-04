@@ -111,4 +111,112 @@ describe('RagIngestService', () => {
     expect(sql).not.toContain('tag = EXCLUDED');
     expect(values).toContain('policy');
   });
+
+  it('skips a same-tenant document with an existing file hash', async () => {
+    const findFirst = jest
+      .fn()
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce({
+        id: BigInt(9),
+        fileName: 'existing.md',
+        sourcePath: 'existing.md',
+        status: 'ready',
+      });
+    service = new RagIngestService(
+      { aplusDocument: { findFirst } } as any,
+      { loadDocument: jest.fn() } as any,
+      {
+        setContext: jest.fn(),
+        info: jest.fn(),
+        error: jest.fn(),
+      } as any,
+      { tenant: 'aplus' } as any,
+    );
+
+    const result = await service.ingestFiles([
+      {
+        absolutePath: '/raw/aplus/new.md',
+        sourcePath: 'new.md',
+        fileName: 'new.md',
+        fileType: 'md',
+        documentType: '',
+        fileHash: 'same-hash',
+        fileSize: 12,
+      },
+    ]);
+
+    expect(result.skippedFiles).toBe(1);
+    expect(result.files[0]).toMatchObject({
+      status: 'skipped',
+      reason: 'duplicate hash',
+      duplicateOf: { documentId: '9', fileName: 'existing.md' },
+    });
+  });
+
+  it('maps a concurrent file-hash unique conflict to duplicate', async () => {
+    const findFirst = jest
+      .fn()
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce({
+        id: BigInt(11),
+        fileName: 'winner.md',
+        sourcePath: 'winner.md',
+        status: 'ready',
+      });
+    const ragPrisma = {
+      aplusDocument: { findFirst },
+      $transaction: jest.fn().mockRejectedValue({
+        code: 'P2010',
+        meta: {
+          code: '23505',
+          message:
+            'duplicate key violates unique constraint aplus_documents_tenant_code_file_hash_key',
+        },
+      }),
+    };
+    service = new RagIngestService(
+      ragPrisma as any,
+      {
+        loadDocument: jest.fn().mockResolvedValue({
+          sourcePath: 'new.md',
+          fileName: 'new.md',
+          fileType: 'md',
+          documentType: '',
+          fileHash: 'same-hash',
+          fileSize: 12,
+          segments: [{ text: 'content', metadata: {} }],
+        }),
+      } as any,
+      {
+        setContext: jest.fn(),
+        info: jest.fn(),
+        error: jest.fn(),
+      } as any,
+      { tenant: 'aplus' } as any,
+    );
+
+    const result = await service.ingestFiles([
+      {
+        absolutePath: '/raw/aplus/new.md',
+        sourcePath: 'new.md',
+        fileName: 'new.md',
+        fileType: 'md',
+        documentType: '',
+        fileHash: 'same-hash',
+        fileSize: 12,
+      },
+    ]);
+
+    expect(result).toMatchObject({
+      indexedFiles: 0,
+      skippedFiles: 1,
+      failedFiles: 0,
+    });
+    expect(result.files[0]).toMatchObject({
+      status: 'skipped',
+      reason: 'duplicate hash',
+      duplicateOf: { documentId: '11', fileName: 'winner.md' },
+    });
+  });
 });

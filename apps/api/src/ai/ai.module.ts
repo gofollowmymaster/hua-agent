@@ -33,6 +33,7 @@ import { NoopReranker } from './rag/services/qa/retrieval/rerank/noop-reranker.s
 import { RuleBasedReranker } from './rag/services/qa/retrieval/rerank/rule-based-reranker.service';
 import { Qwen3Reranker } from './rag/services/qa/retrieval/rerank/qwen3-reranker.service';
 import { RagQuestionRouterService } from './rag/services/qa/rag-question-router.service';
+import { RagDocumentUploadService } from './rag/services/ingest/rag-document-upload.service';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { RagQuestionRouterService } from './rag/services/qa/rag-question-router.
     RagQueryService,
     RagPrismaService,
     RagIngestService,
+    RagDocumentUploadService,
     RagDocumentService,
     RagAdminService,
     RagMemoryService,

@@ -60,9 +60,38 @@ export interface IngestSummary {
   files: Array<{
     sourcePath: string;
     status: 'indexed' | 'skipped' | 'failed';
+    documentId?: string;
     chunks?: number;
     reason?: string;
+    duplicateOf?: {
+      documentId: string;
+      fileName: string;
+    };
   }>;
+}
+
+export type RagDocumentUploadStatus = 'indexed' | 'duplicate' | 'failed';
+
+export interface RagDocumentUploadFileResult {
+  fileName: string;
+  status: RagDocumentUploadStatus;
+  documentId?: string;
+  sourcePath?: string;
+  chunks?: number;
+  duplicateOf?: {
+    documentId: string;
+    fileName: string;
+  };
+  reason?: string;
+}
+
+export interface RagDocumentUploadResult {
+  totalFiles: number;
+  indexedFiles: number;
+  duplicateFiles: number;
+  failedFiles: number;
+  chunks: number;
+  files: RagDocumentUploadFileResult[];
 }
 
 export type RagChannel = 'http' | 'wecom' | 'feishu' | 'web' | string;

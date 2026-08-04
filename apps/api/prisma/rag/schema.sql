@@ -31,7 +31,8 @@ CREATE TABLE IF NOT EXISTS aplus_documents (
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   ingested_at TIMESTAMPTZ,
-  UNIQUE (tenant_code, source_path)
+  UNIQUE (tenant_code, source_path),
+  CONSTRAINT aplus_documents_tenant_code_file_hash_key UNIQUE (tenant_code, file_hash)
 );
 
 CREATE TABLE IF NOT EXISTS aplus_chunks (

@@ -12,7 +12,15 @@
         <template #title>
           <Space class="header-actions">
             <ApButton type="primary" @click="refresh">刷新</ApButton>
-            <ApButton danger type="primary" :disabled="ingesting" @click="runIngest(true)">
+            <ApButton type="primary" @click="uploadModalRef?.show()"
+              >添加文档</ApButton
+            >
+            <ApButton
+              danger
+              type="primary"
+              :disabled="ingesting"
+              @click="runIngest(true)"
+            >
               强制重建索引
             </ApButton>
           </Space>
@@ -22,6 +30,7 @@
 
     <DocumentPreviewModal ref="previewModalRef" />
     <DocumentChunkDrawer ref="chunkDrawerRef" />
+    <DocumentUploadModal ref="uploadModalRef" @uploaded="refresh" />
     <ApModal
       v-model:open="metadataModalOpen"
       title="编辑文档元数据"
@@ -33,11 +42,19 @@
       <div class="metadata-form">
         <label class="metadata-field">
           <span>type</span>
-          <input v-model="metadataForm.type" class="metadata-input" placeholder="业务分类" />
+          <input
+            v-model="metadataForm.type"
+            class="metadata-input"
+            placeholder="业务分类"
+          />
         </label>
         <label class="metadata-field">
           <span>tag</span>
-          <input v-model="metadataForm.tag" class="metadata-input" placeholder="标签" />
+          <input
+            v-model="metadataForm.tag"
+            class="metadata-input"
+            placeholder="标签"
+          />
         </label>
       </div>
     </ApModal>
@@ -65,6 +82,7 @@ import {
 } from '@/api/rag-admin';
 import DocumentChunkDrawer from './components/DocumentChunkDrawer.vue';
 import DocumentPreviewModal from './components/DocumentPreviewModal.vue';
+import DocumentUploadModal from './components/DocumentUploadModal.vue';
 
 const ingesting = ref(false);
 const metadataModalOpen = ref(false);
@@ -76,6 +94,7 @@ const metadataForm = ref({
 });
 const previewModalRef = ref<InstanceType<typeof DocumentPreviewModal>>();
 const chunkDrawerRef = ref<InstanceType<typeof DocumentChunkDrawer>>();
+const uploadModalRef = ref<InstanceType<typeof DocumentUploadModal>>();
 const statusValueEnum = {
   ready: { text: 'ready', color: '#12b76a' },
   failed: { text: 'failed', color: '#f04438' },
@@ -165,7 +184,8 @@ const columns: AgGridColumnType<RagDocumentItem>[] = [
     dataIndex: 'chunkCount',
     width: 100,
     hideInSearch: true,
-    customRender: ({ record }) => record.actualChunkCount ?? record.chunkCount ?? '-',
+    customRender: ({ record }) =>
+      record.actualChunkCount ?? record.chunkCount ?? '-',
   },
   {
     title: '大小',
@@ -191,37 +211,33 @@ const columns: AgGridColumnType<RagDocumentItem>[] = [
     fixed: 'right',
     hideInSearch: true,
     customRender: ({ record }) =>
-      h(
-        Space,
-        { size: 4 },
-        () => [
-          h(
-            ApButton,
-            {
-              type: 'link',
-              onClick: () => editMetadata(record),
-            },
-            () => '编辑',
-          ),
-          h(
-            ApButton,
-            {
-              type: 'link',
-              onClick: () => chunkDrawerRef.value?.show(record),
-            },
-            () => '切片实况',
-          ),
-          h(
-            ApButton,
-            {
-              danger: true,
-              type: 'link',
-              onClick: () => remove(record),
-            },
-            () => '删除索引',
-          ),
-        ],
-      ),
+      h(Space, { size: 4 }, () => [
+        h(
+          ApButton,
+          {
+            type: 'link',
+            onClick: () => editMetadata(record),
+          },
+          () => '编辑',
+        ),
+        h(
+          ApButton,
+          {
+            type: 'link',
+            onClick: () => chunkDrawerRef.value?.show(record),
+          },
+          () => '切片实况',
+        ),
+        h(
+          ApButton,
+          {
+            danger: true,
+            type: 'link',
+            onClick: () => remove(record),
+          },
+          () => '删除索引',
+        ),
+      ]),
   },
 ];
 
@@ -317,7 +333,6 @@ function formatSize(value: string | number) {
   if (size > 1024) return `${(size / 1024).toFixed(1)} KB`;
   return `${size} B`;
 }
-
 </script>
 
 <style scoped>

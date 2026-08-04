@@ -16,7 +16,7 @@ import type {
 } from '../../types/rag.type';
 
 const IGNORED_NAMES = new Set(['.DS_Store', '.WeDrive']);
-const SUPPORTED_EXTENSIONS = new Set([
+export const RAG_SUPPORTED_DOCUMENT_EXTENSIONS = new Set([
   '.pdf',
   '.docx',
   '.xlsx',
@@ -40,28 +40,61 @@ export class DocumentLoaderService {
   }
 
   async scanRawFiles(tenantCode: TenantCode): Promise<RawDocumentFile[]> {
-    const tenantRawDir = path.join(this.rawDir, tenantCode);
+    const tenantRawDir = this.resolveTenantRawDir(tenantCode);
     const absolutePaths = await this.walk(tenantRawDir);
     const files: RawDocumentFile[] = [];
 
     for (const absolutePath of absolutePaths) {
       const ext = path.extname(absolutePath).toLowerCase();
-      if (!SUPPORTED_EXTENSIONS.has(ext)) continue;
-
-      const stat = await fs.stat(absolutePath);
-      const sourcePath = path.relative(tenantRawDir, absolutePath);
-      files.push({
-        absolutePath,
-        sourcePath,
-        fileName: path.basename(absolutePath),
-        fileType: ext.slice(1),
-        documentType: this.resolveDocumentType(sourcePath),
-        fileSize: stat.size,
-        fileHash: await this.hashFile(absolutePath),
-      });
+      if (!RAG_SUPPORTED_DOCUMENT_EXTENSIONS.has(ext)) continue;
+      files.push(await this.buildRawDocumentFile(absolutePath, tenantCode));
     }
 
     return files;
+  }
+
+  isSupportedFileName(fileName: string): boolean {
+    return RAG_SUPPORTED_DOCUMENT_EXTENSIONS.has(
+      path.extname(fileName).toLowerCase(),
+    );
+  }
+
+  getSupportedExtensions(): string[] {
+    return [...RAG_SUPPORTED_DOCUMENT_EXTENSIONS];
+  }
+
+  resolveTenantRawDir(tenantCode: TenantCode): string {
+    return path.join(this.rawDir, tenantCode);
+  }
+
+  async buildRawDocumentFile(
+    absolutePath: string,
+    tenantCode: TenantCode,
+    options: { sourcePath?: string; fileName?: string } = {},
+  ): Promise<RawDocumentFile> {
+    const tenantRawDir = this.resolveTenantRawDir(tenantCode);
+    const sourcePath =
+      options.sourcePath ?? path.relative(tenantRawDir, absolutePath);
+    const ext = path.extname(options.fileName ?? absolutePath).toLowerCase();
+    if (!RAG_SUPPORTED_DOCUMENT_EXTENSIONS.has(ext)) {
+      throw new BadRequestException(`Unsupported file type: ${ext || 'none'}`);
+    }
+
+    const stat = await fs.stat(absolutePath);
+    return {
+      absolutePath,
+      sourcePath,
+      fileName: options.fileName ?? path.basename(absolutePath),
+      fileType: ext.slice(1),
+      documentType: this.resolveDocumentType(sourcePath),
+      fileSize: stat.size,
+      fileHash: await this.hashFile(absolutePath),
+    };
+  }
+
+  async hashFile(filePath: string): Promise<string> {
+    const file = await fs.readFile(filePath);
+    return crypto.createHash('sha256').update(file).digest('hex');
   }
 
   async loadDocument(file: RawDocumentFile): Promise<LoadedDocument> {
@@ -116,11 +149,6 @@ export class DocumentLoaderService {
     }
 
     return files;
-  }
-
-  private async hashFile(filePath: string): Promise<string> {
-    const file = await fs.readFile(filePath);
-    return crypto.createHash('sha256').update(file).digest('hex');
   }
 
   private resolveDocumentType(sourcePath: string) {

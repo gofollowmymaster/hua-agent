@@ -8,10 +8,16 @@ import {
   Post,
   Res,
   StreamableFile,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 import { createReadStream } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { randomUUID } from 'node:crypto';
 import type { Response } from 'express';
 import { AuthGuard } from '@src/common/guard/auth';
 import { SkipTransform } from '@src/common/decorator/skip-transform.decorator';
@@ -23,18 +29,54 @@ import {
   RagAdminSessionPageDto,
 } from './dto/rag-admin.dto';
 import { RagAdminService } from './services/rag-admin.service';
+import { RagDocumentUploadService } from './services/ingest/rag-document-upload.service';
+
+const MAX_UPLOAD_FILES = 20;
+const MAX_UPLOAD_FILE_SIZE = 50 * 1024 * 1024;
 
 @ApiTags('RAG 管理后台')
 @UseGuards(AuthGuard)
 @Controller('ai/rag/admin')
 export class RagAdminController {
-  constructor(private readonly ragAdminService: RagAdminService) {}
+  constructor(
+    private readonly ragAdminService: RagAdminService,
+    private readonly ragDocumentUploadService: RagDocumentUploadService,
+  ) {}
 
   @Post('documents/page')
   @ApiOperation({ summary: '分页查询 RAG 文档' })
   @ApiBody({ type: RagAdminDocumentPageDto })
   pageDocuments(@Body() body: RagAdminDocumentPageDto) {
     return this.ragAdminService.pageDocuments(body);
+  }
+
+  @Post('documents/upload')
+  @UseInterceptors(
+    FilesInterceptor('files', MAX_UPLOAD_FILES, {
+      storage: diskStorage({
+        destination: tmpdir(),
+        filename: (_request, _file, callback) => callback(null, randomUUID()),
+      }),
+      limits: { fileSize: MAX_UPLOAD_FILE_SIZE, files: MAX_UPLOAD_FILES },
+    }),
+  )
+  @ApiOperation({ summary: '批量上传并索引 RAG 文档' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['files'],
+      properties: {
+        files: {
+          type: 'array',
+          maxItems: MAX_UPLOAD_FILES,
+          items: { type: 'string', format: 'binary' },
+        },
+      },
+    },
+  })
+  uploadDocuments(@UploadedFiles() files: Express.Multer.File[]) {
+    return this.ragDocumentUploadService.uploadDocuments(files);
   }
 
   @Delete('documents/:id')

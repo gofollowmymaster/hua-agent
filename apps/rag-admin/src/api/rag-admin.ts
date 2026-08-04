@@ -1,4 +1,4 @@
-import { del, get, getBlob, post } from './http';
+import { del, get, getBlob, http, post } from './http';
 
 export interface PageResult<T> {
   list: T[];
@@ -38,6 +38,28 @@ export interface RagDocumentChunkItem {
   createdAt: string;
 }
 
+export interface RagDocumentUploadFileResult {
+  fileName: string;
+  status: 'indexed' | 'duplicate' | 'failed';
+  documentId?: string;
+  sourcePath?: string;
+  chunks?: number;
+  duplicateOf?: {
+    documentId: string;
+    fileName: string;
+  };
+  reason?: string;
+}
+
+export interface RagDocumentUploadResult {
+  totalFiles: number;
+  indexedFiles: number;
+  duplicateFiles: number;
+  failedFiles: number;
+  chunks: number;
+  files: RagDocumentUploadFileResult[];
+}
+
 export interface RagSessionItem {
   id: string | number;
   channel: string;
@@ -66,7 +88,10 @@ export interface RagMessageItem {
 }
 
 export function pageDocuments(params: Record<string, unknown>) {
-  return post<PageResult<RagDocumentItem>>('/ai/rag/admin/documents/page', params);
+  return post<PageResult<RagDocumentItem>>(
+    '/ai/rag/admin/documents/page',
+    params,
+  );
 }
 
 export async function pageDocumentsGrid(params: Record<string, unknown>) {
@@ -80,6 +105,17 @@ export async function pageDocumentsGrid(params: Record<string, unknown>) {
 
 export function deleteDocument(id: string | number) {
   return del(`/ai/rag/admin/documents/${id}`);
+}
+
+export function uploadDocuments(files: File[]) {
+  const formData = new FormData();
+  for (const file of files) formData.append('files', file, file.name);
+
+  return http.post<unknown, RagDocumentUploadResult>(
+    '/ai/rag/admin/documents/upload',
+    formData,
+    { timeout: 10 * 60 * 1000 },
+  );
 }
 
 export function updateDocumentMetadata(
@@ -108,7 +144,10 @@ export function ingestDocuments(force: boolean) {
 }
 
 export function pageSessions(params: Record<string, unknown>) {
-  return post<PageResult<RagSessionItem>>('/ai/rag/admin/sessions/page', params);
+  return post<PageResult<RagSessionItem>>(
+    '/ai/rag/admin/sessions/page',
+    params,
+  );
 }
 
 export async function pageSessionsGrid(params: Record<string, unknown>) {
@@ -125,13 +164,16 @@ export function listSessionMessages(id: string | number) {
 }
 
 function normalizeGridPageParams(params: Record<string, unknown>) {
-  return Object.entries(params).reduce<Record<string, unknown>>((result, [key, value]) => {
-    if (value === undefined || value === null || value === '') return result;
-    if (isEmptyObject(value)) return result;
+  return Object.entries(params).reduce<Record<string, unknown>>(
+    (result, [key, value]) => {
+      if (value === undefined || value === null || value === '') return result;
+      if (isEmptyObject(value)) return result;
 
-    result[key === 'current' ? 'page' : key] = value;
-    return result;
-  }, {});
+      result[key === 'current' ? 'page' : key] = value;
+      return result;
+    },
+    {},
+  );
 }
 
 function isEmptyObject(value: unknown) {

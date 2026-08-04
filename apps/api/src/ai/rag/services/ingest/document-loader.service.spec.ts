@@ -74,6 +74,26 @@ describe('DocumentLoaderService', () => {
     service = new DocumentLoaderService();
   });
 
+  it('recognizes every supported upload format and computes SHA-256', async () => {
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'rag-loader-hash-'));
+    const filePath = path.join(root, 'document.md');
+    try {
+      await fs.writeFile(filePath, 'same content');
+
+      expect(
+        ['pdf', 'docx', 'xlsx', 'ppt', 'pptx', 'txt', 'md'].every((extension) =>
+          service.isSupportedFileName(`document.${extension}`),
+        ),
+      ).toBe(true);
+      expect(service.isSupportedFileName('document.doc')).toBe(false);
+      expect(await service.hashFile(filePath)).toBe(
+        'a636bd7cd42060a4d07fa1bfbcc010eb7794c2ba721e1e3e4c20335a15b66eaf',
+      );
+    } finally {
+      await fs.rm(root, { recursive: true, force: true });
+    }
+  });
+
   it('loads PDF pages with LangChain community loader and keeps page metadata', async () => {
     mockPdfLoad.mockResolvedValue([
       {
@@ -192,7 +212,10 @@ describe('DocumentLoaderService', () => {
       await fs.mkdir(path.join(root, 'raw', 'aplus', 'policy'), {
         recursive: true,
       });
-      await fs.writeFile(path.join(root, 'raw', 'aplus', 'policy', 'a.md'), '# a');
+      await fs.writeFile(
+        path.join(root, 'raw', 'aplus', 'policy', 'a.md'),
+        '# a',
+      );
       await fs.writeFile(path.join(root, 'raw', 'aplus', 'root.md'), '# root');
 
       service = new DocumentLoaderService();

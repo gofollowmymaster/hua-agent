@@ -10,7 +10,11 @@ import { TenantCode } from '@src/config/tenant';
 import { LoggerService } from '@src/common/service/logger/logger.service';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import { NodeConfigService } from '@src/config/node-config.service';
-import type { IngestSummary, LoadedDocument } from '../../types/rag.type';
+import type {
+  IngestSummary,
+  LoadedDocument,
+  RawDocumentFile,
+} from '../../types/rag.type';
 import { DocumentLoaderService } from './document-loader.service';
 import { RagPrismaService } from '../prisma/rag-prisma.service';
 
@@ -65,6 +69,23 @@ export class RagIngestService {
       durationMs: Date.now() - ingestStart,
     });
 
+    return this.ingestFiles(files, {
+      ...options,
+      tenantCode,
+      startedAt: ingestStart,
+    });
+  }
+
+  async ingestFiles(
+    files: RawDocumentFile[],
+    options: {
+      force?: boolean;
+      tenantCode?: TenantCode;
+      startedAt?: number;
+    } = {},
+  ): Promise<IngestSummary> {
+    const tenantCode = options.tenantCode ?? this.currentTenant();
+    const ingestStart = options.startedAt ?? Date.now();
     const summary: IngestSummary = {
       scannedFiles: files.length,
       indexedFiles: 0,
@@ -96,6 +117,30 @@ export class RagIngestService {
         tenantCode,
         file.sourcePath,
       );
+      const duplicate = await this.findDocumentByHash(
+        tenantCode,
+        file.fileHash,
+      );
+      if (duplicate && String(duplicate.id) !== String(existing?.id ?? '')) {
+        summary.skippedFiles += 1;
+        summary.files.push({
+          sourcePath: file.sourcePath,
+          status: 'skipped',
+          reason: 'duplicate hash',
+          duplicateOf: {
+            documentId: String(duplicate.id),
+            fileName: duplicate.fileName,
+          },
+        });
+        this.logIngestProgress({
+          stage: 'file_skip',
+          ...fileLogContext,
+          reason: 'duplicate hash',
+          duplicateDocumentId: String(duplicate.id),
+          durationMs: Date.now() - fileStart,
+        });
+        continue;
+      }
       if (
         existing &&
         existing.file_hash === file.fileHash &&
@@ -152,6 +197,7 @@ export class RagIngestService {
         summary.files.push({
           sourcePath: file.sourcePath,
           status: 'indexed',
+          documentId,
           chunks: chunks.length,
         });
         this.logIngestProgress({
@@ -162,9 +208,71 @@ export class RagIngestService {
           durationMs: Date.now() - fileStart,
         });
       } catch (error) {
-        summary.failedFiles += 1;
+        if (this.isFileHashUniqueConflict(error)) {
+          const concurrentDuplicate = await this.findDocumentByHash(
+            tenantCode,
+            file.fileHash,
+          );
+          summary.skippedFiles += 1;
+          summary.files.push({
+            sourcePath: file.sourcePath,
+            status: 'skipped',
+            reason: 'duplicate hash',
+            duplicateOf: concurrentDuplicate
+              ? {
+                  documentId: String(concurrentDuplicate.id),
+                  fileName: concurrentDuplicate.fileName,
+                }
+              : undefined,
+          });
+          this.logIngestProgress({
+            stage: 'file_skip',
+            ...fileLogContext,
+            reason: 'duplicate hash',
+            duplicateDocumentId: concurrentDuplicate
+              ? String(concurrentDuplicate.id)
+              : undefined,
+            durationMs: Date.now() - fileStart,
+          });
+          continue;
+        }
+
         const message = error instanceof Error ? error.message : String(error);
-        await this.markDocumentFailed(tenantCode, file, message);
+        try {
+          await this.markDocumentFailed(tenantCode, file, message);
+        } catch (markFailedError) {
+          if (this.isFileHashUniqueConflict(markFailedError)) {
+            const concurrentDuplicate = await this.findDocumentByHash(
+              tenantCode,
+              file.fileHash,
+            );
+            summary.skippedFiles += 1;
+            summary.files.push({
+              sourcePath: file.sourcePath,
+              status: 'skipped',
+              reason: 'duplicate hash',
+              duplicateOf: concurrentDuplicate
+                ? {
+                    documentId: String(concurrentDuplicate.id),
+                    fileName: concurrentDuplicate.fileName,
+                  }
+                : undefined,
+            });
+            this.logIngestProgress({
+              stage: 'file_skip',
+              ...fileLogContext,
+              reason: 'duplicate hash',
+              duplicateDocumentId: concurrentDuplicate
+                ? String(concurrentDuplicate.id)
+                : undefined,
+              durationMs: Date.now() - fileStart,
+            });
+            continue;
+          }
+          throw markFailedError;
+        }
+
+        summary.failedFiles += 1;
         summary.files.push({
           sourcePath: file.sourcePath,
           status: 'failed',
@@ -188,6 +296,18 @@ export class RagIngestService {
     });
 
     return summary;
+  }
+
+  async findDocumentByHash(tenantCode: TenantCode, fileHash: string) {
+    return this.ragPrisma.aplusDocument.findFirst({
+      where: { tenantCode, fileHash },
+      select: {
+        id: true,
+        fileName: true,
+        sourcePath: true,
+        status: true,
+      },
+    });
   }
 
   private async buildChunks(tenantCode: TenantCode, document: LoadedDocument) {
@@ -417,6 +537,21 @@ export class RagIngestService {
       file_hash: document.fileHash,
       status: document.status,
     };
+  }
+
+  private isFileHashUniqueConflict(error: unknown): boolean {
+    if (!error || typeof error !== 'object') return false;
+    const value = error as {
+      code?: string;
+      message?: string;
+      meta?: { code?: string; message?: string };
+    };
+    const message = `${value.message ?? ''} ${value.meta?.message ?? ''}`;
+    return (
+      value.code === 'P2002' ||
+      (value.code === 'P2010' && value.meta?.code === '23505') ||
+      message.includes('aplus_documents_tenant_code_file_hash_key')
+    );
   }
 
   private logIngestProgress(meta: Record<string, unknown>) {
