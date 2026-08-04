@@ -21,6 +21,7 @@ import type {
   RagMemoryMessage,
   RagQueryOptions,
   RagResolvedSession,
+  RagStreamEvent,
   RetrievalCandidate,
   RetrievedChunk,
   SourceItem,
@@ -31,14 +32,13 @@ import type {
   RagWorkflowInput,
   RagWorkflowMode,
   RagWorkflowResult,
-  RagWorkflowStreamEvent,
-} from './rag-workflow.type';
+} from '../../types/rag-workflow.type';
 import type { RagQueryRewriteResult } from './rag-query-rewrite.service';
 
 // 图状态按阶段保存中间结果，独立字段可避免并行召回节点写入冲突。
 const RagWorkflowStateAnnotation = Annotation.Root({
   question: Annotation<string>,
-  options: Annotation<RagQueryOptions | undefined>,
+  options: Annotation<RagQueryOptions>,
   mode: Annotation<RagWorkflowMode>,
   session: Annotation<RagResolvedSession | undefined>,
   memory: Annotation<RagMemoryMessage[]>,
@@ -56,7 +56,7 @@ const RagWorkflowStateAnnotation = Annotation.Root({
 type RagWorkflowGraphState = typeof RagWorkflowStateAnnotation.State;
 type RagWorkflowGraphUpdate = typeof RagWorkflowStateAnnotation.Update;
 type RagWorkflowRuntime = {
-  writer: (event: RagWorkflowStreamEvent) => void;
+  writer: (event: RagStreamEvent) => void;
 };
 
 @Injectable()
@@ -99,7 +99,7 @@ export class RagQueryService {
   async *streamAnswer(
     question: string,
     options: RagQueryOptions = {},
-  ): AsyncGenerator<RagWorkflowStreamEvent> {
+  ): AsyncGenerator<RagStreamEvent> {
     const stream = await this.graph.stream(
       this.buildInput(question, options, 'stream'),
       {
@@ -109,7 +109,7 @@ export class RagQueryService {
     );
 
     for await (const event of stream) {
-      yield event as unknown as RagWorkflowStreamEvent;
+      yield event as unknown as RagStreamEvent;
     }
   }
 
@@ -158,7 +158,7 @@ export class RagQueryService {
     // 两路召回从 rewrite_query 扇出，并通过数组起点 edge 形成 fan-in barrier。
     return new StateGraph({
       state: RagWorkflowStateAnnotation,
-      writer: writer<RagWorkflowStreamEvent>,
+      writer: writer<RagStreamEvent>,
     })
       .addNode('resolve_session', this.resolveSessionNode.bind(this))
       .addNode('load_memory', this.loadMemoryNode.bind(this))
@@ -510,7 +510,7 @@ export class RagQueryService {
   private writeStatus(
     state: RagWorkflowGraphState,
     runtime: RagWorkflowRuntime,
-    data: Extract<RagWorkflowStreamEvent, { type: 'status' }>['data'],
+    data: Extract<RagStreamEvent, { type: 'status' }>['data'],
   ) {
     if (state.mode === 'stream') runtime.writer({ type: 'status', data });
   }

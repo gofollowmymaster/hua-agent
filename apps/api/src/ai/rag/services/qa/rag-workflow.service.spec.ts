@@ -1,10 +1,10 @@
-import { RagQueryService } from './rag-query.service';
+import { RagQueryService } from './rag-workflow.service';
 import type {
   RagResolvedSession,
   RetrievalCandidate,
   RetrievedChunk,
 } from '../../types/rag.type';
-import type { RagRetrievalRouteResult } from './rag-workflow.type';
+import type { RagRetrievalRouteResult } from '../../types/rag-workflow.type';
 
 const mockModelInvoke = jest.fn();
 const mockModelStream = jest.fn();

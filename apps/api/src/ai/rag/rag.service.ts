@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { RagQueryService } from './services/qa/rag-query.service';
+import { RagQueryService } from './services/qa/rag-workflow.service';
 import type { RagQueryOptions, RagStreamEvent } from './types/rag.type';
 
 // 重导出保持向后兼容

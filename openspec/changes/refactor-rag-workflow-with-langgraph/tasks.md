@@ -2,6 +2,7 @@
 
 - [x] 1.1 添加 `@langchain/langgraph` 依赖并更新 workspace lockfile
 - [x] 1.2 定义 RAG 工作流输入、状态、输出和 custom stream 类型
+- [x] 1.3 将工作流共享类型收敛到 `rag/types` 并删除过时类型
 
 ## 2. 检索节点能力
 

@@ -22,7 +22,7 @@ import { RagMemoryService } from './rag/services/qa/rag-memory.service';
 import { RagAdminController } from './rag/rag-admin.controller';
 import { RagAdminService } from './rag/services/rag-admin.service';
 import { PromptRegistryService } from './rag/prompts/prompt.registry';
-import { RagQueryService } from './rag/services/qa/rag-query.service';
+import { RagQueryService } from './rag/services/qa/rag-workflow.service';
 import { RagQueryRewriteService } from './rag/services/qa/rag-query-rewrite.service';
 import { RagRetrievalService } from './rag/services/qa/rag-retrieval.service';
 

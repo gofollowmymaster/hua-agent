@@ -14,7 +14,7 @@ import type {
   RagRerankResult,
   RagRetrievalRouteResult,
   RagStageStatus,
-} from './rag-workflow.type';
+} from '../../types/rag-workflow.type';
 
 type RagRetrievalRow = {
   id: bigint | number | string;

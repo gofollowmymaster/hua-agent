@@ -1,14 +1,10 @@
-import type { RagQueryRewriteResult } from './rag-query-rewrite.service';
 import type {
-  RagMemoryMessage,
   RagQueryOptions,
-  RagResolvedSession,
   RagRetrievalRoute,
-  RagStreamEvent,
   RetrievalCandidate,
   RetrievedChunk,
   SourceItem,
-} from '../../types/rag.type';
+} from './rag.type';
 
 export type RagWorkflowMode = 'sync' | 'stream';
 
@@ -29,22 +25,8 @@ export interface RagRerankResult {
 
 export interface RagWorkflowInput {
   question: string;
-  options?: RagQueryOptions;
+  options: RagQueryOptions;
   mode: RagWorkflowMode;
-}
-
-export interface RagWorkflowState extends RagWorkflowInput {
-  session?: RagResolvedSession;
-  memory: RagMemoryMessage[];
-  rewrite?: RagQueryRewriteResult;
-  vectorResult?: RagRetrievalRouteResult;
-  keywordResult?: RagRetrievalRouteResult;
-  fusedCandidates: RetrievalCandidate[];
-  rerankResult?: RagRerankResult;
-  chunks: RetrievedChunk[];
-  prompt?: string;
-  answer: string;
-  sources: SourceItem[];
 }
 
 export interface RagWorkflowResult {
@@ -53,5 +35,3 @@ export interface RagWorkflowResult {
   sources: SourceItem[];
   chunks: RetrievedChunk[];
 }
-
-export type RagWorkflowStreamEvent = RagStreamEvent;
