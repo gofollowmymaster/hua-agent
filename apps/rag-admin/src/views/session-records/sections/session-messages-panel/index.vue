@@ -89,7 +89,7 @@ function formatTime(value?: string) {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .session-messages-panel {
   padding: 20px;
 }
@@ -111,7 +111,7 @@ function formatTime(value?: string) {
 
 .panel-header p {
   margin: 4px 0 0;
-  color: #667085;
+  color: @text-secondary-color;
   line-height: 20px;
   word-break: break-all;
 }
@@ -127,30 +127,30 @@ function formatTime(value?: string) {
 }
 
 .message {
-  border: 1px solid #eaecf0;
-  border-radius: 8px;
   padding: 12px;
-  background: #ffffff;
+  border: 1px solid @border-color;
+  border-radius: 8px;
+  background: @card-bg-color;
 }
 
 .message.assistant {
-  border-color: #d0d5dd;
-  background: #f9fafb;
+  border-color: @border-color;
+  background: @fill-bg-color;
 }
 
 .message-meta {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  color: #667085;
+  color: @text-secondary-color;
   font-size: 12px;
 }
 
 .message-content {
   margin-top: 8px;
+  color: @text-primary-color;
+  line-height: 22px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  color: #101828;
-  line-height: 22px;
 }
 </style>

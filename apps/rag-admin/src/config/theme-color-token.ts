@@ -30,6 +30,9 @@ export enum ThemeColor {
   FillDisabled = '#F9F9FA',
   FillGlobalBg = '#F2F6f9',
   SiderBg = '#FFFFFF',
+  SiderDarkBg = '#18202d',
+  SiderBrandBg = '#9ee6c7',
+  SiderBrandText = '#eef3f8',
   HeaderBg = '#062773',
   AvatarBg = `linear-gradient(
   0deg,

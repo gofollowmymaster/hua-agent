@@ -73,36 +73,36 @@ function handleInputKeydown(event: KeyboardEvent) {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .assistant-composer {
   flex: 0 0 auto;
   padding: 14px;
-  border-top: 1px solid #e1e7ef;
-  background: #ffffff;
+  border-top: 1px solid @border-color;
+  background: @card-bg-color;
 }
 
 .assistant-input {
   width: 100%;
   min-height: 86px;
   max-height: 180px;
-  resize: vertical;
   padding: 10px 12px;
-  border: 1px solid #cfd8e3;
+  border: 1px solid @border-color;
   border-radius: 8px;
-  color: #202633;
-  background: #ffffff;
-  line-height: 1.6;
   outline: none;
+  background: @card-bg-color;
+  color: @text-primary-color;
+  line-height: 1.6;
+  resize: vertical;
 }
 
 .assistant-input:focus {
-  border-color: #48a77c;
-  box-shadow: 0 0 0 3px rgba(72, 167, 124, 0.16);
+  border-color: @green-color;
+  box-shadow: 0 0 0 3px fade(@green-color, 16%);
 }
 
 .assistant-input:disabled {
-  color: #8995a5;
-  background: #f4f6f8;
+  background: @fill-hover-color;
+  color: @text-tertiary-color;
 }
 
 .assistant-composer-footer {
@@ -114,7 +114,7 @@ function handleInputKeydown(event: KeyboardEvent) {
 }
 
 .assistant-state {
-  color: #667386;
+  color: @text-secondary-color;
   font-size: 13px;
 }
 </style>

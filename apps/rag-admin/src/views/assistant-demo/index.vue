@@ -324,7 +324,7 @@ watch(
 );
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .assistant-page {
   gap: 16px;
 }
@@ -337,21 +337,21 @@ watch(
 
 .assistant-workspace {
   display: grid;
-  min-height: 0;
-  flex: 1 1 auto;
   grid-template-columns: 300px minmax(0, 1fr);
+  flex: 1 1 auto;
+  min-height: 0;
   gap: 16px;
 }
 
 .assistant-history {
   display: flex;
+  flex-direction: column;
   min-width: 0;
   min-height: 0;
-  flex-direction: column;
   overflow: hidden;
-  border: 1px solid #e1e7ef;
+  border: 1px solid @border-color;
   border-radius: 8px;
-  background: #ffffff;
+  background: @card-bg-color;
 }
 
 .assistant-history-head {
@@ -361,53 +361,53 @@ watch(
   justify-content: space-between;
   gap: 12px;
   padding: 14px;
-  border-bottom: 1px solid #e1e7ef;
+  border-bottom: 1px solid @border-color;
 }
 
 .assistant-history-head h2 {
   margin: 0;
-  color: #202633;
+  color: @text-primary-color;
   font-size: 16px;
   line-height: 22px;
 }
 
 .assistant-history-head p {
   margin: 4px 0 0;
-  color: #667386;
+  color: @text-secondary-color;
   font-size: 12px;
   line-height: 18px;
 }
 
 .assistant-history-list {
-  min-height: 0;
   flex: 1 1 auto;
+  min-height: 0;
   padding: 8px;
   overflow: auto;
 }
 
 .assistant-history-item {
   display: flex;
+  flex-direction: column;
   width: 100%;
   min-height: 70px;
-  flex-direction: column;
-  gap: 6px;
   margin: 0 0 6px;
   padding: 10px;
   border: 1px solid transparent;
   border-radius: 8px;
-  color: #202633;
   background: transparent;
+  color: @text-primary-color;
   text-align: left;
   cursor: pointer;
+  gap: 6px;
 }
 
 .assistant-history-item:hover {
-  background: #f4f7fa;
+  background: @fill-hover-color;
 }
 
 .assistant-history-item.active {
-  border-color: #8ad7b4;
-  background: #ecf8f1;
+  border-color: @green-color;
+  background: @green-disabled-color;
 }
 
 .assistant-history-title {
@@ -421,7 +421,7 @@ watch(
 }
 
 .assistant-history-meta {
-  color: #667386;
+  color: @text-secondary-color;
   font-size: 12px;
   line-height: 18px;
 }
@@ -430,24 +430,24 @@ watch(
   display: grid;
   min-height: 160px;
   place-items: center;
-  color: #667386;
+  color: @text-secondary-color;
 }
 
 .assistant-shell {
   display: flex;
-  min-width: 0;
-  min-height: 0;
   flex: 1 1 auto;
   flex-direction: column;
+  min-width: 0;
+  min-height: 0;
   overflow: hidden;
-  border: 1px solid #e1e7ef;
+  border: 1px solid @border-color;
   border-radius: 8px;
-  background: #ffffff;
+  background: @card-bg-color;
 }
 
 .assistant-messages {
-  min-height: 0;
   flex: 1 1 auto;
+  min-height: 0;
   padding: 20px;
   overflow: auto;
 }
@@ -461,14 +461,14 @@ watch(
 
 .assistant-empty h2 {
   margin: 0;
-  color: #202633;
+  color: @text-primary-color;
   font-size: 20px;
   line-height: 28px;
 }
 
 .assistant-empty p {
   margin: 8px 0 0;
-  color: #667386;
+  color: @text-secondary-color;
 }
 
 .assistant-message {
@@ -479,7 +479,7 @@ watch(
 }
 
 .assistant-message-role {
-  color: #667386;
+  color: @text-secondary-color;
   font-weight: 700;
   line-height: 32px;
 }
@@ -499,10 +499,10 @@ watch(
 .assistant-text {
   margin: 0 0 8px;
   padding: 10px 12px;
-  border: 1px solid #dde5ee;
+  border: 1px solid @border-color;
   border-radius: 8px;
-  background: #f8fafc;
-  color: #202633;
+  background: @fill-bg-color;
+  color: @text-primary-color;
   line-height: 1.7;
   overflow-wrap: anywhere;
 }
@@ -543,19 +543,19 @@ watch(
 }
 
 .assistant-markdown :deep(.md-editor-preview a) {
-  color: #1769e0;
+  color: @blue-hover-color;
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
 .assistant-markdown :deep(.md-editor-preview a:hover) {
-  color: #0f56bd;
+  color: @primary-active-color;
 }
 
 .assistant-message--user .assistant-text {
-  border-color: #c9e5d7;
-  background: #ecf8f1;
+  border-color: @green-color;
+  background: @green-disabled-color;
 }
 
 .assistant-status-card {
@@ -563,10 +563,10 @@ watch(
   max-width: 100%;
   margin: 0 0 8px;
   padding: 5px 8px;
-  border: 1px solid #dbe4ee;
+  border: 1px solid @border-color;
   border-radius: 6px;
-  color: #506074;
-  background: #f4f7fa;
+  background: @fill-hover-color;
+  color: @text-secondary-color;
   font-size: 12px;
   line-height: 18px;
   overflow-wrap: anywhere;
@@ -577,11 +577,11 @@ watch(
   flex: 0 0 auto;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
   padding: 8px 14px;
-  border-top: 1px solid #f0c3bd;
-  color: #b42318;
-  background: #fff4f2;
+  border-top: 1px solid fade(@red-color, 30%);
+  background: @red-disabled-color;
+  color: @red-color;
+  gap: 12px;
 }
 
 @media (max-width: 900px) {

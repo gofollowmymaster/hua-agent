@@ -14,27 +14,27 @@ defineProps<{
 }>();
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .assistant-reasoning {
   margin-bottom: 12px;
-  border-left: 2px solid #8c8c8c;
-  color: #595959;
+  border-left: 2px solid @text-tertiary-color;
+  color: @text-secondary-color;
 }
 
 .assistant-reasoning summary {
   width: fit-content;
   padding: 4px 10px;
-  cursor: pointer;
-  color: #434343;
+  color: @text-secondary-color;
   font-size: 13px;
   font-weight: 600;
+  cursor: pointer;
 }
 
 .assistant-reasoning-content {
   padding: 6px 10px 8px;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
   font-size: 13px;
   line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 </style>

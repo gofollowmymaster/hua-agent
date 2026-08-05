@@ -96,11 +96,13 @@ export function pageDocuments(params: Record<string, unknown>) {
 示例：
 
 ```ts
+import { ThemeColor } from '@/config/theme-color-token';
+
 const HISTORY_PAGE_SIZE = 20;
 
 const statusValueEnum = {
-  ready: { text: 'ready', color: '#12b76a' },
-  failed: { text: 'failed', color: '#f04438' },
+  ready: { text: 'ready', color: ThemeColor.Green },
+  failed: { text: 'failed', color: ThemeColor.Red },
 };
 ```
 

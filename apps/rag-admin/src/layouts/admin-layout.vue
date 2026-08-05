@@ -111,7 +111,7 @@ const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
 };
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .app-shell {
   display: flex;
   min-height: 100vh;
@@ -123,7 +123,7 @@ const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
 
 .app-sider {
   min-height: 100vh;
-  background: #18202d;
+  background: @sider-dark-bg-color;
 }
 
 .brand {
@@ -132,18 +132,18 @@ const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
   gap: 12px;
   height: 76px;
   padding: 20px 18px;
-  color: #eef3f8;
+  color: @sider-brand-text-color;
 }
 
 .brand-mark {
   display: grid;
   width: 36px;
   height: 36px;
-  place-items: center;
   border-radius: 8px;
-  color: #17202c;
-  background: #9ee6c7;
+  background: @sider-brand-bg-color;
+  color: @text-primary-color;
   font-weight: 800;
+  place-items: center;
 }
 
 .brand-title {
@@ -153,7 +153,7 @@ const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
 
 .brand-subtitle {
   margin-top: 2px;
-  color: #9aa7b5;
+  color: @text-tertiary-color;
   font-size: 12px;
 }
 
@@ -164,16 +164,16 @@ const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
 
 .app-header {
   display: flex;
-  height: 64px;
   align-items: center;
   justify-content: space-between;
+  height: 64px;
   padding: 0 24px;
-  border-bottom: 1px solid #e6ebf1;
-  background: #ffffff;
+  border-bottom: 1px solid @border-color;
+  background: @card-bg-color;
 }
 
 .header-title {
-  color: #1f2937;
+  color: @text-primary-color;
   font-size: 18px;
   font-weight: 700;
   line-height: 24px;
@@ -181,7 +181,7 @@ const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
 
 .header-subtitle {
   margin-top: 2px;
-  color: #7b8797;
+  color: @text-secondary-color;
   font-size: 12px;
   line-height: 18px;
 }
@@ -191,7 +191,7 @@ const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
   align-items: center;
   gap: 8px;
   max-width: 220px;
-  color: #263244 !important;
+  color: @text-primary-color !important;
 }
 
 .user-trigger :deep(span:last-child) {
@@ -203,32 +203,32 @@ const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
 
 .main {
   display: flex;
-  height: calc(100vh - 64px);
-  min-width: 0;
-  min-height: calc(100vh - 64px);
   flex-direction: column;
+  min-width: 0;
+  height: calc(100vh - 64px);
+  min-height: calc(100vh - 64px);
   padding: 12px;
   overflow: hidden;
-  background: #f4f6f8;
+  background: @fill-hover-color;
 }
 
 .main :deep(.ant-spin-nested-loading),
 .main :deep(.ant-spin-container) {
   display: flex;
-  min-height: 0;
   flex: 1 1 auto;
   flex-direction: column;
+  min-height: 0;
 }
 
 .state {
   display: grid;
   min-height: 160px;
   place-items: center;
-  color: #667386;
+  color: @text-secondary-color;
 }
 
 .error-state {
-  color: #b42318;
+  color: @red-color;
 }
 
 @media (max-width: 900px) {

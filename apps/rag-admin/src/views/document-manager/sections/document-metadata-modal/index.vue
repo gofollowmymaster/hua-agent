@@ -55,7 +55,7 @@ function getForm() {
 defineExpose({ getForm });
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .metadata-form {
   display: flex;
   flex-direction: column;
@@ -66,7 +66,7 @@ defineExpose({ getForm });
   display: flex;
   flex-direction: column;
   gap: 6px;
-  color: #344054;
+  color: @text-secondary-color;
   font-size: 13px;
   font-weight: 600;
 }
@@ -74,16 +74,16 @@ defineExpose({ getForm });
 .metadata-input {
   height: 36px;
   padding: 6px 11px;
-  border: 1px solid #d0d5dd;
+  border: 1px solid @border-color;
   border-radius: 6px;
-  color: #101828;
+  outline: none;
+  color: @text-primary-color;
   font-size: 14px;
   line-height: 22px;
-  outline: none;
 }
 
 .metadata-input:focus {
-  border-color: #1677ff;
-  box-shadow: 0 0 0 2px rgb(22 119 255 / 12%);
+  border-color: @blue-color;
+  box-shadow: 0 0 0 2px fade(@blue-color, 12%);
 }
 </style>

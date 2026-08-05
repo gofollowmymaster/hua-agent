@@ -113,7 +113,7 @@ function isJsonBlob(blob: Blob) {
 
 </script>
 
-<style>
+<style lang="less">
 .document-preview-modal .ant-modal {
   top: 16px;
   max-width: calc(100vw - 32px);
@@ -122,8 +122,8 @@ function isJsonBlob(blob: Blob) {
 
 .document-preview-modal .ant-modal-content {
   display: flex;
-  max-height: calc(100vh - 32px);
   flex-direction: column;
+  max-height: calc(100vh - 32px);
 }
 
 .document-preview-modal .ant-modal-body {
@@ -136,7 +136,7 @@ function isJsonBlob(blob: Blob) {
   height: min(72vh, calc(100vh - 132px));
   min-height: 360px;
   overflow: hidden;
-  background: #f8fafc;
+  background: @fill-bg-color;
 }
 
 .document-preview-viewport .ofv-root,
@@ -153,9 +153,9 @@ function isJsonBlob(blob: Blob) {
 
 .preview-state {
   display: flex;
-  min-height: 220px;
   align-items: center;
   justify-content: center;
-  color: #667386;
+  min-height: 220px;
+  color: @text-secondary-color;
 }
 </style>

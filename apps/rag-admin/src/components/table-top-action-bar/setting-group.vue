@@ -91,8 +91,8 @@
     padding: 0;
     border: 1px solid @border-color;
     border-radius: 4px;
-    color: @text-primary-color;
     background: transparent;
+    color: @text-primary-color;
     cursor: pointer;
 
     &:hover {

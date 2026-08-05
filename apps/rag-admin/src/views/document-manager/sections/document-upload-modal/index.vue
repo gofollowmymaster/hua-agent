@@ -21,9 +21,15 @@
       <header class="upload-result-summary">
         <span>处理 {{ result.totalFiles }} 个文件</span>
         <Space size="small" wrap>
-          <ApTag :text="`成功 ${result.indexedFiles}`" color="#12b76a" />
-          <ApTag :text="`重复 ${result.duplicateFiles}`" color="#f79009" />
-          <ApTag :text="`失败 ${result.failedFiles}`" color="#f04438" />
+          <ApTag
+            :text="`成功 ${result.indexedFiles}`"
+            :color="ThemeColor.Green"
+          />
+          <ApTag
+            :text="`重复 ${result.duplicateFiles}`"
+            :color="ThemeColor.Orange"
+          />
+          <ApTag :text="`失败 ${result.failedFiles}`" :color="ThemeColor.Red" />
         </Space>
       </header>
 
@@ -64,6 +70,7 @@ import {
   type RagDocumentUploadFileResult,
   type RagDocumentUploadResult,
 } from '@/api/rag-admin';
+import { ThemeColor } from '@/config/theme-color-token';
 
 const MAX_FILES = 20;
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
@@ -145,22 +152,24 @@ function statusText(status: RagDocumentUploadFileResult['status']) {
 }
 
 function statusColor(status: RagDocumentUploadFileResult['status']) {
-  return { indexed: '#12b76a', duplicate: '#f79009', failed: '#f04438' }[
-    status
-  ];
+  return {
+    indexed: ThemeColor.Green,
+    duplicate: ThemeColor.Orange,
+    failed: ThemeColor.Red,
+  }[status];
 }
 
 defineExpose({ submit });
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .upload-modal-content {
   padding-top: 4px;
 }
 
 .upload-title {
   margin: 8px 0 4px;
-  color: #101828;
+  color: @text-primary-color;
   font-size: 15px;
   font-weight: 600;
 }
@@ -168,15 +177,15 @@ defineExpose({ submit });
 .upload-hint {
   max-width: 520px;
   margin: 0 auto;
-  color: #667085;
+  color: @text-secondary-color;
   font-size: 13px;
   line-height: 20px;
 }
 
 .upload-result {
   margin-top: 20px;
-  border-top: 1px solid #eaecf0;
   padding-top: 16px;
+  border-top: 1px solid @border-color;
 }
 
 .upload-result-summary,
@@ -189,14 +198,14 @@ defineExpose({ submit });
 
 .upload-result-summary {
   margin-bottom: 12px;
-  color: #344054;
+  color: @text-secondary-color;
   font-weight: 600;
 }
 
 .upload-result-list {
   max-height: 280px;
   overflow: auto;
-  border: 1px solid #eaecf0;
+  border: 1px solid @border-color;
   border-radius: 8px;
 }
 
@@ -205,14 +214,14 @@ defineExpose({ submit });
 }
 
 .upload-result-list article + article {
-  border-top: 1px solid #eaecf0;
+  border-top: 1px solid @border-color;
 }
 
 .upload-file-name {
   flex: 1;
   min-width: 0;
   overflow-wrap: anywhere;
-  color: #344054;
+  color: @text-secondary-color;
   font-weight: 600;
 }
 
@@ -223,15 +232,15 @@ defineExpose({ submit });
 .upload-result-detail {
   margin: 4px 0 0;
   overflow-wrap: anywhere;
-  color: #667085;
+  color: @text-secondary-color;
   font-size: 12px;
   line-height: 18px;
 }
 
 @media (max-width: 640px) {
   .upload-result-summary {
-    align-items: flex-start;
     flex-direction: column;
+    align-items: flex-start;
   }
 }
 </style>

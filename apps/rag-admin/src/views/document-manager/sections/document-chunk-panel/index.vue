@@ -17,11 +17,15 @@
           <Space>
             <ApTag
               :text="documentItem.status || '-'"
-              :color="documentItem.status === 'failed' ? '#f04438' : '#12b76a'"
+              :color="
+                documentItem.status === 'failed'
+                  ? ThemeColor.Red
+                  : ThemeColor.Green
+              "
             />
             <ApTag
               :text="`${documentItem.actualChunkCount ?? documentItem.chunkCount ?? 0} 个切片`"
-              color="#1677ff"
+              :color="ThemeColor.Blue"
             />
             <ApButton type="text" @click="close">关闭</ApButton>
           </Space>
@@ -89,6 +93,7 @@ import {
   type RagDocumentItem,
 } from '@/api/rag-admin';
 import { useLayoutDrawer } from '@/layouts/layout-drawer/use-layout-drawer';
+import { ThemeColor } from '@/config/theme-color-token';
 
 const props = defineProps<{
   drawerCode: string | number;
@@ -199,7 +204,7 @@ function formatMetadata(value: Record<string, unknown>) {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .chunk-panel {
   padding: 20px;
 }
@@ -221,7 +226,7 @@ function formatMetadata(value: Record<string, unknown>) {
 
 .chunk-summary p {
   margin: 4px 0 0;
-  color: #667085;
+  color: @text-secondary-color;
   line-height: 20px;
   word-break: break-all;
 }
@@ -237,31 +242,31 @@ function formatMetadata(value: Record<string, unknown>) {
 }
 
 .chunk-card {
-  border: 1px solid #eaecf0;
-  border-radius: 8px;
-  background: #ffffff;
   overflow: hidden;
+  border: 1px solid @border-color;
+  border-radius: 8px;
+  background: @card-bg-color;
 }
 
 .chunk-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
   padding: 10px 12px;
-  color: #667085;
-  background: #f9fafb;
+  background: @fill-bg-color;
+  color: @text-secondary-color;
   font-size: 12px;
   cursor: pointer;
   user-select: none;
+  gap: 12px;
 }
 
 .chunk-card-header:hover {
-  background: #f2f4f7;
+  background: @fill-hover-color;
 }
 
 .chunk-card-header:focus-visible {
-  outline: 2px solid #1677ff;
+  outline: 2px solid @blue-color;
   outline-offset: -2px;
 }
 
@@ -269,20 +274,20 @@ function formatMetadata(value: Record<string, unknown>) {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #344054;
+  color: @text-secondary-color;
   font-weight: 600;
 }
 
 .chunk-chevron {
   display: inline-flex;
-  width: 14px;
-  height: 14px;
   align-items: center;
   justify-content: center;
-  color: #667085;
+  width: 14px;
+  height: 14px;
+  transition: transform 0.16s ease;
+  color: @text-secondary-color;
   font-size: 16px;
   line-height: 14px;
-  transition: transform 0.16s ease;
 }
 
 .chunk-chevron.expanded {
@@ -290,28 +295,28 @@ function formatMetadata(value: Record<string, unknown>) {
 }
 
 .chunk-card-body {
-  border-top: 1px solid #eaecf0;
+  border-top: 1px solid @border-color;
 }
 
 .chunk-content,
 .chunk-metadata {
   margin: 0;
-  white-space: pre-wrap;
-  word-break: break-word;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  word-break: break-word;
+  white-space: pre-wrap;
 }
 
 .chunk-content {
   padding: 12px;
-  color: #101828;
+  color: @text-primary-color;
   line-height: 20px;
 }
 
 .chunk-metadata {
-  border-top: 1px solid #eaecf0;
   padding: 10px 12px;
-  color: #475467;
-  background: #fcfcfd;
+  border-top: 1px solid @border-color;
+  background: @fill-disabled-color;
+  color: @text-secondary-color;
   font-size: 12px;
   line-height: 18px;
 }
