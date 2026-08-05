@@ -16,6 +16,7 @@
 - `app.vue`：根组件。
 - `api/`：axios 实例和业务 API 封装。
 - `auth/`：登录中心、token cookie 和鉴权相关前端逻辑。
+- `config/`：全局 UI 主题与 Design Token 预设。
 - `hooks/`：跨页面共享 hooks，例如文档预览弹窗 hook。
 - `layouts/`：后台布局组件。
 - `layouts/layout-drawer.vue`：全局详情抽屉容器。
