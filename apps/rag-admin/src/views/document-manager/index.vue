@@ -2,21 +2,29 @@
   <section class="page">
     <div class="grid-fill">
       <AgGrid :columns="columns" v-bind="gridProps">
-        <template #title>
-          <Space class="header-actions">
-            <ApButton type="primary" @click="refresh">刷新</ApButton>
-            <ApButton type="primary" @click="uploadModal.open()"
-              >添加文档</ApButton
-            >
-            <ApButton
-              danger
-              type="primary"
-              :disabled="ingesting"
-              @click="runIngest(true)"
-            >
-              强制重建索引
-            </ApButton>
-          </Space>
+        <template #title="{ selectedRowKeys, clearAll }">
+          <TableTopActionBar
+            :selected-row-keys="selectedRowKeys"
+            :clear-all="clearAll"
+            :show-selected="false"
+            :settings="{ persistenceKey: 'document-manager-list' }"
+          >
+            <template #suffix>
+              <Space class="header-actions">
+                <ApButton type="primary" @click="uploadModal.open()"
+                  >添加文档</ApButton
+                >
+                <ApButton
+                  danger
+                  type="primary"
+                  :disabled="ingesting"
+                  @click="runIngest(true)"
+                >
+                  强制重建索引
+                </ApButton>
+              </Space>
+            </template>
+          </TableTopActionBar>
         </template>
       </AgGrid>
     </div>
@@ -44,6 +52,7 @@ import {
 } from '@/api/rag-admin';
 import { useRowClickAction } from '@/hooks/use-row-click-action';
 import { useDocumentPreviewModal } from '@/components/document-preview-modal/use-document-preview-modal';
+import TableTopActionBar from '@/components/table-top-action-bar/index.vue';
 import { useDocumentMetadataModal } from './sections/document-metadata-modal/use-document-metadata-modal';
 import { useDocumentUploadModal } from './sections/document-upload-modal/use-document-upload-modal';
 

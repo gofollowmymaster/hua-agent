@@ -2,8 +2,13 @@
   <section class="page">
     <div class="grid-fill">
       <AgGrid :columns="columns" v-bind="gridProps">
-        <template #title>
-          <ApButton type="primary" @click="refresh">刷新</ApButton>
+        <template #title="{ selectedRowKeys, clearAll }">
+          <TableTopActionBar
+            :selected-row-keys="selectedRowKeys"
+            :clear-all="clearAll"
+            :show-selected="false"
+            :settings="{ persistenceKey: 'session-records-list' }"
+          />
         </template>
       </AgGrid>
     </div>
@@ -16,13 +21,13 @@ import dayjs from 'dayjs';
 import { useRoute } from 'vue-router';
 import {
   AgGrid,
-  ApButton,
   ApTag,
   usePageListAgGrid,
   type AgGridColumnType,
 } from '@aplus-frontend/ui';
 import { pageSessionsGrid, type RagSessionItem } from '@/api/rag-admin';
 import { useRowClickAction } from '@/hooks/use-row-click-action';
+import TableTopActionBar from '@/components/table-top-action-bar/index.vue';
 
 const route = useRoute();
 const { onRowClick, getPointerRowClassName, clickAction } =
@@ -145,7 +150,7 @@ const columns: AgGridColumnType<RagSessionItem>[] = [
   },
 ];
 
-const [gridProps, { reload }] = usePageListAgGrid({
+const [gridProps] = usePageListAgGrid({
   api: pageSessionsGrid,
   rowKey: 'id',
   onRowClicked(record, event) {
@@ -172,10 +177,6 @@ const [gridProps, { reload }] = usePageListAgGrid({
     x: 1040,
   },
 });
-
-function refresh() {
-  reload();
-}
 
 function formatTime(value?: string) {
   return value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-';
