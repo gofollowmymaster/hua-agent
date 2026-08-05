@@ -32,6 +32,8 @@ pnpm admin:lint         # 转发到 RAG Admin ESLint（--fix）
 pnpm admin:lint:check   # 转发到 RAG Admin ESLint（只检查）
 pnpm admin:format       # 转发到 RAG Admin Prettier（--write）
 pnpm admin:format:check # 转发到 RAG Admin Prettier（只检查）
+pnpm admin:stylelint       # 转发到 RAG Admin Stylelint（--fix）
+pnpm admin:stylelint:check # 转发到 RAG Admin Stylelint（只检查）
 ```
 
 格式化和 lint 命令会改写文件，执行前确认这是当前任务的一部分：

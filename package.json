@@ -38,7 +38,9 @@
     "admin:lint": "pnpm --filter @aplus-sql/rag-admin lint",
     "admin:lint:check": "pnpm --filter @aplus-sql/rag-admin lint:check",
     "admin:format": "pnpm --filter @aplus-sql/rag-admin format",
-    "admin:format:check": "pnpm --filter @aplus-sql/rag-admin format:check"
+    "admin:format:check": "pnpm --filter @aplus-sql/rag-admin format:check",
+    "admin:stylelint": "pnpm --filter @aplus-sql/rag-admin stylelint",
+    "admin:stylelint:check": "pnpm --filter @aplus-sql/rag-admin stylelint:check"
   },
   "lint-staged": {
     "apps/api/**/*.ts": "pnpm --filter @aplus-sql/api exec eslint --max-warnings 0",

@@ -48,6 +48,8 @@ pnpm lint              # ESLint 9 flat config，自动修复可自动修复的�
 pnpm lint:check        # ESLint 只检查，不修改文件
 pnpm format            # Prettier 按 prettier.config.cjs 格式化代码与配置文件
 pnpm format:check      # Prettier 只检查，不修改文件
+pnpm stylelint         # Stylelint 按 stylelint.config.cjs 检查样式，自动修复可修复问题
+pnpm stylelint:check   # Stylelint 只检查，不修改文件
 ```
 
 根目录兼容命令：
@@ -60,6 +62,8 @@ pnpm admin:lint
 pnpm admin:lint:check
 pnpm admin:format
 pnpm admin:format:check
+pnpm admin:stylelint
+pnpm admin:stylelint:check
 ```
 
 ## 环境变量

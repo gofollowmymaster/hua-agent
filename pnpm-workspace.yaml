@@ -14,6 +14,10 @@ catalog:
   typescript-eslint: 8.66.0
   vue-eslint-parser: 10.4.1
 
+overrides:
+  stylelint-config-html: 1.1.0
+  stylelint-config-recommended: 14.0.1
+
 allowBuilds:
   "@nestjs/core": true
   "@prisma/client": true
