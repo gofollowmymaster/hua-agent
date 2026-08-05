@@ -28,7 +28,7 @@ description: 根据需求文档、UI设计图和接口代码，在 RAG Admin（a
 - `apps/rag-admin/docs/standard/development/page-structure-blueprint.md`
 - `apps/rag-admin/docs/standard/development/page-implementation-best-practices.md`
 - `apps/rag-admin/docs/standard/development/naming-conventions.md`
-- `apps/rag-admin/docs/standard/design/README.md`
+- `docs/standard/design/README.md`
 
 按页面类型追加：
 

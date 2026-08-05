@@ -1,6 +1,6 @@
 # RAG Admin 规范索引
 
-`apps/rag-admin/docs/standard/` 记录 `apps/rag-admin` 的页面开发规范和产品设计规范。登录/API、目录/模块、路由/状态规范已合并到 `apps/rag-admin/docs/architecture/` 对应文件；架构事实入口见 `apps/rag-admin/docs/architecture/README.md`。
+`apps/rag-admin/docs/standard/` 记录 `apps/rag-admin` 的页面开发规范。整体产品设计规范位于根目录 `docs/standard/design/`；登录/API、目录/模块、路由/状态规范已合并到 `apps/rag-admin/docs/architecture/` 对应文件；架构事实入口见 `apps/rag-admin/docs/architecture/README.md`。
 
 ## 阅读顺序
 
@@ -15,7 +15,7 @@
 9. `../architecture/project-architecture.md`：项目架构、路由和 Pinia 状态管理规范。
 10. `development/styling.md`：全局样式、组件样式和 UI 组件使用规范。
 
-产品设计规范见 `design/README.md`。
+整体产品设计规范见 [根目录产品设计规范](../../../../docs/standard/design/README.md)。
 
 ## 高频硬规则
 

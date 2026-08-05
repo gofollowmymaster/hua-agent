@@ -49,3 +49,11 @@
 
 - 只读取 `VITE_` 前缀变量。
 - 不在前端代码中写死后端 token、secret、数据库连接串或租户敏感配置。
+
+## 工程化检查
+
+- ESLint 使用 `apps/rag-admin/eslint.config.js`（ESLint 9 flat config），规则基线参考 `aplus-user-wms/eslint.config.js`。
+- Prettier 使用 `apps/rag-admin/prettier.config.cjs`，不引入 `@aplus-frontend/prettier-config`。
+- 常用命令：`pnpm lint`、`pnpm lint:check`、`pnpm format`、`pnpm format:check`；根目录使用 `pnpm admin:*` 对应命令。
+- 新增或修改代码后至少运行 `pnpm lint:check` 和 `pnpm format:check`；`pnpm lint` 会执行 `--fix`，`pnpm format` 会执行 `--write`。
+- 首次接入时的既有 ESLint error 和 Prettier warning 需逐步清理，清理后保持命令 0 error。

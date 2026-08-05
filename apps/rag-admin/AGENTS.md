@@ -28,7 +28,7 @@ RAG Admin 任务按需读取：
 - 页面实现最佳实践：`docs/standard/development/page-implementation-best-practices.md`
 - 页面类型规范：`docs/standard/development/table-pattern.md`、`docs/standard/development/form-pattern.md`、`docs/standard/development/detail-pattern.md`
 - 命名规范：`docs/standard/development/naming-conventions.md`
-- 产品设计规范：`docs/standard/design/README.md`
+- 整体产品设计规范：`../../docs/standard/design/README.md`
 - 页面开发执行：`../../.agents/skills/fd-page-dev/SKILL.md`，涉及 `@aplus-frontend/ui` 时同时读 `../../.agents/skills/aplus-ui/SKILL.md`
 - 涉及后端接口契约时，补读 `../api/docs/architecture/README.md` 和 `../api/docs/standard/README.md`
 
@@ -44,6 +44,10 @@ pnpm dev:test          # Vite test mode 开发服务
 pnpm build             # vue-tsc --noEmit && vite build
 pnpm build:test        # test mode 类型检查和构建
 pnpm preview           # Vite preview
+pnpm lint              # ESLint 9 flat config，自动修复可自动修复的问题
+pnpm lint:check        # ESLint 只检查，不修改文件
+pnpm format            # Prettier 按 prettier.config.cjs 格式化代码与配置文件
+pnpm format:check      # Prettier 只检查，不修改文件
 ```
 
 根目录兼容命令：
@@ -52,6 +56,10 @@ pnpm preview           # Vite preview
 pnpm admin:dev
 pnpm admin:build
 pnpm admin:preview
+pnpm admin:lint
+pnpm admin:lint:check
+pnpm admin:format
+pnpm admin:format:check
 ```
 
 ## 环境变量

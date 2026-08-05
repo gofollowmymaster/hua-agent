@@ -17,7 +17,7 @@
 | --- | --- | --- |
 | `workspace` | 根脚本、pnpm workspace、依赖放置、部署/构建边界 | `AGENTS.md`、`docs/ai-governance/README.md` |
 | `api` | NestJS 后端、Prisma、Redis、BullMQ、飞书、多租户 | `apps/api/docs/architecture/README.md`、`apps/api/docs/standard/README.md` |
-| `rag-admin` | Vue/Vite 前端、页面、路由、store、API client、样式 | `apps/rag-admin/docs/architecture/README.md`、`apps/rag-admin/docs/standard/README.md` |
+| `rag-admin` | Vue/Vite 前端、页面、路由、store、API client、样式 | `apps/rag-admin/docs/architecture/README.md`、`apps/rag-admin/docs/standard/README.md`、`docs/standard/design/README.md` |
 | `shared` | 共享类型、无副作用工具、跨包导出 | `packages/shared/docs/architecture/README.md`、`packages/shared/docs/standard/README.md` |
 | `cross-app` | 前后端接口契约、登录链路、静态资源发布、shared 消费 | `workspace` 入口 + 受影响子项目入口 |
 | `docs-only` | 文档治理、架构说明、规范说明 | `docs/ai-governance/testing-and-verification.md` |
@@ -27,8 +27,9 @@
 1. 先读根目录 `AGENTS.md`：获取技术栈、常用命令、环境加载、路径别名和最短读取路径。
 2. 再读本文：确认任务范围、风险分级、OpenSpec 判断和上下文读取策略。
 3. 按任务范围读取对应子项目的 `docs/architecture/README.md` 与 `docs/standard/README.md`。
-4. 需要从需求推进到实现和交付时，读 `development-workflow.md`。
-5. 需要确认验证要求时，读 `testing-and-verification.md`。
+4. 前端、UI、交互或产品设计相关任务，再读 `docs/standard/design/README.md`。
+5. 需要从需求推进到实现和交付时，读 `development-workflow.md`。
+6. 需要确认验证要求时，读 `testing-and-verification.md`。
 
 ## 任务分级
 
@@ -54,7 +55,7 @@
 ## 高风险补读入口
 
 - API 鉴权、租户、Redis key、飞书表格或飞书回调：读 `apps/api/docs/architecture/auth-and-tenant.md`、`apps/api/docs/architecture/feishu-integration.md` 和 `testing-and-verification.md`。
-- RAG Admin 登录、API client、路由、构建输出：读 `apps/rag-admin/docs/architecture/auth-and-api-client.md`、`apps/rag-admin/docs/architecture/build-and-runtime.md` 和 `apps/rag-admin/docs/standard/README.md`。
+- RAG Admin 登录、API client、路由、构建输出：读 `apps/rag-admin/docs/architecture/auth-and-api-client.md`、`apps/rag-admin/docs/architecture/build-and-runtime.md`、`apps/rag-admin/docs/standard/README.md` 和 `docs/standard/design/README.md`。
 - shared 导出或跨端类型：读 `packages/shared/docs/architecture/package-boundary.md`、`packages/shared/docs/standard/package-design.md`。
 - 根脚本、依赖、部署/构建边界：读 `AGENTS.md` 和受影响子项目入口。
 
@@ -63,4 +64,5 @@
 - `AGENTS.md`：短、快、稳定。承载必须遵守的命令、环境、代码风格和文档入口。
 - `apps/*/docs/architecture/`、`packages/shared/docs/architecture/`：子项目架构事实。
 - `apps/*/docs/standard/`、`packages/shared/docs/standard/`：子项目开发规范。
+- `docs/standard/design/`：整体产品设计规范。
 - `docs/ai-governance/`：AI 工作原则、任务分级、风险边界、OpenSpec 判断、上下文读取策略、验证和交付。

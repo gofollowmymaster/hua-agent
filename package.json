@@ -32,7 +32,11 @@
     "rag:db:init": "pnpm --filter @aplus-sql/api rag:db:init",
     "admin:dev": "pnpm --filter @aplus-sql/rag-admin dev",
     "admin:build": "pnpm --filter @aplus-sql/rag-admin build",
-    "admin:preview": "pnpm --filter @aplus-sql/rag-admin preview"
+    "admin:preview": "pnpm --filter @aplus-sql/rag-admin preview",
+    "admin:lint": "pnpm --filter @aplus-sql/rag-admin lint",
+    "admin:lint:check": "pnpm --filter @aplus-sql/rag-admin lint:check",
+    "admin:format": "pnpm --filter @aplus-sql/rag-admin format",
+    "admin:format:check": "pnpm --filter @aplus-sql/rag-admin format:check"
   },
   "devDependencies": {
     "dotenv-cli": "^7.4.2"

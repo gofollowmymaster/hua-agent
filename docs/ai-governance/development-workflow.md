@@ -34,7 +34,7 @@
 
 - workspace 任务：检查根 `package.json`、`pnpm-workspace.yaml`、受影响 app 的 `package.json` 和相关部署配置。
 - API 任务：查找 controller、service、DTO、table adapter、helper、配置、测试和相关规范。
-- RAG Admin 任务：查找 router、view、layout、store、API client、auth、样式和 Vite 配置。
+- RAG Admin 任务：查找 router、view、layout、store、API client、auth、样式和 Vite 配置，并读 `docs/standard/design/README.md`。
 - shared 任务：查找 `packages/shared` 导出和所有 workspace 消费者。
 - cross-app 任务：同时查后端 DTO/Controller/Service 和前端 API client/页面调用方。
 

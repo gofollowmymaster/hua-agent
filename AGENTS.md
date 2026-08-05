@@ -28,6 +28,10 @@ pnpm test               # 转发到 API Jest
 pnpm pg                 # 转发到 API Prisma generate
 pnpm admin:dev          # RAG Admin 开发服务
 pnpm admin:build        # RAG Admin 类型检查和生产构建
+pnpm admin:lint         # 转发到 RAG Admin ESLint（--fix）
+pnpm admin:lint:check   # 转发到 RAG Admin ESLint（只检查）
+pnpm admin:format       # 转发到 RAG Admin Prettier（--write）
+pnpm admin:format:check # 转发到 RAG Admin Prettier（只检查）
 ```
 
 格式化和 lint 命令会改写文件，执行前确认这是当前任务的一部分：
@@ -55,11 +59,12 @@ AI 任务默认先读：
    - workspace：`AGENTS.md`、`docs/ai-governance/README.md`
    - API：`apps/api/docs/architecture/README.md`、`apps/api/docs/standard/README.md`
    - RAG Admin：`apps/rag-admin/docs/architecture/README.md`、`apps/rag-admin/docs/standard/README.md`
+   - 整体产品设计：`docs/standard/design/README.md`（前端、UI、交互相关任务必读）
    - Shared：`packages/shared/docs/architecture/README.md`、`packages/shared/docs/standard/README.md`
    - Cross-app：`AGENTS.md`、`docs/ai-governance/README.md` + 受影响子项目文档
 3. 需要执行或交付时读 `docs/ai-governance/development-workflow.md` 和 `docs/ai-governance/testing-and-verification.md`
 
-长期架构事实写入 `apps/*/docs/architecture/` 或 `packages/shared/docs/architecture/`，开发规范写入 `apps/*/docs/standard/` 或 `packages/shared/docs/standard/`，AI 工作流写入 `docs/ai-governance/`。不要把完整子项目规范复制到根 `AGENTS.md`。
+长期架构事实写入 `apps/*/docs/architecture/` 或 `packages/shared/docs/architecture/`，完整子项目开发规范写入 `apps/*/docs/standard/` 或 `packages/shared/docs/standard/`，整体产品设计规范写入 `docs/standard/design/`，AI 工作流写入 `docs/ai-governance/`。不要把完整子项目规范复制到根 `AGENTS.md`。
 
 ## OpenSpec 工作流
 
@@ -73,7 +78,7 @@ AI 任务默认先读：
 
 ## 全局风格
 
-- Prettier: 单引号、尾随逗号
+- Prettier: API 沿用根 `.prettierrc`（单引号、尾随逗号）；RAG Admin 使用 `apps/rag-admin/prettier.config.cjs`（单引号、无尾随逗号）
 - ESLint: TypeScript 推荐规则（关闭 no-explicit-any）
 - TypeScript: 关闭 strictNullChecks、关闭 noImplicitAny
 - AI 新增或实质修改类、类方法时，必须使用简洁 JSDoc 说明其职责；具体要求见 `docs/ai-governance/development-workflow.md`。

@@ -4,10 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "dev:test": "vite --host 0.0.0.0 --mode test",
     "build": "vue-tsc --noEmit && vite build",
     "build:test": "vue-tsc --noEmit && vite build --mode test",
+    "dev": "vite --host 0.0.0.0",
+    "dev:test": "vite --host 0.0.0.0 --mode test",
+    "format": "prettier --write \"src/**/*.{ts,vue,less}\" index.html vite.config.ts eslint.config.js prettier.config.cjs tsconfig.json package.json",
+    "format:check": "prettier --check \"src/**/*.{ts,vue,less}\" index.html vite.config.ts eslint.config.js prettier.config.cjs tsconfig.json package.json",
+    "lint": "eslint --cache --cache-location node_modules/.cache/.eslintcache --max-warnings 0 \"src/**/*.{vue,ts}\" --fix",
+    "lint:check": "eslint --cache --cache-location node_modules/.cache/.eslintcache --max-warnings 0 \"src/**/*.{vue,ts}\"",
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
@@ -30,10 +34,19 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.23.0",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^22.13.5",
+    "eslint": "^9.21.0",
+    "eslint-config-prettier": "^10.0.2",
+    "eslint-plugin-vue": "^10.0.0",
+    "globals": "^16.0.0",
     "less": "^4.8.1",
+    "prettier": "^3.5.3",
+    "prettier-plugin-packagejson": "^2.5.10",
     "typescript": "5.7.2",
+    "typescript-eslint": "^8.26.0",
+    "vue-eslint-parser": "^10.1.1",
     "vue-tsc": "^2.2.4"
   }
 }
