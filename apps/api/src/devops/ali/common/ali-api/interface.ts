@@ -79,12 +79,7 @@ export type AppReleaseWorkflow = {
   releaseStages: ReleaseStages[];
 };
 export type PipelineStageType =
-  | 'SUCCESS'
-  | 'FAIL'
-  | 'RUNNING'
-  | 'WAITING'
-  | 'INIT'
-  | 'CANCELED';
+  'SUCCESS' | 'FAIL' | 'RUNNING' | 'WAITING' | 'INIT' | 'CANCELED';
 export type AppWorkflowPublishType = {
   /** 应用名称 */
   appName: string;

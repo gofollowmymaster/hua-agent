@@ -102,8 +102,4 @@ export type GlobalConfigType = {
 export type GlobalConfigKey = keyof GlobalConfigType;
 
 export type RagReasoningEffort =
-  | 'minimal'
-  | 'low'
-  | 'medium'
-  | 'high'
-  | 'xhigh';
+  'minimal' | 'low' | 'medium' | 'high' | 'xhigh';

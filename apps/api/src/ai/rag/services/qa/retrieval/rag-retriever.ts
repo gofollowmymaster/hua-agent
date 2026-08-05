@@ -67,6 +67,7 @@ export abstract class BaseRagRetriever implements RagRetriever {
 
   /** 允许具体检索器根据输入动态关闭当前路由。 */
   protected isDisabled(_input: RagRetrieveInput): boolean {
+    void _input;
     return false;
   }
 

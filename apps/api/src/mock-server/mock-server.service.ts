@@ -91,7 +91,7 @@ export class MockServerService {
         } else {
           return null;
         }
-      } catch (err) {
+      } catch {
         return null;
       }
     }

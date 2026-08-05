@@ -46,7 +46,7 @@ export class JsonTypeValidator implements ValidatorConstraintInterface {
       }
 
       return true;
-    } catch (error) {
+    } catch {
       // JSON 解析错误
       return false;
     }

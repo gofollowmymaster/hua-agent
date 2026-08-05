@@ -27,7 +27,7 @@ export async function addRetryJob(
           clearInterval(intervalHandler);
           reject(false);
         }
-      } catch (error) {
+      } catch {
         clearInterval(intervalHandler);
         reject(false);
       }

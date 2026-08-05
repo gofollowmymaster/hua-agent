@@ -9,7 +9,6 @@ import { wait } from '@src/common/utils/job';
 import { ErrorEndpoint } from '@src/alert/common/type/alert';
 import { NodeConfigService } from '@src/config/node-config.service';
 
-const businessLines = ['商家运营', '仓储物流', '业财一体', '基础架构'];
 const statusColorMap = {
   待处理: 'red',
   处理中: 'yellow',

@@ -1,11 +1,5 @@
 import { TenantConfig } from '.';
 
-function booleanEnv(key: string, fallback: boolean) {
-  const value = process.env[key];
-  if (value === undefined) return fallback;
-  return ['1', 'true', 'yes', 'on'].includes(value.toLowerCase());
-}
-
 const yurexConfig: TenantConfig = {
   FeishuWikiSpaceIds: ['7583921476789652686'],
   hostTag: 'yurex',

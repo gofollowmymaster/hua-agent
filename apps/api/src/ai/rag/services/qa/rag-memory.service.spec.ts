@@ -3,7 +3,9 @@ import { RagMemoryService } from './rag-memory.service';
 
 jest.mock('@src/config/node-config.service', () => ({
   NodeConfigService: {
-    get: jest.fn((key: string) => (key === 'defaultTenant' ? 'aplus' : undefined)),
+    get: jest.fn((key: string) =>
+      key === 'defaultTenant' ? 'aplus' : undefined,
+    ),
   },
 }));
 
@@ -248,7 +250,9 @@ describe('RagMemoryService', () => {
       session: { channel: 'http', conversationId: 'conv-1' },
     });
 
-    await expect(service.appendTurn(session, '问题', '答案')).resolves.toBeUndefined();
+    await expect(
+      service.appendTurn(session, '问题', '答案'),
+    ).resolves.toBeUndefined();
 
     expect(logger.warn).toHaveBeenCalledWith(
       'Failed to append RAG short-term memory',

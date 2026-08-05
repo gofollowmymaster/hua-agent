@@ -22,7 +22,7 @@ import { useLayoutDrawerStore } from '@/stores/modules/layout-drawer';
 import { resolveDrawerFromQuery } from './layout-drawer/component-map';
 import { useLayoutDrawer } from './layout-drawer/use-layout-drawer';
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     width?: string | number;
   }>(),

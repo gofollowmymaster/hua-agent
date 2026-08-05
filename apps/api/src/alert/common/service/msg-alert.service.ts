@@ -1,4 +1,4 @@
-import { AlertEvent, Environment, ErrorEndpoint } from '../type/alert';
+import { AlertEvent, ErrorEndpoint } from '../type/alert';
 import { FeishuMsgType } from '@src/common/feishu/type/im';
 import { NodeConfigService } from '@src/config/node-config.service';
 import { isNeedSendAlertMsg } from '../utils';

@@ -5,17 +5,16 @@ import path from 'node:path';
 import { TenantCode } from '@src/config/tenant';
 
 declare global {
-  // eslint-disable-next-line no-var
   var __mockPdfLoad: jest.Mock;
-  // eslint-disable-next-line no-var
+
   var __mockDocxLoad: jest.Mock;
-  // eslint-disable-next-line no-var
+
   var __mockPptxLoad: jest.Mock;
-  // eslint-disable-next-line no-var
+
   var __mockPdfLoader: jest.Mock;
-  // eslint-disable-next-line no-var
+
   var __mockDocxLoader: jest.Mock;
-  // eslint-disable-next-line no-var
+
   var __mockPptxLoader: jest.Mock;
 }
 

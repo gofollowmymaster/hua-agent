@@ -430,11 +430,7 @@ export type SentryHookIssue = {
 };
 
 export type businessLine =
-  | '商家运营'
-  | '仓储物流'
-  | '业财一体'
-  | '基础架构'
-  | '其他';
+  '商家运营' | '仓储物流' | '业财一体' | '基础架构' | '其他';
 export type PushIssueCardToUserParams = {
   businessLine: businessLine;
   errorEndpoint: ErrorEndpoint;

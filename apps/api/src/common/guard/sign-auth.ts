@@ -72,7 +72,7 @@ export class SignAuthGuard implements CanActivate {
 
       // Generate MD5 hash
       generatedSignature = generateSign(restData, secretKey);
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException();
     }
 

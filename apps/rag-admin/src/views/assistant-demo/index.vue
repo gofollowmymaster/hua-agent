@@ -143,7 +143,6 @@ import {
   formatTime,
   resolvePreviewDocument,
   toUiMessages,
-  type RagAssistantMessage,
 } from './hooks/use-chat';
 import AssistantComposer from './sections/assistant-composer/index.vue';
 import AssistantReasoning from './sections/assistant-reasoning/index.vue';

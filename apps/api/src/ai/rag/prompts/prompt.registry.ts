@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PromptTemplate } from '@langchain/core/prompts';
-import { NodeConfigService } from '@src/config/node-config.service';
 import type { RetrievedChunk } from '../types/rag.type';
 import type {
   IPromptBuildContext,

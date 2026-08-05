@@ -24,7 +24,9 @@ export class RagQueryDto {
   @Max(20)
   topK?: number;
 
-  @ApiPropertyOptional({ description: '渠道会话 ID，如群聊 ID、单聊 ID、页面会话 ID' })
+  @ApiPropertyOptional({
+    description: '渠道会话 ID，如群聊 ID、单聊 ID、页面会话 ID',
+  })
   @IsOptional()
   @IsString()
   conversationId?: string;

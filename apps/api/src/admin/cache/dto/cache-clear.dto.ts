@@ -3,7 +3,7 @@ import { RedisValueType } from '@src/common/service/redis/redis.service';
 import { IsNotEmpty } from 'class-validator';
 
 export enum KeyType {
-  '多维表格' = '多维表格',
+  多维表格 = '多维表格',
   自定义键 = '自定义键',
 }
 export class CacheClearDto {

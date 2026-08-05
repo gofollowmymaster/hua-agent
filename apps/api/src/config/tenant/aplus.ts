@@ -1,11 +1,5 @@
 import { TenantConfig } from '.';
 
-function booleanEnv(key: string, fallback: boolean) {
-  const value = process.env[key];
-  if (value === undefined) return fallback;
-  return ['1', 'true', 'yes', 'on'].includes(value.toLowerCase());
-}
-
 const aplusConfig: TenantConfig = {
   FeishuWikiSpaceIds: ['7382766506582736900'],
   hostTag: 'lnk',

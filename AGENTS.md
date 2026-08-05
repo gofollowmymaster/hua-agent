@@ -42,6 +42,8 @@ pnpm lint:check
 pnpm format
 ```
 
+提交前使用 `husky` + `lint-staged` 对暂存的 API TS 和 RAG Admin TS/Vue 文件执行 ESLint 只检查；需要临时跳过时使用 `git commit --no-verify`。
+
 ## 子项目入口
 
 进入具体 app 工作时，优先读取对应 app 级规则：

@@ -1,5 +1,3 @@
-import * as lark from '@larksuiteoapi/node-sdk';
-
 import FeishuClient from '../clients/client';
 
 import { FEISHU_CLIENT_ID } from './constants';
@@ -34,10 +32,8 @@ class FeishuOpenapiHelper extends FeishuDataApiHelper {
     data: Record<string, any>,
     appName?: FeishuApp,
   ) {
-    const {
-      app_access_token: appAccessToken,
-      tenant_access_token: tenantAccessToken,
-    } = await this.feishuAuthHelper.getAppAccessToken(appName);
+    const { tenant_access_token: tenantAccessToken } =
+      await this.feishuAuthHelper.getAppAccessToken(appName);
 
     const response = await firstValueFrom(
       this.httpService.post(this.apiPrefix + url, data, {

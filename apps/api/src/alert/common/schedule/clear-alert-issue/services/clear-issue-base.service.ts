@@ -1,5 +1,4 @@
 import { BitTableFilter } from '@src/common/feishu/type/bitable';
-import dayjs from 'dayjs';
 import { Injectable } from '@nestjs/common';
 import FeishuMessageHelper from '@src/common/feishu/helper/message-helper';
 import FeishuBusinessLineTable from '@src/common/table/business-line-table';

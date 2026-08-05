@@ -1,4 +1,3 @@
-import { sendExceptionToFeishu } from '@src/common/feishu/utils';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import Redis from 'ioredis';
 import { RedisKeys } from '../const/redis-key.enum';
