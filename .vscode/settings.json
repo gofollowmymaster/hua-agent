@@ -88,7 +88,7 @@
     "*.ts": "$(capture).spec.ts",
     "*.env": "$(capture).env.*",
     "CHANGELOG.md": "CHANGELOG*",
-    "package.json": "pnpm-lock.yaml,pnpm-workspace.yaml,Dockerfile,ecosystem.config.js,webpack-hmr.config.js,nest-cli.json,LICENSE,.gitattributes,.gitignore,.gitpod.yml,CNAME,README*,.npmrc",
+    "package.json": "pnpm-lock.yaml,pnpm-workspace.yaml,Dockerfile,ecosystem.config.js,webpack-hmr.config.js,nest-cli.json,LICENSE,.gitattributes,.gitignore,.gitpod.yml,CNAME,README*,.npmrc,AGENTS.md",
     ".eslintrc.js": ".prettierrc,.prettierignore,.commitlintrc.*,.prettierrc.*,tsconfig.json,jest.config.ts"
   },
   "terminal.integrated.scrollback": 10000,

@@ -4,9 +4,9 @@
 
 ## 样式入口
 
-- `src/styles/global.css` 只放全局公共样式：reset、body、通用页面容器、通用表格容器和通用文本工具类。
-- 布局专属样式放在对应布局组件的 `<style scoped>` 中，不放入 `global.css`。
-- 具体模块、页面或 section 的专属样式放在对应 `.vue` 组件的 `<style scoped>` 中，不放入 `global.css`。
+- `src/styles/global.less` 只放全局公共样式：reset、body、通用页面容器、通用表格容器和通用文本工具类。
+- 布局专属样式放在对应布局组件的 `<style scoped>` 中，不放入 `global.less`。
+- 具体模块、页面或 section 的专属样式放在对应 `.vue` 组件的 `<style scoped>` 中，不放入 `global.less`。
 - 跨项目稳定复用的通用样式才考虑沉淀到 `styles/`，沉淀前必须确认真实复用需求。
 
 ## UI 组件
@@ -26,6 +26,13 @@
 - 避免依赖脆弱的深层选择器覆盖第三方组件；确需覆盖时限制作用域。
 - 保持布局在常见桌面宽度下可读，避免文本和按钮重叠。
 - 样式类名使用语义化 kebab-case，优先体现模块和职责，例如 `assistant-history-item`。
-- 页面样式不要污染全局；确需全局样式时放入 `src/styles/global.css` 并说明适用范围。
-- 新增样式时先判断归属：全局公共 → `global.css`；布局 → 布局组件；模块/页面/section → 对应组件。
-- 禁止把某一个模块专用样式或布局样式写入 `global.css`。
+- 页面样式不要污染全局；确需全局样式时放入 `src/styles/global.less` 并说明适用范围。
+- 新增样式时先判断归属：全局公共 → `global.less`；布局 → 布局组件；模块/页面/section → 对应组件。
+- 禁止把某一个模块专用样式或布局样式写入 `global.less`。
+- Less 样式中颜色统一使用 `@primary-color`、`@text-primary-color` 等变量，禁止在 `.less` 中重复写色值。
+- 需要命名空间前缀时使用 Less 变量 `@namespace`，不硬编码应用名。
+
+## 预设颜色规范
+
+- 项目中只能使用预设颜色，且只能通过变量形式使用：Less 样式统一使用 `@primary-color`、`@text-primary-color` 等 `@*-color` 变量；TS/JS 主题配置统一使用 `aplusModifyVars['@primary-color']`，禁止直接写十六进制、rgba、渐变等色值。
+- 设计页面时强制采用预设颜色体系：新页面、区块、弹窗、抽屉、状态色、边框、背景和文字颜色均从 `src/config/theme-color-token.ts` 的 `ThemeColor` 预设中选择；确需新增颜色时先补充到预设，再通过变量引用，不在页面代码中引入临时色值。
