@@ -38,6 +38,7 @@ pnpm admin:format:check # 转发到 RAG Admin Prettier（只检查）
 
 ```bash
 pnpm lint
+pnpm lint:check
 pnpm format
 ```
 
@@ -78,8 +79,9 @@ AI 任务默认先读：
 
 ## 全局风格
 
-- Prettier: API 沿用根 `.prettierrc`（单引号、尾随逗号）；RAG Admin 使用 `apps/rag-admin/prettier.config.cjs`（单引号、无尾随逗号）
+- Prettier: API 使用 `apps/api/.prettierrc`（单引号、尾随逗号）；RAG Admin 使用 `apps/rag-admin/prettier.config.cjs`（单引号、无尾随逗号）
 - ESLint: TypeScript 推荐规则（关闭 no-explicit-any）
+- ESLint / Prettier 及配套插件版本统一由 `pnpm-workspace.yaml` 的 `catalog` 管理，子项目通过 `catalog:` 引用
 - TypeScript: 关闭 strictNullChecks、关闭 noImplicitAny
 - AI 新增或实质修改类、类方法时，必须使用简洁 JSDoc 说明其职责；具体要求见 `docs/ai-governance/development-workflow.md`。
 - 不修改与任务无关的文件，不回退用户或其他 agent 的改动。

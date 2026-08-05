@@ -41,7 +41,7 @@ AI 收到任务后，**按任务类型读取对应文档**，不可跳过。多�
 - **缓存/队列**: Redis + BullMQ
 - **定时任务**: `@nestjs/schedule`
 - **外部集成**: 飞书、企业微信、OpenAI/LangChain
-- **代码检查**: ESLint + Prettier
+- **代码检查**: ESLint + Prettier（配置位于 `apps/api/eslint.config.js`、`apps/api/.prettierrc`）
 
 ---
 
@@ -56,6 +56,7 @@ pnpm start:debug        # 调试模式
 pnpm test               # Jest 单元测试，匹配 src 下 *.spec.ts
 pnpm test:cov           # 覆盖率测试
 pnpm lint               # ESLint --fix，会改写文件
+pnpm lint:check         # ESLint 只检查，不改写文件
 pnpm format             # Prettier 写入格式化结果，会改写文件
 ```
 

@@ -21,6 +21,7 @@
     "docker:dev": "pnpm --filter @aplus-sql/api docker:dev",
     "docker:test": "pnpm --filter @aplus-sql/api docker:test",
     "lint": "pnpm --filter @aplus-sql/api lint",
+    "lint:check": "pnpm --filter @aplus-sql/api lint:check",
     "pg:mysql": "pnpm --filter @aplus-sql/api pg:mysql",
     "pg:rag": "pnpm --filter @aplus-sql/api pg:rag",
     "pg": "pnpm --filter @aplus-sql/api pg",
