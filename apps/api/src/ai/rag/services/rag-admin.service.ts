@@ -70,6 +70,42 @@ export class RagAdminService {
     };
   }
 
+  /** 校验租户归属后返回单个文档详情。 */
+  async getDocument(id: number) {
+    const tenantCode = this.currentTenant();
+    const document = await this.ragPrisma.aplusDocument.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: { chunks: true },
+        },
+      },
+    });
+
+    if (!document || document.tenantCode !== tenantCode) {
+      throw new BadRequestException(`Document #${id} not found`);
+    }
+
+    return {
+      id: this.serializeBigInt(document.id),
+      tenantCode: document.tenantCode,
+      sourcePath: document.sourcePath,
+      fileName: document.fileName,
+      fileType: document.fileType,
+      type: document.type,
+      tag: document.tag,
+      fileHash: document.fileHash,
+      fileSize: this.serializeBigInt(document.fileSize),
+      chunkCount: document.chunkCount,
+      actualChunkCount: document._count.chunks,
+      status: document.status,
+      error: document.error,
+      createdAt: document.createdAt,
+      updatedAt: document.updatedAt,
+      ingestedAt: document.ingestedAt,
+    };
+  }
+
   /** 校验文档归属后更新可维护的业务元数据。 */
   async updateDocumentMetadata(
     id: number,

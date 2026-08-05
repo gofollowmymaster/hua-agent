@@ -127,7 +127,6 @@
         />
       </div>
     </div>
-    <DocumentPreviewModal ref="previewModalRef" />
   </section>
 </template>
 
@@ -142,6 +141,7 @@ import {
   type RagSessionItem,
 } from '@/api/rag-admin';
 import { useUserStore } from '@/stores/modules/user';
+import { useDocumentPreviewModal } from '@/components/document-preview-modal/use-document-preview-modal';
 import {
   createChatSession,
   createLocalChatId,
@@ -149,18 +149,16 @@ import {
   formatTime,
   resolvePreviewDocument,
   toUiMessages,
-  type PreviewDocumentItem,
   type RagAssistantMessage,
 } from './hooks/use-chat';
-import AssistantComposer from './components/assistant-composer.vue';
-import AssistantReasoning from './components/assistant-reasoning.vue';
-import DocumentPreviewModal from '@/components/document-preview-modal.vue';
+import AssistantComposer from './sections/assistant-composer/index.vue';
+import AssistantReasoning from './sections/assistant-reasoning/index.vue';
 
 const HISTORY_PAGE_SIZE = 20;
 
 const userStore = useUserStore();
 const messagePaneRef = ref<HTMLElement>();
-const previewModalRef = ref<InstanceType<typeof DocumentPreviewModal>>();
+const previewModal = useDocumentPreviewModal();
 const input = ref('');
 const sessions = ref<RagSessionItem[]>([]);
 const selectedSessionId = ref('');
@@ -318,7 +316,7 @@ function handleMarkdownClick(event: MouseEvent) {
   if (!previewItem) return;
 
   event.preventDefault();
-  previewModalRef.value?.show(previewItem);
+  previewModal.open(previewItem);
 }
 
 watch(
@@ -332,3 +330,283 @@ watch(
   { deep: true },
 );
 </script>
+
+<style scoped>
+.assistant-page {
+  gap: 16px;
+}
+
+.assistant-header {
+  flex: 0 0 auto;
+}
+
+.assistant-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.assistant-workspace {
+  display: grid;
+  min-height: 0;
+  flex: 1 1 auto;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 16px;
+}
+
+.assistant-history {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e1e7ef;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.assistant-history-head {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border-bottom: 1px solid #e1e7ef;
+}
+
+.assistant-history-head h2 {
+  margin: 0;
+  color: #202633;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.assistant-history-head p {
+  margin: 4px 0 0;
+  color: #667386;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.assistant-history-list {
+  min-height: 0;
+  flex: 1 1 auto;
+  padding: 8px;
+  overflow: auto;
+}
+
+.assistant-history-item {
+  display: flex;
+  width: 100%;
+  min-height: 70px;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 6px;
+  padding: 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #202633;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.assistant-history-item:hover {
+  background: #f4f7fa;
+}
+
+.assistant-history-item.active {
+  border-color: #8ad7b4;
+  background: #ecf8f1;
+}
+
+.assistant-history-title {
+  display: -webkit-box;
+  overflow: hidden;
+  font-weight: 700;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.assistant-history-meta {
+  color: #667386;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.assistant-history-empty {
+  display: grid;
+  min-height: 160px;
+  place-items: center;
+  color: #667386;
+}
+
+.assistant-shell {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e1e7ef;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.assistant-messages {
+  min-height: 0;
+  flex: 1 1 auto;
+  padding: 20px;
+  overflow: auto;
+}
+
+.assistant-empty {
+  display: grid;
+  min-height: 280px;
+  place-content: center;
+  text-align: center;
+}
+
+.assistant-empty h2 {
+  margin: 0;
+  color: #202633;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+.assistant-empty p {
+  margin: 8px 0 0;
+  color: #667386;
+}
+
+.assistant-message {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.assistant-message-role {
+  color: #667386;
+  font-weight: 700;
+  line-height: 32px;
+}
+
+.assistant-message-body {
+  max-width: 840px;
+}
+
+.assistant-message--user .assistant-message-body {
+  justify-self: end;
+}
+
+.assistant-message--assistant .assistant-message-body {
+  justify-self: start;
+}
+
+.assistant-text {
+  margin: 0 0 8px;
+  padding: 10px 12px;
+  border: 1px solid #dde5ee;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #202633;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.assistant-markdown :deep(.md-editor-preview-wrapper) {
+  padding: 0;
+  background: transparent;
+}
+
+.assistant-markdown :deep(.md-editor-preview) {
+  color: inherit;
+  font-size: 14px;
+  line-height: 1.7;
+  word-break: break-word;
+}
+
+.assistant-markdown :deep(.md-editor-preview > :first-child) {
+  margin-top: 0;
+}
+
+.assistant-markdown :deep(.md-editor-preview > :last-child) {
+  margin-bottom: 0;
+}
+
+.assistant-markdown :deep(.md-editor-preview p),
+.assistant-markdown :deep(.md-editor-preview ul),
+.assistant-markdown :deep(.md-editor-preview ol),
+.assistant-markdown :deep(.md-editor-preview blockquote),
+.assistant-markdown :deep(.md-editor-preview pre),
+.assistant-markdown :deep(.md-editor-preview table) {
+  margin-bottom: 10px;
+}
+
+.assistant-markdown :deep(.md-editor-preview pre),
+.assistant-markdown :deep(.md-editor-preview table) {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.assistant-markdown :deep(.md-editor-preview a) {
+  color: #1769e0;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.assistant-markdown :deep(.md-editor-preview a:hover) {
+  color: #0f56bd;
+}
+
+.assistant-message--user .assistant-text {
+  border-color: #c9e5d7;
+  background: #ecf8f1;
+}
+
+.assistant-status-card {
+  display: inline-flex;
+  max-width: 100%;
+  margin: 0 0 8px;
+  padding: 5px 8px;
+  border: 1px solid #dbe4ee;
+  border-radius: 6px;
+  color: #506074;
+  background: #f4f7fa;
+  font-size: 12px;
+  line-height: 18px;
+  overflow-wrap: anywhere;
+}
+
+.assistant-error {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 14px;
+  border-top: 1px solid #f0c3bd;
+  color: #b42318;
+  background: #fff4f2;
+}
+
+@media (max-width: 900px) {
+  .assistant-workspace {
+    grid-template-columns: 1fr;
+    overflow: auto;
+  }
+
+  .assistant-history {
+    min-height: 260px;
+  }
+
+  .assistant-message {
+    grid-template-columns: 52px minmax(0, 1fr);
+  }
+}
+</style>

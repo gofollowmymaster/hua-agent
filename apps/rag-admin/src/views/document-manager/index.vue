@@ -12,7 +12,7 @@
         <template #title>
           <Space class="header-actions">
             <ApButton type="primary" @click="refresh">刷新</ApButton>
-            <ApButton type="primary" @click="uploadModalRef?.show()"
+            <ApButton type="primary" @click="uploadModal.open()"
               >添加文档</ApButton
             >
             <ApButton
@@ -27,42 +27,13 @@
         </template>
       </AgGrid>
     </div>
-
-    <DocumentPreviewModal ref="previewModalRef" />
-    <DocumentUploadModal ref="uploadModalRef" @uploaded="refresh" />
-    <ApModal
-      v-model:open="metadataModalOpen"
-      title="编辑文档元数据"
-      :confirm-loading="metadataSaving"
-      destroy-on-close
-      @ok="saveMetadata"
-      @cancel="closeMetadataModal"
-    >
-      <div class="metadata-form">
-        <label class="metadata-field">
-          <span>type</span>
-          <input
-            v-model="metadataForm.type"
-            class="metadata-input"
-            placeholder="业务分类"
-          />
-        </label>
-        <label class="metadata-field">
-          <span>tag</span>
-          <input
-            v-model="metadataForm.tag"
-            class="metadata-input"
-            placeholder="标签"
-          />
-        </label>
-      </div>
-    </ApModal>
   </section>
 </template>
 
 <script setup lang="ts">
 import { h, ref } from 'vue';
 import dayjs from 'dayjs';
+import { useRoute } from 'vue-router';
 import { Space, message } from '@aplus-frontend/antdv';
 import {
   AgGrid,
@@ -76,25 +47,20 @@ import {
   deleteDocument,
   ingestDocuments,
   pageDocumentsGrid,
-  updateDocumentMetadata,
   type RagDocumentItem,
 } from '@/api/rag-admin';
-import DocumentChunkPanel from './components/document-chunk-panel.vue';
-import DocumentPreviewModal from '@/components/document-preview-modal.vue';
-import DocumentUploadModal from './components/document-upload-modal.vue';
-import { useLayoutDrawerStore } from '@/stores/modules/layout-drawer';
+import { useRowClickAction } from '@/hooks/use-row-click-action';
+import { useDocumentPreviewModal } from '@/components/document-preview-modal/use-document-preview-modal';
+import { useDocumentMetadataModal } from './sections/document-metadata-modal/use-document-metadata-modal';
+import { useDocumentUploadModal } from './sections/document-upload-modal/use-document-upload-modal';
 
+const route = useRoute();
 const ingesting = ref(false);
-const metadataModalOpen = ref(false);
-const metadataSaving = ref(false);
-const editingDocument = ref<RagDocumentItem | null>(null);
-const metadataForm = ref({
-  type: '',
-  tag: '',
-});
-const layoutDrawerStore = useLayoutDrawerStore();
-const previewModalRef = ref<InstanceType<typeof DocumentPreviewModal>>();
-const uploadModalRef = ref<InstanceType<typeof DocumentUploadModal>>();
+const { onRowClick, getPointerRowClassName, clickAction } =
+  useRowClickAction('documents');
+const previewModal = useDocumentPreviewModal();
+const uploadModal = useDocumentUploadModal({ onUploaded: refresh });
+const metadataModal = useDocumentMetadataModal({ onSaved: refresh });
 const statusValueEnum = {
   ready: { text: 'ready', color: '#12b76a' },
   failed: { text: 'failed', color: '#f04438' },
@@ -128,7 +94,10 @@ const columns: AgGridColumnType<RagDocumentItem>[] = [
           {
             class: 'file-name-link',
             type: 'link',
-            onClick: () => previewModalRef.value?.show(record),
+            onClick: (event: MouseEvent) => {
+              event.stopPropagation();
+              previewModal.open(record);
+            },
           },
           () => record.fileName || '-',
         ),
@@ -219,22 +188,21 @@ const columns: AgGridColumnType<RagDocumentItem>[] = [
         actions: [
           {
             text: '编辑',
-            onClick: () => editMetadata(record),
+            onClick: (event: MouseEvent) => {
+              event.stopPropagation();
+              metadataModal.open(record);
+            },
           },
           {
-            text: '切片实况',
-            onClick: () =>
-              layoutDrawerStore.open({
-                component: DocumentChunkPanel,
-                data: {
-                  documentItem: record,
-                },
-              }),
+            ...clickAction({ text: '切片实况' }),
           },
           {
             text: '删除',
             color: 'error',
-            onClick: () => remove(record),
+            onClick: (event: MouseEvent) => {
+              event.stopPropagation();
+              remove(record);
+            },
           },
         ],
       };
@@ -245,6 +213,17 @@ const columns: AgGridColumnType<RagDocumentItem>[] = [
 const [gridProps, { reload }] = usePageListAgGrid({
   api: pageDocumentsGrid,
   rowKey: 'id',
+  onRowClicked(record, event) {
+    onRowClick(event, {
+      query: {
+        ...route.query,
+        drawer: 'document-chunks',
+        drawerCode: record.id,
+      },
+      replace: Boolean(route.query.drawer),
+    });
+  },
+  rowClassName: getPointerRowClassName(),
   rowHeight: 58,
   isShowRowSelection: false,
   adaptive: true,
@@ -290,41 +269,6 @@ function remove(item: RagDocumentItem) {
   });
 }
 
-function editMetadata(item: RagDocumentItem) {
-  editingDocument.value = item;
-  metadataForm.value = {
-    type: item.type || '',
-    tag: item.tag || '',
-  };
-  metadataModalOpen.value = true;
-}
-
-async function saveMetadata() {
-  if (!editingDocument.value) return;
-
-  metadataSaving.value = true;
-  try {
-    await updateDocumentMetadata(editingDocument.value.id, {
-      type: metadataForm.value.type,
-      tag: metadataForm.value.tag,
-    });
-    message.success('文档元数据已更新');
-    closeMetadataModal();
-    reload();
-  } finally {
-    metadataSaving.value = false;
-  }
-}
-
-function closeMetadataModal() {
-  metadataModalOpen.value = false;
-  editingDocument.value = null;
-  metadataForm.value = {
-    type: '',
-    tag: '',
-  };
-}
-
 function formatTime(value?: string) {
   return value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-';
 }
@@ -346,36 +290,5 @@ function formatSize(value: string | number) {
   line-height: 20px;
   white-space: normal;
   text-align: left;
-}
-
-.metadata-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.metadata-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  color: #344054;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.metadata-input {
-  height: 36px;
-  padding: 6px 11px;
-  border: 1px solid #d0d5dd;
-  border-radius: 6px;
-  color: #101828;
-  font-size: 14px;
-  line-height: 22px;
-  outline: none;
-}
-
-.metadata-input:focus {
-  border-color: #1677ff;
-  box-shadow: 0 0 0 2px rgb(22 119 255 / 12%);
 }
 </style>

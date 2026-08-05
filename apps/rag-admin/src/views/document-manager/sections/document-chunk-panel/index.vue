@@ -1,32 +1,37 @@
 <template>
   <section class="chunk-panel">
-    <template v-if="documentItem">
-      <section class="chunk-summary">
-        <div>
-          <h2>{{ documentItem.fileName || '-' }}</h2>
-          <p>{{ documentItem.sourcePath || '-' }}</p>
-        </div>
-        <Space>
-          <ApTag
-            :text="documentItem.status || '-'"
-            :color="documentItem.status === 'failed' ? '#f04438' : '#12b76a'"
-          />
-          <ApTag
-            :text="`${documentItem.actualChunkCount ?? documentItem.chunkCount ?? 0} 个切片`"
-            color="#1677ff"
-          />
-          <ApButton type="text" @click="close">关闭</ApButton>
-        </Space>
-      </section>
+    <Alert
+      v-if="errorText"
+      class="chunk-alert"
+      type="error"
+      show-icon
+      :message="errorText"
+    />
+    <Spin v-else :spinning="loading">
+      <template v-if="documentItem">
+        <section class="chunk-summary">
+          <div>
+            <h2>{{ documentItem.fileName || '-' }}</h2>
+            <p>{{ documentItem.sourcePath || '-' }}</p>
+          </div>
+          <Space>
+            <ApTag
+              :text="documentItem.status || '-'"
+              :color="documentItem.status === 'failed' ? '#f04438' : '#12b76a'"
+            />
+            <ApTag
+              :text="`${documentItem.actualChunkCount ?? documentItem.chunkCount ?? 0} 个切片`"
+              color="#1677ff"
+            />
+            <ApButton type="text" @click="close">关闭</ApButton>
+          </Space>
+        </section>
 
-      <Alert v-if="errorText" class="chunk-alert" type="error" show-icon :message="errorText" />
-
-      <Spin :spinning="loading">
         <Empty
-          v-if="!loading && !errorText && chunks.length === 0"
+          v-if="!loading && chunks.length === 0"
           description="暂无切片"
         />
-        <div v-else-if="!errorText" class="chunk-list">
+        <div v-else-if="!loading" class="chunk-list">
           <article v-for="chunk in chunks" :key="String(chunk.id)" class="chunk-card">
             <header
               class="chunk-card-header"
@@ -51,18 +56,18 @@
             </div>
           </article>
         </div>
-      </Spin>
 
-      <Pagination
-        v-if="total > pageSize"
-        class="chunk-pagination"
-        :current="page"
-        :page-size="pageSize"
-        :total="total"
-        :show-size-changer="false"
-        @change="changePage"
-      />
-    </template>
+        <Pagination
+          v-if="total > pageSize"
+          class="chunk-pagination"
+          :current="page"
+          :page-size="pageSize"
+          :total="total"
+          :show-size-changer="false"
+          @change="changePage"
+        />
+      </template>
+    </Spin>
   </section>
 </template>
 
@@ -72,19 +77,21 @@ import dayjs from 'dayjs';
 import { Alert, Empty, Pagination, Space, Spin } from '@aplus-frontend/antdv';
 import { ApButton, ApTag } from '@aplus-frontend/ui';
 import {
+  getDocument,
   pageDocumentChunks,
   type RagDocumentChunkItem,
   type RagDocumentItem,
 } from '@/api/rag-admin';
-import { useLayoutDrawerStore } from '@/stores/modules/layout-drawer';
+import { useLayoutDrawer } from '@/layouts/layout-drawer/use-layout-drawer';
 
 const props = defineProps<{
-  documentItem: RagDocumentItem;
+  drawerCode: string | number;
 }>();
 
-const layoutDrawerStore = useLayoutDrawerStore();
+const layoutDrawer = useLayoutDrawer();
 const loading = ref(false);
 const errorText = ref('');
+const documentItem = ref<RagDocumentItem | null>(null);
 const chunks = ref<RagDocumentChunkItem[]>([]);
 const expandedChunkKeys = ref<Set<string>>(new Set());
 const page = ref(1);
@@ -92,24 +99,43 @@ const pageSize = ref(10);
 const total = ref(0);
 
 watch(
-  () => props.documentItem.id,
+  () => props.drawerCode,
   () => {
     page.value = 1;
     chunks.value = [];
     expandedChunkKeys.value = new Set();
     total.value = 0;
-    void loadChunks();
+    void loadPanel();
   },
   {
     immediate: true,
   },
 );
 
+async function loadPanel() {
+  loading.value = true;
+  errorText.value = '';
+  documentItem.value = null;
+
+  try {
+    documentItem.value = await getDocument(props.drawerCode);
+    await loadChunks();
+  } catch (error) {
+    console.error(error);
+    documentItem.value = null;
+    chunks.value = [];
+    total.value = 0;
+    errorText.value = '文档详情加载失败，请稍后重试。';
+  } finally {
+    loading.value = false;
+  }
+}
+
 async function loadChunks() {
   loading.value = true;
   errorText.value = '';
   try {
-    const result = await pageDocumentChunks(props.documentItem.id, {
+    const result = await pageDocumentChunks(props.drawerCode, {
       page: page.value,
       pageSize: pageSize.value,
     });
@@ -134,7 +160,7 @@ function changePage(nextPage: number) {
 }
 
 function close() {
-  layoutDrawerStore.setVisible(false);
+  layoutDrawer.close();
 }
 
 function getChunkKey(chunk: RagDocumentChunkItem) {

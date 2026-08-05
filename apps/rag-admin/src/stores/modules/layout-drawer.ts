@@ -10,43 +10,26 @@ export interface LayoutDrawerContent {
 
 export const useLayoutDrawerStore = defineStore('layout-drawer', () => {
   const context = ref<LayoutDrawerContent | null>(null);
-  const cache = ref<Record<string, LayoutDrawerContent>>({});
 
   function open(content: Omit<LayoutDrawerContent, 'visible'>) {
-    setTimeout(() => {
-      context.value = {
-        ...content,
-        visible: true,
-      };
-    }, 10);
+    context.value = {
+      ...content,
+      visible: true,
+    };
   }
 
-  function close(fullPath?: string) {
+  function close() {
     if (context.value) {
       context.value = {
         ...context.value,
         visible: false,
       };
     }
-    if (fullPath) {
-      delete cache.value[fullPath];
-    }
-  }
-
-  function setVisible(visible: boolean) {
-    if (context.value) {
-      context.value = {
-        ...context.value,
-        visible,
-      };
-    }
   }
 
   return {
     context,
-    cache,
     open,
     close,
-    setVisible,
   };
 });

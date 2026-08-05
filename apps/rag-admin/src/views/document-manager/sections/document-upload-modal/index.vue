@@ -1,17 +1,5 @@
 <template>
-  <ApModal
-    v-model:open="open"
-    title="添加文档"
-    width="680px"
-    ok-text="开始上传"
-    cancel-text="关闭"
-    :confirm-loading="uploading"
-    :ok-button-props="{ disabled: selectedFiles.length === 0 }"
-    :mask-closable="!uploading"
-    :keyboard="!uploading"
-    @ok="submit"
-    @cancel="close"
-  >
+  <div class="upload-modal-content">
     <Upload.Dragger
       v-model:file-list="fileList"
       name="files"
@@ -63,14 +51,14 @@
         </article>
       </div>
     </section>
-  </ApModal>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { Space, Upload, message } from '@aplus-frontend/antdv';
 import type { UploadFile } from '@aplus-frontend/antdv';
-import { ApModal, ApTag } from '@aplus-frontend/ui';
+import { ApTag } from '@aplus-frontend/ui';
 import {
   uploadDocuments,
   type RagDocumentUploadFileResult,
@@ -90,7 +78,6 @@ const ACCEPTED_EXTENSIONS = [
 ];
 
 const emit = defineEmits<{ uploaded: [] }>();
-const open = ref(false);
 const uploading = ref(false);
 const fileList = ref<UploadFile[]>([]);
 const result = ref<RagDocumentUploadResult | null>(null);
@@ -99,11 +86,6 @@ const selectedFiles = computed<File[]>(() =>
     item.originFileObj ? [item.originFileObj as File] : [],
   ),
 );
-
-function show() {
-  open.value = true;
-  result.value = null;
-}
 
 function beforeUpload() {
   return false;
@@ -118,7 +100,7 @@ async function submit() {
   const validationError = validateFiles(files);
   if (validationError) {
     message.error(validationError);
-    return;
+    return false;
   }
 
   uploading.value = true;
@@ -132,8 +114,10 @@ async function submit() {
     } else {
       message.warning('文档处理完成，请查看逐文件结果');
     }
+    return true;
   } catch {
     message.error('文档上传失败，请稍后重试');
+    return false;
   } finally {
     uploading.value = false;
   }
@@ -166,16 +150,14 @@ function statusColor(status: RagDocumentUploadFileResult['status']) {
   ];
 }
 
-function close() {
-  if (uploading.value) return;
-  fileList.value = [];
-  result.value = null;
-}
-
-defineExpose({ show });
+defineExpose({ submit });
 </script>
 
 <style scoped>
+.upload-modal-content {
+  padding-top: 4px;
+}
+
 .upload-title {
   margin: 8px 0 4px;
   color: #101828;

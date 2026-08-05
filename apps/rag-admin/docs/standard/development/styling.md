@@ -4,9 +4,10 @@
 
 ## 样式入口
 
-- 全局样式放在 `src/styles/global.css`。
-- 页面或组件私有样式优先放在对应 `.vue` 文件中。
-- 跨页面复用样式再考虑沉淀到 `styles/`。
+- `src/styles/global.css` 只放全局公共样式：reset、body、通用页面容器、通用表格容器和通用文本工具类。
+- 布局专属样式放在对应布局组件的 `<style scoped>` 中，不放入 `global.css`。
+- 具体模块、页面或 section 的专属样式放在对应 `.vue` 组件的 `<style scoped>` 中，不放入 `global.css`。
+- 跨项目稳定复用的通用样式才考虑沉淀到 `styles/`，沉淀前必须确认真实复用需求。
 
 ## UI 组件
 
@@ -26,3 +27,5 @@
 - 保持布局在常见桌面宽度下可读，避免文本和按钮重叠。
 - 样式类名使用语义化 kebab-case，优先体现模块和职责，例如 `assistant-history-item`。
 - 页面样式不要污染全局；确需全局样式时放入 `src/styles/global.css` 并说明适用范围。
+- 新增样式时先判断归属：全局公共 → `global.css`；布局 → 布局组件；模块/页面/section → 对应组件。
+- 禁止把某一个模块专用样式或布局样式写入 `global.css`。

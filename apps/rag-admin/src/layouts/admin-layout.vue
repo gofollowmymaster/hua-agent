@@ -44,7 +44,7 @@
           </div>
           <RouterView v-else />
         </Spin>
-        <LayoutDrawer :width="'80%'" />
+        <LayoutDrawer />
       </LayoutContent>
     </Layout>
   </Layout>
@@ -74,7 +74,9 @@ const userStore = useUserStore();
 const route = useRoute();
 const router = useRouter();
 
-const userInitial = computed(() => userStore.displayName.slice(0, 1).toUpperCase());
+const userInitial = computed(() =>
+  userStore.displayName.slice(0, 1).toUpperCase(),
+);
 const selectedKeys = computed(() => [String(route.name || 'documents')]);
 const currentTitle = computed(() => String(route.meta.title || 'RAG 管理后台'));
 
@@ -105,3 +107,134 @@ const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
   if (key === 'logout') userStore.logout();
 };
 </script>
+
+<style scoped>
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-shell :deep(.ant-layout) {
+  min-width: 0;
+}
+
+.app-sider {
+  min-height: 100vh;
+  background: #18202d;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 76px;
+  padding: 20px 18px;
+  color: #eef3f8;
+}
+
+.brand-mark {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 8px;
+  color: #17202c;
+  background: #9ee6c7;
+  font-weight: 800;
+}
+
+.brand-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.brand-subtitle {
+  margin-top: 2px;
+  color: #9aa7b5;
+  font-size: 12px;
+}
+
+.side-menu {
+  border-inline-end: 0;
+  background: transparent;
+}
+
+.app-header {
+  display: flex;
+  height: 64px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 1px solid #e6ebf1;
+  background: #ffffff;
+}
+
+.header-title {
+  color: #1f2937;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+}
+
+.header-subtitle {
+  margin-top: 2px;
+  color: #7b8797;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.user-trigger {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  max-width: 220px;
+  color: #263244 !important;
+}
+
+.user-trigger :deep(span:last-child) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.main {
+  display: flex;
+  height: calc(100vh - 64px);
+  min-width: 0;
+  min-height: calc(100vh - 64px);
+  flex-direction: column;
+  padding: 24px;
+  overflow: hidden;
+  background: #f4f6f8;
+}
+
+.main :deep(.ant-spin-nested-loading),
+.main :deep(.ant-spin-container) {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.state {
+  display: grid;
+  min-height: 160px;
+  place-items: center;
+  color: #667386;
+}
+
+.error-state {
+  color: #b42318;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    min-width: 720px;
+  }
+
+  .app-sider {
+    min-height: 100vh;
+  }
+}
+</style>

@@ -77,11 +77,22 @@
 
 ## 弹框
 
+- 每个弹窗必须拆分为独立的内容组件和调用门面 hook，不在页面 `index.vue` 中内联弹窗结构。
+- 优先使用 `ApModal.createModal` 或 `ApModal.createModalStream`；简单确认、提示类弹窗可使用 `ApModal.*` 静态方法。
+- 内容组件和调用门面 hook 放在同一个文件夹下组织：
+
+```text
+views/<page>/sections/<modal-name>/
+├── index.vue            # 弹窗内容组件，不包含弹窗外壳
+└── use-<modal-name>.ts  # 调用门面 hook，负责 createModal 参数和打开/销毁
+```
+
+同一模块内多页面共用的业务弹窗仍放模块 `sections/`；跨项目稳定复用的弹窗使用相同结构，放在 `src/components/<modal-name>/`。
+- `ApModal.createModal` 的 `content` 必须直接传入 `h(ContentComponent, props)` VNode，不要传函数，避免内容渲染异常。
 - 普通确认、提示、表单、内容展示等弹框优先使用 `ApModal`，避免直接使用 `@aplus-frontend/antdv` 的 `Modal` 或手写弹框结构。
-- 路由级详情抽屉统一使用全局 `LayoutDrawer`（`src/layouts/layout-drawer.vue`）和 `useLayoutDrawerStore`，页面只通过 `layoutDrawerStore.open()` 打开，不再维护页面私有 `Drawer`。
+- 所有详情默认通过全局 `LayoutDrawer`（`src/layouts/layout-drawer.vue`）展示，并由 URL query 驱动；页面通过 `useLayoutDrawer().open(key, params)` 打开或切换，通过 `useLayoutDrawer().close()` 关闭，不再维护页面私有 `Drawer`。
 - 表格弹框使用 `useAgGridModal`，表格选择弹框使用 `useAgGridSelectModal`，避免用 `ApModal` + `AgGrid` 手写重复的弹框表格能力。
 - 表格选择弹框默认宽度设置为 `1200`，除非业务场景明确需要更窄或更宽的弹框。
-- 简单弹窗统一使用 `ApModal.*` 静态方法；复杂弹窗流使用 `ApModal.createModalStream`，整体封装为独立 section 或 component。
 
 ## 时间字段
 

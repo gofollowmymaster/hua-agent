@@ -2,7 +2,7 @@
 
 ## 1. 适用范围
 
-本文档定义 RAG Admin 页面统一目录标准。当前页面已按 `views/<page>/index.vue` 组织；页面私有组件放页面同级 `components/`，跨页面稳定复用组件放 `components/`。
+本文档定义 RAG Admin 页面统一目录标准。当前页面已按 `views/<page>/index.vue` 组织；模块内公共组件放 `components/`，业务弹窗、抽屉和页面区块放 `sections/`，跨项目稳定复用组件放 `src/components/`。
 
 本文档不负责顶层目录分层、历史兼容口径或 API 目录结构；这些内容由 `apps/rag-admin/AGENTS.md`、`../../architecture/directory-structure.md` 和 `../../architecture/auth-and-api-client.md` 承接。
 
@@ -31,8 +31,8 @@ src/views/<page>/
 
 - `index.vue`：页面编排与顶层组装。
 - `hooks/`：页面私有逻辑。
-- `components/`：页面私有组件。
-- `sections/`：大区块拆分。
+- `components/`：当前模块中 sections 或多个页面复用的公共展示组件。
+- `sections/`：页面业务模块，包含页面区块、业务弹窗、业务抽屉；多页面共用的业务模块也放这里。
 
 ## 3. 标准 CRUD 模块推荐结构
 
@@ -52,6 +52,11 @@ src/views/<Module>/
 │   └── <module-shared-name>/
 │       ├── index.vue
 │       └── interface.ts
+├── sections/
+│   └── <business-section>/
+│       ├── index.vue
+│       ├── components/
+│       └── hooks/
 ├── helper/
 │   ├── constants.ts
 │   └── index.ts
@@ -62,12 +67,15 @@ src/views/<Module>/
 
 - `interface.ts`：模块页面视图模型和页面适配类型入口，不替代 `src/api/` 的接口类型。
 - `helper/`：模块内跨页面复用的方法与常量。
-- `components/`：模块内跨页面复用组件。
+- `components/`：模块内 sections 或多个页面复用的公共展示组件。
+- `sections/`：页面业务模块，包含页面区块、业务弹窗、业务抽屉；多页面共用的业务模块也放这里。
 - `list` / `create` / `edit` / `detail`：标准页面动作目录。
 
 ## 4. 跨页面复用边界
 
-- 跨页面稳定复用组件继续放在 `src/components/`。
+- 模块内被多个 section 或页面复用的公共展示组件放在模块 `components/`。
+- 业务弹窗、抽屉和页面区块按业务模块放在 `sections/`；多页面共用的业务模块也放这里。
+- 跨项目稳定复用组件放在 `src/components/`。
 - 页面私有实现不得反向污染模块公共层或其他页面。
 - 禁止页面之间直接引用彼此私有 `hooks/`、`components/` 或 `sections/`。
 - API 类型和请求封装继续放在 `src/api/`，页面不自行创建 axios 实例。
@@ -85,8 +93,8 @@ src/views/<Module>/
 
 - 轻量页面可只保留 `index.vue`。
 - 出现页面私有复用逻辑时，再新增 `hooks/`。
-- 出现页面私有组件时，再新增 `components/`。
-- 出现多个大区块时，再新增 `sections/`。
+- 出现被多个 section 或页面复用的展示组件时，再新增 `components/`。
+- 出现业务弹窗、抽屉或独立业务区块时，再新增 `sections/`。
 
 ## 6. 命名规则
 
@@ -103,7 +111,7 @@ src/views/<Module>/
 ## 7. 页面迁移结果
 
 - 存量扁平页面已迁移为 `views/<page>/index.vue` 目录结构。
-- 页面私有组件已下沉到对应页面 `components/`，跨页面稳定复用组件保留在 `src/components/`。
+- 业务弹窗、抽屉和页面区块已按业务模块放入 `sections/`；模块公共展示组件保留在 `components/`，跨项目稳定复用组件保留在 `src/components/`。
 - 文件、目录统一使用 `kebab-case`，不再创建扁平 `PascalCase.vue` 文件。
 
 ## 8. API 类型边界

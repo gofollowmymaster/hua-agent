@@ -52,6 +52,13 @@ export class RagAdminController {
     return this.ragAdminService.pageDocuments(body);
   }
 
+  /** 返回当前租户指定文档详情。 */
+  @Get('documents/:id')
+  @ApiOperation({ summary: '查询 RAG 文档详情' })
+  getDocument(@Param('id', ParseIntPipe) id: number) {
+    return this.ragAdminService.getDocument(id);
+  }
+
   /** 接收批量文档上传并交由上传服务完成持久化和索引。 */
   @Post('documents/upload')
   @UseInterceptors(

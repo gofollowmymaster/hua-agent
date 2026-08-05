@@ -1,74 +1,39 @@
 <template>
-  <section class="page split-page">
-    <div class="list-pane">
-      <header class="page-header compact">
-        <div>
-          <h1>消息对话记录</h1>
-          <p>按会话查看用户提问与助手回答。</p>
-        </div>
-      </header>
-
-      <div class="grid-fill">
-        <AgGrid :columns="columns" v-bind="gridProps">
-          <template #title>
-            <ApButton type="primary" @click="refresh">刷新</ApButton>
-          </template>
-        </AgGrid>
+  <section class="page">
+    <header class="page-header compact">
+      <div>
+        <h1>消息对话记录</h1>
+        <p>按会话查看用户提问与助手回答。</p>
       </div>
-    </div>
+    </header>
 
-    <ApCard class="detail-pane" :padding="'16px'">
-      <Empty v-if="!selected" description="选择一个会话查看消息详情" />
-      <template v-else>
-        <header class="detail-header">
-          <div>
-            <h2>{{ selected.conversationId || selected.sessionKey }}</h2>
-            <p>{{ selected.channel }} · {{ selected.userId || '未知用户' }}</p>
-          </div>
-          <ApTag :text="`${selected.messageCount} 条`" color="#1677ff" />
-        </header>
-        <Spin :spinning="messageLoading">
-          <div
-            v-for="message in messages"
-            :key="String(message.id)"
-            class="message"
-            :class="message.role"
-          >
-            <div class="message-meta">
-              <span>{{ message.role === 'assistant' ? '助手' : '用户' }}</span>
-              <span>{{ formatTime(message.createdAt) }}</span>
-            </div>
-            <div class="message-content">{{ message.content }}</div>
-          </div>
-          <Empty v-if="!messageLoading && messages.length === 0" description="暂无消息" />
-        </Spin>
-      </template>
-    </ApCard>
+    <div class="grid-fill">
+      <AgGrid :columns="columns" v-bind="gridProps">
+        <template #title>
+          <ApButton type="primary" @click="refresh">刷新</ApButton>
+        </template>
+      </AgGrid>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { h, ref } from 'vue';
+import { h } from 'vue';
 import dayjs from 'dayjs';
-import { Empty, Spin } from '@aplus-frontend/antdv';
+import { useRoute } from 'vue-router';
 import {
   AgGrid,
   ApButton,
-  ApCard,
   ApTag,
   usePageListAgGrid,
   type AgGridColumnType,
 } from '@aplus-frontend/ui';
-import {
-  listSessionMessages,
-  pageSessionsGrid,
-  type RagMessageItem,
-  type RagSessionItem,
-} from '@/api/rag-admin';
+import { pageSessionsGrid, type RagSessionItem } from '@/api/rag-admin';
+import { useRowClickAction } from '@/hooks/use-row-click-action';
 
-const messages = ref<RagMessageItem[]>([]);
-const selected = ref<RagSessionItem | null>(null);
-const messageLoading = ref(false);
+const route = useRoute();
+const { onRowClick, getPointerRowClassName, clickAction } =
+  useRowClickAction('sessions');
 
 const columns: AgGridColumnType<RagSessionItem>[] = [
   {
@@ -174,10 +139,7 @@ const columns: AgGridColumnType<RagSessionItem>[] = [
       }
       return {
         actions: [
-          {
-            text: '查看消息',
-            onClick: () => select(record),
-          },
+          clickAction({ text: '查看消息' }),
         ],
       };
     },
@@ -185,20 +147,19 @@ const columns: AgGridColumnType<RagSessionItem>[] = [
 ];
 
 const [gridProps, { reload }] = usePageListAgGrid({
-  api: async (params: Record<string, unknown>) => {
-    const result = await pageSessionsGrid(params);
-
-    if (
-      selected.value &&
-      !result.records.some((item) => item.id === selected.value?.id)
-    ) {
-      selected.value = null;
-      messages.value = [];
-    }
-
-    return result;
-  },
+  api: pageSessionsGrid,
   rowKey: 'id',
+  onRowClicked(record, event) {
+    onRowClick(event, {
+      query: {
+        ...route.query,
+        drawer: 'session-messages',
+        drawerCode: record.id,
+      },
+      replace: Boolean(route.query.drawer),
+    });
+  },
+  rowClassName: getPointerRowClassName(),
   rowHeight: 62,
   isShowRowSelection: false,
   adaptive: true,
@@ -217,17 +178,20 @@ function refresh() {
   reload();
 }
 
-async function select(item: RagSessionItem) {
-  selected.value = item;
-  messageLoading.value = true;
-  try {
-    messages.value = await listSessionMessages(item.id);
-  } finally {
-    messageLoading.value = false;
-  }
-}
-
 function formatTime(value?: string) {
   return value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-';
 }
 </script>
+
+<style scoped>
+.strong {
+  font-weight: 700;
+}
+
+.session-preview {
+  overflow: hidden;
+  color: #404b5b;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+</style>

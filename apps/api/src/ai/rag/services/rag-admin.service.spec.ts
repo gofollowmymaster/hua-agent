@@ -179,6 +179,66 @@ describe('RagAdminService', () => {
     expect(() => JSON.stringify(result)).not.toThrow();
   });
 
+  it('returns document detail for current tenant and serializes BigInt', async () => {
+    ragPrisma.aplusDocument.findUnique.mockResolvedValue({
+      id: BigInt(1),
+      tenantCode: 'aplus',
+      sourcePath: 'raw/aplus/a.md',
+      fileName: 'a.md',
+      fileType: 'md',
+      type: 'policy',
+      tag: '重点',
+      fileHash: 'hash',
+      fileSize: BigInt(12),
+      chunkCount: 2,
+      status: 'ready',
+      error: null,
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-01-02T00:00:00.000Z'),
+      ingestedAt: new Date('2026-01-02T00:00:00.000Z'),
+      _count: { chunks: 2 },
+    });
+
+    const result = await service.getDocument(1);
+
+    expect(ragPrisma.aplusDocument.findUnique).toHaveBeenCalledWith({
+      where: { id: 1 },
+      include: {
+        _count: {
+          select: { chunks: true },
+        },
+      },
+    });
+    expect(result).toMatchObject({
+      id: '1',
+      tenantCode: 'aplus',
+      fileName: 'a.md',
+      fileSize: '12',
+      actualChunkCount: 2,
+    });
+    expect(() => JSON.stringify(result)).not.toThrow();
+  });
+
+  it('blocks cross tenant document detail query', async () => {
+    ragPrisma.aplusDocument.findUnique.mockResolvedValue({
+      id: BigInt(1),
+      tenantCode: 'boat',
+      _count: { chunks: 0 },
+    });
+
+    await expect(service.getDocument(1)).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
+  });
+
+  it('blocks document detail query when document does not exist', async () => {
+    ragPrisma.aplusDocument.findUnique.mockResolvedValue(undefined);
+
+    await expect(service.getDocument(999)).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
+  });
+
   it('updates document metadata for current tenant and trims input', async () => {
     ragPrisma.aplusDocument.findUnique.mockResolvedValue({
       id: BigInt(1),

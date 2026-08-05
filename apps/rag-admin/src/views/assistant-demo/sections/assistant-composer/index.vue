@@ -72,3 +72,49 @@ function handleInputKeydown(event: KeyboardEvent) {
   handleSubmit();
 }
 </script>
+
+<style scoped>
+.assistant-composer {
+  flex: 0 0 auto;
+  padding: 14px;
+  border-top: 1px solid #e1e7ef;
+  background: #ffffff;
+}
+
+.assistant-input {
+  width: 100%;
+  min-height: 86px;
+  max-height: 180px;
+  resize: vertical;
+  padding: 10px 12px;
+  border: 1px solid #cfd8e3;
+  border-radius: 8px;
+  color: #202633;
+  background: #ffffff;
+  line-height: 1.6;
+  outline: none;
+}
+
+.assistant-input:focus {
+  border-color: #48a77c;
+  box-shadow: 0 0 0 3px rgba(72, 167, 124, 0.16);
+}
+
+.assistant-input:disabled {
+  color: #8995a5;
+  background: #f4f6f8;
+}
+
+.assistant-composer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.assistant-state {
+  color: #667386;
+  font-size: 13px;
+}
+</style>

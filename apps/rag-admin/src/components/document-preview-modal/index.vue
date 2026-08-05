@@ -1,37 +1,26 @@
 <template>
-  <ApModal
-    v-model:open="open"
-    :title="previewTitle"
-    width="80vw"
-    :footer="null"
-    destroy-on-close
-    wrap-class-name="document-preview-modal"
-    @cancel="close"
-  >
-    <div class="document-preview-viewport">
-      <div v-if="loading" class="preview-state">文件加载中...</div>
-      <div v-else-if="errorText" class="preview-state error-text">
-        {{ errorText }}
-      </div>
-      <OpenFileViewer
-        v-else-if="previewFile"
-        :file="previewFile"
-        :file-name="previewFile.name"
-        height="100%"
-        fit="contain"
-        theme="light"
-        toolbar
-        :plugins="viewerPlugins"
-        @error="handlePreviewError"
-        @unsupported="handlePreviewUnsupported"
-      />
+  <div class="document-preview-viewport">
+    <div v-if="loading" class="preview-state">文件加载中...</div>
+    <div v-else-if="errorText" class="preview-state error-text">
+      {{ errorText }}
     </div>
-  </ApModal>
+    <OpenFileViewer
+      v-else-if="previewFile"
+      :file="previewFile"
+      :file-name="previewFile.name"
+      height="100%"
+      fit="contain"
+      theme="light"
+      toolbar
+      :plugins="viewerPlugins"
+      @error="handlePreviewError"
+      @unsupported="handlePreviewUnsupported"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { ApModal } from '@aplus-frontend/ui';
+import { ref, watch } from 'vue';
 import { OpenFileViewer } from '@open-file-viewer/vue';
 import {
   imagePlugin,
@@ -49,10 +38,12 @@ interface PreviewDocumentItem {
   fileType: string;
 }
 
-const open = ref(false);
+const props = defineProps<{
+  item: PreviewDocumentItem;
+}>();
+
 const loading = ref(false);
 const errorText = ref('');
-const previewItem = ref<PreviewDocumentItem | null>(null);
 const previewFile = ref<File | null>(null);
 const viewerPlugins = [
   imagePlugin(),
@@ -60,22 +51,29 @@ const viewerPlugins = [
   officePlugin(),
   textPlugin(),
 ];
-const previewTitle = computed(() => previewItem.value?.fileName || '文件预览');
 
-async function show(item: PreviewDocumentItem) {
-  open.value = true;
+watch(
+  () => props.item,
+  () => {
+    void loadPreview();
+  },
+  {
+    immediate: true,
+  },
+);
+
+async function loadPreview() {
   loading.value = true;
   errorText.value = '';
-  previewItem.value = item;
   previewFile.value = null;
 
   try {
-    const blob = await getDocumentPreviewFile(item.id);
+    const blob = await getDocumentPreviewFile(props.item.id);
     if (isJsonBlob(blob)) {
       throw new Error('Preview endpoint returned JSON');
     }
-    previewFile.value = new File([blob], item.fileName, {
-      type: blob.type || getMimeType(item.fileType),
+    previewFile.value = new File([blob], props.item.fileName, {
+      type: blob.type || getMimeType(props.item.fileType),
     });
   } catch (error) {
     console.error(error);
@@ -83,12 +81,6 @@ async function show(item: PreviewDocumentItem) {
   } finally {
     loading.value = false;
   }
-}
-
-function close() {
-  previewFile.value = null;
-  errorText.value = '';
-  previewItem.value = null;
 }
 
 function handlePreviewError() {
@@ -119,7 +111,6 @@ function isJsonBlob(blob: Blob) {
   return blob.type.includes('application/json');
 }
 
-defineExpose({ show });
 </script>
 
 <style>

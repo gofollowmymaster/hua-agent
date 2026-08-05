@@ -33,8 +33,10 @@
 ## 页面落位
 
 - 页面统一按 `page-structure-blueprint.md` 使用 `src/views/<page>/index.vue`。
-- 页面私有组件放在页面同级 `components/`，跨页面稳定复用组件放在 `src/components/`。
-- 页面私有逻辑放在页面同级 `hooks/`、`components/`、`sections/`。
+- 模块内被多个 section 或页面复用的公共展示组件放在 `components/`。
+- 业务弹窗、抽屉和页面区块按业务模块放在 `sections/`。
+- 跨项目稳定复用组件放在 `src/components/`。
+- 页面私有逻辑放在页面同级 `hooks/`。
 
 ## API 与类型
 

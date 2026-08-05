@@ -9,11 +9,7 @@
     :header-style="{ display: 'none' }"
     class="layout-drawer-container"
   >
-    <component
-      v-if="context"
-      :is="context.component"
-      v-bind="context.data"
-    />
+    <component v-if="context" :is="context.component" v-bind="context.data" />
   </ApDrawer>
 </template>
 
@@ -23,23 +19,30 @@ import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { ApDrawer } from '@aplus-frontend/ui';
 import { useLayoutDrawerStore } from '@/stores/modules/layout-drawer';
+import { resolveDrawerFromQuery } from './layout-drawer/component-map';
+import { useLayoutDrawer } from './layout-drawer/use-layout-drawer';
 
 const props = withDefaults(
   defineProps<{
     width?: string | number;
   }>(),
   {
-    width: '80%',
+    width: '60%',
   },
 );
 
 const route = useRoute();
 const layoutDrawerStore = useLayoutDrawerStore();
-const { context, cache } = storeToRefs(layoutDrawerStore);
+const layoutDrawer = useLayoutDrawer();
+const { context } = storeToRefs(layoutDrawerStore);
 
 const open = computed({
   get: () => Boolean(context.value?.visible),
-  set: (visible: boolean) => layoutDrawerStore.setVisible(visible),
+  set: (visible: boolean) => {
+    if (!visible) {
+      layoutDrawer.close();
+    }
+  },
 });
 
 function handleDocumentClick(event: MouseEvent) {
@@ -48,26 +51,23 @@ function handleDocumentClick(event: MouseEvent) {
   const path = (event.composedPath?.() || []) as EventTarget[];
   const drawerEl = document.querySelector('.layout-drawer-container');
   const isInDrawer = drawerEl && path.includes(drawerEl);
-  if (!isInDrawer) {
-    layoutDrawerStore.close(route.fullPath);
+  const target = event.target;
+  const isRowClick =
+    target instanceof Element && Boolean(target.closest('.ag-row'));
+
+  if (!isInDrawer && !isRowClick) {
+    layoutDrawer.close();
   }
 }
 
 watch(
-  () => route.fullPath,
-  (newPath, oldPath) => {
-    if (context.value?.visible && oldPath) {
-      cache.value[oldPath] = {
-        ...context.value,
-        visible: false,
-      };
-    }
-
-    const cached = cache.value[newPath];
-    if (cached) {
-      layoutDrawerStore.open(cached);
+  () => route.query,
+  (query) => {
+    const content = resolveDrawerFromQuery(query);
+    if (content) {
+      layoutDrawerStore.open(content);
     } else {
-      layoutDrawerStore.close(newPath);
+      layoutDrawerStore.close();
     }
   },
   {

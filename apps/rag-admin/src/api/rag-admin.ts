@@ -103,6 +103,10 @@ export async function pageDocumentsGrid(params: Record<string, unknown>) {
   } satisfies GridPageResult<RagDocumentItem>;
 }
 
+export function getDocument(id: string | number) {
+  return get<RagDocumentItem>(`/ai/rag/admin/documents/${id}`);
+}
+
 export function deleteDocument(id: string | number) {
   return del(`/ai/rag/admin/documents/${id}`);
 }

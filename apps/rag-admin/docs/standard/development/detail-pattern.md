@@ -8,6 +8,12 @@
 
 详情页默认采用 `ApCard + ApDescriptions` 模式，页面整体使用现有 `section.page` + `page-header` 骨架。当前项目暂无独立详情页路由，不引入本项目不存在的统一详情头部组件。
 
+所有详情默认通过全局 `LayoutDrawer` 展示，并由 URL query 驱动：
+
+- 页面不新建私有详情 `Drawer`。
+- 打开或切换详情通过 `useLayoutDrawer().open(key, params)` 修改 URL query；业务 id 统一使用 `drawerCode` 参数，由页面业务组件自行映射。
+- 关闭通过 `useLayoutDrawer().close()` 移除 drawer query。
+
 新增详情页按 `page-structure-blueprint.md` 落地，推荐文件职责：
 
 - `index.vue`：页面布局、标题、状态、动作、权限、详情加载、区块组装。
@@ -46,7 +52,7 @@ src/views/<page>/
 
 当前项目暂无独立详情页。可参考以下只读展示能力：
 
-- `src/views/document-manager/components/document-chunk-panel.vue`：只读抽屉内容 + 分页列表。
+- `src/views/document-manager/sections/document-chunk-panel/index.vue`：只读抽屉内容 + 分页列表。
 - `src/views/session-records/index.vue`：列表 + 右侧详情卡片。
 
 新增详情页按蓝图目录落地。
