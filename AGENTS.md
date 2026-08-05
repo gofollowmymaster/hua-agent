@@ -43,6 +43,7 @@ pnpm format
 ```
 
 提交前使用 `husky` + `lint-staged` 对暂存的 API TS 和 RAG Admin TS/Vue 文件执行 ESLint 只检查；需要临时跳过时使用 `git commit --no-verify`。
+提交信息使用 Conventional Commits，通过 `@commitlint/config-conventional` 校验，例如 `feat: xxx`、`fix: xxx`。
 
 ## 子项目入口
 

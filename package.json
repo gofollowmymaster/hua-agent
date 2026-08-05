@@ -44,7 +44,14 @@
     "apps/api/**/*.ts": "pnpm --filter @aplus-sql/api exec eslint --max-warnings 0",
     "apps/rag-admin/src/**/*.{ts,vue}": "pnpm --filter @aplus-sql/rag-admin exec eslint --max-warnings 0"
   },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
   "devDependencies": {
+    "@commitlint/cli": "^19.7.1",
+    "@commitlint/config-conventional": "^19.7.1",
     "dotenv-cli": "^7.4.2",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.5"
