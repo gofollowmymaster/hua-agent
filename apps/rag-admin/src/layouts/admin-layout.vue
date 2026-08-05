@@ -23,7 +23,7 @@
       <LayoutHeader class="app-header">
         <div>
           <div class="header-title">{{ currentTitle }}</div>
-          <div class="header-subtitle">RAG 文档与对话运营后台</div>
+          <div class="header-subtitle">{{ currentSubtitle }}</div>
         </div>
 
         <Dropdown>
@@ -79,6 +79,9 @@ const userInitial = computed(() =>
 );
 const selectedKeys = computed(() => [String(route.name || 'documents')]);
 const currentTitle = computed(() => String(route.meta.title || 'RAG 管理后台'));
+const currentSubtitle = computed(() =>
+  String(route.meta.subtitle || 'RAG 文档与对话运营后台'),
+);
 
 const menuItems = computed<ItemType[]>(() =>
   adminMenus.map((menu) => ({
@@ -204,7 +207,7 @@ const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
   min-width: 0;
   min-height: calc(100vh - 64px);
   flex-direction: column;
-  padding: 24px;
+  padding: 12px;
   overflow: hidden;
   background: #f4f6f8;
 }

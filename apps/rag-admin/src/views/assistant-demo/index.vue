@@ -1,18 +1,12 @@
 <template>
   <section class="page assistant-page">
-    <header class="page-header assistant-header">
-      <div>
-        <h1>问答助手</h1>
-        <p>基于当前 RAG 文档索引的 AGUI 协议演示会话。</p>
-      </div>
-      <div class="assistant-actions">
-        <ApButton type="primary" @click="startNewSession">新建会话</ApButton>
-        <ApButton v-if="busy" @click="stopChat">停止</ApButton>
-        <ApButton :disabled="busy && messages.length === 0" @click="clearChat">
-          清空
-        </ApButton>
-      </div>
-    </header>
+    <div class="assistant-actions">
+      <ApButton type="primary" @click="startNewSession">新建会话</ApButton>
+      <ApButton v-if="busy" @click="stopChat">停止</ApButton>
+      <ApButton :disabled="busy && messages.length === 0" @click="clearChat">
+        清空
+      </ApButton>
+    </div>
 
     <div class="assistant-workspace">
       <aside class="assistant-history">
@@ -334,10 +328,6 @@ watch(
 <style scoped>
 .assistant-page {
   gap: 16px;
-}
-
-.assistant-header {
-  flex: 0 0 auto;
 }
 
 .assistant-actions {

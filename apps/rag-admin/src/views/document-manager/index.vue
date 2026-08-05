@@ -1,12 +1,5 @@
 <template>
   <section class="page">
-    <header class="page-header">
-      <div>
-        <h1>文档管理</h1>
-        <p>查看、维护或删除已索引文档，也可触发 raw 目录重新入库。</p>
-      </div>
-    </header>
-
     <div class="grid-fill">
       <AgGrid :columns="columns" v-bind="gridProps">
         <template #title>
@@ -101,7 +94,7 @@ const columns: AgGridColumnType<RagDocumentItem>[] = [
           },
           () => record.fileName || '-',
         ),
-        h('div', { class: 'muted path' }, record.sourcePath || '-'),
+        h('div', { class: 'muted ' }, record.sourcePath || '-'),
         record.error ? h('div', { class: 'error-text' }, record.error) : null,
       ]),
   },

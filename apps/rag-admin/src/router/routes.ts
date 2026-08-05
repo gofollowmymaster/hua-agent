@@ -32,6 +32,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           title: '文档管理',
           menuTitle: '文档管理',
+          subtitle: '查看、维护或删除已索引文档，也可触发 raw 目录重新入库。',
         },
       },
       {
@@ -41,6 +42,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           title: '消息对话记录',
           menuTitle: '消息对话记录',
+          subtitle: '按会话查看用户提问与助手回答。',
         },
       },
       {
@@ -50,6 +52,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           title: '问答助手',
           menuTitle: '问答助手',
+          subtitle: '基于当前 RAG 文档索引的 AGUI 协议演示会话。',
         },
       },
     ],

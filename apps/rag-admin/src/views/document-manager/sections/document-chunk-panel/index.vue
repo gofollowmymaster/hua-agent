@@ -27,12 +27,13 @@
           </Space>
         </section>
 
-        <Empty
-          v-if="!loading && chunks.length === 0"
-          description="暂无切片"
-        />
+        <Empty v-if="!loading && chunks.length === 0" description="暂无切片" />
         <div v-else-if="!loading" class="chunk-list">
-          <article v-for="chunk in chunks" :key="String(chunk.id)" class="chunk-card">
+          <article
+            v-for="chunk in chunks"
+            :key="String(chunk.id)"
+            class="chunk-card"
+          >
             <header
               class="chunk-card-header"
               role="button"
@@ -43,7 +44,10 @@
               @keydown.space.prevent="toggleChunk(chunk)"
             >
               <span class="chunk-card-title">
-                <span class="chunk-chevron" :class="{ expanded: isChunkExpanded(chunk) }">
+                <span
+                  class="chunk-chevron"
+                  :class="{ expanded: isChunkExpanded(chunk) }"
+                >
                   ›
                 </span>
                 #{{ chunk.chunkIndex }}
@@ -52,7 +56,9 @@
             </header>
             <div v-if="isChunkExpanded(chunk)" class="chunk-card-body">
               <pre class="chunk-content">{{ chunk.content }}</pre>
-              <pre class="chunk-metadata">{{ formatMetadata(chunk.metadata) }}</pre>
+              <pre class="chunk-metadata">{{
+                formatMetadata(chunk.metadata)
+              }}</pre>
             </div>
           </article>
         </div>
@@ -95,7 +101,7 @@ const documentItem = ref<RagDocumentItem | null>(null);
 const chunks = ref<RagDocumentChunkItem[]>([]);
 const expandedChunkKeys = ref<Set<string>>(new Set());
 const page = ref(1);
-const pageSize = ref(10);
+const pageSize = ref(15);
 const total = ref(0);
 
 watch(

@@ -6,7 +6,7 @@
 
 ## 标准骨架
 
-详情页默认采用 `ApCard + ApDescriptions` 模式，页面整体使用现有 `section.page` + `page-header` 骨架。当前项目暂无独立详情页路由，不引入本项目不存在的统一详情头部组件。
+详情页默认采用 `ApCard + ApDescriptions` 模式，页面整体使用 `section.page` 骨架，页面标题与说明文案由布局 `.header-title` / `.header-subtitle` 展示。当前项目暂无独立详情页路由，不引入本项目不存在的统一详情头部组件。
 
 所有详情默认通过全局 `LayoutDrawer` 展示，并由 URL query 驱动：
 

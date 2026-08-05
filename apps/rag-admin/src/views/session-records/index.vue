@@ -1,12 +1,5 @@
 <template>
   <section class="page">
-    <header class="page-header compact">
-      <div>
-        <h1>消息对话记录</h1>
-        <p>按会话查看用户提问与助手回答。</p>
-      </div>
-    </header>
-
     <div class="grid-fill">
       <AgGrid :columns="columns" v-bind="gridProps">
         <template #title>
@@ -90,8 +83,12 @@ const columns: AgGridColumnType<RagSessionItem>[] = [
     hideInSearch: true,
     customRender: ({ record }) =>
       h('div', [
-        h('div', { class: 'strong' }, record.conversationId || record.sessionKey || '-'),
-        h('div', { class: 'muted path' }, record.sessionKey || '-'),
+        h(
+          'div',
+          { class: 'strong' },
+          record.conversationId || record.sessionKey || '-',
+        ),
+        h('div', { class: 'muted ' }, record.sessionKey || '-'),
       ]),
   },
   {
@@ -115,7 +112,11 @@ const columns: AgGridColumnType<RagSessionItem>[] = [
     hideInSearch: true,
     ellipsis: true,
     customRender: ({ record }) =>
-      h('div', { class: 'session-preview' }, record.latestMessage?.content || '暂无消息'),
+      h(
+        'div',
+        { class: 'session-preview' },
+        record.latestMessage?.content || '暂无消息',
+      ),
   },
   {
     title: '最后活跃',
@@ -138,9 +139,7 @@ const columns: AgGridColumnType<RagSessionItem>[] = [
         return {};
       }
       return {
-        actions: [
-          clickAction({ text: '查看消息' }),
-        ],
+        actions: [clickAction({ text: '查看消息' })],
       };
     },
   },
