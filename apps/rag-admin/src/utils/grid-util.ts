@@ -52,11 +52,10 @@ export const transformAgGridRowClicked = <RecordType = any>(option: {
     }
 
     const target = event?.target as HTMLElement | undefined;
-    if (
-      includeClassNameList.every(
-        (className) => !target?.classList?.contains(className),
-      )
-    ) {
+    const isInCell = includeClassNameList.some((className) =>
+      Boolean(target?.closest?.(`.${className}`)),
+    );
+    if (!isInCell) {
       return;
     }
     if (
