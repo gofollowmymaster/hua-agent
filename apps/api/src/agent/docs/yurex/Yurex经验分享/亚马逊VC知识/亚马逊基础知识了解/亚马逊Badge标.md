@@ -62,7 +62,7 @@ Wiki节点ID: "CS1NwapFwi6hoik67O5cQa8Vnpe"
 
 亚马逊某一细分类目下一定时间内销量排行第一的产品拥有Best Seller标志，系统会实时刷新。（要求该类目必须有100条Listing销售时该目录下才会有BS）。样式如图：
 
-![图片展示的是亚马逊Best Seller Badge的样式。它是一个橙色的长条形徽标，左侧有白色数字“#1”，右侧是白色大字“Best Seller”。该徽标用于标识亚马逊某一细分类目下一定时间内销量排行第一的产品，系统会实时刷新。图片与上下文紧密相关，上下文介绍了Best Seller Badge的定义及样式，直观呈现了其外观特征。](./assets/images/图片展示的是亚马逊Best-Seller-02eef643ec60.png)
+![该徽标用于标识亚马逊某一细分类目下一定时间内销量排行第一的产品。](./assets/images/图片展示的是亚马逊Best-Seller-02eef643ec60.png)
 
 #### New Release
 

@@ -16,7 +16,7 @@ Wiki节点ID: "M83Fw09eYiVpF8kSBZRc8XYPnCg"
 
 ![Yurex左侧“销售”菜单展开后的营销推广入口，红框依次标注“销售”和“Best Deals”，用于进入Best Deal活动列表。](./assets/images/图片展示了Salesforce的图片-a-568006666d83.png)
 
-![Best Deal操作界面，界面左侧有导航栏，右侧是Best Deals列表区域。在界面中上方区域，有一个黑色的“创建Best Deal”按钮，按钮被红色框突出显示，旁边有“点击按钮”的提示箭头指向该按钮。](./assets/images/图片展示了Best-Deal操作界面-5fb03a27838f.png)
+![Best Deal操作界面。红框标注“点击按钮”。](./assets/images/图片展示了Best-Deal操作界面-5fb03a27838f.png)
 
 ### BD创建全流程指南
 
@@ -49,7 +49,7 @@ Wiki节点ID: "M83Fw09eYiVpF8kSBZRc8XYPnCg"
 
 BD具体规则及注意事项请参考：创建活动时，当亚马逊返回的min funding+最大deal price ≠ 最高 funding +最低deal price时，只能按min funding 创建，不支持输入折扣金额保证BD开始前30天内产品前台最低价≥提报的Deal Price，30D最低价查看方法参考如下：
 
-> ![展示了亚马逊平台某款Homebase Air Purifier Home产品的价格历史。左侧有“Price History”标签，下方折线图呈现了过去30天的价格波动，标注了最低价$39.99和最高价$59.99。右侧“Price history”区域显示当前价格$59.99，比List Price低73%。](./assets/images/图片展示了展示了亚马逊平台某款Homeb-3a544ae8fe00.png)
+> ![展示了亚马逊平台某款Homebase Air Purifier Home产品的价格历史。](./assets/images/图片展示了展示了亚马逊平台某款Homeb-3a544ae8fe00.png)
 
 #### 促销状态解读
 
@@ -68,7 +68,7 @@ BD具体规则及注意事项请参考：创建活动时，当亚马逊返回的
 
 #### 重新创建Best Deal
 
-![亚马逊Best Deals页面，显示了产品信息及 Best Deals - Amazon Best Sellers (US) -。页面上方有筛选条件，如产品类别、促销状态等。下方表格中列出了产品名称、促销ID、列表价格、当前列表价格、参考价格、折扣价格、折扣百分比、库存数量、商品费用、活动商品费用、活动商品费用百分比等信息。表格右侧有“+ 添加商品”按钮，以及“重新创建”和“详情”操作按钮，其中“重新创建”按钮被红色框突出显示。](./assets/images/图片展示的是亚马逊Best-Deals页-4b6a41683d8b.png)
+![亚马逊Best Deals页面。红框标注“重新创建”。](./assets/images/图片展示的是亚马逊Best-Deals页-4b6a41683d8b.png)
 
 > - 创建失败/出错结束状态的活动，支持重新创建，自动填充之前活动的相关信息
 > - 进入重新创建页面，系统默认填充上次活动相关信息，并会展示相关报错信息

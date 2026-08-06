@@ -149,7 +149,7 @@ Best Deal指的是亚马逊平台上的特别优惠活动，属于Promotions中�
 ![产品信息列表页面，突出显示了“商品未在Amazon.com销售”的报错信息，该信息位于列表中某行产品右侧，以红色边框高亮显示。](./assets/images/图片展示的是产品信息列表页面-bf24c7512cef.png)
 查看出错原因
 
-![Best Deals中查看活动产品列表的页面。下方表格中列出了产品信息、Promotion ID、List Price、Current List Price、参考价、折扣力度、期望销量、期望收入、当前销量。](./assets/images/图片展示的是Best-Deals中查看活-e1e5038dbf58.png)
+![Best Deals中查看活动产品列表。](./assets/images/图片展示的是Best-Deals中查看活-e1e5038dbf58.png)
 查看取消原因（平台运营经理帮取消的，才有原因）
 
 

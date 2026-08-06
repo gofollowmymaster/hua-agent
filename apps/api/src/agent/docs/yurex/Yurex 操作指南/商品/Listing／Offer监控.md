@@ -71,11 +71,11 @@ Wiki节点ID: "OpGqw9I0ciK1YLkzf79cWWTUnXe"
 
 > 移除后，上方对应产品的“添加”功能，恢复为可点击状态。
 
-![Listing/Offer监控中批量配置“是否提醒”和“监控异常类型”的操作界面。界面中列出了产品名称、提醒方式、是否提醒、配置异常类型等信息，每个产品右侧有“操作”按钮，箭头分别指向两个“操作”按钮。](./assets/images/图片展示的是Listing-Offer监-bba1a4bc7fd2.png)
+![“监控异常类型”页面。箭头标注“操作”。](./assets/images/图片展示的是Listing-Offer监-bba1a4bc7fd2.png)
 
 ### 批量移除选择错误的产品
 
-![“新增Listing监控”操作路径中“批量移除选择错误的产品”步骤的界面。红色框突出显示了“批量移除选择错误的产品”步骤，以及“产品名称”“产品类型”“产品状态”“是否提醒”“监控异常类型”等筛选条件，与上下文对应，直观呈现操作要点。](./assets/images/图片展示了“新增Listing监控”操作-b7a134ccffbd.png)
+![“批量移除选择错误的产品”页面。红框标注“批量移除选择错误的产品”。](./assets/images/图片展示了“新增Listing监控”操作-b7a134ccffbd.png)
 
 ### 单条配置“是否提醒”和“监控异常类型”
 
@@ -91,11 +91,11 @@ Wiki节点ID: "OpGqw9I0ciK1YLkzf79cWWTUnXe"
 >
 > 仅会检测勾选了的异常类型，未勾选，即使Listing有对应的异常，系统也不会记录和通知；
 
-![“新增Listing监控产品”弹窗界面。右侧是智能监控产品列表，包含产品名称、产品类型、产品状态、产品异常、产品异常类型、操作等信息，如“产品名称”为“产品1”，“产品类型”为“手动”。](./assets/images/图片展示的是“新增Listing监控产品-d5a4a64a8f9e.png)
+![“新增Listing监控产品”弹窗。](./assets/images/图片展示的是“新增Listing监控产品-d5a4a64a8f9e.png)
 
 ### 需要至少配置一种异常类型
 
-![“新增Listing监控”操作中，批量移除选择错误的产品界面。在“配置监控异常类型”部分，有“下架/冻结”“价格异常”“库存异常”“可销售库存为0”“图片异常”选项，其中“下架/冻结”选项被红色框突出显示。](./assets/images/图片展示的是“新增Listing监控”操-a49e7e911ad2.png)
+![“新增Listing监控”页面。红框标注“下架/冻结”。](./assets/images/图片展示的是“新增Listing监控”操-a49e7e911ad2.png)
 
 ### 取消新增监控，关闭弹出
 
@@ -107,7 +107,7 @@ Wiki节点ID: "OpGqw9I0ciK1YLkzf79cWWTUnXe"
 
 ### 新增Listing监控后，列表还无Listing记录，页面中间提示：您配置的监控任务已启动,系统正在持续监测中...
 
-![Listing/Offer监控操作中新增Listing监控后的页面。页面上方有“操作成功”提示，下方有红色框突出显示的“您配置的监控任务已启动,系统正在持续监测中...”文字，表明已启动监控任务，系统正在持续监测。](./assets/images/图片展示的是Listing-Offer监-588f88521661.png)
+![Listing/Offer新增监控结果页面。红框标注监控任务已启动。](./assets/images/图片展示的是Listing-Offer监-588f88521661.png)
 
 
 ### 点击“已监控列表”按钮
@@ -122,17 +122,17 @@ Wiki节点ID: "OpGqw9I0ciK1YLkzf79cWWTUnXe"
 
 > 默认是全部用户接收站内通知，您可以指定用户或者角色
 
-![“已监控Listing列表”弹窗界面，上方有“已监控Listing列表”标题及筛选条件区域，可按产品名称、监控状态、是否提醒筛选。红色箭头指向“配置提醒人员”按钮，该按钮用于配置异常站内信接收人员，与文档中“配置异常站内信接收人员”操作步骤对应，是批量配置提醒人员的入口。](./assets/images/图片展示的是“已监控Listing列表”-4ea81c11026f.png)
+![“已监控Listing列表”弹窗。箭头标注“配置提醒人员”。](./assets/images/图片展示的是“已监控Listing列表”-4ea81c11026f.png)
 
-![Listing/Offer监控中配置异常站内信接收人员的界面。左侧导航栏中“Offer”被红框圈出，右侧列表显示消息类型、消息接收人和未读消息等信息，其中一行消息接收人处有一个红框标识的图标。](./assets/images/图片展示了Listing-Offer监控-7af1ae7b0662.png)
+![Listing/Offer监控中配置异常站内信接收人员页面。红框标注“Offer”。](./assets/images/图片展示了Listing-Offer监控-7af1ae7b0662.png)
 
-![“信息订阅管理”页面，左侧为导航栏，选中“Offer”下的“Listing”。“Listing”监控类型下有多个监控接收人，如“全部用户”“全部用户”“全部用户”等，部分接收人右侧有红色框标注的“编辑”按钮。](./assets/images/图片展示的是“信息订阅管理”页面-571f4cc651ce.png)
+![“信息订阅管理”页面。红框标注“编辑”。](./assets/images/图片展示的是“信息订阅管理”页面-571f4cc651ce.png)
 
 ![“设置消息接收人”弹窗界面。弹窗内有“用户”和“角色”下拉框，下方列表显示了多个用户及角色信息。](./assets/images/图片展示了“设置消息接收人”弹窗界面-d5f2dc591d50.png)
 
 ### 单条配置“是否监控”、“是否提醒”和“监控异常类型”
 
-![“已监控的Listing列表”弹窗界面。右侧有“配置站内信接收人员”“是否监控”“是否提醒”“监控异常类型”等设置项，其中“是否监控”开关被红色框突出显示，下方有“开启监控”和“关闭监控”选项。](./assets/images/图片展示的是“已监控的Listing列表-9d79c41645a7.png)
+![“已监控的Listing列表”弹窗。红框标注“是否监控”。](./assets/images/图片展示的是“已监控的Listing列表-9d79c41645a7.png)
 
 ### 批量配置“是否监控”、“是否提醒”和“监控异常类型”
 
@@ -175,7 +175,7 @@ Wiki节点ID: "OpGqw9I0ciK1YLkzf79cWWTUnXe"
 
 > 具体的某条异常如果已经标记为“已处理”，不能再标记为“待处理”和“暂不处理”
 
-![Listing/Offer监控界面中“产品信息”筛选项的设置。左侧导航栏选中“产品信息”，右侧筛选区域有“经营状态”“产品类型”“平台类型”“产品负责人”“运营经理”“处理状态”等筛选项，其中“经营状态”被红色框突出显示。](./assets/images/图片展示了Listing-Offer监控-faef50f1f04a.png)
+![Listing/Offer监控界面。红框标注“经营状态”。](./assets/images/图片展示了Listing-Offer监控-faef50f1f04a.png)
 
 ![Listing/Offer监控中批量标记处理状态的操作界面。](./assets/images/图片展示的是Listing-Offer监-13462699e37e.png)
 
@@ -191,11 +191,11 @@ Wiki节点ID: "OpGqw9I0ciK1YLkzf79cWWTUnXe"
 
 ### 查看Listing异常详情
 
-![Listing/Offer监控操作步骤中查看Listing异常详情的页面。下方列表显示产品相关信息，如产品名称、异常图、商品ID、商品类型、商品状态、产品负责人、平台流量排序、数据状态等，还设有“操作”列，可进行“查看详情”操作。](./assets/images/图片展示的是Listing-Offer监-1ad3ff4e5f3b.png)
+![Listing/Offer监控操作步骤中查看Listing异常详情的页面。](./assets/images/图片展示的是Listing-Offer监-1ad3ff4e5f3b.png)
 
 ### 详情页上方展示产品相关信息，下方列表展示历史异常记录
 
-![Listing/Offer监控中“查看Listing异常详情”页面。下方列表呈现历史异常记录，包括异常类型、异常详情、行动建议、最近更新时间等，如“库存不足”“库存不足”“库存不足”等异常，部分异常详情有“点击查看详情”按钮。](./assets/images/图片展示的是Listing-Offer监-9b79e989f919.png)
+![“查看Listing异常详情”页面。](./assets/images/图片展示的是Listing-Offer监-9b79e989f919.png)
 
 ### Listing 历史异常记录
 
@@ -217,7 +217,7 @@ Wiki节点ID: "OpGqw9I0ciK1YLkzf79cWWTUnXe"
 
 ![Listing/Offer监控系统中Listing异常详情页面。页面右侧有操作日志，记录了异常处理相关操作。](./assets/images/图片展示的是Listing-Offer监-66ca6ef1d472.png)
 
-![Listing/Offer监控中批量处理异常时的弹窗界面。该弹窗与文档中“批量处理异常，仅会更新非‘已处理’状态的异常状态”内容相关，用于在批量处理异常时确认操作，确保仅更新非“已处理”状态的异常状态。](./assets/images/图片展示的是Listing-Offer监-24285a53f6e6.png)
+![Listing/Offer监控中批量处理异常时的弹窗。](./assets/images/图片展示的是Listing-Offer监-24285a53f6e6.png)
 
 ### Listing 批量处理异常
 
@@ -227,7 +227,7 @@ Wiki节点ID: "OpGqw9I0ciK1YLkzf79cWWTUnXe"
 
 ### 查看操作日志
 
-![Listing/Offer监控中查看操作日志的操作步骤。画面中弹出“操作日志”窗口，显示操作类型为“产品异常处理”，操作人是系统，操作时间为2024 - 01 - 14 10:30:42，操作内容为“产品异常处理”。](./assets/images/图片展示了Listing-Offer监控-4e8dda2cba0e.png)
+![“操作日志”弹窗。](./assets/images/图片展示了Listing-Offer监控-4e8dda2cba0e.png)
 
 ### 关闭抽屉弹出
 
@@ -272,7 +272,7 @@ Wiki节点ID: "OpGqw9I0ciK1YLkzf79cWWTUnXe"
 
 ![Offer异常产品列表页面。页面左侧有“批量操作”下拉菜单，可进行批量处理等操作。](./assets/images/图片展示的是Offer异常产品列表页面-704997b64c63.png)
 
-![Listing/Offer监控中批量标记处理状态的操作界面。画面中弹出确认框，内容为“确定将选中ASIN的所有异常标记为已处理？”，框内有“取消”和“确定”两个按钮，其中“确定”按钮被红色箭头突出指向。](./assets/images/图片展示的是Listing-Offer监-0329e9b8859b.png)
+![Listing/Offer监控中批量标记处理状态的操作界面。箭头标注“确定”。](./assets/images/图片展示的是Listing-Offer监-0329e9b8859b.png)
 
 
 ### 指定导出数据
@@ -290,7 +290,7 @@ Wiki节点ID: "OpGqw9I0ciK1YLkzf79cWWTUnXe"
 
 ### 详情页上方展示产品相关信息，下方列表展示历史异常记录
 
-![Listing/Offer监控中Offer异常详情的详情页。下方历史异常记录列表中，异常类型为产品评论异常，异常详情是系统OQ Offer与商品的产品评论数量不一致，行动建议为为确保评论数量。](./assets/images/图片展示的是Listing-Offer监-7fcc6c136178.png)
+![Listing/Offer监控中Offer异常详情的详情页。](./assets/images/图片展示的是Listing-Offer监-7fcc6c136178.png)
 
 ### Offer 历史异常记录
 
@@ -312,13 +312,13 @@ Wiki节点ID: "OpGqw9I0ciK1YLkzf79cWWTUnXe"
 
 ![Offer异常详情页中的历史异常记录列表。列表展示了异常类型、异常详情、行动建议、最近更新时间、处理状态及操作等信息。](./assets/images/图片展示的是Offer异常详情页中的历史-575e93900a22.png)
 
-![Listing/Offer监控中单条处理异常的操作界面。当前“待处理”状态，可标记为“已处理”和“暂不处理”；“暂不处理”状态，可标记为“已处理”和“待处理”；“已处理”状态不支持再继续处理。](./assets/images/图片展示的是Listing-Offer监-5d76a6414806.png)
+![Listing/Offer监控中单条处理异常的操作界面。](./assets/images/图片展示的是Listing-Offer监-5d76a6414806.png)
 
 ### Offer 批量处理异常
 
 批量处理异常，仅会更新非“已处理”状态的异常状态
 
-![Listing/Offer监控中Offer异常详情页面。下方列表显示异常类型、异常详情、行动建议、最近更新时间等信息，如“产品信息”异常，异常详情为“系统PC offer与产品信息不一致”。](./assets/images/图片展示了Listing-Offer监控-b49e0756c84f.png)
+![Listing/Offer监控中Offer异常详情页。](./assets/images/图片展示了Listing-Offer监控-b49e0756c84f.png)
 
 ### 查看操作日志
 

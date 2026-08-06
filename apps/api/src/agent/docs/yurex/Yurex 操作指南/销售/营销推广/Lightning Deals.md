@@ -31,7 +31,7 @@ Lightning Deal，简称LD，是亚马逊交易页面上限时的价格折扣活�
 
 【销售】-【营销推广】-【Lightning Deals】
 
-![在系统中找到“Lightning Deals”的操作路径界面。左侧导航栏中，“销售”选项被红色框标识，其下拉菜单里“营销推广”也被红框标出，进一步展开的“Lightning Deals”同样以红框突出显示。](./assets/images/图片展示了在系统中找到“Lightnin-57853fc31388.png)
+![“Lightning Deals”页面。红框标注“销售”、“营销推广”。](./assets/images/图片展示了在系统中找到“Lightnin-57853fc31388.png)
 
 ### 点击【创建Lightning Deal】
 
@@ -51,7 +51,7 @@ Lightning Deal，简称LD，是亚马逊交易页面上限时的价格折扣活�
 
 > 活动类型，默认自定义，当亚马逊允许提报某种特殊活动时，对应那种特殊活动就可以被选择
 
-![在亚马逊后台创建Lightning Deal时的界面。界面中突出显示了“参加活动的ASIN需要有亚马逊参考价，如果无亚马逊参考价，将无法参加Lightning Deal”这一提示信息。](./assets/images/图片展示的是在亚马逊后台创建Lightn-20a0556ac5b1.png)
+![在亚马逊后台创建Lightning Deal时页面。](./assets/images/图片展示的是在亚马逊后台创建Lightn-20a0556ac5b1.png)
 有其他Promotions效果
 
 ![创建Lightning Deal时设置活动ASIN的界面。左侧红框突出显示了“ASIN”输入框，提示需输入ASIN。](./assets/images/图片展示了创建Lightning-Dea-7d190722581b.png)
@@ -155,7 +155,7 @@ Lightning Deal，简称LD，是亚马逊交易页面上限时的价格折扣活�
 
 状态为“待生效”、“生效中”、“异常”的活动，支持编辑
 
-![Lightning Deals活动管理界面。界面中列出了多个活动信息，包括Promotion ID、List Price、Current List Price、新旧折价、促销价格、折价百分比、库存数量、开。](./assets/images/图片展示的是Lightning-Deal-73d3c55b634c.png)
+![Lightning Deals活动管理界面。](./assets/images/图片展示的是Lightning-Deal-73d3c55b634c.png)
 
 ### 编辑活动信息
 
@@ -169,7 +169,7 @@ Lightning Deal，简称LD，是亚马逊交易页面上限时的价格折扣活�
 > - 已经开始的活动，不管是“生效中”还是“异常”状态，都不支持删除产品，只有在活动还未开始时，支持删除
 > - 已存在的产品，不支持重新获取参考价，如果获取失败，可以关闭窗口，重新进入
 
-![Lightning Deals编辑活动页面的部分内容。活动类型不可修改；秒杀活动日期仅日期大于当天时可修改且只能调大；“生效中”和“异常”状态的库存数量不支持修改，“待生效”状态支持调整。](./assets/images/图片展示了Lightning-Deals-96703ae778e7.png)
+![Lightning Deals编辑活动页面。](./assets/images/图片展示了Lightning-Deals-96703ae778e7.png)
 【生效中】或者【异常】状态编辑
 
 ![Lightning Deals编辑活动中“生效中”或“异常”状态的编辑页面。页面中有活动ID为LD - 0002等信息，活动类型不支持修改。](./assets/images/图片展示了Lightning-Deals-6bd9baa2171a.png)
@@ -217,7 +217,7 @@ Lightning Deal，简称LD，是亚马逊交易页面上限时的价格折扣活�
 
 勾选需要的数据，再点击导出；
 
-![Lightning Deals操作流程中导出数据的操作界面。用红色框突出显示了“先勾选要导出的数据”和“点击导出按钮”两个操作步骤，与上下文介绍的通过搜索条件搜索过滤数据再导出的操作流程相呼应。](./assets/images/图片展示了Lightning-Deals-ff674b846db7.png)
+![Lightning Deals导出页面。红框标注勾选数据后点击导出。](./assets/images/图片展示了Lightning-Deals-ff674b846db7.png)
 
 ## 常见问题
 

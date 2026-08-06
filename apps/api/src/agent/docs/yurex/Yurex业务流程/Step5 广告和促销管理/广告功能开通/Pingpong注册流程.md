@@ -44,7 +44,7 @@ https://us.pingpongx.com/entrance/signup?cb=true&inviteCode=jem2Aj785
 
 #### 使用手机号和邮箱注册（未注册过pingpong）
 
-![PingPong注册账号时使用手机号和邮箱注册（未注册过pingpong）的页面。页面左侧为账号创建区域，有邮箱、手机号、验证码、登录密码、登录密码确认等输入框。关键信息是“您的PingPong客户经理姓名”处，用红色框和箭头突出显示，提示填写“吴建琴”。](./assets/images/图片展示的是PingPong注册账号时使-24d699c57069.png)
+![PingPong注册账号时使用手机号和邮箱注册（未注册过pingpong）的页面。](./assets/images/图片展示的是PingPong注册账号时使-24d699c57069.png)
 
 **客户经理：吴建琴；将注册手机号提供给平台运营经理**
 
@@ -60,7 +60,7 @@ https://us.pingpongx.com/entrance/signup?cb=true&inviteCode=jem2Aj785
 
 将邮箱验证码进行填写，并点击下一步
 
-![PingPong注册流程中激活账号页面。页面上方显示“您已注册成功！激活您的PingPong账号”，并提示需在15分钟内提交验证。下方有“邮箱验证码”输入框，下方有“下一步”蓝色按钮。](./assets/images/图片展示的是PingPong注册流程中激-f39f2d27d8d1.png)
+![PingPong注册流程中激活账号页面。](./assets/images/图片展示的是PingPong注册流程中激-f39f2d27d8d1.png)
 
 #### 设置交易密码（纯6位数字，也可跳过）
 
@@ -74,13 +74,13 @@ https://us.pingpongx.com/entrance/signup?cb=true&inviteCode=jem2Aj785
 
 以Amazon新店为例：Amazon注册过程中需要收款账号，请先在PingPong进行申请。
 
-![申请收款账号流程。左侧显示可选择的平台，如Walmart、Amazon等。右侧是为亚马逊收款设置页面，需填写店铺名称、选择店铺所在国家、选择销售类目及预计年销量，下方有“申请收款账号”按钮。图片中用蓝色箭头标注了关键步骤：①选择平台；②正在注册店铺，店铺状态选择“暂无店铺”；③填写店铺名称；④选择店铺对应市场所在国家（可多选）；⑤选择销售类目，预计年销量；⑥点击“申请收款账号”提交。](./assets/images/图片展示申请收款账号流程-be3e9b36e15e.png)
+![左侧显示可选择的平台。](./assets/images/图片展示申请收款账号流程-be3e9b36e15e.png)
 
 #### 完善实名认证
 
 提交成功，点击“立即完善实名信息”完善实名认证
 
-![PingPong平台的页面。页面上方有“首页”“平台收款”“明细查询”“付款服务”“更多服务”等导航栏，右上角有“帮助”“推荐有礼”“账号中心”等选项。页面中部显示“提交成功”，提示店铺信息提交成功，需前往【店铺详情】页面完善实名认证信息和提现账户，审核完成后收款账号将在1分钟内发放，并有“继续添加店铺”和“完善实名信息”按钮。](./assets/images/图片展示的是PingPong平台的页面-af65c3068755.png)
+![PingPong平台的页面。](./assets/images/图片展示的是PingPong平台的页面-af65c3068755.png)
 
 ### **完成实名认证**
 
@@ -90,7 +90,7 @@ https://us.pingpongx.com/entrance/signup?cb=true&inviteCode=jem2Aj785
 
 若不小心点到其他页面，也可点击右上角【账号中心】——【实名认证】，提交实名信息。
 
-![Pingpong平台的注册页面。页面上方有“帮助”“搜索有礼”“账号中心”等选项。中间部分有“为了不耽误您的入驻、提现及其他PingPong服务，请完成实名认证”提示，下方有“立即完善实名信息”按钮。页面右侧有“提交实名认证信息”“添加第一个提现账户”“收到一笔入账”等步骤，其中“提交实名认证信息”步骤旁有“立即前往”按钮，该按钮被红色框线突出显示。](./assets/images/图片展示的是Pingpong平台的注册页-f1fe31ff6df9.png)
+![Pingpong平台的注册页面。](./assets/images/图片展示的是Pingpong平台的注册页-f1fe31ff6df9.png)
 
 #### 选择账户类型
 
@@ -98,7 +98,7 @@ https://us.pingpongx.com/entrance/signup?cb=true&inviteCode=jem2Aj785
 
 温馨提示：请根据自身情况选择账号类型，一旦提交实名认证将无法更改。
 
-![Pingpong平台的实名认证页面。页面上方有平台名称及导航栏，中间标题为“开始您的实名认证”，提示需实名认证才能解锁部分功能。下方有“中国内地”和“中国香港”选项，当前选中“中国内地”。](./assets/images/图片展示的是Pingpong平台的实名认-598dcafc3b0e.png)
+![Pingpong平台的实名认证页面。](./assets/images/图片展示的是Pingpong平台的实名认-598dcafc3b0e.png)
 
 1. 账户类型—企业信息注册
 
@@ -106,7 +106,7 @@ https://us.pingpongx.com/entrance/signup?cb=true&inviteCode=jem2Aj785
 
 【若注册PingPong账号为绑定coupang店铺使用，需选择企业信息注册】
 
-![Pingpong平台文档中注册B2C账号流程步骤中“选择账户类型—企业信息注册”页面。页面上方有“选择账户类型”“企业认证”“所选信息”等步骤标识。下方提示已注册过账号可直接使用，未注册可点击“立即注册”。](./assets/images/图片展示的是Pingpong平台文档中注-84bb2d368b20.png)
+![“选择账户类型—企业信息注册”页面。](./assets/images/图片展示的是Pingpong平台文档中注-84bb2d368b20.png)
 
 #### 上传实名证件
 
@@ -126,7 +126,7 @@ https://us.pingpongx.com/entrance/signup?cb=true&inviteCode=jem2Aj785
 
 手机验证成功后，电脑端页面点击“已完成认证”，提交实名信息。
 
-![PingPong注册流程中手机验证成功的页面。左侧显示“身份验证成功”及绿色对勾图标，提示在电脑端查看认证结果，若未更新可点击“已完成认证”。右侧有“上一步”和“提交”按钮，下方箭头指向“提交”按钮，旁边文字说明点击“已完成认证”后点击“提交”提交确认。](./assets/images/图片展示的是PingPong注册流程中手-4d124680c302.png)
+![PingPong注册流程中手机验证成功的页面。箭头标注“提交”。](./assets/images/图片展示的是PingPong注册流程中手-4d124680c302.png)
 
 ### **添加提现账号**
 
@@ -156,17 +156,17 @@ https://us.pingpongx.com/entrance/signup?cb=true&inviteCode=jem2Aj785
 
 1. 查看PingPong发放的收款账号。以亚马逊北美站为例：
 
-![PingPong平台管理界面，用于添加提现账号。界面中“选择收款账户地区”处有美国、加拿大、墨西哥选项，当前选中美国。收款账户信息区域要求填写银行所在国家、账户持有人姓名、银行名称、汇款账号代码、银行账号等，部分信息被遮挡。](./assets/images/图片展示的是PingPong平台管理界面-de46fb04081f.png)
+![PingPong平台管理界面。](./assets/images/图片展示的是PingPong平台管理界面-de46fb04081f.png)
 
 #### 填入收款账号
 
 将收款账号填入亚马逊【设置您的存款方式】处，以亚马逊北美站为例：
 
-![PingPong注册流程中设置收款方式的页面。页面上方有“设置您的收款方式”标题，下方有收款账号填写区域。重点突出“设置您的存款方式”区域，需填入银行账号、姓名、开户行、账户类型、账户编号、账户名称等信息。图片右侧有蓝色箭头，标注“将PingPong发放的银行账号对应填写至【设置您的存款方式】处”，与上下文介绍的将收款账号填入亚马逊【设置您的存款方式】处相呼应，指导用户完成PingPong完善授权步骤。](./assets/images/图片展示了PingPong注册流程中设置-0bc54b6f1f15.png)
+![PingPong注册流程中设置收款方式的页面。箭头标注“设置您的存款方式”。](./assets/images/图片展示了PingPong注册流程中设置-0bc54b6f1f15.png)
 
 1. 将收款账号填入亚马逊【设置您的存款方式】处，以亚马逊北美站为例，对应如下：
 
-![PingPong设置存款方式的页面。页面上方有“设置您的存款方式”标题，下方有“输入您的银行信息，以便从亚马逊接收付款”的提示。页面中有多个输入框，包括银行地址、账户持有人姓名、9位数的汇款账号号码、银行账号、银行账号重输等，部分输入框被蓝色箭头指向，如银行地址、账户持有人姓名、9位数的汇款账号号码、银行账号、银行账号重输等。](./assets/images/图片展示了PingPong设置存款方式的-7b7d35bc6494.png)
+![PingPong设置存款方式的页面。](./assets/images/图片展示了PingPong设置存款方式的-7b7d35bc6494.png)
 
 #### PingPong完善授权
 
@@ -180,10 +180,10 @@ https://us.pingpongx.com/entrance/signup?cb=true&inviteCode=jem2Aj785
 
 自动授权：直接跳转登录授权，勾选协议确认即可，需在该店铺的常用IP环境进行操作，操作指引：https://us.pingpongx.com/help/amazonguide
 
-![Pingpong注册流程中B2C账号注册的店铺授权自动授权界面。界面上显示自动授权方式，需两步完成店铺授权，即点击跳转授权并登录对应站点亚马逊卖家后台，勾选授权协议后点击确认。下方有温馨提示，需在店铺常用IP环境操作以免关联。界面中有明显突出的蓝色“跳转授权”按钮，以红色框标识。](./assets/images/图片展示的是Pingpong注册流程中B-1a4ffbc2ff90.png)
+![Pingpong注册流程中B2C账号注册的店铺授权自动授权界面。](./assets/images/图片展示的是Pingpong注册流程中B-1a4ffbc2ff90.png)
 
 #### 授权成功
 
 授权成功后，店铺跳到【审核中店铺】或者【正常店铺】，等待款项入账即可，如下图。
 
-![Pingpong平台店铺管理界面。上方有“正常店铺”“审核中的店铺”“待完善的店铺”三个选项卡，当前选中“正常店铺”。下方列表显示了店铺名称、地区、币种、审核状态及操作等信息，如“3C数码专营店”在加拿大地区，币种为CAD，审核状态为“您的店铺已授权成功，请耐心等待平台打款至PingPong收款账户”，操作栏有“更多”选项。](./assets/images/图片展示的是Pingpong平台店铺管理-dcd71ad0b5f4.png)
+![Pingpong平台店铺管理界面。](./assets/images/图片展示的是Pingpong平台店铺管理-dcd71ad0b5f4.png)

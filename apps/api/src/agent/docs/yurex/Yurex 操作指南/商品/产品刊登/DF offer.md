@@ -46,7 +46,7 @@ Wiki节点ID: "Lfh4wwPqcizpdBkQfQ3ccQqEnJg"
 
 ### 操作路径【商品】-【产品刊登】-【catalog】-【克隆offer】
 
-![亚马逊平台中Catalog页面，左侧有导航栏，右侧显示产品列表。“克隆Offer”选项被突出显示，表明这是操作路径中“批量克隆”步骤的入口，点击后可弹出数据来自于生效成功的PO offer且不在产品提交审核的弹框。](./assets/images/图片展示的是亚马逊平台中Catalog页-5a6a3cc8ad8d.png)
+![亚马逊平台中Catalog页面。红框标注“克隆Offer”。](./assets/images/图片展示的是亚马逊平台中Catalog页-5a6a3cc8ad8d.png)
 
 ### 克隆 Offer
 

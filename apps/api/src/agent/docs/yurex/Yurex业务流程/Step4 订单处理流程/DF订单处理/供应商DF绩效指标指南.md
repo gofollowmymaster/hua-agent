@@ -274,6 +274,6 @@ Wiki节点ID: "NDkDw0d7uiTHfLkvMjec6Lr6nSM"
 
 DF 常见前台示例： DF Guranteed Delivery状态示例：
 
-![亚马逊商品详情页的DF配送示例，红框突出“Available to ship in 1-2 days”，表示商品可在1至2天内发货；下方红框标注卖家和发货方均为Amazon.com。](./assets/images/图片-54630010682e.png)
+![亚马逊商品详情页。](./assets/images/图片-54630010682e.png)
 
 ![亚马逊商品详情页的Prime配送示例，红框突出Prime会员免费配送承诺，包括预计送达日期和剩余下单时间。](./assets/images/图片-ae33dafec91e.png)

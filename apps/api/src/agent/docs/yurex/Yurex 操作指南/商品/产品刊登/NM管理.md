@@ -59,7 +59,7 @@ Wiki节点ID: "TbcCwhgt0iP5JXkcr2xcKklrnph"
 >
 > 提交成功后，您可在列表页通过搜索ASIN查询到历史上传文件以及审核状态等。
 
-![NM管理中上传Newer Model的页面。页面右上方有“下载Newer Model模板”按钮；中部是文件上传区域，提示点击或将文件拖动至此处上传；下方有一个输入框被红色箭头指向并框出。](./assets/images/图片展示了NM管理中上传Newer-Mo-4ad714f98ab1.png)
+![NM管理中上传Newer Model的页面。](./assets/images/图片展示了NM管理中上传Newer-Mo-4ad714f98ab1.png)
 
 ### 点击【提交】
 
@@ -71,7 +71,7 @@ Wiki节点ID: "TbcCwhgt0iP5JXkcr2xcKklrnph"
 
 > 可查看上传时输入的所有产品ASIN。
 
-![在NM管理中上传Newer Model后的操作界面。红色箭头指向“审核中”状态的ASIN，对应文档中“当此条数据状态变为【运营审核中】时，表示您的Newer Model已提交成功，并已提交至管理端”的内容。](./assets/images/图片展示的是在NM管理中上传Newer-a37de6835f4c.png)
+![在NM管理中上传Newer Model后的操作界面。箭头标注“审核中”。](./assets/images/图片展示的是在NM管理中上传Newer-a37de6835f4c.png)
 
 ### 点击【下载文件】
 

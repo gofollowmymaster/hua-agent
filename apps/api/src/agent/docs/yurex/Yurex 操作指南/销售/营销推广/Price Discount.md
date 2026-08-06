@@ -56,19 +56,19 @@ Wiki节点ID: "ToOuw7ylQiJQCrkND9LcOzfDnSb"
 
 一个活动，最多添加20个ASIN，点击+添加产品，添加更多活动ASIN，点击删除可以删除已选择的活动ASIN，但是需至少保留一个
 
-![“创建Price Discount”操作流程中“创建Price Discount”页面。页面中部中提到的“+添加产品”操作，即在页面右下角点击“+添加产品”按钮，可添加更多活动ASIN，点击“删除”按钮可时代中国可。](./assets/images/图片展示的是“创建Price-Disco-3c7a4a850e44.png)
+![“创建Price Discount”页面。](./assets/images/图片展示的是“创建Price-Disco-3c7a4a850e44.png)
 
 ### 取消创建
 
 取消创建，可以点击tab菜单上x小图标，也可以点击取消按钮，注意当前输入内容不会被保存
 
-![“创建Price Discount”操作流程中“查看活动产品列表”页面。下方表格显示活动产品列表，包含ASIN、SKU、业务模式、Current List Price、折扣方式、折扣值比例、折扣金额、预计促销金额（BASE）、操作等。](./assets/images/图片展示的是“创建Price-Disco-df4870f05674.png)
+![“查看活动产品列表”页面。](./assets/images/图片展示的是“创建Price-Disco-df4870f05674.png)
 
 ### 提交创建
 
 活动信息设置好后，点击创建按钮，提交创建请求到亚马逊审核
 
-![“创建Price Discount”页面。页面上方有praice_discount_创建Price Discount_操作流程_创建Price Discount_操作路径_创建Price Discoun。](./assets/images/图片展示的是“创建Price-Disco-60726eec0b32.png)
+![“创建Price Discount”页面。](./assets/images/图片展示的是“创建Price-Disco-60726eec0b32.png)
 
 ![Price Discount活动产品列表页面。页面上方有搜索栏及多个操作按钮。](./assets/images/图片展示的是Price-Discount-ae0476079747.png)
 
@@ -86,7 +86,7 @@ Wiki节点ID: "ToOuw7ylQiJQCrkND9LcOzfDnSb"
 > - 上次活动的开始日期大于当前+2天时，才默认填充活动起止日期
 > - 页面相关检验规则与创建功能一致，请参考
 
-![】Price Discount【操作流程中“重新创建Price Discount”部分，展示了重新创建页面。页面显示“尚未创建Price Discount”，并提示上次活动的开始日期大于当前+2天时默认填充活动起止日期。](./assets/images/图片展示-addCriterion】Pr-36e9f6de8538.png)
+![】Price Discount【操作流程中“重新创建Price Discount”部分，展示了重新创建页面。](./assets/images/图片展示-addCriterion】Pr-36e9f6de8538.png)
 
 ### 提交重新创建
 
@@ -99,7 +99,7 @@ Wiki节点ID: "ToOuw7ylQiJQCrkND9LcOzfDnSb"
 
 创建提交成功，列表展示“创建审核中”
 
-![亚马逊平台Price Discount活动产品管理界面的活动产品列表页面。列表中显示了产品名称、Promotion ID、List Price、Current List Price、折扣方式、折扣比例、系列折扣100%、预计促销结束 。](./assets/images/图片展示的是亚马逊平台Price-Dis-bb80372ece00.png)
+![亚马逊平台Price Discount活动产品管理界面。](./assets/images/图片展示的是亚马逊平台Price-Dis-bb80372ece00.png)
 
 ### 搜索条件
 
@@ -111,7 +111,7 @@ Wiki节点ID: "ToOuw7ylQiJQCrkND9LcOzfDnSb"
 
 活动产品列表展示 产品信息、Promotion ID、List Price、Current List Price、折扣方式、折扣比例、折扣金额、预估促销价格、活动起止日期、销量、销售额、费用、浏览次数、业务模式、产品负责人、平台运营经理、创建时间、状态 字段，默认按创建时间倒序排序
 
-![亚马逊Price Discount页面，重点突出“活动产品列表”区域。该区域显示了产品信息、Promotion ID、Current List Price、折扣方式、折扣比例、新销售价格（USD）、剩余促销库存（USD）等信息。](./assets/images/图片展示的是亚马逊Price-Disco-0aa4ed9115a4.png)
+![亚马逊Price Discount页面。红框标注“活动产品列表”。](./assets/images/图片展示的是亚马逊Price-Disco-0aa4ed9115a4.png)
 
 ### 状态异常原因
 
@@ -140,14 +140,14 @@ Wiki节点ID: "ToOuw7ylQiJQCrkND9LcOzfDnSb"
 
 活动信息修改后，点击提交按钮，提交创建请求到亚马逊审核，活动状态变为“处理中”
 
-![“编辑Price Discount”页面，上方显示活动ID、创建日期等信息，下方表格列出商品信息，如ASIN、SKU、商品名称等。页面右上角有“取消”和“提交”按钮，其中“提交”按钮被红色箭头突出指向。](./assets/images/图片展示的是“编辑Price-Disco-1f19ae62b909.png)
+![“编辑Price Discount”页面。箭头标注“提交”。](./assets/images/图片展示的是“编辑Price-Disco-1f19ae62b909.png)
 
 
 ### 查看详情
 
 所有状态的活动，都支持查看详情，点击操作栏【详情】，可查看活动的详细信息。
 
-![Price Discount活动管理页面。右侧列表显示活动信息，包括Promotion ID、List Price/USD、Current List Price/USD、折扣方式、折扣百分比、折扣促销I。](./assets/images/图片展示的是Price-Discount-257b96eb7925.png)
+![Price Discount活动管理页面。](./assets/images/图片展示的是Price-Discount-257b96eb7925.png)
 
 ### 取消活动
 
@@ -162,7 +162,7 @@ Wiki节点ID: "ToOuw7ylQiJQCrkND9LcOzfDnSb"
 
 所有状态的活动，都支持查看操作日志，点击操作栏【操作日志】，可查看活动的操作记录。
 
-![“Price Discount”操作流程中“编辑活动”部分的界面。“操作”列有“编辑”选项，图片中用红色框突出显示了“编辑”操作按钮，与上下文提到的“操作日志会记录具体操作内容、操作时间、操作人和操作结果。](./assets/images/图片展示的是“Price-Discoun-6adb6613d6bc.png)
+![“编辑活动”页面。红框标注“编辑”。](./assets/images/图片展示的是“Price-Discoun-6adb6613d6bc.png)
 
 ### 操作日志会记录具体操作内容、操作时间、操作人和操作结果。
 

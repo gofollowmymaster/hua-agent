@@ -14,9 +14,9 @@ Wiki节点ID: "Th86wzG4tiacX1kMcgycDpV9nFb"
 
 操作路径：销售 → 营销推广 → Lightning Deal → 点击 “创建 Lightning Deal” 按钮
 
-![Salesforce系统中“销售”模块下“营销推广”功能的界面。左侧导航栏中，“销售”模块被红色框突出显示，其下“营销推广”选项被展开，其中“Lightning Deals”选项也被红色框突出显示。](./assets/images/图片展示了Salesforce系统中“销-c58825611790.png)
+![“营销推广”页面。红框标注“销售”、“Lightning Deals”。](./assets/images/图片展示了Salesforce系统中“销-c58825611790.png)
 
-![Shopify后台“Lightning Deals”页面。页面上方有导航栏，可点击“首页”或“Lightning Deals”。下方有筛选栏，可按“全部”或“ASIN/Promotion ID/SKU/MSKU”筛选，还有“状态”筛选选项。](./assets/images/图片展示的是Shopify后台“Ligh-07384a38c087.png)
+![“Lightning Deals”页面。](./assets/images/图片展示的是Shopify后台“Ligh-07384a38c087.png)
 
 ### 秒杀活动全流程指南
 
@@ -33,7 +33,7 @@ Wiki节点ID: "Th86wzG4tiacX1kMcgycDpV9nFb"
 
 #### 配置活动核心信息
 
-![在Amazon卖家平台创建Lightning Deal时配置活动核心信息的界面。界面左侧有导航栏，右侧上方有“取消”和“提交”按钮。活动开始日期可选当前洛杉矶时间2天后，秒杀产品可选择同一变体关系下的多个ASIN。](./assets/images/图片展示的是在Amazon卖家平台创建L-e3cd00b41c3c.png)
+![在Amazon卖家平台创建Lightning Deal时配置活动核心信息页面。](./assets/images/图片展示的是在Amazon卖家平台创建L-e3cd00b41c3c.png)
 
 1. 选择活动开始日期：最早可选择当前洛杉矶时间2天后
 2. 挑选秒杀产品：支持选择同一变体关系下的多个 ASIN，精准匹配 “同类产品集中秒杀” 需求

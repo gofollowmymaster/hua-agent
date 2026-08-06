@@ -22,7 +22,7 @@ Wiki节点ID: "Arrow7LKSiymulkD3z1czZQOnU4"
 
 步骤二：页面中找到Promotion Information ---> Best Sellers Rank --> 点击类目
 
-![Amazon产品页面的部分信息。右侧是“Additional Information”板块，突出显示了ASIN、Best Sellers Rank（排名）、Date First Availab。](./assets/images/图片展示的是Amazon产品页面的部分信-308adfc5deed.png)
+![Amazon产品页面。](./assets/images/图片展示的是Amazon产品页面的部分信-308adfc5deed.png)
 
 ### 步骤三：获取 Node ID
 
@@ -30,4 +30,4 @@ Wiki节点ID: "Arrow7LKSiymulkD3z1czZQOnU4"
 
 该产品的最小类目节点为：String Lights，所对应的Node ID为3742221。
 
-![Amazon Best Sellers网页，页面标题为“Best Sellers in Outdoor String Lights”。左侧导航栏中“String Lights”被红色框突出显示。](./assets/images/图片展示的是Amazon-Best-Se-f02a50a01fb7.png)
+![Amazon Best Sellers网页，页面。红框标注“String Lights”。](./assets/images/图片展示的是Amazon-Best-Se-f02a50a01fb7.png)

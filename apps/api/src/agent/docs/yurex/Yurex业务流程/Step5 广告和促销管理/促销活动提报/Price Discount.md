@@ -16,7 +16,7 @@ Wiki节点ID: "TxBVwSXHoi1r61k94z1ceSeenBc"
 
 ![Yurex Price Discount功能入口，左侧“销售”菜单及展开后的“Price Discount”子菜单均以红框突出，进入后可创建Price Discount活动。](./assets/images/图片展示了一个系统界面-49ca234778aa.png)
 
-![亚马逊销售模块中Price Discount页面。页面左上角有导航栏，可点击“首页”等选项。中部上方有“全部”下拉菜单及“Promotion ID/ASIN/SKU/MSKU/…”搜索框。下方有“活动起止日期”筛选栏，以及“创建Price Discount”按钮，该按钮被红色框和箭头突出显示。](./assets/images/图片展示了亚马逊销售模块中Price-D-dac9a40b4790.png)
+![亚马逊销售模块中Price Discount页面。](./assets/images/图片展示了亚马逊销售模块中Price-D-dac9a40b4790.png)
 
 ### 详细操作指南：
 
@@ -26,7 +26,7 @@ Wiki节点ID: "TxBVwSXHoi1r61k94z1ceSeenBc"
 
 #### 填写活动核心信息
 
-![Price Discount活动组创建流程中“选择参与活动的产品”步骤界面。上方提示若输入的ASIN属于多个AVC账号，提交后将跳转至“确认Price Discount活动组”页面。下方表格列有ASIN、SKU、产品名称、折扣及操作栏，其中“折扣”栏有“请输入”“USD”“%”选项，可设置折扣方式。](./assets/images/图片展示的是Price-Discount-5863a5949c9d.png)
+![“选择参与活动的产品”页面。](./assets/images/图片展示的是Price-Discount-5863a5949c9d.png)
 
 | 配置项 | 操作说明 |
 |-|-|
