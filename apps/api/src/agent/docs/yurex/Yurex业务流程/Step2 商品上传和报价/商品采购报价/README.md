@@ -4,6 +4,7 @@
 Wiki节点ID: "E5MLwdNtsiXKPWkhSZhc9qFFnMg"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex业务流程 > Step2 商品上传和报价 > 商品采购报价"
+source_file: feishu-doc
 ---
 
 # 飞书文档：商品采购报价

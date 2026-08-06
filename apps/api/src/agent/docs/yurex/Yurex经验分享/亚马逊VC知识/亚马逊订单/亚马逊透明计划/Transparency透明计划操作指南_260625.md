@@ -1,3 +1,12 @@
+---
+远程文档: ""
+文档ID: ""
+Wiki节点ID: ""
+最后修改时间: ""
+文档路径面包屑: "Yurex经验分享 > 亚马逊VC知识 > 亚马逊订单 > 亚马逊透明计划 > Transparency透明计划操作指南_260625"
+source_file: ""
+---
+
 # Transparency 透明计划操作指南
 
 > 来源：[Transparency透明计划操作指南_260625.pdf](./Transparency%E9%80%8F%E6%98%8E%E8%AE%A1%E5%88%92%E6%93%8D%E4%BD%9C%E6%8C%87%E5%8D%97_260625.pdf)

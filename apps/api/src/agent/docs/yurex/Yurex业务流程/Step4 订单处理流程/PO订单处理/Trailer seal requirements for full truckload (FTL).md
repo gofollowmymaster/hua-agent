@@ -4,6 +4,7 @@
 Wiki节点ID: "Fm74wHBP6iOM7SkAOnIc5C1gnwg"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex业务流程 > Step4 订单处理流程 > PO订单处理 > Trailer seal requirements for full truckload (FTL)"
+source_file: feishu-doc
 ---
 
 # 飞书文档：Trailer seal requirements for full truckload (FTL)

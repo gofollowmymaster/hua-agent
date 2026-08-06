@@ -4,6 +4,7 @@
 Wiki节点ID: "HEfWwCE9MiuN5LkGwx8cpLQWnFe"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex经验分享 > 亚马逊VC知识 > 亚马逊订单 > 亚马逊透明计划"
+source_file: feishu-doc
 ---
 
 # 飞书文档：亚马逊透明计划

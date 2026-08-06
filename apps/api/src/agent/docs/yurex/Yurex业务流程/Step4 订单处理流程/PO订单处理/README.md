@@ -4,6 +4,7 @@
 Wiki节点ID: "MC5LwlUx8iFTR7k8xP4cIuuCnpf"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex业务流程 > Step4 订单处理流程 > PO订单处理"
+source_file: feishu-doc
 ---
 
 # 飞书文档：PO订单处理

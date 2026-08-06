@@ -4,6 +4,7 @@
 Wiki节点ID: "Ir0GwAuIBigTkjkZgDbczKPAnXc"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex业务流程 > Step5 广告和促销管理 > 广告功能开通"
+source_file: feishu-doc
 ---
 
 # 飞书文档：广告功能开通

@@ -4,6 +4,7 @@
 Wiki节点ID: "VYHvwhUr6iPgQ5keig9cI5ZSnZg"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex经验分享 > 亚马逊VC知识 > 亚马逊内容规范 > 亚马逊Listing组成部分"
+source_file: feishu-doc
 ---
 
 # 飞书文档：亚马逊Listing组成部分

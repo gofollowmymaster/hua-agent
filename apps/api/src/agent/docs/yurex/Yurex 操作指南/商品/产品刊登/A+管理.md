@@ -4,6 +4,7 @@
 Wiki节点ID: "PE0awaQUUirG91kmF0lcN7WDnEd"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex 操作指南 > 商品 > 产品刊登 > A+管理"
+source_file: feishu-doc
 ---
 
 # 飞书文档：A+管理

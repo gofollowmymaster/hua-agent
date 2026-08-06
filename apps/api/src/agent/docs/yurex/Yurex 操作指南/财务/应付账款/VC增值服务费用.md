@@ -5,6 +5,7 @@ Wiki节点ID: "Kv06w6QnjiHbhWkCJomcYpZ5nkf"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex 操作指南 > 财务 > 应付账款 > VC增值服务费用"
 当前版本: "v1.0.0"
+source_file: feishu-doc
 ---
 
 # 飞书文档：VC增值服务费用

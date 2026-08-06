@@ -4,6 +4,7 @@
 Wiki节点ID: "FVsgwDQM9ig9fskQ38GcIyVSnUh"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex业务流程 > Step3 仓库配置 & 备货 > VC渠道备货指南 > Yurex备货模板"
+source_file: feishu-doc
 ---
 
 # 飞书文档：Yurex备货模板

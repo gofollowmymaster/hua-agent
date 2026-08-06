@@ -4,6 +4,7 @@
 Wiki节点ID: "GWQdw45SFiWeDDkCJwBckfYlnjh"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex 操作指南 > 商品 > ASIN售后监控"
+source_file: feishu-doc
 ---
 
 # 飞书文档：ASIN售后监控

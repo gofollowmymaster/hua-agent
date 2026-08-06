@@ -4,6 +4,7 @@
 Wiki节点ID: "YNUpwyfcNiUjRgks4xycB9e3ndh"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex 操作指南 > 仓储 > DF可售库存"
+source_file: feishu-doc
 ---
 
 # 飞书文档：DF可售库存

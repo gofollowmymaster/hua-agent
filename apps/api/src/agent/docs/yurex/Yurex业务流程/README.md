@@ -4,6 +4,7 @@
 Wiki节点ID: "QypLw7LW3ivy4kkcJ3jcnmnKnVb"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex业务流程"
+source_file: feishu-doc
 ---
 
 # 飞书文档：Yurex业务流程

@@ -5,6 +5,7 @@ Wiki节点ID: "N917wQlAfiyKCNkl3MFc7fuunqc"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex 操作指南 > 订单 > VCPO订单"
 当前版本: "v1.0.4"
+source_file: feishu-doc
 ---
 
 # 飞书文档：VCPO订单

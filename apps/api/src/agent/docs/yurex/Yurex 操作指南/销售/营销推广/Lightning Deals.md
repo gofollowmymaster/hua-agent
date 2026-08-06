@@ -5,6 +5,7 @@ Wiki节点ID: "V3G9wCxKfi1qq7kH5GUcJhdjn50"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex 操作指南 > 销售 > 营销推广 > Lightning Deals"
 当前版本: "v3.0.0"
+source_file: feishu-doc
 ---
 
 # 飞书文档：Lightning Deals

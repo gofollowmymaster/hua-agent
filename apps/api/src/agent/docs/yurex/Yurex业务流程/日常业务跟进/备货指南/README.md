@@ -4,6 +4,7 @@
 Wiki节点ID: "SrXswYuM9iAxLtkvDKBc4d8in3c"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex业务流程 > 日常业务跟进 > 备货指南"
+source_file: feishu-doc
 ---
 
 # 飞书文档：备货指南

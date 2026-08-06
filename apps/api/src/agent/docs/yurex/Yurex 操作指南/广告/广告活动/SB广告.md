@@ -5,6 +5,7 @@ Wiki节点ID: "SaQpwO6W0ihPHakkHNscr1j7nqj"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex 操作指南 > 广告 > 广告活动 > SB广告"
 当前版本: "v1.1.2"
+source_file: feishu-doc
 ---
 
 # 飞书文档：SB广告

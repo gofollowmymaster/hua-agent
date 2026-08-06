@@ -4,6 +4,7 @@
 Wiki节点ID: "TbcCwhgt0iP5JXkcr2xcKklrnph"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex 操作指南 > 商品 > 产品刊登 > NM管理"
+source_file: feishu-doc
 ---
 
 # 飞书文档：NM管理

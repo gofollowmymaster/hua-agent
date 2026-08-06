@@ -4,6 +4,7 @@
 Wiki节点ID: "AZ4GweuJ6icsBZk89p8cmMBVn7e"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex经验分享 > 亚马逊VC知识 > 亚马逊VC合作要求"
+source_file: feishu-doc
 ---
 
 # 飞书文档：亚马逊VC合作要求

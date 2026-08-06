@@ -4,6 +4,7 @@
 Wiki节点ID: "S0Pvw06hBiZaq7kws3qccirMnnd"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex业务流程 > Step4 订单处理流程 > PO订单处理 > 供应商PO绩效指标指南"
+source_file: feishu-doc
 ---
 
 # 飞书文档：供应商PO绩效指标指南

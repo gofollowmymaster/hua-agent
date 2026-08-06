@@ -4,6 +4,7 @@
 Wiki节点ID: "FuGmwLGgpid6MekWqf1c8Qz3nMd"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex业务流程 > Step2 商品上传和报价 > 产品Listing上传至VC"
+source_file: feishu-doc
 ---
 
 # 飞书文档：产品Listing上传至VC

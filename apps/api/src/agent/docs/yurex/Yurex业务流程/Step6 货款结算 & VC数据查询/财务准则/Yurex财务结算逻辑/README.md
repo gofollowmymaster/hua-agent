@@ -4,6 +4,7 @@
 Wiki节点ID: "FrcgwKo1UiI7CDkm59LcCzpYnTg"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex业务流程 > Step6 货款结算 & VC数据查询 > 财务准则 > Yurex财务结算逻辑"
+source_file: feishu-doc
 ---
 
 # 飞书文档：Yurex财务结算逻辑
