@@ -1,16 +1,12 @@
-# 飞书文档：亚马逊透明计划
-
-## 文档信息
-
-| 项 | 内容 |
-| --- | --- |
-| 远程文档 | https://q1njej8cpab.feishu.cn/wiki/HEfWwCE9MiuN5LkGwx8cpLQWnFe |
-| 图片处理 | 本地下载（assets/images） |
-| 快照时间 | 2026-08-06 |
-| 来源命令 | `lark-cli docs +fetch --api-version v2 --doc https://q1njej8cpab.feishu.cn/wiki/HEfWwCE9MiuN5LkGwx8cpLQWnFe --doc-format markdown --as user --format json --jq .data.document.content` |
-| 格式处理 | fd-doc-markdown-sync/scripts/normalize-feishu-doc-markdown.mjs |
-
 ---
+远程文档: "https://q1njej8cpab.feishu.cn/wiki/HEfWwCE9MiuN5LkGwx8cpLQWnFe"
+文档ID: ""
+Wiki节点ID: "HEfWwCE9MiuN5LkGwx8cpLQWnFe"
+最后修改时间: "2026-08-06"
+文档路径面包屑: "Yurex经验分享 > 亚马逊VC知识 > 亚马逊订单 > 亚马逊透明计划"
+---
+
+# 飞书文档：亚马逊透明计划
 
 亚马逊透明计划
 

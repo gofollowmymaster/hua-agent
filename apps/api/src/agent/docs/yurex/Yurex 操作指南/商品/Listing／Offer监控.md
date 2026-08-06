@@ -1,16 +1,12 @@
-# 飞书文档：Listing/Offer监控
-
-## 文档信息
-
-| 项 | 内容 |
-| --- | --- |
-| 远程文档 | https://q1njej8cpab.feishu.cn/wiki/OpGqw9I0ciK1YLkzf79cWWTUnXe |
-| 图片处理 | 本地下载（assets/images） |
-| 快照时间 | 2026-08-06 |
-| 来源命令 | `lark-cli docs +fetch --api-version v2 --doc https://q1njej8cpab.feishu.cn/wiki/OpGqw9I0ciK1YLkzf79cWWTUnXe --doc-format markdown --as user --format json --jq .data.document.content` |
-| 格式处理 | fd-doc-markdown-sync/scripts/normalize-feishu-doc-markdown.mjs |
-
 ---
+远程文档: "https://q1njej8cpab.feishu.cn/wiki/OpGqw9I0ciK1YLkzf79cWWTUnXe"
+文档ID: ""
+Wiki节点ID: "OpGqw9I0ciK1YLkzf79cWWTUnXe"
+最后修改时间: "2026-08-06"
+文档路径面包屑: "Yurex 操作指南 > 商品 > Listing/Offer监控"
+---
+
+# 飞书文档：Listing/Offer监控
 
 Listing/Offer监控
 

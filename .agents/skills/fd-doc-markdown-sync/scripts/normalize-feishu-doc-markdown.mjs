@@ -6,12 +6,8 @@ import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 
 const args = parseArgs(process.argv.slice(2));
-const title = args.title || "未命名飞书文档";
-const remote = args.remote || "";
-const snapshotAt = args["snapshot-at"] || new Date().toISOString().slice(0, 10);
-const sourceCommand =
-  args["source-command"] ||
-  'lark-cli docs +fetch --as user --doc "<remote>" --jq ".data.markdown"';
+const documentMetadata = loadDocumentMetadata(args.metadata);
+const title = args.title || documentMetadata.title || "未命名飞书文档";
 const outputPath = args.output ? path.resolve(args.output) : "";
 const assetsDir =
   args["assets-dir"] ||
@@ -20,8 +16,6 @@ const downloadImages = args["download-images"] === "true";
 const mindnoteMap = loadMindnoteMap(args["mindnote-map"]);
 const allowUnresolvedMindnotes = args["allow-unresolved-mindnotes"] === "true";
 const kind = args.kind || "";
-const workItem = args["work-item"] || "";
-const teamInfo = args["team-info"] || "";
 
 const input = args.input
   ? fs.readFileSync(args.input, "utf8")
@@ -29,17 +23,13 @@ const input = args.input
 
 const output = normalizeDocument(input, {
   title,
-  remote,
-  snapshotAt,
-  sourceCommand,
+  documentMetadata,
   assetsDir,
   outputPath,
   downloadImages,
   mindnoteMap,
   allowUnresolvedMindnotes,
   kind,
-  workItem,
-  teamInfo,
 });
 
 if (outputPath) {
@@ -72,11 +62,49 @@ function loadMindnoteMap(filePath) {
   return JSON.parse(raw);
 }
 
+function loadDocumentMetadata(filePath) {
+  if (!filePath) {
+    throw new Error("必须通过 --metadata 提供元数据 JSON 文件。");
+  }
+  const metadata = JSON.parse(fs.readFileSync(filePath, "utf8"));
+  const requiredStrings = [
+    ["remote", metadata.remote],
+    ["documentId", metadata.documentId],
+    ["wikiNodeId", metadata.wikiNodeId],
+    ["lastModifiedDate", metadata.lastModifiedDate],
+  ];
+  for (const [name, value] of requiredStrings) {
+    if (typeof value !== "string" || !value.trim()) {
+      throw new Error(`元数据字段 ${name} 必须是非空字符串。`);
+    }
+  }
+  if (!isCalendarDate(metadata.lastModifiedDate)) {
+    throw new Error(
+      "元数据字段 lastModifiedDate 必须是有效的 YYYY-MM-DD 日期。",
+    );
+  }
+  if (!Array.isArray(metadata.breadcrumb) || metadata.breadcrumb.length === 0) {
+    throw new Error("元数据字段 breadcrumb 必须是非空标题数组。");
+  }
+  metadata.breadcrumb = metadata.breadcrumb.map((item) => {
+    const value = String(item || "").trim();
+    if (!value) throw new Error("breadcrumb 不允许包含空标题。");
+    return value;
+  });
+  return metadata;
+}
+
+function isCalendarDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
+
 function normalizeDocument(markdown, meta) {
   let body = markdown.replace(/\r\n/g, "\n");
   const mindnoteBlocks = [];
   const whiteboardBlocks = [];
-  body = stripExistingSnapshotHeader(body);
+  body = stripExistingGeneratedHeader(body);
   body = normalizeMarkdownImages(body, meta);
   body = normalizeBlockAssets(body, meta, mindnoteBlocks, whiteboardBlocks);
   body = body.replace(/<lark-table\b[^>]*>[\s\S]*?<\/lark-table>/g, tableToMarkdown);
@@ -92,35 +120,18 @@ function normalizeDocument(markdown, meta) {
     : meta.kind === "prd" ? "PRD"
     : "飞书文档";
 
-  const docInfoRows = [
-    `| 远程文档 | ${meta.remote || "未记录"} |`,
-    `| 图片处理 | ${meta.downloadImages ? "本地下载（assets/images）" : "云端引用"} |`,
-  ];
-
-  if (meta.workItem) {
-    docInfoRows.push(`| 飞书项目工作项 | ${meta.workItem} |`);
-  }
-
-  docInfoRows.push(
-    `| 快照时间 | ${meta.snapshotAt} |`,
-    `| 来源命令 | \`${escapeTableCell(meta.sourceCommand)}\` |`,
-    `| 格式处理 | fd-doc-markdown-sync/scripts/normalize-feishu-doc-markdown.mjs |`,
-  );
-
-  if (meta.kind === "prd" && meta.teamInfo) {
-    docInfoRows.push(`| 人员 | ${escapeTableCell(meta.teamInfo)} |`);
-  }
+  const metadata = meta.documentMetadata;
 
   return [
-    `# ${kindLabel}：${meta.title}`,
-    "",
-    "## 文档信息",
-    "",
-    "| 项 | 内容 |",
-    "| --- | --- |",
-    ...docInfoRows,
-    "",
     "---",
+    `远程文档: ${yamlString(metadata.remote)}`,
+    `文档ID: ${yamlString(metadata.documentId)}`,
+    `Wiki节点ID: ${yamlString(metadata.wikiNodeId)}`,
+    `最后修改时间: ${yamlString(metadata.lastModifiedDate)}`,
+    `文档路径面包屑: ${yamlString(metadata.breadcrumb.join(" > "))}`,
+    "---",
+    "",
+    `# ${kindLabel}：${meta.title}`,
     "",
     body,
   ]
@@ -130,10 +141,29 @@ function normalizeDocument(markdown, meta) {
     .trimEnd() + "\n";
 }
 
-function stripExistingSnapshotHeader(markdown) {
-  return markdown
-    .replace(/^#\s+(飞书文档|文档快照|PRD 快照|PRD|测分|后端系分)[^\n]*\n(?:\n|.)*?\n---\n+/, "")
-    .replace(/^#\s+(飞书文档|文档快照|PRD 快照|PRD|测分|后端系分)[^\n]*\n+/, "");
+function stripExistingGeneratedHeader(markdown) {
+  let output = markdown;
+  const frontmatter = output.match(/^---\n([\s\S]*?)\n---\n*/);
+  if (
+    frontmatter &&
+    /^(远程文档|文档ID|Wiki节点ID|最后修改时间|文档路径面包屑):/m.test(
+      frontmatter[1],
+    )
+  ) {
+    output = output.slice(frontmatter[0].length);
+  }
+  output = output.replace(
+    /^#\s+(飞书文档|文档快照|PRD 快照|PRD|测分|后端系分)[^\n]*\n+##\s+文档信息\s*\n+(?:\|[^\n]*\|\n)+\s*---\n+/,
+    "",
+  );
+  return output.replace(
+    /^#\s+(飞书文档|文档快照|PRD 快照|PRD|测分|后端系分)[^\n]*\n+/,
+    "",
+  );
+}
+
+function yamlString(value) {
+  return JSON.stringify(String(value));
 }
 
 function normalizeBlockAssets(markdown, meta, mindnoteBlocks, whiteboardBlocks) {

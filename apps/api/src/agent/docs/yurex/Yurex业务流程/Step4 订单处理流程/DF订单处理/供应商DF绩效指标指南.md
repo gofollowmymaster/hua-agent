@@ -1,16 +1,12 @@
-# 飞书文档：供应商DF绩效指标指南
-
-## 文档信息
-
-| 项 | 内容 |
-| --- | --- |
-| 远程文档 | https://q1njej8cpab.feishu.cn/wiki/NDkDw0d7uiTHfLkvMjec6Lr6nSM |
-| 图片处理 | 本地下载（assets/images） |
-| 快照时间 | 2026-08-06 |
-| 来源命令 | `lark-cli docs +fetch --as user --doc "<remote>" --jq ".data.markdown"` |
-| 格式处理 | fd-doc-markdown-sync/scripts/normalize-feishu-doc-markdown.mjs |
-
 ---
+远程文档: "https://q1njej8cpab.feishu.cn/wiki/NDkDw0d7uiTHfLkvMjec6Lr6nSM"
+文档ID: ""
+Wiki节点ID: "NDkDw0d7uiTHfLkvMjec6Lr6nSM"
+最后修改时间: "2026-08-06"
+文档路径面包屑: "Yurex业务流程 > Step4 订单处理流程 > DF订单处理 > 供应商DF绩效指标指南"
+---
+
+# 飞书文档：供应商DF绩效指标指南
 
 供应商DF绩效指标指南
 

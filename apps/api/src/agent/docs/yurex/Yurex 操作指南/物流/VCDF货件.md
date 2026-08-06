@@ -1,16 +1,12 @@
-# 飞书文档：VCDF货件
-
-## 文档信息
-
-| 项 | 内容 |
-| --- | --- |
-| 远程文档 | https://q1njej8cpab.feishu.cn/wiki/HzPpw2JNEigiLVkGMQbcUQXCnoc |
-| 图片处理 | 本地下载（assets/images） |
-| 快照时间 | 2026-08-06 |
-| 来源命令 | `lark-cli docs +fetch --as user --doc "<remote>" --jq ".data.markdown"` |
-| 格式处理 | fd-doc-markdown-sync/scripts/normalize-feishu-doc-markdown.mjs |
-
 ---
+远程文档: "https://q1njej8cpab.feishu.cn/wiki/HzPpw2JNEigiLVkGMQbcUQXCnoc"
+文档ID: ""
+Wiki节点ID: "HzPpw2JNEigiLVkGMQbcUQXCnoc"
+最后修改时间: "2026-08-06"
+文档路径面包屑: "Yurex 操作指南 > 物流 > VCDF货件"
+---
+
+# 飞书文档：VCDF货件
 
 VCDF货件
 

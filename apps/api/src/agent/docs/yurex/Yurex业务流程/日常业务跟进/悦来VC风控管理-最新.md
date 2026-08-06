@@ -1,16 +1,12 @@
-# 飞书文档：悦来VC风控管理-最新
-
-## 文档信息
-
-| 项 | 内容 |
-| --- | --- |
-| 远程文档 | https://q1njej8cpab.feishu.cn/wiki/Z1mEwaIy9iqo0gk08VlcRSq7n5g |
-| 图片处理 | 云端引用 |
-| 快照时间 | 2026-08-06 |
-| 来源命令 | `lark-cli docs +fetch --api-version v2 --doc https://q1njej8cpab.feishu.cn/wiki/Z1mEwaIy9iqo0gk08VlcRSq7n5g --doc-format markdown --as user --format json --jq .data.document.content` |
-| 格式处理 | fd-doc-markdown-sync/scripts/normalize-feishu-doc-markdown.mjs |
-
 ---
+远程文档: "https://q1njej8cpab.feishu.cn/wiki/Z1mEwaIy9iqo0gk08VlcRSq7n5g"
+文档ID: ""
+Wiki节点ID: "Z1mEwaIy9iqo0gk08VlcRSq7n5g"
+最后修改时间: "2026-08-06"
+文档路径面包屑: "Yurex业务流程 > 日常业务跟进 > 悦来VC风控管理-最新"
+---
+
+# 飞书文档：悦来VC风控管理-最新
 
 悦来VC风控管理-最新
 

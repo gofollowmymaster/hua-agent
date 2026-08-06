@@ -1,16 +1,12 @@
-# 飞书文档：Trailer seal requirements for full truckload (FTL)
-
-## 文档信息
-
-| 项 | 内容 |
-| --- | --- |
-| 远程文档 | https://q1njej8cpab.feishu.cn/wiki/Fm74wHBP6iOM7SkAOnIc5C1gnwg |
-| 图片处理 | 本地下载（assets/images） |
-| 快照时间 | 2026-08-06 |
-| 来源命令 | `lark-cli docs +fetch --api-version v2 --doc https://q1njej8cpab.feishu.cn/wiki/Fm74wHBP6iOM7SkAOnIc5C1gnwg --doc-format markdown --as user --format json --jq .data.document.content` |
-| 格式处理 | fd-doc-markdown-sync/scripts/normalize-feishu-doc-markdown.mjs |
-
 ---
+远程文档: "https://q1njej8cpab.feishu.cn/wiki/Fm74wHBP6iOM7SkAOnIc5C1gnwg"
+文档ID: ""
+Wiki节点ID: "Fm74wHBP6iOM7SkAOnIc5C1gnwg"
+最后修改时间: "2026-08-06"
+文档路径面包屑: "Yurex业务流程 > Step4 订单处理流程 > PO订单处理 > Trailer seal requirements for full truckload (FTL)"
+---
+
+# 飞书文档：Trailer seal requirements for full truckload (FTL)
 
 ## Trailer seal requirements for full truckload (FTL)
 

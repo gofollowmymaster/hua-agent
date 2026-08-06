@@ -1,16 +1,12 @@
-# 飞书文档：Yurex财务结算逻辑
-
-## 文档信息
-
-| 项 | 内容 |
-| --- | --- |
-| 远程文档 | https://q1njej8cpab.feishu.cn/wiki/FrcgwKo1UiI7CDkm59LcCzpYnTg |
-| 图片处理 | 云端引用 |
-| 快照时间 | 2026-08-06 |
-| 来源命令 | `lark-cli docs +fetch --api-version v2 --doc https://q1njej8cpab.feishu.cn/wiki/FrcgwKo1UiI7CDkm59LcCzpYnTg --doc-format markdown --as user --format json --jq .data.document.content` |
-| 格式处理 | fd-doc-markdown-sync/scripts/normalize-feishu-doc-markdown.mjs |
-
 ---
+远程文档: "https://q1njej8cpab.feishu.cn/wiki/FrcgwKo1UiI7CDkm59LcCzpYnTg"
+文档ID: ""
+Wiki节点ID: "FrcgwKo1UiI7CDkm59LcCzpYnTg"
+最后修改时间: "2026-08-06"
+文档路径面包屑: "Yurex业务流程 > Step6 货款结算 & VC数据查询 > 财务准则 > Yurex财务结算逻辑"
+---
+
+# 飞书文档：Yurex财务结算逻辑
 
 Yurex财务结算逻辑
 

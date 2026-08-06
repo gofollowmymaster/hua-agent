@@ -1,16 +1,12 @@
-# 飞书文档：SD广告
-
-## 文档信息
-
-| 项 | 内容 |
-| --- | --- |
-| 远程文档 | https://q1njej8cpab.feishu.cn/wiki/MEwWwz64WiUEi0kkeUZcvjKFnMf |
-| 图片处理 | 本地下载（assets/images） |
-| 快照时间 | 2026-08-06 |
-| 来源命令 | `lark-cli docs +fetch --as user --doc "<remote>" --jq ".data.markdown"` |
-| 格式处理 | fd-doc-markdown-sync/scripts/normalize-feishu-doc-markdown.mjs |
-
 ---
+远程文档: "https://q1njej8cpab.feishu.cn/wiki/MEwWwz64WiUEi0kkeUZcvjKFnMf"
+文档ID: ""
+Wiki节点ID: "MEwWwz64WiUEi0kkeUZcvjKFnMf"
+最后修改时间: "2026-08-06"
+文档路径面包屑: "Yurex 操作指南 > 广告 > 广告活动 > SD广告"
+---
+
+# 飞书文档：SD广告
 
 SD广告
 

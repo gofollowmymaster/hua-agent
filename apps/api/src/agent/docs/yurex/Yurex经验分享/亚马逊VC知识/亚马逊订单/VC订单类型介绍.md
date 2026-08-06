@@ -1,16 +1,12 @@
-# 飞书文档：VC订单类型介绍
-
-## 文档信息
-
-| 项 | 内容 |
-| --- | --- |
-| 远程文档 | https://q1njej8cpab.feishu.cn/wiki/LUA6w1pXpiikRYkq7WrctgVenmg |
-| 图片处理 | 本地下载（assets/images） |
-| 快照时间 | 2026-08-06 |
-| 来源命令 | `lark-cli docs +fetch --as user --doc "<remote>" --jq ".data.markdown"` |
-| 格式处理 | fd-doc-markdown-sync/scripts/normalize-feishu-doc-markdown.mjs |
-
 ---
+远程文档: "https://q1njej8cpab.feishu.cn/wiki/LUA6w1pXpiikRYkq7WrctgVenmg"
+文档ID: ""
+Wiki节点ID: "LUA6w1pXpiikRYkq7WrctgVenmg"
+最后修改时间: "2026-08-06"
+文档路径面包屑: "Yurex经验分享 > 亚马逊VC知识 > 亚马逊订单 > VC订单类型介绍"
+---
+
+# 飞书文档：VC订单类型介绍
 
 VC订单类型介绍
 

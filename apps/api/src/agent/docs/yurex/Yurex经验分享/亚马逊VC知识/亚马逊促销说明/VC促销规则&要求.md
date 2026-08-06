@@ -1,16 +1,12 @@
-# 飞书文档：VC促销规则&要求
-
-## 文档信息
-
-| 项 | 内容 |
-| --- | --- |
-| 远程文档 | https://q1njej8cpab.feishu.cn/wiki/Norrwi7uSiPLcIkaFPqc3n0dnEf |
-| 图片处理 | 云端引用 |
-| 快照时间 | 2026-08-06 |
-| 来源命令 | `lark-cli docs +fetch --api-version v2 --doc https://q1njej8cpab.feishu.cn/wiki/Norrwi7uSiPLcIkaFPqc3n0dnEf --doc-format markdown --as user --format json --jq .data.document.content` |
-| 格式处理 | fd-doc-markdown-sync/scripts/normalize-feishu-doc-markdown.mjs |
-
 ---
+远程文档: "https://q1njej8cpab.feishu.cn/wiki/Norrwi7uSiPLcIkaFPqc3n0dnEf"
+文档ID: ""
+Wiki节点ID: "Norrwi7uSiPLcIkaFPqc3n0dnEf"
+最后修改时间: "2026-08-06"
+文档路径面包屑: "Yurex经验分享 > 亚马逊VC知识 > 亚马逊促销说明 > VC促销规则&要求"
+---
+
+# 飞书文档：VC促销规则&要求
 
 VC促销规则&要求
 

@@ -1,16 +1,12 @@
-# 飞书文档：Best Deal
-
-## 文档信息
-
-| 项 | 内容 |
-| --- | --- |
-| 远程文档 | https://q1njej8cpab.feishu.cn/wiki/M83Fw09eYiVpF8kSBZRc8XYPnCg |
-| 图片处理 | 本地下载（assets/images） |
-| 快照时间 | 2026-08-06 |
-| 来源命令 | `lark-cli docs +fetch --api-version v2 --doc https://q1njej8cpab.feishu.cn/wiki/M83Fw09eYiVpF8kSBZRc8XYPnCg --doc-format markdown --as user --format json --jq .data.document.content` |
-| 格式处理 | fd-doc-markdown-sync/scripts/normalize-feishu-doc-markdown.mjs |
-
 ---
+远程文档: "https://q1njej8cpab.feishu.cn/wiki/M83Fw09eYiVpF8kSBZRc8XYPnCg"
+文档ID: ""
+Wiki节点ID: "M83Fw09eYiVpF8kSBZRc8XYPnCg"
+最后修改时间: "2026-08-06"
+文档路径面包屑: "Yurex业务流程 > Step5 广告和促销管理 > 促销活动提报 > Best Deal"
+---
+
+# 飞书文档：Best Deal
 
 ## Best Deal
 

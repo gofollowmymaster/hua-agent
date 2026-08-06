@@ -1,16 +1,12 @@
-# 飞书文档：Yurex备货模板
-
-## 文档信息
-
-| 项 | 内容 |
-| --- | --- |
-| 远程文档 | https://q1njej8cpab.feishu.cn/wiki/FVsgwDQM9ig9fskQ38GcIyVSnUh |
-| 图片处理 | 云端引用 |
-| 快照时间 | 2026-08-06 |
-| 来源命令 | `lark-cli sheets +cells-get --spreadsheet-token QmXRss3AOhBqbZtAZnyc17JBnnh --include value --as user --format json` |
-| 格式处理 | fd-doc-markdown-sync/scripts/normalize-feishu-doc-markdown.mjs |
-
 ---
+远程文档: "https://q1njej8cpab.feishu.cn/wiki/FVsgwDQM9ig9fskQ38GcIyVSnUh"
+文档ID: ""
+Wiki节点ID: "FVsgwDQM9ig9fskQ38GcIyVSnUh"
+最后修改时间: "2026-08-06"
+文档路径面包屑: "Yurex业务流程 > Step3 仓库配置 & 备货 > VC渠道备货指南 > Yurex备货模板"
+---
+
+# 飞书文档：Yurex备货模板
 
 ### 备货计划
 

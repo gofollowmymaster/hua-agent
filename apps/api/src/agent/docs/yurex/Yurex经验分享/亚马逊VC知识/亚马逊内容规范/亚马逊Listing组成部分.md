@@ -1,16 +1,12 @@
-# 飞书文档：亚马逊Listing组成部分
-
-## 文档信息
-
-| 项 | 内容 |
-| --- | --- |
-| 远程文档 | https://q1njej8cpab.feishu.cn/wiki/VYHvwhUr6iPgQ5keig9cI5ZSnZg |
-| 图片处理 | 本地下载（assets/images） |
-| 快照时间 | 2026-08-06 |
-| 来源命令 | `lark-cli docs +fetch --as user --doc "<remote>" --jq ".data.markdown"` |
-| 格式处理 | fd-doc-markdown-sync/scripts/normalize-feishu-doc-markdown.mjs |
-
 ---
+远程文档: "https://q1njej8cpab.feishu.cn/wiki/VYHvwhUr6iPgQ5keig9cI5ZSnZg"
+文档ID: ""
+Wiki节点ID: "VYHvwhUr6iPgQ5keig9cI5ZSnZg"
+最后修改时间: "2026-08-06"
+文档路径面包屑: "Yurex经验分享 > 亚马逊VC知识 > 亚马逊内容规范 > 亚马逊Listing组成部分"
+---
+
+# 飞书文档：亚马逊Listing组成部分
 
 亚马逊Listing组成部分
 
@@ -71,7 +67,7 @@
 2. 规则：
 
  - 使用 100 到 200 个单词
- - 使用基本 HTML 标签，例如 、 <br> 、 、
+ - 使用基本 HTML 标签，例如 <p> 、 <br> 、 <li> 、 <ul>
  - 使用完整句并在末尾使用句号
  - 不要使用任何丰富（ A+ ）内容的图像、链接或比较表以及其他任何网站链接
  - 使用句首字母大写：大写字母仅用于句首（首字母缩略词除外，例如 HDMI 、 BMX 或 USB ，这些字母均采用大写）

@@ -9,10 +9,14 @@
   - `--kind prd`：`# PRD：{标题}`
   - `--kind test`：`# 测分：{标题}`
   - `--kind backend`：`# 后端系分：{标题}`
-- 顶部使用 `## 文档信息`，用 Markdown 表格记录。
-  - 基础行：`远程文档`、`快照时间`、`来源命令`、`格式处理`。
-  - 如果传了 `--work-item`，追加 `| 飞书项目工作项 | {workItem} |` 行。
-  - 如果传了 `--kind prd` 且传了 `--team-info`，追加 `| 人员 | {teamInfo} |` 行。
+- 文件最顶部使用 YAML Front Matter，字段固定为：
+  - `远程文档`：调用方输入的完整飞书 URL 或 token。
+  - `文档ID`：底层文档的 canonical `obj_token` / `document_id`。
+  - `Wiki节点ID`：Wiki `node_token`；直接文档未关联 Wiki 时写“未关联”。
+  - `最后修改时间`：飞书真实修改时间按 `Asia/Shanghai` 转为 `YYYY-MM-DD`。
+  - `文档路径面包屑`：包含当前文档标题，层级之间用 ` > ` 分隔。
+- 元数据必须由 `scripts/resolve-feishu-doc-metadata.mjs` 生成并通过 `--metadata` 传入规范化脚本；禁止使用本地同步日期。
+- YAML Front Matter 后输出文档一级标题，不再生成 `## 文档信息` 表格或额外分隔线。
 - 原始正文标题整体下移一级，避免多个一级标题并列。
 - 每个标题前后保留空行，删除连续空标题和空章节。
 
