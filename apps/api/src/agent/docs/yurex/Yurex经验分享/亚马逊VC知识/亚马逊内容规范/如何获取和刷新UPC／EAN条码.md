@@ -123,11 +123,11 @@ UPC是通用产品代码的缩写，其英文全称是Universal Product Code。U
 
 针对产品原先的UPC/EAN条码存在从非正规官方渠道GS1购买的情况下，请首先在SC后台将UPC刷新为正确的值，与ASIN建立关联性后再在Yurex系统上传VC的Offer。步骤如下：
 
-#### **第一步：**在SC后台检查product id（US市场一般是UPC）是否合规
+### **第一步：**在SC后台检查product id（US市场一般是UPC）是否合规
 
 检查路径：Seller Central→Inventory→Manage (FBA)Inventory→Select Product→Edit
 
-#### **第二步：**如果Product id不合规，则按照以下的方法进行UPC条码刷新
+### **第二步：**如果Product id不合规，则按照以下的方法进行UPC条码刷新
 
 1. **方法1：**在SC后台下载模板填写新的UPC进行强制刷新更新路径Inventory →Add Products via Upload →Select Product Category →Download Inventory File →Upload File→ Monitor Upload Status请注意表格模板一定要把SKU填对，并且使用partial_update，否则listing容易出现信息错误篡改等情况。
 2. **方法2：**通过SC后台发Case找客服刷新UPC

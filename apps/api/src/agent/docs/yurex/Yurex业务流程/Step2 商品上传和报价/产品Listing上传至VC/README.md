@@ -20,13 +20,13 @@ SC老产品转移至VC销售的**本质是跟卖（即创建VC offer）**，即�
 
  1. 进入单个新增功能页面
 
- ![图片展示了产品Listing上传至VC操作流程中单个新增功能的进入路径。左侧导航栏中，点击“商品”后，弹出下拉菜单，其中“Catalog”选项被红色框线突出显示。该图片与上下文紧密相关，直观呈现了操作步骤中“进入单个新增功能页面”这一步骤的具体位置，帮助用户明确在系统中找到“单个新增”功能的入口。](./assets/images/图片展示了产品Listing上传至VC操-0dd759904888.png)
+ ![产品Listing上传至VC操作流程中单个新增功能的进入路径。左侧导航栏中，点击“商品”后，弹出下拉菜单，其中“Catalog”选项被红色框线突出显示。](./assets/images/图片展示了产品Listing上传至VC操-0dd759904888.png)
 
- ![图片展示的是产品Listing上传至VC操作流程中单个新增功能页面。页面左侧有多个功能图标，右侧上方有“首页”“Catalog”等导航栏。中间部分有“新增产品”下拉菜单，其中“单个新增”被红色框突出显示。下方还有“批量新增”选项。该图片与上下文紧密相关，直观呈现了操作流程中单个新增功能的入口位置，帮助用户快速找到并进行单个产品信息的填写操作。](./assets/images/图片展示的是产品Listing上传至VC-3cc2b1864b87.png)
+ ![产品Listing上传至VC操作流程中单个新增功能页面。页面左侧有多个功能图标，右侧上方有“首页”“Catalog”等导航栏。中间部分有“新增产品”下拉菜单，其中“单个新增”被红色框突出显示。](./assets/images/图片展示的是产品Listing上传至VC-3cc2b1864b87.png)
 
  1. 点击单个新增，填写产品信息
 
- ![图片展示了产品Listing单个新增功能页面。页面上方有“注意事项”，列出了1 - 5条注意事项，如新上架产品需有ASIN等。下方是填写产品信息区域，包含“SKU”“类型”“UPC/EAN”“ASIN”“业务模式”“产品目录”等必填项，部分字段有红色星号标识。右上角有“取消”和“提交”按钮。该图片与文档中“单个新增”操作流程上下文对应，直观呈现了填写产品信息的操作界面。](./assets/images/图片展示了产品Listing单个新增功能-ec4eb60bf258.png)
+ ![产品Listing单个新增功能页面。页面上方有“注意事项”，列出了1 - 5条注意事项，如新上架产品需有ASIN等。下方是填写产品信息区域，包含“SKU”“类型”“UPC/EAN”“ASIN”“业务模式”“产品目录”等必填项，部分字段有红色星号标识。](./assets/images/图片展示了产品Listing单个新增功能-ec4eb60bf258.png)
 
  **填写字段详解：**
  1. SKU：已完成采购报价的产品，系统自动生成的字段，用于系统管理产品，可进行搜索并选中。
@@ -46,7 +46,7 @@ SC老产品转移至VC销售的**本质是跟卖（即创建VC offer）**，即�
  注意：产品详细信息尽可能填写准确，不清楚的地方请查看。
  3. 填写完后，**点击提交后由亚马逊进行审核**，会出现几种状态需要您关注并操作
 
- ![图片展示的是产品Listing上传至VC的“状态”下拉菜单。菜单中列出了多种状态，包括“处理中”“创建失败”“待填写详细信息”“生效成功”“生效成功（编辑处理中）”“生效成功（编辑失败）”“生效成功（Amazon审核中）”“生效成功（Amazon审核失败）”等。该图片与上下文紧密相关，上下文提到在填写完产品相关详细信息后，点击提交后由亚马逊进行审核，会出现这些状态，用户需关注并操作。](./assets/images/图片展示的是产品Listing上传至VC-3e62b584e64d.png)
+ ![产品Listing上传至VC的“状态”下拉菜单。菜单中列出了多种状态，包括“处理中”“创建失败”“待填写详细信息”“生效成功”“生效成功（编辑处理中）”“生效成功（编辑失败）”“生效成功（Amazon审核中）”“生效成功（Amazon审核失败）”等。](./assets/images/图片展示的是产品Listing上传至VC-3e62b584e64d.png)
 
  - 生效成功-无需操作
  - 异常情况及处理方法：**必填项未填写：红色感叹号提示！，提示该项未填写，需再次填写后提交创建失败：点击编辑，根据报错原因填写对应信息后，再次点击提交**
@@ -58,9 +58,9 @@ SC老产品转移至VC销售的**本质是跟卖（即创建VC offer）**，即�
 
  1. 进入批量新增功能页面
 
- ![图片展示了产品Listing中批量新增中“操作流程：批量新增”部分的操作路径。在左侧导航栏中，将鼠标悬停在“商品”选项上，会弹出下拉菜单，其中“Catalog”选项被红色框线突出显示。该图片与上下文紧密相关，直观呈现了进入批量新增功能页面的操作路径，即先点击左侧，再选择“Catalog”选项，以引导用户进行后续批量新增操作。](./assets/images/图片展示了产品Listing中批量新增中-624c8c5bf848.png)
+ ![产品Listing中批量新增中“操作流程：批量新增”部分的操作路径。在左侧导航栏中，将鼠标悬停在“商品”选项上，会弹出下拉菜单，其中“Catalog”选项被红色框线突出显示。](./assets/images/图片展示了产品Listing中批量新增中-624c8c5bf848.png)
 
- ![图片展示了产品管理平台中“Catalog”页面，左侧有多个功能模块。页面上方有“全部”“ASIN/MSKU/UPC/EAN...”“状态”“接单状态”等筛选栏，以及“查询”“重置”按钮。页面中部“新增产品”下有“单个新增”“批量新增”选项，其中“批量新增”以红色框突出显示。该图片与文档中“操作流程：批量新增”部分对应，直观呈现了进入批量新增功能页面的操作路径，帮助用户快速找到批量新增入口。](./assets/images/图片展示了产品管理平台中“Catalog-6a3e0259e2e3.png)
+ ![产品管理平台中“Catalog”页面，左侧有多个功能模块。页面上方有“全部”“ASIN/MSKU/UPC/EAN...”“状态”“接单状态”等筛选栏，以及“查询”“重置”按钮。页面中部“新增产品”下有“单个新增”“批量新增”选项，其中“批量新增”以红色框突出显示。](./assets/images/图片展示了产品管理平台中“Catalog-6a3e0259e2e3.png)
 
  1. 选择上传方式 - 通过**ASIN**或**类目**进行批量上传
 
@@ -69,44 +69,44 @@ SC老产品转移至VC销售的**本质是跟卖（即创建VC offer）**，即�
 
  **方式1操作详解：**
  1. 选择通过ASIN进行批量上传
- ![图片展示的是通过ASIN进行批量上传的操作页面。页面提示若产品曾在Amazon进行销售，已成功绑定UPC/EAN可选择此方式。在“请选择上传方式”处，有“ASIN 通过ASIN进行批量上传”和“类目 通过类目进行批量上传”两个选项，其中“ASIN”选项被红色框突出显示。该图片与上文“选择通过ASIN进行批量上传”操作步骤对应，直观呈现了选择ASIN上传方式的操作界面。](./assets/images/图片展示的是通过ASIN进行批量上传的操-5e61e2500444.png)
+ ![通过ASIN进行批量上传的操作页面。页面提示若产品曾在Amazon进行销售，已成功绑定UPC/EAN可选择此方式。在“请选择上传方式”处，有“ASIN 通过ASIN进行批量上传”和“类目 通过类目进行批量上传”两个选项，其中“ASIN”选项被红色框突出显示。](./assets/images/图片展示的是通过ASIN进行批量上传的操-5e61e2500444.png)
  1. 选择需要上传的ASIN，点击下载模板
 
- ![图片展示的是通过ASIN批量上传操作流程中选择ASIN的界面。左侧有“选择ASIN”区域，可向下选择或搜索框搜索想要上传的ASIN，下方有勾选框及ASIN、SKU、UPC/EAN等信息栏。右侧是“已选择ASIN”区域，显示已选ASIN信息及操作选项。界面右下角有“下载模板”按钮。该图片与上文“选择通过ASIN进行批量上传，选择需要上传的ASIN，点击下载模板”的操作步骤对应，直观呈现了操作界面及关键步骤。](./assets/images/图片展示的是通过ASIN批量上传操作流程-978e126556bb.png)
+ ![通过ASIN批量上传操作流程中选择ASIN的界面。左侧有“选择ASIN”区域，可向下选择或搜索框搜索想要上传的ASIN，下方有勾选框及ASIN、SKU、UPC/EAN等信息栏。右侧是“已选择ASIN”区域，显示已选ASIN信息及操作选项。](./assets/images/图片展示的是通过ASIN批量上传操作流程-978e126556bb.png)
 
  1. 自动跳转到【批量上传】，待此条数据流传为下载成功时，点击获取模板（可点击查询刷新数据状态）
  2. 下载失败，可点击问号查看具体原因，根据具体原因进行处理后，再重新下载模板
  2. 在下载的模板里填写产品相关信息
- ![图片展示的是通过ASIN进行批量上传时下载的模板内容。模板包含Order Type、Vendor SKU、Product Type、Item Name、Brand Name、External Product ID Type、External Product ID、Merchant Suggested ASIN、External ID Exemption Reason、Product Category、Product Subcategory、Item Type Key等字段，其中Vendor SKU、Product Type、Item Name、Brand Name、External Product ID Type、Product Category、Product Subcategory、Item Type Key等字段标注为REQUIRED，External Product ID字段标注为CONDITIONALLY REQUIRED。该图片与文档中通过ASIN进行批量上传操作步骤中下载模板后填写产品相关信息的内容相关。](./assets/images/图片展示的是通过ASIN进行批量上传时下-7d88e80db6b0.png)
+ ![通过ASIN进行批量上传时下载的模板内容。模板包含Order Type、Vendor SKU、Product Type、Item Name、Brand Name、External Product ID Type、External Product ID、Merchant Suggested ASIN、External ID Exemption Reason、Product Category、Product Subcategory、Item Type Key等字段，其中Vendor SKU、Product Type、Item Name、Brand Name、External Product ID Type、Product Category、Product Subcategory、Item Type Key等字段标注为REQUIRED，External Product ID字段标注为CONDITIONALLY REQUIRED。](./assets/images/图片展示的是通过ASIN进行批量上传时下-7d88e80db6b0.png)
  1. 上传模板：商品>批量上传>上传Offer
 
- ![图片展示了产品Listing批量新增操作流程中进入批量新增功能页面的路径。在左侧导航栏中，点击“商品”后，进入“Catalog”页面，再点击“批量上传”选项，即可跳转至批量上传页面。页面右上角有“批量上传”按钮，下方有“模板名称”输入框及“Offer上传数量”提示，还显示了“Offer上传数量”为1的两条记录。该图片与上文操作步骤中“进入批量新增功能页面”内容对应，直观呈现了操作路径。](./assets/images/图片展示了产品Listing批量新增操作-29ffb332edd2.png)
+ ![产品Listing批量新增操作流程中进入批量新增功能页面的路径。在左侧导航栏中，点击“商品”后，进入“Catalog”页面，再点击“批量上传”选项，即可跳转至批量上传页面。页面右上角有“批量上传”按钮，下方有“模板名称”输入框及“Offer上传数量”提示，还显示了“Offer上传数量”为1的两条记录。](./assets/images/图片展示了产品Listing批量新增操作-29ffb332edd2.png)
 
- ![图片展示的是商品批量上传页面。页面左侧有商品、销售、广告等导航栏。右侧上方有“首页”“Catalog”“新增产品”“批量上传”等选项。下方“下载模板”区域有“下载模板”“上传Offer”按钮，其中“上传Offer”按钮被红色框突出显示。该图片与文档中“批量新增”操作流程相关，对应上传模板步骤，直观呈现了上传Offer操作的页面位置及按钮标识。](./assets/images/图片展示的是商品批量上传页面-33a041ab12f4.png)
+ ![商品批量上传页面。页面左侧有商品、销售、广告等导航栏。右侧上方有“首页”“Catalog”“新增产品”“批量上传”等选项。下方“下载模板”区域有“下载模板”“上传Offer”按钮，其中“上传Offer”按钮被红色框突出显示。](./assets/images/图片展示的是商品批量上传页面-33a041ab12f4.png)
 
- ![图片展示的是“上传Offer”页面，上方有规则说明，包括下载模板、填写后上传、注意上传规则、批量上传限制等内容。下方是上传区域，提示点击或将文件拖拽到此上传，支持扩展名xlsx、xlsm，文件大小小于5G。该图片与文档中批量新增操作流程中上传模板步骤相关，是上传Offer操作的具体展示，帮助用户了解上传Offer的界面及操作要求。](./assets/images/图片展示的是“上传Offer”页面-a2014e329d28.png)
+ ![“上传Offer”页面，上方有规则说明，包括下载模板、填写后上传、注意上传规则、批量上传限制等内容。下方是上传区域，提示点击或将文件拖拽到此上传，支持扩展名xlsx、xlsm，文件大小小于5G。](./assets/images/图片展示的是“上传Offer”页面-a2014e329d28.png)
 
  1. 正常情况：状态为生效成功
  2. 异常情况：点击获取错误模板，根据表格里的报错信息修改，再重新上传
 
  **方式2操作详解：**
  1. 选择通过类目进行批量上传
- ![图片展示的是通过类目进行批量上传的操作界面。界面上方有“批量上传”标题及“收起”按钮。在“请选择上传方式”区域，有“通过ASIN进行批量上传”和“通过类目进行批量上传”两个选项，其中“通过类目进行批量上传”被红色框突出显示。下方有“取消”和“下一步”按钮，其中“下一步”按钮也被红色框突出显示。该图片与文档中通过类目进行批量上传的操作步骤相关，用于指导用户选择上传方式并进行下一步操作。](./assets/images/图片展示的是通过类目进行批量上传的操作界-9085072c6174.png)
+ ![通过类目进行批量上传的操作界面。界面上方有“批量上传”标题及“收起”按钮。在“请选择上传方式”区域，有“通过ASIN进行批量上传”和“通过类目进行批量上传”两个选项，其中“通过类目进行批量上传”被红色框突出显示。下方有“取消”和“下一步”按钮，其中“下一步”按钮也被红色框突出显示。](./assets/images/图片展示的是通过类目进行批量上传的操作界-9085072c6174.png)
  1. 选择产品的最小类目，点击下载模板
 
- ![图片展示的是通过产品类目批量上传操作中选择类目的界面。左侧为选择类目区域，可搜索或选择最小类目，如“Bathroom Shelves”等。右侧是已选产品类目区域，当前已突出显示“Bathroom Shelves”。界面右下角有“取消”“上一步”和“下载模板”按钮。该图片与文档中通过类目进行批量上传的操作步骤相关，是选择产品最小类目并下载模板的示例展示。](./assets/images/图片展示的是通过产品类目批量上传操作中选-0c0393b6bed6.png)
+ ![通过产品类目批量上传操作中选择类目的界面。左侧为选择类目区域，可搜索或选择最小类目，如“Bathroom Shelves”等。右侧是已选产品类目区域，当前已突出显示“Bathroom Shelves”。](./assets/images/图片展示的是通过产品类目批量上传操作中选-0c0393b6bed6.png)
 
  1. 自动跳转到【批量上传】，待此条数据流传为下载成功时，点击获取模板（可点击查询刷新数据状态）
  2. 下载失败，可点击问号查看具体原因，根据具体原因进行处理后，再重新下载模板
  2. 在下载的模板里填写产品相关信息
- ![图片展示的是通过ASIN进行批量上传时下载的模板内容。模板包含Order Type、Vendor SKU、Product Type、Item Name、Brand Name、External Product ID Type、External Product ID、Merchant Suggested ASIN、External ID Exemption Reason、Product Category、Product Subcategory、Item Type Key等字段，部分字段标注为必填项或条件必填项，如Vendor SKU、Product Type、Item Name、Brand Name、External Product ID Type、External Product ID、Product Category、Product Subcategory、Item Type Key等为必填，Order Type、External ID Exemption Reason为条件必填。该模板用于在下载后填写产品相关信息，再上传至VC。](./assets/images/图片展示的是通过ASIN进行批量上传时下-613ad026eb12.png)
+ ![通过ASIN进行批量上传时下载的模板内容。模板包含Order Type、Vendor SKU、Product Type、Item Name、Brand Name、External Product ID Type、External Product ID、Merchant Suggested ASIN、External ID Exemption Reason、Product Category、Product Subcategory、Item Type Key等字段，部分字段标注为必填项或条件必填项，如Vendor SKU、Product Type、Item Name、Brand Name、External Product ID Type、External Product ID、Product Category、Product Subcategory、Item Type Key等为必填，Order Type、External ID Exemption Reason为条件必填。](./assets/images/图片展示的是通过ASIN进行批量上传时下-613ad026eb12.png)
  1. 上传模板：商务>批量上传>上传Offer
 
- ![图片展示了产品Listing批量新增操作流程中进入批量新增功能页面的路径。在左侧导航栏中，点击“商品”后，进入“Catalog”页面，再点击“批量上传”选项，弹出窗口显示“可以刷新后查看模板最新状态”，并有“Offer上传数量”为1的记录。该图片与上文操作步骤中“进入批量新增功能页面”内容对应，直观呈现了操作路径，帮助用户明确如何找到批量新增功能页面。](./assets/images/图片展示了产品Listing批量新增操作-43f7596130b7.png)
+ ![产品Listing批量新增操作流程中进入批量新增功能页面的路径。在左侧导航栏中，点击“商品”后，进入“Catalog”页面，再点击“批量上传”选项，弹出窗口显示“可以刷新后查看模板最新状态”，并有“Offer上传数量”为1的记录。](./assets/images/图片展示了产品Listing批量新增操作-43f7596130b7.png)
 
- ![图片展示的是商品批量上传页面。页面左侧有商品、销售、广告等导航栏。右侧上方有“首页”“Catalog”“新增产品”“批量上传”等选项。下方“下载模板”区域有“下载模板”“上传Offer”按钮，其中“上传Offer”按钮被红色框突出显示。该图片与文档中“批量新增”操作流程相关，对应上传模板步骤，直观呈现了上传Offer操作的页面位置及按钮标识。](./assets/images/图片展示的是商品批量上传页面-cce91052de34.png)
+ ![商品批量上传页面。页面左侧有商品、销售、广告等导航栏。右侧上方有“首页”“Catalog”“新增产品”“批量上传”等选项。下方“下载模板”区域有“下载模板”“上传Offer”按钮，其中“上传Offer”按钮被红色框突出显示。](./assets/images/图片展示的是商品批量上传页面-cce91052de34.png)
 
- ![图片展示的是 addCriterion](./assets/images/图片展示的是-addCriterion-f4b64cc3e653.png)
+ ![“上传Offer”弹窗，提示先下载模板、按必填规则填写后再上传；支持上传xlsx或xlsm文件，并说明模板数据量和重复产品等校验规则。](./assets/images/图片展示的是-addCriterion-f4b64cc3e653.png)
 
  1. 正常情况：状态为生效成功
  2. 异常情况：点击获取错误模板，根据表格里的报错信息修改，再重新上传
@@ -120,13 +120,13 @@ SC老产品转移至VC销售的**本质是跟卖（即创建VC offer）**，即�
 
  1. 进入功能页面
 
- ![图片展示了亚马逊卖家平台中“商品”功能页面的导航栏。左侧导航栏中，“商品”选项被红色框线突出显示，其下有“商品管理”“货品管理”“辅料管理”等子选项，其中“Catalog”选项也被红色框线突出显示。该图片与文档中“三、克隆Offer”部分内容相关，用于说明在商品页面下选择“Catalog”功能，以进行克隆Offer操作，是操作路径“商品>Catalog>克隆offer”的第一步展示。](./assets/images/图片展示了亚马逊卖家平台中“商品”功能页-038126baa3db.png)
+ ![亚马逊卖家平台中“商品”功能页面的导航栏。左侧导航栏中，“商品”选项被红色框线突出显示，其下有“商品管理”“货品管理”“辅料管理”等子选项，其中“Catalog”选项也被红色框线突出显示。](./assets/images/图片展示了亚马逊卖家平台中“商品”功能页-038126baa3db.png)
 
- ![图片展示了产品Listing上传至VC中克隆Offer的操作路径界面。在“商品”分类下，点击“Catalog”进入功能页面。页面中有“新增产品”和“克隆Offer”两个选项，其中“克隆Offer”被红色框突出显示。该图片与上下文紧密相关，直观呈现了在商品页面中选择“克隆Offer”这一操作步骤，是后续选择需要上传DF Offer产品并点击确定等操作的前提。](./assets/images/图片展示了产品Listing上传至VC中-2fa3a1129eb9.png)
+ ![产品Listing上传至VC中克隆Offer的操作路径界面。在“商品”分类下，点击“Catalog”进入功能页面。页面中有“新增产品”和“克隆Offer”两个选项，其中“克隆Offer”被红色框突出显示。](./assets/images/图片展示了产品Listing上传至VC中-2fa3a1129eb9.png)
 
  1. 选择需要上传DF Offer的产品，点击确定
 
- ![图片展示的是“克隆Offer”操作步骤中选择产品的界面。界面上方有提示，仅当PO offer状态为“生效成功”时，才可通过克隆PO offer生成DF offer。界面中有一个输入框，提示可输入“ASIN/SKU/UPC/EAN”进行产品筛选，旁边有“加”“查询”“重置”按钮。下方表格区域目前暂无数据。右下角有“取消”和“确定”按钮，其中“确定”按钮被红色箭头指向。该图片对应操作步骤中“选择需要上传DF Offer的产品，点击确定”这一步骤，用于指导用户进行产品选择操作。](./assets/images/图片展示的是“克隆Offer”操作步骤中-fe253108a6bb.png)
+ ![“克隆Offer”操作步骤中选择产品的界面。界面上方有提示，仅当PO offer状态为“生效成功”时，才可通过克隆PO offer生成DF offer。界面中有一个输入框，提示可输入“ASIN/SKU/UPC/EAN”进行产品筛选，旁边有“加”“查询”“重置”按钮。右下角有“取消”和“确定”按钮，其中“确定”按钮被红色箭头指向。](./assets/images/图片展示的是“克隆Offer”操作步骤中-fe253108a6bb.png)
 
  1. 提交后亚马逊会进行审核，需要您关注状态并及时操作
 

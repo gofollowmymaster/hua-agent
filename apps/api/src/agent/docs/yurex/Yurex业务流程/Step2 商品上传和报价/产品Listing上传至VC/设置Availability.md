@@ -12,7 +12,7 @@ Wiki节点ID: "Yotyw9QXyiW59ekgxHucgdiJnLo"
 
 1. 操作步骤：【商品】-【Catalog】-勾选对应ASIN-点击设置Availability
 
-![图片展示的是亚马逊平台商品管理界面。左侧有导航栏，选中“商品”选项。右侧是商品列表，显示了ASIN、状态、品牌、Page views、List price、Availability、业务模式、产品负责人、最近跟进时间、状态等信息。其中“设置Availability”按钮被红色框突出显示。该图片与文档中设置商品Availability状态的操作步骤相关，直观呈现了操作前的商品管理界面，帮助用户了解操作环境。](./assets/images/图片展示的是亚马逊平台商品管理界面-adf42db9b2b7.png)
+![亚马逊平台商品管理界面。左侧有导航栏，选中“商品”选项。右侧是商品列表，显示了ASIN、状态、品牌、Page views、List price、Availability、业务模式、产品负责人、最近跟进时间、状态等信息。其中“设置Availability”按钮被红色框突出显示。](./assets/images/图片展示的是亚马逊平台商品管理界面-adf42db9b2b7.png)
 
 1. Availability状态解释：
 

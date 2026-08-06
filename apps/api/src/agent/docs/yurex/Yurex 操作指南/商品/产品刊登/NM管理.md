@@ -29,31 +29,31 @@ Wiki节点ID: "TbcCwhgt0iP5JXkcr2xcKklrnph"
 ## 操作步骤
 
 
-#### 操作路径
+### 操作路径
 
 【商品】-【产品刊登】-【NM管理】
 
 ![NM管理的操作界面，左侧导航栏中“商品”图标被红色框突出显示，其下方的“NM管理”选项也被红色框标识。](./assets/images/图片展示了NM管理的操作界面-780b5bcdf55b.png)
 
-#### 点击【上传Newer Model】
+### 点击【上传Newer Model】
 
 > 进入上传Newer Model页面
 
 ![NM管理中上传Newer Model的操作界面。画面中，“上传Newer Model”按钮被红色框线和箭头突出标识。](./assets/images/图片展示了NM管理中上传Newer-Mo-81331b972bcb.png)
 
-#### 点击【下载模版】
+### 点击【下载模版】
 
 > 根据表头填写产品信息
 
 ![“上传Newer Model”页面。页面中部有“点击或拖动文件按钮”区域，提示可上传CSV、XLSX文件。](./assets/images/图片展示的是“上传Newer-Model-aac061f1b978.png)
 
-#### 文件上传
+### 文件上传
 
 > 点击或将文件拖动至文件上传区域
 
 ![在上传Newer Model操作中上传文件的界面。画面中有一个红色框突出显示的区域，内有“点击或拖动文件到此区域上传”的提示文字，下方还有“点击或拖动文件到此区域上传”字样。](./assets/images/图片展示了在上传Newer-Model操-fd84bd7280a5.png)
 
-#### 填写产品ASIN
+### 填写产品ASIN
 
 > 为了让您在Newer Model列表页能更快捷地查询到已上传Newer Model的ASIN，请在该步输入上传文件中的所有ASIN。
 >
@@ -61,33 +61,33 @@ Wiki节点ID: "TbcCwhgt0iP5JXkcr2xcKklrnph"
 
 ![NM管理中上传Newer Model的页面。页面右上方有“下载Newer Model模板”按钮；中部是文件上传区域，提示点击或将文件拖动至此处上传；下方有一个输入框被红色箭头指向并框出。](./assets/images/图片展示了NM管理中上传Newer-Mo-4ad714f98ab1.png)
 
-#### 点击【提交】
+### 点击【提交】
 
 > 提交成功后将直接跳转至Newer Model列表页，并自动生成该条申请。
 
 ![上传Newer Model的页面。右上角有一个明显偏亮且被红框突出显示的“提交”按钮。](./assets/images/图片展示的是上传Newer-Model的-ccaf178e59cd.png)
 
-#### 点击【更多】
+### 点击【更多】
 
 > 可查看上传时输入的所有产品ASIN。
 
 ![在NM管理中上传Newer Model后的操作界面。红色箭头指向“审核中”状态的ASIN，对应文档中“当此条数据状态变为【运营审核中】时，表示您的Newer Model已提交成功，并已提交至管理端”的内容。](./assets/images/图片展示的是在NM管理中上传Newer-a37de6835f4c.png)
 
-#### 点击【下载文件】
+### 点击【下载文件】
 
 > 可通过【下载文件】查看历史上传文件。
 
 ![NM管理界面中 ， 上传Newer Model操作路径下的“点击【下载文件】”内容。画面中“操作”列下有“下载文件”按钮，箭头指向该按钮，提示可通过点击此。](./assets/images/图片展示了NM管理界面中-5fea17992ffb.png)
 
-#### 当此条数据状态变为【运营审核中】时，表示您的Newer Model已提交成功，并已提交至管理端。
+### 当此条数据状态变为【运营审核中】时，表示您的Newer Model已提交成功，并已提交至管理端。
 
 ![亚马逊平台Newer Model管理界面。中间区域显示Newer Model列表，包含申请编号、ASIN、数据提交时间、产品负责人、联系人、状态、操作等列。](./assets/images/图片展示的是亚马逊平台Newer-Mod-817ba582c722.png)
 
-#### 当此条数据状态变为【审核通过】时，表示您的Newer Model产品已经审核通过。
+### 当此条数据状态变为【审核通过】时，表示您的Newer Model产品已经审核通过。
 
 ![NM管理中上传Newer Model的操作界面。界面中列出了相关数据信息，其中一条数据的“状态”列以红色框突出显示为“运营审核中”。](./assets/images/图片展示的是NM管理中上传Newer-M-67cccc5d0847.png)
 
-#### 当此条数据状态变为【审核失败】时，表示您Newer Model在Amazon审核失败。
+### 当此条数据状态变为【审核失败】时，表示您Newer Model在Amazon审核失败。
 
 > 若审核失败，您可以根据反馈的失败原因修改产品Newer Model信息重新提交。
 >

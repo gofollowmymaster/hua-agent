@@ -12,9 +12,9 @@ Wiki节点ID: "TxBVwSXHoi1r61k94z1ceSeenBc"
 
 ### 操作路径：销售模块 → Price Discount → 点击 “创建 Price Discount” 按钮
 
-![图片展示了一个系统界面，左侧菜单栏中“销售”选项被红框突出显示，点击“销售”后展开的下拉菜单里，“Price Discount”选项也被红框圈出。这与文档中“操作路径：销售模块→Price Discount→点击‘创建Price Discount’”相呼应，直观呈现了在系统中找到“Price Discount”功能的操作步骤，即先找到左侧菜单栏的“销售”模块，再从其下拉菜单中选择“Price Discount”。](./assets/images/图片展示了一个系统界面-49ca234778aa.png)
+![Yurex Price Discount功能入口，左侧“销售”菜单及展开后的“Price Discount”子菜单均以红框突出，进入后可创建Price Discount活动。](./assets/images/图片展示了一个系统界面-49ca234778aa.png)
 
-![图片展示了亚马逊销售模块中Price Discount页面。页面左上角有导航栏，可点击“首页”等选项。中部上方有“全部”下拉菜单及“Promotion ID/ASIN/SKU/MSKU/…”搜索框。下方有“活动起止日期”筛选栏，以及“创建Price Discount”按钮，该按钮被红色框和箭头突出显示。页面右上角有“导出”按钮，显示已选0条数据。此图与文档中“操作路径：销售模块→Price Discount→点击‘创建Price Discount’”的上下文对应，直观呈现了创建Price Discount的操作入口。](./assets/images/图片展示了亚马逊销售模块中Price-D-dac9a40b4790.png)
+![亚马逊销售模块中Price Discount页面。页面左上角有导航栏，可点击“首页”等选项。中部上方有“全部”下拉菜单及“Promotion ID/ASIN/SKU/MSKU/…”搜索框。下方有“活动起止日期”筛选栏，以及“创建Price Discount”按钮，该按钮被红色框和箭头突出显示。](./assets/images/图片展示了亚马逊销售模块中Price-D-dac9a40b4790.png)
 
 ### 详细操作指南：
 
@@ -24,7 +24,7 @@ Wiki节点ID: "TxBVwSXHoi1r61k94z1ceSeenBc"
 
 #### 填写活动核心信息
 
-![图片展示的是Price Discount活动组创建流程中“选择参与活动的产品”步骤界面。上方提示若输入的ASIN属于多个AVC账号，提交后将跳转至“确认Price Discount活动组”页面。下方表格列有ASIN、SKU、产品名称、折扣及操作栏，其中“折扣”栏有“请输入”“USD”“%”选项，可设置折扣方式。该图片与文档中Price Discount活动组创建流程上下文对应，直观呈现了活动产品选择环节的操作界面及相关信息。](./assets/images/图片展示的是Price-Discount-5863a5949c9d.png)
+![Price Discount活动组创建流程中“选择参与活动的产品”步骤界面。上方提示若输入的ASIN属于多个AVC账号，提交后将跳转至“确认Price Discount活动组”页面。下方表格列有ASIN、SKU、产品名称、折扣及操作栏，其中“折扣”栏有“请输入”“USD”“%”选项，可设置折扣方式。](./assets/images/图片展示的是Price-Discount-5863a5949c9d.png)
 
 | 配置项 | 操作说明 |
 |-|-|

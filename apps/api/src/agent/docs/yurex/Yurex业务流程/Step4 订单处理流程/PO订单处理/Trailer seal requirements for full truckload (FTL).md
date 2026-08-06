@@ -54,7 +54,7 @@ If you, the vendor/shipper, have loaded and sealed the trailer before the carrie
 
 如果您（供应商/发货人）在承运人有机会清点和检查货物之前就已装载并封上拖车，则必须在提单（BOL）上注明“发货人装载与清点”（Shipper Load and Count，简称 SLC）。
 
-![图片展示了一款RFID Tamper Evident Cable Seal/RM UHF C型封条，黄色主体，蓝色金属环。其尺寸标注为62mm（2.4英寸）长、27.5mm（1.0英寸）宽。右上角有“Quarter”字样，旁边是24.26mm（0.9英寸）的硬币，用于对比封条大小。封条上有二维码、条形码及数字序列号60109115578，还印有“Made in China”等信息。该图片与文档中关于封条尺寸及来源的内容相关，直观呈现了封条的外观及尺寸。](./assets/images/图片展示了一款RFID-Tamper-E-c14f8fa983f9.png)
+![一款RFID Tamper Evident Cable Seal/RM UHF C型封条，黄色主体，蓝色金属环。其尺寸标注为62mm（2.4英寸）长、27.5mm（1.0英寸）宽。右上角有“Quarter”字样，旁边是24.26mm（0.9英寸）的硬币，用于对比封条大小。](./assets/images/图片展示了一款RFID-Tamper-E-c14f8fa983f9.png)
 
 Order the seals from the AMZ store:
 
