@@ -8,7 +8,6 @@ Wiki节点ID: "HEfWwCE9MiuN5LkGwx8cpLQWnFe"
 
 # 飞书文档：亚马逊透明计划
 
-亚马逊透明计划
 
 ## 一、定义
 

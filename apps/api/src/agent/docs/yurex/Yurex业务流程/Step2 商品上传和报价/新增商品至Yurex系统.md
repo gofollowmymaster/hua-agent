@@ -8,7 +8,6 @@ Wiki节点ID: "WUjEwUyNbiDtT6kEqa7cdktPnLe"
 
 # 飞书文档：新增商品至Yurex系统
 
-新增商品至Yurex系统
 
 **需要开展VC业务的商品，必须在Yurex系统中进行商品新增**
 商品类型说明：

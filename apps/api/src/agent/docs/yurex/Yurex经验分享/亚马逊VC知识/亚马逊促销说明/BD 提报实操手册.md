@@ -8,7 +8,6 @@ Wiki节点ID: "XjBMww1XciZzBAkh4xQc7bQnnpg"
 
 # 飞书文档：BD 提报实操手册
 
-BD 提报实操手册
 
 ## 提报核心规则（必看）
 

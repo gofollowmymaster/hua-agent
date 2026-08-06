@@ -8,7 +8,6 @@ Wiki节点ID: "Norrwi7uSiPLcIkaFPqc3n0dnEf"
 
 # 飞书文档：VC促销规则&要求
 
-VC促销规则&要求
 
 ## 规则说明
 

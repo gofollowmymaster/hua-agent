@@ -8,7 +8,6 @@ Wiki节点ID: "WIhCw4jYvinwLZk72YGcCTWxnEf"
 
 # 飞书文档：VC渠道备货指南
 
-VC渠道备货指南
 
 ## **一、目的**
 

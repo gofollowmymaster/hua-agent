@@ -8,7 +8,6 @@ Wiki节点ID: "LUA6w1pXpiikRYkq7WrctgVenmg"
 
 # 飞书文档：VC订单类型介绍
 
-VC订单类型介绍
 
 ![亚马逊VC订单类型思维导图：订单分为DF订单、PO订单和DI订单，其中PO订单进一步分为Auto PO、BTR和BBO三类。](./assets/whiteboards/未命名上下文-Xrx3wXO4EhfkzNbtmhxc18ONnOi.png)
 

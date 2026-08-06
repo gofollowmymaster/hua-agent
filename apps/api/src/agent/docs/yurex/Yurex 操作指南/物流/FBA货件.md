@@ -8,7 +8,6 @@ Wiki节点ID: "GzVRwURkjiLPutkTC6vc7SVonwf"
 
 # 飞书文档：FBA货件
 
-FBA货件
 
 ## 功能介绍
 

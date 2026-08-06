@@ -8,7 +8,6 @@ Wiki节点ID: "OceGwoEluiFCjAkU2nUcvFzJnCg"
 
 # 飞书文档：如何获取和刷新UPC/EAN条码
 
-如何获取和刷新UPC/EAN条码
 
 ## 如何获取正规UPC/EAN条码？
 

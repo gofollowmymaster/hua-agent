@@ -8,7 +8,6 @@ Wiki节点ID: "Ir0GwAuIBigTkjkZgDbczKPAnXc"
 
 # 飞书文档：广告功能开通
 
-广告功能开通
 
 ## Yurex广告系统使用流程
 

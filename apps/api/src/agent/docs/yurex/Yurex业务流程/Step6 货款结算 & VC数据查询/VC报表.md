@@ -8,7 +8,6 @@ Wiki节点ID: "MsgfwltMXiqVP2kmOdGcSPOznPe"
 
 # 飞书文档：VC报表
 
-VC报表
 
 ## 销售分析
 

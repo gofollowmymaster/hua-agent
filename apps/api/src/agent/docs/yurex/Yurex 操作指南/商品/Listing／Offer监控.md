@@ -8,7 +8,6 @@ Wiki节点ID: "OpGqw9I0ciK1YLkzf79cWWTUnXe"
 
 # 飞书文档：Listing/Offer监控
 
-Listing/Offer监控
 
 ## 功能介绍
 
@@ -31,7 +30,6 @@ Listing/Offer监控
 
 ## 操作步骤
 
-##
 
 #### 操作路径
 
@@ -107,7 +105,6 @@ Listing/Offer监控
 
 ![Listing/Offer监控操作中新增Listing监控后的页面。页面上方有“操作成功”提示，下方有红色框突出显示的“您配置的监控任务已启动,系统正在持续监测中...”文字，表明已启动监控任务，系统正在持续监测。](./assets/images/图片展示的是Listing-Offer监-588f88521661.png)
 
-##
 
 #### 点击“已监控列表”按钮
 
@@ -137,7 +134,6 @@ Listing/Offer监控
 
 ![Listing监控Offer监控中“已监控列表”界面。下方有“是否监控”“是否提醒”“监控异常类型”三个开关按钮。](./assets/images/图片展示了Listing监控Offer监-eb2d8dee3135.png)
 
-##
 
 #### 查看Listing异常产品列表
 
@@ -175,7 +171,6 @@ Listing/Offer监控
 
 ![Listing/Offer监控中批量标记处理状态的操作界面。](./assets/images/图片展示的是Listing-Offer监-13462699e37e.png)
 
-##
 
 #### 指定导出数据
 
@@ -185,7 +180,6 @@ Listing/Offer监控
 
 ![“Listing／Offer监控”页面截图，展示“全量导出数据”的功能入口和操作区域。](./assets/images/图片-affa16342af4.png)
 
-##
 
 #### 查看Listing异常详情
 
@@ -227,7 +221,6 @@ Listing/Offer监控
 
 ![Listing/Offer监控中的Listing异常详情页面。列表可按异常类型和处理状态筛选，显示异常类型、详情、行动建议等信息。](./assets/images/图片展示了Listing-Offer监控-eb99bb620789.png)
 
-##
 
 #### 查看Offer异常产品列表
 
@@ -265,7 +258,6 @@ Listing/Offer监控
 
 ![Listing/Offer监控中批量标记处理状态的操作界面。画面中弹出确认框，内容为“确定将选中ASIN的所有异常标记为已处理？”，框内有“取消”和“确定”两个按钮，其中“确定”按钮被红色箭头突出指向。](./assets/images/图片展示的是Listing-Offer监-0329e9b8859b.png)
 
-##
 
 #### 指定导出数据
 
@@ -275,7 +267,6 @@ Listing/Offer监控
 
 ![Listing/Offer监控中Offer异常产品列表界面。上方有“Offer异常产品列表”标题，下方有筛选条件区域，可按产品信息、业务模式、异常类型等筛选。](./assets/images/图片展示的是Listing-Offer监-0cc6e8259447.png)
 
-##
 
 #### 查看Offer异常详情
 

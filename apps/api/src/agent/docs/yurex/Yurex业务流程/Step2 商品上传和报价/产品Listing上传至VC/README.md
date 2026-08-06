@@ -8,7 +8,6 @@ Wiki节点ID: "FuGmwLGgpid6MekWqf1c8Qz3nMd"
 
 # 飞书文档：产品Listing上传至VC
 
-产品Listing上传至VC
 
 SC老产品转移至VC销售的**本质是跟卖（即创建VC offer）**，即使用同一条链接进行销售，只不过多了一个VC卖家进行供货。
 由于VC的特殊性，**我们常规使用DF和PO两种模式的情况下，每一个产品都需要具备DF和PO模式下的2个offer，**Yurex系统创建VC offer的前提是该**产品已经完成系统采购报价流程。**

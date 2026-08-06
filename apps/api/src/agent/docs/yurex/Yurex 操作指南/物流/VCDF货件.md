@@ -8,7 +8,6 @@ Wiki节点ID: "HzPpw2JNEigiLVkGMQbcUQXCnoc"
 
 # 飞书文档：VCDF货件
 
-VCDF货件
 
 ## 功能介绍
 

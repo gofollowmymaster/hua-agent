@@ -4,13 +4,12 @@
 Wiki节点ID: "GCIswc6PUiQlkOk1aUlco1rSnVf"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex 操作指南 > 财务 > 应付账款 > 其他VC费用"
+当前版本: "v1.0.0"
 ---
 
 # 飞书文档：其他VC费用
 
-其他VC费用
 
-当前版本v1.0.0
 
 ## 功能介绍
 
@@ -26,7 +25,6 @@ Wiki节点ID: "GCIswc6PUiQlkOk1aUlco1rSnVf"
 
 ## 操作流程
 
-##
 
 #### 操作路径
 
@@ -42,7 +40,6 @@ Wiki节点ID: "GCIswc6PUiQlkOk1aUlco1rSnVf"
 
 ![“其他VC费用”页面。上方有搜索框，可输入“其他VC费用编号”“费用名称”等进行。](./assets/images/图片展示的是“其他VC费用”页面-ab00ccd9c919.png)
 
-##
 
 - 可批量导出或指定数据导出，可按需进行导出。
 
@@ -53,6 +50,5 @@ Wiki节点ID: "GCIswc6PUiQlkOk1aUlco1rSnVf"
 
 ## 常见问题
 
-##
 
 若您对其他VC费用明细存在异议，请联系您的财务负责人进行对应咨询。

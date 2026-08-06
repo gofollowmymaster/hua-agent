@@ -8,7 +8,6 @@ Wiki节点ID: "VYHvwhUr6iPgQ5keig9cI5ZSnZg"
 
 # 飞书文档：亚马逊Listing组成部分
 
-亚马逊Listing组成部分
 
 ## Listing框架
 

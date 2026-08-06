@@ -8,7 +8,6 @@ Wiki节点ID: "DZoSwhX4Xiig2jk2ptacn9ZWnfb"
 
 # 飞书文档：BBO询价单
 
-BBO询价单
 
 ## 功能介绍
 

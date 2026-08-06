@@ -8,7 +8,6 @@ Wiki节点ID: "Hth0wclHeisOlEk9GzKcdR5Dn4d"
 
 # 飞书文档：Pingpong注册流程
 
-Pingpong注册流程
 
 ## 一、需要的Pingpong的账户类型：B2C账号
 
