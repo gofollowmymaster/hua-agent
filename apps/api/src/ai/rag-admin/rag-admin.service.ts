@@ -11,9 +11,9 @@ import {
   RagAdminDocumentPageDto,
   RagAdminIngestDto,
   RagAdminSessionPageDto,
-} from '../dto/rag-admin.dto';
-import { RagIngestService } from './ingest/rag-ingest.service';
-import { RagPrismaService } from './prisma/rag-prisma.service';
+} from './dto/rag-admin.dto';
+import { RagIngestService } from '../rag/services/ingest/rag-ingest.service';
+import { RagPrismaService } from '../rag/services/prisma/rag-prisma.service';
 
 /** 编排 RAG 管理后台的租户级文档、切片和会话数据操作。 */
 @Injectable()

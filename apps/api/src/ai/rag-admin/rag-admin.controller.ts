@@ -28,8 +28,8 @@ import {
   RagAdminIngestDto,
   RagAdminSessionPageDto,
 } from './dto/rag-admin.dto';
-import { RagAdminService } from './services/rag-admin.service';
-import { RagDocumentUploadService } from './services/ingest/rag-document-upload.service';
+import { RagAdminService } from './rag-admin.service';
+import { RagDocumentUploadService } from './rag-document-upload.service';
 
 const MAX_UPLOAD_FILES = 20;
 const MAX_UPLOAD_FILE_SIZE = 50 * 1024 * 1024;

@@ -33,7 +33,33 @@ src/<module>/
 └── ...
 ```
 
-小功能可以保持扁平；当出现多个 controller、service、table、adapter，或职责开始分叉时，再按上面结构拆分。
+小功能可以保持扁平；出现 HTTP Controller 时按「业务子模块」拆为独立子模块目录，出现多个 service、table、adapter 或职责开始分叉时再进一步拆分。
+
+## 业务子模块
+
+业务模块下新增 HTTP Controller 时，一个 Controller 对应一个独立子模块目录；Controller 不直接放在父模块根目录，同一子模块目录内不允许存在多个 Controller。子模块目录布局遵循通用模块结构：
+
+```text
+src/<module>/<submodule>/
+├── <submodule>.controller.ts
+├── <submodule>.service.ts
+├── dto/
+│   └── *.dto.ts
+├── type/
+│   └── *.ts
+├── table/
+│   └── *.table.ts
+├── adapter/
+│   └── *.adapter.ts
+└── common/
+    ├── schedule/
+    ├── processor/
+    └── service/
+```
+
+- 控制器文件与子模块目录同名，例如 `src/doc/wiki/wiki.controller.ts`。
+- 子模块是父模块内的目录拆分，不新增 `<submodule>.module.ts`；controller、service、provider 由父模块统一注册。
+- 子模块内额外私有 service 可放在子模块根目录或 `common/service/`；子模块间复用仍通过父模块内的 Service 注入，不跨目录调用内部实现细节。
 
 ## 分层规则
 

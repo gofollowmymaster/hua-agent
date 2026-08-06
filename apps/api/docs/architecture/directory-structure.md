@@ -1,6 +1,6 @@
 # API 目录架构
 
-本文说明 `apps/api` 目录职责和边界。新文件放置规则见 `apps/api/docs/standard/module-design.md`。monorepo 根目录、RAG Admin 和 shared 包结构见 `AGENTS.md`。
+本文说明 `apps/api` 下 `src` 整体目录结构与职责边界，不重复承载模块设计规则。模块、子模块目录设计和文件放置规则见 `apps/api/docs/standard/module-design.md`。monorepo 根目录、RAG Admin 和 shared 包结构见 `AGENTS.md`。
 
 ## API app 顶层目录
 
@@ -31,6 +31,8 @@
 - `apps/api/src/devops/`：DevOps、云效发布通知和定时处理。
 - `apps/api/src/demo-plugin/`：插件演示与 MID 相关能力。
 - `apps/api/src/mock-server/`：历史 mock server 能力，当前访问会被 `DiscardMiddleware` 阻断。
+
+业务模块下的子模块目录布局、Controller 放置和通用模块结构见 `apps/api/docs/standard/module-design.md`。
 
 ## 定时任务与后台处理
 

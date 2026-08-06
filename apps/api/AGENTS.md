@@ -278,7 +278,7 @@ pnpm env:prod
 |------|------|--------|
 | `README.md` | 架构文档入口与阅读顺序 | 首次接触项目 |
 | `project-architecture.md` | 整体架构、启动链路、中间件链、请求生命周期 | 理解系统全貌 |
-| `directory-structure.md` | 目录职责边界与放置决策 | 新增模块/文件 |
+| `directory-structure.md` | src 整体目录结构说明 | 新增模块/文件 |
 | `auth-and-tenant.md` | 鉴权、Guard、租户上下文、Redis key 隔离 | 鉴权/多租户变更 |
 | `feishu-integration.md` | 飞书分层：client/helper/table/card/event | 飞书相关变更 |
 
@@ -287,7 +287,7 @@ pnpm env:prod
 |------|------|--------|
 | `README.md` | 规范文档入口与任务映射 | 首次接触项目 |
 | `code-style.md` | TypeScript/NestJS 分层、异常、日志、命名 | 几乎所有编码任务 |
-| `module-design.md` | 模块设计、table/adapter/helper 放置规则 | 新增模块/外部集成 |
+| `module-design.md` | 模块/子模块目录设计、table/adapter/helper 放置规则 | 新增模块/外部集成 |
 | `configuration.md` | 环境变量、NodeConfigService、租户配置 | 配置/环境变量变更 |
 | `redis.md` | Redis key 规范、缓存、限流、幂等 | Redis 相关变更 |
 | `background-jobs.md` | BaseSchedule/BaseProcessor、队列规范 | 定时任务/队列变更 |

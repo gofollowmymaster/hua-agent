@@ -8,9 +8,9 @@ import type { TenantCode } from '@src/config/tenant';
 import type {
   RagDocumentUploadFileResult,
   RagDocumentUploadResult,
-} from '../../types/rag.type';
-import { DocumentLoaderService } from './document-loader.service';
-import { RagIngestService } from './rag-ingest.service';
+} from '../rag/types/rag.type';
+import { DocumentLoaderService } from '../rag/services/ingest/document-loader.service';
+import { RagIngestService } from '../rag/services/ingest/rag-ingest.service';
 
 /** 负责租户文档的批量上传、去重、落盘和索引编排。 */
 @Injectable()

@@ -19,8 +19,8 @@ import { RagPrismaService } from './rag/services/prisma/rag-prisma.service';
 import { RagDocumentService } from './rag/services/rag-document.service';
 import { RagIngestService } from './rag/services/ingest/rag-ingest.service';
 import { RagMemoryService } from './rag/services/qa/rag-memory.service';
-import { RagAdminController } from './rag/rag-admin.controller';
-import { RagAdminService } from './rag/services/rag-admin.service';
+import { RagAdminController } from './rag-admin/rag-admin.controller';
+import { RagAdminService } from './rag-admin/rag-admin.service';
 import { PromptRegistryService } from './rag/prompts/prompt.registry';
 import { RagQueryService } from './rag/services/qa/rag-workflow.service';
 import { RagQueryRewriteService } from './rag/services/qa/rag-query-rewrite.service';
@@ -33,7 +33,7 @@ import { NoopReranker } from './rag/services/qa/retrieval/rerank/noop-reranker.s
 import { RuleBasedReranker } from './rag/services/qa/retrieval/rerank/rule-based-reranker.service';
 import { Qwen3Reranker } from './rag/services/qa/retrieval/rerank/qwen3-reranker.service';
 import { RagQuestionRouterService } from './rag/services/qa/rag-question-router.service';
-import { RagDocumentUploadService } from './rag/services/ingest/rag-document-upload.service';
+import { RagDocumentUploadService } from './rag-admin/rag-document-upload.service';
 
 @Module({
   imports: [
