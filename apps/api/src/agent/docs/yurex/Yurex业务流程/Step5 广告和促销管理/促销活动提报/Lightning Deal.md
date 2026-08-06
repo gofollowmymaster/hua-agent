@@ -10,7 +10,9 @@ Wiki节点ID: "Th86wzG4tiacX1kMcgycDpV9nFb"
 
 ## Lightning Deal
 
-### 操作路径：销售 → 营销推广 → Lightning Deal → 点击 “创建 Lightning Deal” 按钮
+### 创建 Lightning Deal
+
+操作路径：销售 → 营销推广 → Lightning Deal → 点击 “创建 Lightning Deal” 按钮
 
 ![Salesforce系统中“销售”模块下“营销推广”功能的界面。左侧导航栏中，“销售”模块被红色框突出显示，其下“营销推广”选项被展开，其中“Lightning Deals”选项也被红色框突出显示。](./assets/images/图片展示了Salesforce系统中“销-c58825611790.png)
 

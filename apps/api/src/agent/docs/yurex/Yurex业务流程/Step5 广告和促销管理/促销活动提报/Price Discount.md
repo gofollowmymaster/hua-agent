@@ -10,7 +10,9 @@ Wiki节点ID: "TxBVwSXHoi1r61k94z1ceSeenBc"
 
 ## Price Discount
 
-### 操作路径：销售模块 → Price Discount → 点击 “创建 Price Discount” 按钮
+### 创建 Price Discount
+
+操作路径：销售模块 → Price Discount → 点击 “创建 Price Discount” 按钮
 
 ![Yurex Price Discount功能入口，左侧“销售”菜单及展开后的“Price Discount”子菜单均以红框突出，进入后可创建Price Discount活动。](./assets/images/图片展示了一个系统界面-49ca234778aa.png)
 

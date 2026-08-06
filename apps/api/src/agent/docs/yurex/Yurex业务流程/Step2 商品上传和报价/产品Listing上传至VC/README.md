@@ -77,7 +77,7 @@ SC老产品转移至VC销售的**本质是跟卖（即创建VC offer）**，即�
  1. 自动跳转到【批量上传】，待此条数据流传为下载成功时，点击获取模板（可点击查询刷新数据状态）
  2. 下载失败，可点击问号查看具体原因，根据具体原因进行处理后，再重新下载模板
  2. 在下载的模板里填写产品相关信息
- ![通过ASIN进行批量上传时下载的模板内容。模板包含Order Type、Vendor SKU、Product Type、Item Name、Brand Name、External Product ID Type、External Product ID、Merchant Suggested ASIN、External ID Exemption Reason、Product Category、Product Subcategory、Item Type Key等字段，其中Vendor SKU、Product Type、Item Name、Brand Name、External Product ID Type、Product Category、Product Subcategory、Item Type Key等字段标注为REQUIRED，External Product ID字段标注为CONDITIONALLY REQUIRED。](./assets/images/图片展示的是通过ASIN进行批量上传时下-7d88e80db6b0.png)
+ ![通过ASIN批量上传时下载的Offer模板，包含Vendor SKU、Product Type、Item Name、Brand Name、External Product ID、Product Category和Item Type Key等字段；表头标明REQUIRED必填项和CONDITIONALLY REQUIRED条件必填项。](./assets/images/图片展示的是通过ASIN进行批量上传时下-7d88e80db6b0.png)
  1. 上传模板：商品>批量上传>上传Offer
 
  ![产品Listing批量新增操作流程中进入批量新增功能页面的路径。在左侧导航栏中，点击“商品”后，进入“Catalog”页面，再点击“批量上传”选项，即可跳转至批量上传页面。页面右上角有“批量上传”按钮，下方有“模板名称”输入框及“Offer上传数量”提示，还显示了“Offer上传数量”为1的两条记录。](./assets/images/图片展示了产品Listing批量新增操作-29ffb332edd2.png)
@@ -99,7 +99,7 @@ SC老产品转移至VC销售的**本质是跟卖（即创建VC offer）**，即�
  1. 自动跳转到【批量上传】，待此条数据流传为下载成功时，点击获取模板（可点击查询刷新数据状态）
  2. 下载失败，可点击问号查看具体原因，根据具体原因进行处理后，再重新下载模板
  2. 在下载的模板里填写产品相关信息
- ![通过ASIN进行批量上传时下载的模板内容。模板包含Order Type、Vendor SKU、Product Type、Item Name、Brand Name、External Product ID Type、External Product ID、Merchant Suggested ASIN、External ID Exemption Reason、Product Category、Product Subcategory、Item Type Key等字段，部分字段标注为必填项或条件必填项，如Vendor SKU、Product Type、Item Name、Brand Name、External Product ID Type、External Product ID、Product Category、Product Subcategory、Item Type Key等为必填，Order Type、External ID Exemption Reason为条件必填。](./assets/images/图片展示的是通过ASIN进行批量上传时下-613ad026eb12.png)
+ ![通过产品类目批量上传时下载的Offer模板，包含Vendor SKU、Product Type、Item Name、Brand Name、External Product ID、Product Category和Item Type Key等字段；表头区分必填项与条件必填项。](./assets/images/图片展示的是通过ASIN进行批量上传时下-613ad026eb12.png)
  1. 上传模板：商务>批量上传>上传Offer
 
  ![产品Listing批量新增操作流程中进入批量新增功能页面的路径。在左侧导航栏中，点击“商品”后，进入“Catalog”页面，再点击“批量上传”选项，弹出窗口显示“可以刷新后查看模板最新状态”，并有“Offer上传数量”为1的记录。](./assets/images/图片展示了产品Listing批量新增操作-43f7596130b7.png)

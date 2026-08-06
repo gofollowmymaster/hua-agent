@@ -10,7 +10,9 @@ Wiki节点ID: "M83Fw09eYiVpF8kSBZRc8XYPnCg"
 
 ## Best Deal
 
-### 操作路径：销售→营销推广→Best Deals→点击“创建Best Deal”
+### 创建 Best Deal
+
+操作路径：销售→营销推广→Best Deals→点击“创建Best Deal”
 
 ![Yurex左侧“销售”菜单展开后的营销推广入口，红框依次标注“销售”和“Best Deals”，用于进入Best Deal活动列表。](./assets/images/图片展示了Salesforce的图片-a-568006666d83.png)
 

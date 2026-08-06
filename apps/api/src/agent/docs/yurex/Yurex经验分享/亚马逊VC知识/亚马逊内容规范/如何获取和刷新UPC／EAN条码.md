@@ -27,11 +27,15 @@ UPC是通用产品代码的缩写，其英文全称是Universal Product Code。U
 
 #### 第一步：登陆GS1官方网站 https://www.gs1.org/
 
-#### 第二步：下拉到网页底部，点击"Standards“下的"Need a barcode“
+#### 第二步：进入条码申请入口
+
+第二步：下拉到网页底部，点击"Standards“下的"Need a barcode“
 
 ![图片展示的是GS1官方网站网页底部“Standards”栏的内容。其中“Need a barcode”被红色矩形框突出显示。这与获取单个UPC条码的第二步操作相呼应，即下拉到网页底部，点击“Standards”下的“Need a barcode”。此部分是获取单个UPC条码流程中的关键步骤指引图示，直观地指出了在网站上进行操作的具体位置，帮助用户准确执行获取条码的操作步骤。](./assets/images/图片展示的是GS1官方网站网页底部“St-953a929f7426.png)
 
-#### 第三步：在"Select Location“-选择”United States“，然后点击”Get a barcode/GTIN“
+#### 第三步：选择地区并申请条码
+
+第三步：在"Select Location“-选择”United States“，然后点击”Get a barcode/GTIN“
 
 ![图片展示的是GS1官方网站获取UPC/EAN条码的页面。页面上方有导航栏，其中“Standards”选项被红色线条突出显示。下方橙色背景区域有文字说明所有产品需GS1条码/GTIN编号才能在线上或实体店销售，还标注有116个GS1办公室提供服务。右侧白色区域有“Select Location”下拉框，已选“United States”，下方有“Get a barcode/GTIN”红色箭头指向按钮。该图片对应文档中获取单个UPC条码步骤中的第三步，直观呈现了选择位置并获取条码的操作界面。](./assets/images/图片展示的是GS1官方网站获取UPC-E-f8aa0eae9f41.png)
 
@@ -39,7 +43,9 @@ UPC是通用产品代码的缩写，其英文全称是Universal Product Code。U
 
 ![图片展示的是GS1 US官网页面，标题为“Get Your U.P.C. Barcodes from GS1 US”，强调适用于在实体店、在线或两者兼有的销售。页面中部有“Get Several UPC Barcodes”和“Get a Single UPC Barcode”两个橙色按钮，后者被红色框突出显示。下方文字提示了解决方案，每个产品销售需唯一条码。该图片与上文获取单个UPC条码流程中第四步“点击一次性购买单个UPC条码”的内容对应，直观呈现了操作选项。](./assets/images/图片展示的是GS1-US官网页面-8d6078cc3db0.png)
 
-#### 第五步：填写基础信息（请保证Brand Name填写信息和后续创建VC listing信息一致），完成UPC条码购买，获取到合规的UPC条码
+#### 第五步：填写信息并购买条码
+
+第五步：填写基础信息（请保证Brand Name填写信息和后续创建VC listing信息一致），完成UPC条码购买，获取到合规的UPC条码
 
 ![图片展示的是GS1 US GTIN页面，用于购买单个UPC条码。页面显示价格为$30.00，需填写Brand Name等信息。右侧有提示，若不确定所需GTIN数量，可使用条码估算工具。下方列出添加GTIN到购物车的步骤，包括输入产品描述中应出现的品牌名称、产品描述等。底部有Pricing表格，显示GS1 US GTIN（条形码）的Cost为$30，Annual Renewal Fee为None。该图片与文档中获取单个UPC条码的第四步操作内容相关，是填写基础信息并添加到购物车的页面展示。](./assets/images/图片展示的是GS1-US-GTIN页面-bca1f1b05c6d.png)
 
@@ -91,11 +97,15 @@ UPC是通用产品代码的缩写，其英文全称是Universal Product Code。U
 
 ![图片展示的是登录Data Hub后的欢迎界面。左侧“Getting Started”板块中，“Create Your Barcodes”部分被红色框突出显示，其下方有“Create or Manage Barcodes”按钮，旁边文字说明可打印或下载条形码，并有“Learn How to Create Barcodes”链接。该图片与上下文关系紧密，上下文提到登录Data Hub后需点击“Create or Manage Barcodes”，此图直观呈现了该操作位置，帮助用户明确下一步操作。](./assets/images/图片展示的是登录Data-Hub后的欢迎-c3767bcfa766.jpg)
 
-##### 点击Add New Product添加商品，确保信息正确，避免关联错误
+##### 添加商品
+
+点击Add New Product添加商品，确保信息正确，避免关联错误
 
 ![图片展示的是登录GS1 US Data Hub后，点击“Create or Manage Barcodes”进入的“Add New Product”页面。页面上方有“Add New Product”按钮，右侧还有“Import Products”按钮。页面中部有“Products per page”下拉选择框，下方有“Status”“Description”“Brand”“GTIN”“GS1 Company Prefix”“Packaging Level”“SKU”“Last Updated”等筛选栏，当前显示“0 - 0 of 0 Products”。该图片与上下文关系紧密，直观呈现了添加新产品的操作入口及页面布局。](./assets/images/图片展示的是登录GS1-US-Data-3ee73c1ca878.png)
 
-##### 编辑详情，带required选项为必填项，编辑后可选保存为草稿或者点击保存继续下一步
+##### 编辑商品详情
+
+编辑详情，带required选项为必填项，编辑后可选保存为草稿或者点击保存继续下一步
 
 ![图片展示的是登录后在GS1 US Data Hub创建或管理条形码时，添加新商品的编辑详情界面。界面中有多个必填项，如Product Description、Brand Name、Industry、Language等，其中Product Description和Brand Name已输入内容，Industry为General，Language均为en - English。界面下方有“Purchasable by Consumer?”选项，已选中“Yes”。界面底部有“Cancel”“Save and Exit”“Save and Continue”三个按钮。该图片与上下文紧密相关，是登录后操作指引中编辑详情步骤的展示。](./assets/images/图片展示的是登录后在GS1-US-Dat-53b5bfbffb92.png)
 
@@ -111,11 +121,15 @@ UPC是通用产品代码的缩写，其英文全称是Universal Product Code。U
 
 ![图片展示的是在GS1 US Data Hub中创建或管理条形码时，添加新产品的界面。界面显示商品名称为“Foam Climbing Blocks - 4Pc Green/Navy”，GTIN为00850071031003。下方有“Package Measurement”和“Product Dimensions (optional)”等信息填写区域，如产品高度、宽度、深度、净重、总重等，部分区域为必填项。界面底部有“Close”“Save and Exit”“Skip this Step”和“Save”按钮。该图与上下文关系紧密，是登录后创建或管理条形码操作流程中的一个环节。](./assets/images/图片展示的是在GS1-US-Data-H-c33d4e462496.png)
 
-##### 填完信息后如下图所示生成具体信息，包括状态、UPC具体信息和上次操作时间
+##### 查看条码信息
+
+填完信息后如下图所示生成具体信息，包括状态、UPC具体信息和上次操作时间
 
 ![图片展示的是登录后在GS1 US Data Hub中“Create or Manage Barcodes”页面下“Add New Product”操作后的界面。页面上方有“Export Selected Products”和“Export All Products”按钮，下方是“Search All Columns”搜索框及筛选图标。下方表格中显示了1 - 1 of 1 Products，包含Status、Description、Brand、GTIN、GS1 Company Prefix、Packaging Level、SKU、Last Updated等列，其中Status列下有“PREMARKET”选项。该图与上下文关系为，展示了在GS1 US Data Hub中添加新商品后生成的具体信息界面，与亚马逊所需GTIN-12(U.P.C)对应的UPC条形码相关。](./assets/images/图片展示的是登录后在GS1-US-Dat-0385970ba3fa.png)
 
-##### 可查看详情，亚马逊需要的是GTIN-12(U.P.C)对应的UPC条形码
+##### 查看 UPC 条形码
+
+可查看详情，亚马逊需要的是GTIN-12(U.P.C)对应的UPC条形码
 
 ![图片展示的是在GS1 US Data Hub中生成的Foam Climbing Blocks - 4Pc Green/Navy商品信息界面。左侧显示商品描述、品牌、行业等信息，以及GTIN - 14、GTIN - 12（U.P.C.）、GS1公司前缀等条形码相关数据。右侧有“View Barcode”等操作按钮，其中“View Barcode”按钮被蓝色边框突出显示。该图片与文档中获取正规UPC/EAN条码及登录后操作指引的内容相关，直观呈现了生成的条形码信息及操作选项。](./assets/images/图片展示的是在GS1-US-Data-H-59a51bfaa98a.png)
 

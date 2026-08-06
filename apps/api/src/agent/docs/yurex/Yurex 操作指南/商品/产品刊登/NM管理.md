@@ -79,15 +79,21 @@ Wiki节点ID: "TbcCwhgt0iP5JXkcr2xcKklrnph"
 
 ![NM管理界面中 ， 上传Newer Model操作路径下的“点击【下载文件】”内容。画面中“操作”列下有“下载文件”按钮，箭头指向该按钮，提示可通过点击此。](./assets/images/图片展示了NM管理界面中-5fea17992ffb.png)
 
-### 当此条数据状态变为【运营审核中】时，表示您的Newer Model已提交成功，并已提交至管理端。
+### 运营审核中
+
+当此条数据状态变为【运营审核中】时，表示您的Newer Model已提交成功，并已提交至管理端。
 
 ![亚马逊平台Newer Model管理界面。中间区域显示Newer Model列表，包含申请编号、ASIN、数据提交时间、产品负责人、联系人、状态、操作等列。](./assets/images/图片展示的是亚马逊平台Newer-Mod-817ba582c722.png)
 
-### 当此条数据状态变为【审核通过】时，表示您的Newer Model产品已经审核通过。
+### 审核通过
+
+当此条数据状态变为【审核通过】时，表示您的Newer Model产品已经审核通过。
 
 ![NM管理中上传Newer Model的操作界面。界面中列出了相关数据信息，其中一条数据的“状态”列以红色框突出显示为“运营审核中”。](./assets/images/图片展示的是NM管理中上传Newer-M-67cccc5d0847.png)
 
-### 当此条数据状态变为【审核失败】时，表示您Newer Model在Amazon审核失败。
+### 审核失败
+
+当此条数据状态变为【审核失败】时，表示您Newer Model在Amazon审核失败。
 
 > 若审核失败，您可以根据反馈的失败原因修改产品Newer Model信息重新提交。
 >
