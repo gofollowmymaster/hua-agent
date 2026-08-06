@@ -12,9 +12,7 @@ Wiki节点ID: "AZ4GweuJ6icsBZk89p8cmMBVn7e"
 
 **VC业务模式简述**
 
-![画板：亚马逊VC合作要求](./assets/whiteboards/亚马逊VC合作要求-BBDkw6bqjhPELGbffD4czYd7nMh.png)
-
-> 画板来源：token=`BBDkw6bqjhPELGbffD4czYd7nMh`
+![亚马逊VC合作仓储与配送链路画板：供应商自行承担费用，将本地工厂或仓库货物运至海外仓；PO订单由亚马逊配送至VC仓库后再送达C端客户，DF订单则由亚马逊从海外仓直接配送至C端客户，两种订单的亚马逊配送费用均不由供应商承担。](./assets/whiteboards/亚马逊VC合作要求-BBDkw6bqjhPELGbffD4czYd7nMh.png)
 
 #### 一、合规要求
 

@@ -18,9 +18,7 @@ Wiki节点ID: "GqLMw1JoDinC9KkGhDscNVLnnyf"
 
 ### 关键节点
 
-![画板：关键节点](./assets/whiteboards/关键节点-VfM3w80rchZtMpb3Ot7cypxGnEg.png)
-
-> 画板来源：token=`VfM3w80rchZtMpb3Ot7cypxGnEg`
+![DF订单关键节点流程画板：系统查看新订单并下载标签，海外仓按订单备货，承运商提货后在系统点击出库；C端买家收货后，系统确认账单，完成DF订单履约。](./assets/whiteboards/关键节点-VfM3w80rchZtMpb3Ot7cypxGnEg.png)
 
 ### 操作指南
 

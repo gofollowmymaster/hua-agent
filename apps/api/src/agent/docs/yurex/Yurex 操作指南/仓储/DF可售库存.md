@@ -22,8 +22,6 @@ DF可售库存：可查看并能设置产品在某仓库的DF可售库存数量�
 
 ![DF可售库存系统流程画板，包含系统与亚马逊两条泳道：针对执行成功或失败的普通产品，用户在系统填写DF可售库存，亚马逊接收并更新库存；系统随后获取亚马逊的更新结果并结束流程。](./assets/whiteboards/系统流程-GUnXwplVGhT9XdbHv5PczlL5nKd.png)
 
-> 画板来源：token=`GUnXwplVGhT9XdbHv5PczlL5nKd`
-
 ## 操作指南
 
 ### 查看DF可售库存

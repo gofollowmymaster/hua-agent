@@ -12,13 +12,9 @@ PO订单处理
 
 ## 一、关键节点
 
-![画板：一、关键节点](./assets/whiteboards/一、关键节点-PObjw9zwOhXhplbKR50cXvVDnTc.png)
+![PO订单关键节点总流程画板：蓝色节点为Yurex系统操作，黄色节点为线下操作。收到PO后需在23小时内接单并下载标签，仓库备货后由运输商提货；随后在系统完成出库并上传BOL签单，亚马逊收货后确认账单，结束订单流程。](./assets/whiteboards/一、关键节点-PObjw9zwOhXhplbKR50cXvVDnTc.png)
 
-> 画板来源：token=`PObjw9zwOhXhplbKR50cXvVDnTc`
-
-![画板：一、关键节点](./assets/whiteboards/一、关键节点-X2qCwq4Mwhbh37bf0YycGAArnAf.png)
-
-> 画板来源：token=`X2qCwq4Mwhbh37bf0YycGAArnAf`
+![PO订单关键节点时间轴画板：系统生成PO订单后需在23小时内接单，随后生成物流单、下载箱标及运输标签并创建Shipment；仓库按标签备货，运输商提货后在系统生成出库单并完成出库，再上传签收BOL，最后进入对账结算。画板同时标注了各环节入口、操作要点和接单、标签下载及承运商分配等时间要求。](./assets/whiteboards/一、关键节点-X2qCwq4Mwhbh37bf0YycGAArnAf.png)
 
 ## 二、操作流程
 

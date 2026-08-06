@@ -61,8 +61,6 @@ PS：不同于亚马逊只保留65天(daily)的广告报告数据，会保留所
 
 ![SD广告创建操作画板：先设置活动名称、起止日期和预算；再设置广告组名称及覆盖人数、页面访问或转化等优化目标，对应VCPM或CPC计费。广告可选择图片或视频格式及落地页，并配置商品或受众定位；创意需填写图片、视频、Logo、标题等素材，最后保存草稿或提交。](./assets/whiteboards/操作流程-RKFiwVOJ3hS7zmbRfPncSrq6nRf.png)
 
-> 画板来源：token=`RKFiwVOJ3hS7zmbRfPncSrq6nRf`
-
 ### 创建SD广告活动
 
 点击【创建广告活动】，进入创建页面

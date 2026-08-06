@@ -33,8 +33,6 @@ VCPO货件，在VCPO订单被确认并接受后，系统将自动为已接单订
 
 ![VCPO货件系统流程画板：系统创建货件并从亚马逊获取箱唛标签及承运商信息，随后下载并保存货件附件与标签，供仓库备货、贴标和后续交运使用。](./assets/whiteboards/系统流程-RVzRwHzuhhVYqKbO5Zecudk4nVb.png)
 
-> 画板来源：token=`RVzRwHzuhhVYqKbO5Zecudk4nVb`
-
 ## 操作指南
 
 ### 查看货件单列表

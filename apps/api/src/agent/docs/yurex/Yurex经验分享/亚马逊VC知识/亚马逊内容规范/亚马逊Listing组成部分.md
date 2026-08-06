@@ -12,9 +12,7 @@ Wiki节点ID: "VYHvwhUr6iPgQ5keig9cI5ZSnZg"
 
 ## Listing框架
 
-![画板：Listing框架](./assets/whiteboards/Listing框架-OoZdwPln0hRVN4bYdyOcJtpInXg.png)
-
-> 画板来源：token=`OoZdwPln0hRVN4bYdyOcJtpInXg`
+![亚马逊Listing结构思维导图：八大核心要素包括Title、Brand Name、Product Image、Bullet Point、Product Description、A+或Premium A+、Search Term和Browse Node；完整页面还包括Amazon Badge、Price、商品图片与视频、Variations、Brand Story、Product Information、Q&A与Reviews、Sponsored Ads、Ratings、推荐商品及按特征评分。图中标注搜索权重依次为Title、Bullet Point、Description或A+、Q&A或Reviews。](./assets/whiteboards/Listing框架-OoZdwPln0hRVN4bYdyOcJtpInXg.png)
 
 ## Listing填写规则
 

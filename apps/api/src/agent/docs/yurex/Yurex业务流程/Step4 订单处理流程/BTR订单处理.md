@@ -12,9 +12,7 @@ BTR订单处理
 
 ## 关键节点
 
-![画板：关键节点](./assets/whiteboards/关键节点-Cb4QwDPhqhDpwDbA5YNcwz2Knhh.png)
-
-> 画板来源：token=`Cb4QwDPhqhDpwDbA5YNcwz2Knhh`
+![BTR订单关键节点流程画板：创建并提交订单后先经平台运营经理审核，未通过则编辑后重新提交；通过后进入亚马逊审核，未通过由平台运营经理调整并再次提交。审核通过后查看结果并在亚马逊采购订单模块接单，按正常流程发货至亚马逊VC仓；销售期结束后查看销售进度，未售罄则核对滞留费用，随后进入财务结算，售罄订单可直接结算。](./assets/whiteboards/关键节点-Cb4QwDPhqhDpwDbA5YNcwz2Knhh.png)
 
 ## 操作说明
 

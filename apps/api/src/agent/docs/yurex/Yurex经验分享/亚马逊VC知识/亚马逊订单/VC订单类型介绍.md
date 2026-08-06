@@ -10,9 +10,7 @@ Wiki节点ID: "LUA6w1pXpiikRYkq7WrctgVenmg"
 
 VC订单类型介绍
 
-![画板：未命名上下文](./assets/whiteboards/未命名上下文-Xrx3wXO4EhfkzNbtmhxc18ONnOi.png)
-
-> 画板来源：token=`Xrx3wXO4EhfkzNbtmhxc18ONnOi`
+![亚马逊VC订单类型思维导图：订单分为DF订单、PO订单和DI订单，其中PO订单进一步分为Auto PO、BTR和BBO三类。](./assets/whiteboards/未命名上下文-Xrx3wXO4EhfkzNbtmhxc18ONnOi.png)
 
 ## VC订单类型
 
@@ -49,9 +47,7 @@ DF订单是指亚马逊作为平台销售商时，供应商直接将商品发货
 
 ### PO订单流程
 
-![画板：PO订单流程](./assets/whiteboards/PO订单流程-B9kLwBIm7hsy5kbeNTFcEEpdnIf.png)
-
-> 画板来源：token=`B9kLwBIm7hsy5kbeNTFcEEpdnIf`
+![亚马逊VC PO订单泳道画板，按VC卖家、海外仓和亚马逊分工：卖家创建PO Offer并配置发货仓，海外仓备货后开启接单；亚马逊下达PO，卖家按库存确认数量和提货时间并创建Shipment、箱唛及ASN；亚马逊分配SP、LTL或TL承运商并生成运输标签，海外仓贴标打托备货。承运商提货后，LTL或TL取得BOL，卖家确认出库、提交ASN及BOL，货物到达VC仓上架销售。](./assets/whiteboards/PO订单流程-B9kLwBIm7hsy5kbeNTFcEEpdnIf.png)
 
 ### PO订单常见问题
 
@@ -72,9 +68,7 @@ DF订单是指亚马逊作为平台销售商时，供应商直接将商品发货
 
 ### DF订单流程
 
-![画板：DF订单流程](./assets/whiteboards/DF订单流程-HciOw6aFLhwEg0b1tdcc50janeK.png)
-
-> 画板来源：token=`HciOw6aFLhwEg0b1tdcc50janeK`
+![亚马逊VC DF订单泳道画板，按VC卖家、海外仓、亚马逊和C端客户分工：卖家创建DF Offer并配置发货仓，海外仓备货到仓后为ASIN设置DF可售库存；Offer变为可售后客户下单，亚马逊向卖家传递订单。卖家确认订单并下载Shipping Label，海外仓拣货贴标，亚马逊安排UPS或CEVA提货并承担运费，将商品送达客户；卖家在确认提货后执行Confirm Shipment。](./assets/whiteboards/DF订单流程-HciOw6aFLhwEg0b1tdcc50janeK.png)
 
 ### DF订单常见问题
 

@@ -12,9 +12,7 @@ Wiki节点ID: "Ir0GwAuIBigTkjkZgDbczKPAnXc"
 
 ## Yurex广告系统使用流程
 
-![画板：Yurex广告系统使用流程](./assets/whiteboards/Yurex广告系统使用流程-W4f8wE2wOhDZL0b9jhfcGTjHnYf.png)
-
-> 画板来源：token=`W4f8wE2wOhDZL0b9jhfcGTjHnYf`
+![Yurex广告系统使用七步流程画板：先签署并上传广告服务合同，配置广告收付款账户，再在广告财务中开通广告账户；随后通过广告财务完成充值，在广告活动中选择产品投放；运营期间持续管理余额并优化广告，终止合作时签订广告服务终止协议，待账户余额提现和保证金提现完成后结束。](./assets/whiteboards/Yurex广告系统使用流程-W4f8wE2wOhDZL0b9jhfcGTjHnYf.png)
 
 ## 准备工作
 

@@ -22,8 +22,6 @@ FBA订单审核通过后，系统自动创建FBA货件单，您可在此处查�
 
 ![FBA货件系统流程画板：FBA订单审核通过后系统创建FBA货件；自提模式下需编辑货件并补充预约信息，完成预约后由仓库出库，货物进入运输并最终到仓；非自提模式按承运配置直接进入后续出库和运输环节。](./assets/whiteboards/系统流程-TY6gwOjBihIaMZbinzYcHRLVnei.png)
 
-> 画板来源：token=`TY6gwOjBihIaMZbinzYcHRLVnei`
-
 ## 操作指南
 
 ### 查看FBA货件列表

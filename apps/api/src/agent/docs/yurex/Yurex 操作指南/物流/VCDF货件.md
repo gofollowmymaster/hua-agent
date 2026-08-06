@@ -26,8 +26,6 @@ VCDF货件，当DF正常落单后，系统将自动生成DF物流，您可在此
 
 ![VCDF货件系统流程画板：系统创建VCDF货件后，用户下载货件附件，仓库按附件备货并贴标；承运商上门提货后，用户在出库列表提交对应出库单，完成货件出库。](./assets/whiteboards/系统流程-MzotwQw6nhiIsXbXtc2cmw5Ankh.png)
 
-> 画板来源：token=`MzotwQw6nhiIsXbXtc2cmw5Ankh`
-
 ## 操作指南
 
 ### 查看VCDF货件单列表

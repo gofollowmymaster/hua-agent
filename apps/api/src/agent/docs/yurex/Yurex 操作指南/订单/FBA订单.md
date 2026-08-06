@@ -24,8 +24,6 @@ FBA订单
 
 ![FBA订单系统流程画板：创建FBA订单后可暂存草稿或提交运营审核；审核拒绝时可修改后重新提交，也可取消订单；审核通过后创建物流货件和出库单，仓库完成出库运输，最终送达并签收。](./assets/whiteboards/系统流程-AgszwqF5ChOCtFbw1PtcK0rln7e.png)
 
-> 画板来源：token=`AgszwqF5ChOCtFbw1PtcK0rln7e`
-
 ## 操作指南
 
 ### FBA订单列表

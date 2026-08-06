@@ -17,6 +17,4 @@ Yurex业务流程
 
 **点击具体模块，可跳转操作文档SOP。**
 
-![画板：业务主流程](./assets/whiteboards/业务主流程-HaTQwxWYNheFX4bE5WIc1vmanwd.png)
-
-> 画板来源：token=`HaTQwxWYNheFX4bE5WIc1vmanwd`
+![Yurex VC合作业务主流程画板：从Yurex账号开通、用户角色权限配置和系统培训开始，依次完成新增商品、采购报价审核、仓库配置、品牌授权及商品上传至VC、库存录入与DF库存配置；业务运行阶段涵盖BTR、DF和PO订单处理、促销提报、广告账户开通、VC数据查看、工单处理、财务对账和周期性复盘，最终完成通关。](./assets/whiteboards/业务主流程-HaTQwxWYNheFX4bE5WIc1vmanwd.png)

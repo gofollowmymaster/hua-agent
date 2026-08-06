@@ -29,8 +29,6 @@ BBO，全称Bulk Buy Offer，亚马逊批量采购询价单，是在现有PO供�
 
 ![BBO询价单系统流程画板：亚马逊下发BBO询价；可议价时卖家提交还价，由亚马逊审核并产生接受、拒绝或调整数量等分支，各分支在倒计时结束后汇合。询价结果同步至亚马逊后，亚马逊下发PO或BBO订单，卖家接单、仓库发货，最终由亚马逊收货。](./assets/whiteboards/系统流程-NXrow18zxhkHVgbLS2nc4LuknLb.png)
 
-> 画板来源：token=`NXrow18zxhkHVgbLS2nc4LuknLb`
-
 ## 操作指南
 
 ### 新BBO询价单通知
