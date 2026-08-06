@@ -18,7 +18,7 @@
                   danger
                   type="primary"
                   :disabled="ingesting"
-                  @click="runIngest(true)"
+                  @click="confirmForceRebuildIndex"
                 >
                   强制重建索引
                 </ApButton>
@@ -254,6 +254,19 @@
     } finally {
       ingesting.value = false;
     }
+  }
+
+  function confirmForceRebuildIndex() {
+    ApModal.confirm({
+      title: '确认强制重建索引？',
+      content:
+        '请确认文档已准备好。本次操作将重建全部文档索引，耗时较长，请耐心等待。',
+      okText: '确认重建',
+      cancelText: '取消',
+      onOk() {
+        return runIngest(true);
+      }
+    });
   }
 
   function remove(item: RagDocumentItem) {

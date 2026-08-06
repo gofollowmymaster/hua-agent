@@ -15,6 +15,7 @@
 - `document-manager/index.vue`：RAG 文档管理。
 - `session-records/index.vue`：会话与消息记录查看。
 - `assistant-demo/index.vue`：助手演示页面。
+- `business-agent/knowledge|skills|sessions|config|demo/index.vue`：业务 Agent 骨架占位页面。
 
 模块公共展示组件位于对应页面目录的 `components/`，业务弹窗、抽屉和页面区块位于 `sections/`，跨项目稳定复用组件位于 `src/components/`，例如文档预览弹窗。后台布局位于 `src/layouts/admin-layout.vue`，全局抽屉容器位于 `src/layouts/layout-drawer.vue`，路由定义位于 `src/router/`。
 
@@ -44,6 +45,7 @@ RAG Admin 开发态通过 Vite proxy 将 `/ai` 请求转发到 API 后端。生�
 - 新增路由时确认页面标题、布局、鉴权要求和默认跳转行为。
 - 路由 `name` 使用稳定语义化名称，优先 `camelCase` 或同文件既有风格；页面组件文件使用 `kebab-case.vue`。
 - 路由 path 使用短横线 kebab-case，避免拼音、无意义缩写或过深层级。
+- 路由按一级模块组织：`/knowledge/*` 承载知识问答，`/business-agent/*` 承载业务 Agent；旧 `/documents`、`/sessions`、`/assistant` 保留 redirect。
 
 ## 状态管理规则
 

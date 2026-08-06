@@ -13,6 +13,7 @@ import { AdminModule } from './admin/admin.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AlertModule } from './alert/alert.module';
 import { FdCopilotModule } from './fd-copilot/fd-copilot.module';
+import { AgentModule } from './agent/agent.module';
 import { TenantMiddleware } from './common/middleware/tenant.middleware';
 import { DiscardMiddleware } from './common/middleware/discard.middleware';
 import { DevopsModule } from './devops/devops.module';
@@ -27,6 +28,7 @@ const modulesAll = [
   ManageModule,
   RobotModule,
   AiModule,
+  AgentModule,
   AdminModule,
   DocModule,
   DocModule,

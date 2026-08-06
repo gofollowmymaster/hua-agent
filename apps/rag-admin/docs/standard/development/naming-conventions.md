@@ -62,7 +62,7 @@ rag-admin -> 业务域 -> 模块名 -> 动作 / 表语义
 
 ```ts
 {
-  path: '/documents',
+  path: '/knowledge/documents',
   name: 'documents',
   component: () => import('@/views/document-manager/index.vue'),
   meta: { title: '文档管理' },

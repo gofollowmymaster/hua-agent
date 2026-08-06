@@ -1,0 +1,4 @@
+interface:
+  display_name: "飞书文档Markdown同步"
+  short_description: "将飞书文档同步并保存为本地 Markdown 文件"
+  default_prompt: "使用 $fd-doc-markdown-sync，将这个飞书文档同步为本地 Markdown 文件。"

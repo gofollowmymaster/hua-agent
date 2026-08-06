@@ -15,6 +15,8 @@
         theme="dark"
         :items="menuItems"
         :selected-keys="selectedKeys"
+        :open-keys="openKeys"
+        @update:open-keys="handleOpenKeysChange"
         @click="handleMenuClick"
       />
     </LayoutSider>
@@ -51,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { RouterView, useRoute, useRouter } from 'vue-router';
 import {
   Avatar,
@@ -82,12 +84,19 @@ const currentTitle = computed(() => String(route.meta.title || 'RAG 管理后台
 const currentSubtitle = computed(() =>
   String(route.meta.subtitle || 'RAG 文档与对话运营后台'),
 );
+const openKeys = ref<string[]>([]);
+const leafMenus = adminMenus.flatMap((group) => group.children);
 
 const menuItems = computed<ItemType[]>(() =>
-  adminMenus.map((menu) => ({
-    key: menu.name,
-    label: menu.title,
-    title: menu.title,
+  adminMenus.map((group) => ({
+    key: group.name,
+    label: group.title,
+    title: group.title,
+    children: group.children.map((menu) => ({
+      key: menu.name,
+      label: menu.title,
+      title: menu.title,
+    })),
   })),
 );
 
@@ -100,15 +109,30 @@ const userMenuItems: ItemType[] = [
 ];
 
 const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
-  const menu = adminMenus.find((item) => item.name === key);
+  const menu = leafMenus.find((item) => item.name === key);
   if (menu && route.path !== menu.path) {
     void router.push(menu.path);
   }
 };
 
+function handleOpenKeysChange(keys: Array<string | number>) {
+  openKeys.value = keys.map(String);
+}
+
 const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
   if (key === 'logout') userStore.logout();
 };
+
+watch(
+  () => String(route.name || ''),
+  (name) => {
+    const group = adminMenus.find((item) =>
+      item.children.some((menu) => menu.name === name),
+    );
+    openKeys.value = group ? [group.name] : [];
+  },
+  { immediate: true },
+);
 </script>
 
 <style lang="less" scoped>
