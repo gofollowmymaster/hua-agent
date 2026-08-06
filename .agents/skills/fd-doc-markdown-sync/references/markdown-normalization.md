@@ -31,10 +31,12 @@
 
 ## 图片、画板、思维导图、附件
 
-- `<image token="..." width="..." height="..." />` 转为图片占位，保留 token、width、height。
-- `<img token="..." width="..." height="..." />` 同样转为图片占位，优先使用 `alt` 属性作为标题，然后回退为上下文标题；token 优先使用 `token` 属性，其次 `src` 属性。
-- `<whiteboard token="..." />` 优先下载缩略图到输出文件旁的 `assets/whiteboards/`，并转为 Markdown 图片引用。
-- 只有下载失败或未启用 `--download-whiteboards true` 时，才降级为 token 占位。
+- 文档中的 Markdown 图片 `![alt](url)` 默认保持云端链接。
+- `<image token="..." src="..." width="..." height="..." />` 默认转为云端 Markdown 图片引用；只有 token 且无 src 时保留 token 占位，并保留 width、height。
+- `<img token="..." src="..." width="..." height="..." />` 默认同样转为云端 Markdown 图片引用；优先使用 `alt` 属性作为标题，然后回退为上下文标题。
+- 传 `--download-images true` 时，Markdown 图片、`<image>`、`<img>` 会下载到输出文件旁的 `assets/images/` 并替换为本地相对路径；下载失败自动回退云端链接或 token 占位。
+- `<whiteboard token="..." />` 自动优先调用 `lark-cli whiteboard +query --output_as code` 导出 Mermaid；成功时输出 ` ```mermaid ... ``` ` 代码块并保留来源 token。
+- Mermaid 不可用或画板内不是单一 Mermaid 图时，自动保存截图到输出文件旁的 `assets/whiteboards/` 并转为 Markdown 图片引用；截图也失败时保留 token 占位。
 - `<mindnote token="..." />` 必须展开为树形分层 Markdown 列表，保留来源 token。
 - 思维导图节点结构由 `--mindnote-map` 提供。脚本支持 JSON 节点树或已渲染的 Markdown 树：
 

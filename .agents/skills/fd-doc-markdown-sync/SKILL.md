@@ -11,6 +11,7 @@ description: 将单个飞书云文档、知识库文档链接或文档 token 拉
 
 - `lark-shared`：认证、身份、权限处理。
 - `lark-doc`：读取飞书文档、下载图片/文件/画板素材。
+- `lark-whiteboard`：导出画板 Mermaid 代码或截图。
 - `lark-drive`：inspect 文档类型、处理独立思维导图对象；当文档中出现 `<mindnote token="..."/>` 时用于进一步追溯。
 - `lark-wiki`：当输入是 `/wiki/` 链接且需要确认真实文档类型时使用。
 
@@ -82,14 +83,15 @@ description: 将单个飞书云文档、知识库文档链接或文档 token 拉
        --remote "<飞书文档链接或 token>" \
        --snapshot-at "<YYYY-MM-DD>" \
        --assets-dir "<输出文件所在目录>/assets" \
-       --download-whiteboards true \
+       --download-images true \
        --mindnote-map "<mindnote-map.json>" \
        --input "<raw.md>" \
        --output "<target.md>"
      ```
 
    - 也可以通过 stdin 输入原始 Markdown，省略 `--input`。
-   - 如果不希望下载画板缩略图，使用 `--download-whiteboards false`。
+   - 画板自动优先尝试导出 Mermaid 代码块；Mermaid 不可用时自动保存截图到 `assets/whiteboards/` 并改为本地图片引用；两者都失败才保留 token 占位。
+   - 图片默认保持云端链接；需要把图片下载到本地时传 `--download-images true`，图片会保存到输出文件旁的 `assets/images/` 并替换为本地相对路径，下载失败自动回退云端链接。
    - 如果文档没有思维导图，可以省略 `--mindnote-map`。
    - 如果需要生成需求包文档（PRD/测分/后端系分）格式的头部，可使用：
      - `--kind prd`：生成 `# PRD：{标题}` 头部，配合 `--team-info` 可在文档信息表格中追加人员信息行。
@@ -98,7 +100,7 @@ description: 将单个飞书云文档、知识库文档链接或文档 token 拉
      - 不传 `--kind`：保持默认 `# 飞书文档：{标题}` 头部。
    - 如果需要关联飞书项目工作项，传入 `--work-item "<工作项链接>"`，会在文档信息表格中追加 `| 飞书项目工作项 | ... |` 行。
    - 如果需要在 PRD 文档中标注人员信息，传入 `--team-info "<产品：{姓名} / 测试：{姓名} / 后端：{姓名}>"`（仅当 `--kind prd` 时生效）。
-   - 图片和附件默认保留可追溯 token 占位；画板在可下载时保存到 `assets/whiteboards/` 并写成 Markdown 图片引用；思维导图必须展开为树形分层文本。
+   - 图片默认保留云端 Markdown 链接；启用 `--download-images true` 后下载到 `assets/images/`。附件默认保留可追溯 token 占位；画板优先转为 Mermaid 代码块，失败则保存截图到 `assets/whiteboards/`；思维导图必须展开为树形分层文本。
    - 转换细节见 `references/markdown-normalization.md`。
 
 5. **验收**
@@ -115,7 +117,7 @@ description: 将单个飞书云文档、知识库文档链接或文档 token 拉
 
 6. **回报结果**
    - 输出本地 Markdown 路径。
-   - 输出素材目录路径，若无素材则说明未生成。
+   - 输出素材目录路径（`assets/images/`、`assets/whiteboards/`），若无素材则说明未生成。
    - 说明跳过或失败原因，例如权限不足、链接不是云文档、文档为空、画板缩略图下载失败、思维导图节点读取失败。
    - 如果发现 lark-cli 更新提示，完成当前任务后提醒用户。
 

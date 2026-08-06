@@ -2,6 +2,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 
 const args = parseArgs(process.argv.slice(2));
@@ -15,7 +16,7 @@ const outputPath = args.output ? path.resolve(args.output) : "";
 const assetsDir =
   args["assets-dir"] ||
   (outputPath ? path.join(path.dirname(outputPath), "assets") : "");
-const downloadWhiteboards = args["download-whiteboards"] === "true";
+const downloadImages = args["download-images"] === "true";
 const mindnoteMap = loadMindnoteMap(args["mindnote-map"]);
 const allowUnresolvedMindnotes = args["allow-unresolved-mindnotes"] === "true";
 const kind = args.kind || "";
@@ -33,7 +34,7 @@ const output = normalizeDocument(input, {
   sourceCommand,
   assetsDir,
   outputPath,
-  downloadWhiteboards,
+  downloadImages,
   mindnoteMap,
   allowUnresolvedMindnotes,
   kind,
@@ -74,11 +75,14 @@ function loadMindnoteMap(filePath) {
 function normalizeDocument(markdown, meta) {
   let body = markdown.replace(/\r\n/g, "\n");
   const mindnoteBlocks = [];
+  const whiteboardBlocks = [];
   body = stripExistingSnapshotHeader(body);
-  body = normalizeBlockAssets(body, meta, mindnoteBlocks);
+  body = normalizeMarkdownImages(body, meta);
+  body = normalizeBlockAssets(body, meta, mindnoteBlocks, whiteboardBlocks);
   body = body.replace(/<lark-table\b[^>]*>[\s\S]*?<\/lark-table>/g, tableToMarkdown);
   body = body.replace(/<table\b[^>]*>[\s\S]*?<\/table>/g, tableToMarkdown);
   body = cleanInline(body);
+  body = restoreWhiteboardBlocks(body, whiteboardBlocks);
   body = restoreMindnoteBlocks(body, mindnoteBlocks);
   body = normalizeHeadingLevels(body);
   body = normalizeWhitespace(body);
@@ -90,6 +94,7 @@ function normalizeDocument(markdown, meta) {
 
   const docInfoRows = [
     `| 远程文档 | ${meta.remote || "未记录"} |`,
+    `| 图片处理 | ${meta.downloadImages ? "本地下载（assets/images）" : "云端引用"} |`,
   ];
 
   if (meta.workItem) {
@@ -131,7 +136,7 @@ function stripExistingSnapshotHeader(markdown) {
     .replace(/^#\s+(飞书文档|文档快照|PRD 快照|PRD|测分|后端系分)[^\n]*\n+/, "");
 }
 
-function normalizeBlockAssets(markdown, meta, mindnoteBlocks) {
+function normalizeBlockAssets(markdown, meta, mindnoteBlocks, whiteboardBlocks) {
   let out = markdown;
   out = out.replace(/<view[^>]*>\s*<file\s+([^>]*?)\/>\s*<\/view>/g, (_, attrs) => {
     const name = attr(attrs, "name") || "未命名附件";
@@ -140,15 +145,25 @@ function normalizeBlockAssets(markdown, meta, mindnoteBlocks) {
   });
   out = out.replace(/<image\s+([^>]*?)\/>/g, (_, attrs, offset) => {
     const token = attr(attrs, "token") || "unknown";
+    const url = attr(attrs, "src") || attr(attrs, "url");
     const width = attr(attrs, "width");
     const height = attr(attrs, "height");
+    const alt = attr(attrs, "alt") || currentContextTitle(out, offset);
     const size = [width ? `width=${width}` : "", height ? `height=${height}` : ""]
       .filter(Boolean)
       .join("，");
+    const assetPath = materializeImage({ url, token, title: alt, meta });
+    if (assetPath) {
+      return `\n\n![${escapeImageAlt(alt)}](${assetPath})\n\n`;
+    }
+    if (url) {
+      return `\n\n![${escapeImageAlt(alt)}](${url})\n\n`;
+    }
     return `\n\n> 图片：${currentContextTitle(out, offset)}，token=\`${token}\`${size ? `，${size}` : ""}。远程素材未下载。\n\n`;
   });
   out = out.replace(/<img\s+([^>]*?)\/>/g, (_, attrs, offset) => {
-    const token = attr(attrs, "token") || attr(attrs, "src") || "unknown";
+    const token = attr(attrs, "token") || "unknown";
+    const url = attr(attrs, "src") || attr(attrs, "url");
     const width = attr(attrs, "width");
     const height = attr(attrs, "height");
     const alt = attr(attrs, "alt");
@@ -156,16 +171,19 @@ function normalizeBlockAssets(markdown, meta, mindnoteBlocks) {
       .filter(Boolean)
       .join("，");
     const caption = alt || currentContextTitle(out, offset);
+    const assetPath = materializeImage({ url, token, title: caption, meta });
+    if (assetPath) {
+      return `\n\n![${escapeImageAlt(caption)}](${assetPath})\n\n`;
+    }
+    if (url) {
+      return `\n\n![${escapeImageAlt(caption)}](${url})\n\n`;
+    }
     return `\n\n> 图片：${caption}，token=\`${token}\`${size ? `，${size}` : ""}。远程素材未下载。\n\n`;
   });
   out = out.replace(/<whiteboard\s+([^>]*?)(?:\/>|>\s*<\/whiteboard>)/g, (_, attrs, offset) => {
     const token = attr(attrs, "token") || "unknown";
     const title = currentContextTitle(out, offset);
-    const assetPath = materializeWhiteboard(token, title, meta);
-    if (assetPath) {
-      return `\n\n![画板：${escapeImageAlt(title)}](${assetPath})\n\n> 画板来源：token=\`${token}\`\n\n`;
-    }
-    return `\n\n> 画板：${title}，token=\`${token}\`。缩略图未下载；可执行 \`lark-cli docs +media-download --type whiteboard --token ${token}\` 后改为 Markdown 图片引用。\n\n`;
+    return renderWhiteboard(token, title, meta, whiteboardBlocks);
   });
   out = out.replace(/<mindnote\s+([^>]*?)\/>/g, (_, attrs, offset) => {
     const token = attr(attrs, "token") || "unknown";
@@ -192,6 +210,128 @@ function restoreMindnoteBlocks(markdown, mindnoteBlocks) {
     out = out.replace(`%%FEISHU_MINDNOTE_BLOCK_${index}%%`, mindnoteBlocks[index]);
   }
   return out;
+}
+
+function normalizeMarkdownImages(markdown, meta) {
+  return markdown.replace(/!\[([\s\S]*?)\]\((https?:\/\/[^)\s]+)\)/g, (_, alt, url) => {
+    const assetPath = materializeImage({ url, title: alt || "图片", token: "", meta });
+    if (assetPath) return `![${escapeImageAlt(alt)}](${assetPath})`;
+    return `![${escapeImageAlt(alt)}](${url})`;
+  });
+}
+
+function materializeImage({ url, token, title, meta }) {
+  if (!meta.downloadImages || !meta.assetsDir) return "";
+
+  const relativeDir = "images";
+  const absoluteDir = path.resolve(meta.assetsDir, relativeDir);
+  const identifier =
+    token && token !== "unknown"
+      ? token
+      : url
+        ? createHash("sha256").update(url).digest("hex").slice(0, 12)
+        : "unknown";
+  const shortTitle = String(title || "图片")
+    .split(/[，。；、,.;]/)[0]
+    .trim()
+    .slice(0, 20);
+  const baseName = slugify(`${shortTitle}-${identifier}`).slice(0, 80) || "图片";
+
+  fs.mkdirSync(absoluteDir, { recursive: true });
+  const existing = findImageFile(absoluteDir, baseName);
+  if (existing) return imageRelativePath(meta, path.join(absoluteDir, existing));
+  if (url) return downloadImageFromUrl(url, baseName, absoluteDir, meta);
+  if (token && token !== "unknown") {
+    return downloadImageByToken(token, baseName, absoluteDir, meta);
+  }
+  return "";
+}
+
+function downloadImageFromUrl(url, baseName, absoluteDir, meta) {
+  const outputPath = path.join(absoluteDir, `${baseName}.download`);
+  try {
+    const headers = execFileSync(
+      "curl",
+      [
+        "-L",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--dump-header",
+        "-",
+        "--output",
+        outputPath,
+        url,
+      ],
+      { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+    );
+    const extension =
+      extensionFromContentType(headers) || extensionFromUrl(url) || ".png";
+    const finalPath = path.join(absoluteDir, `${baseName}${extension}`);
+    fs.renameSync(outputPath, finalPath);
+    return imageRelativePath(meta, finalPath);
+  } catch {
+    fs.rmSync(outputPath, { force: true });
+    return "";
+  }
+}
+
+function downloadImageByToken(token, baseName, absoluteDir, meta) {
+  try {
+    execFileSync(
+      "lark-cli",
+      [
+        "docs",
+        "+media-download",
+        "--token",
+        token,
+        "--output",
+        baseName,
+        "--overwrite",
+        "--as",
+        "user",
+      ],
+      { cwd: absoluteDir, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+    );
+    const saved = findImageFile(absoluteDir, baseName);
+    return saved ? imageRelativePath(meta, path.join(absoluteDir, saved)) : "";
+  } catch {
+    return "";
+  }
+}
+
+function findImageFile(dir, baseName) {
+  if (!fs.existsSync(dir)) return "";
+  return (
+    fs.readdirSync(dir).find((name) => name.startsWith(`${baseName}.`)) || ""
+  );
+}
+
+function imageRelativePath(meta, absolutePath) {
+  const fromDir = meta.outputPath
+    ? path.dirname(meta.outputPath)
+    : path.resolve(meta.assetsDir, "..");
+  return toPosixRelative(fromDir, absolutePath);
+}
+
+function extensionFromContentType(headers) {
+  const mime = headers.match(/content-type:\s*([^;\r\n]+)/i)?.[1]?.trim().toLowerCase();
+  const map = {
+    "image/png": ".png",
+    "image/jpeg": ".jpg",
+    "image/gif": ".gif",
+    "image/webp": ".webp",
+    "image/svg+xml": ".svg",
+    "image/bmp": ".bmp",
+    "image/x-icon": ".ico",
+  };
+  return map[mime] || "";
+}
+
+function extensionFromUrl(url) {
+  const match = url.match(/\.(png|jpe?g|gif|webp|svg|bmp|ico)(?:$|\?)/i);
+  if (!match) return "";
+  return match[1].toLowerCase() === "jpeg" ? ".jpg" : `.${match[1].toLowerCase()}`;
 }
 
 function renderMindnote(token, contextTitle, meta) {
@@ -291,31 +431,223 @@ function safeText(value) {
     .trim();
 }
 
-function materializeWhiteboard(token, title, meta) {
-  if (!meta.assetsDir || !token || token === "unknown") return "";
-
-  const relativeDir = "whiteboards";
-  const filename = `${slugify(`${title}-${token}`)}.png`;
-  const absoluteDir = path.resolve(meta.assetsDir, relativeDir);
-  const absolutePath = path.join(absoluteDir, filename);
-  const relativePath = meta.outputPath
-    ? toPosixRelative(path.dirname(meta.outputPath), absolutePath)
-    : path.posix.join("assets", relativeDir, filename);
-
-  if (fs.existsSync(absolutePath)) return relativePath;
-  if (!meta.downloadWhiteboards) return "";
-
-  fs.mkdirSync(absoluteDir, { recursive: true });
-  try {
-    execFileSync(
-      "lark-cli",
-      ["docs", "+media-download", "--type", "whiteboard", "--token", token, "--output", filename],
-      { cwd: absoluteDir, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+function renderWhiteboard(token, title, meta, whiteboardBlocks) {
+  const mermaid = fetchWhiteboardMermaid(token);
+  if (mermaid) {
+    const placeholder = `%%FEISHU_WHITEBOARD_BLOCK_${whiteboardBlocks.length}%%`;
+    whiteboardBlocks.push(
+      [
+        `**画板：${title}**`,
+        "",
+        `> 画板来源：token=\`${token}\``,
+        "",
+        "```mermaid",
+        mermaid.trimEnd(),
+        "```",
+      ].join("\n"),
     );
-    return fs.existsSync(absolutePath) ? relativePath : "";
+    return `\n\n${placeholder}\n\n`;
+  }
+
+  const assetPath = materializeWhiteboardImage(token, title, meta);
+  if (assetPath) {
+    return `\n\n![画板：${escapeImageAlt(title)}](${assetPath})\n\n> 画板来源：token=\`${token}\`\n\n`;
+  }
+
+  return `\n\n> 画板：${title}，token=\`${token}\`。Mermaid 与截图均不可用。\n\n`;
+}
+
+function restoreWhiteboardBlocks(markdown, whiteboardBlocks) {
+  let out = markdown;
+  for (let index = 0; index < whiteboardBlocks.length; index += 1) {
+    out = out.replace(`%%FEISHU_WHITEBOARD_BLOCK_${index}%%`, whiteboardBlocks[index]);
+  }
+  return out;
+}
+
+function fetchWhiteboardMermaid(token) {
+  if (!token || token === "unknown") return "";
+  try {
+    const output = execFileSync(
+      "lark-cli",
+      [
+        "whiteboard",
+        "+query",
+        "--whiteboard-token",
+        token,
+        "--output_as",
+        "code",
+        "--as",
+        "user",
+        "--format",
+        "json",
+      ],
+      { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+    );
+    const code = extractWhiteboardCode(output);
+    return isMermaidCode(code) ? normalizeMermaidCode(code) : "";
   } catch {
     return "";
   }
+}
+
+function normalizeMermaidCode(code) {
+  const fenced = String(code || "").match(/```(?:mermaid)?\s*([\s\S]*?)```/i);
+  return (fenced?.[1] || code || "").trim();
+}
+
+function extractWhiteboardCode(output) {
+  try {
+    const parsed = JSON.parse(output);
+    const found = findStringField(parsed, [
+      "code",
+      "mermaid",
+      "plantuml",
+      "content",
+      "text",
+      "output",
+      "result",
+    ]);
+    if (typeof found === "string" && found.trim()) return found;
+  } catch {
+    const fenced = output.match(/```(?:mermaid|plantuml)?\s*([\s\S]*?)```/i);
+    if (fenced?.[1]?.trim()) return fenced[1];
+    return output.trim();
+  }
+  return "";
+}
+
+function findStringField(node, keys, depth = 0) {
+  if (!node || depth > 6) return "";
+  if (typeof node === "string") return node;
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      const found = findStringField(item, keys, depth + 1);
+      if (found) return found;
+    }
+    return "";
+  }
+  if (typeof node !== "object") return "";
+  for (const key of keys) {
+    if (typeof node[key] === "string" && node[key].trim()) return node[key];
+  }
+  for (const value of Object.values(node)) {
+    const found = findStringField(value, keys, depth + 1);
+    if (found) return found;
+  }
+  return "";
+}
+
+function isMermaidCode(code) {
+  const body = String(code || "")
+    .replace(/^%%\{[^}]*%%\}\s*/g, "")
+    .trim();
+  return /^(graph|flowchart|sequenceDiagram|classDiagram|stateDiagram|erDiagram|gantt|pie|journey|mindmap|timeline|gitGraph|quadrantChart|requirementDiagram|C4Context|block-beta|sankey-beta|xychart-beta|packet-beta|architecture-beta)\b/.test(
+    body,
+  );
+}
+
+function materializeWhiteboardImage(token, title, meta) {
+  if (!meta.assetsDir || !token || token === "unknown") return "";
+
+  const relativeDir = "whiteboards";
+  const absoluteDir = path.resolve(meta.assetsDir, relativeDir);
+  const filename = `${slugify(`${title}-${token}`)}.png`;
+  const absolutePath = path.join(absoluteDir, filename);
+  if (fs.existsSync(absolutePath)) {
+    return imageRelativePath(meta, absolutePath);
+  }
+
+  fs.mkdirSync(absoluteDir, { recursive: true });
+  const before = fs.existsSync(absoluteDir)
+    ? new Set(fs.readdirSync(absoluteDir))
+    : new Set();
+  try {
+    const output = execFileSync(
+      "lark-cli",
+      [
+        "whiteboard",
+        "+query",
+        "--whiteboard-token",
+        token,
+        "--output_as",
+        "image",
+        "--output",
+        absoluteDir,
+        "--overwrite",
+        "--as",
+        "user",
+        "--format",
+        "json",
+      ],
+      { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+    );
+    const savedPath = findSavedImagePath(output, absoluteDir, before);
+    if (savedPath) return imageRelativePath(meta, savedPath);
+  } catch {
+    // Fall through to media-download.
+  }
+
+  try {
+    execFileSync(
+      "lark-cli",
+      [
+        "docs",
+        "+media-download",
+        "--type",
+        "whiteboard",
+        "--token",
+        token,
+        "--output",
+        filename,
+        "--overwrite",
+        "--as",
+        "user",
+      ],
+      { cwd: absoluteDir, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+    );
+    if (fs.existsSync(absolutePath)) {
+      return imageRelativePath(meta, absolutePath);
+    }
+    const downloaded = fs.readdirSync(absoluteDir).find((name) =>
+      name.startsWith(`${slugify(`${title}-${token}`)}.`),
+    );
+    return downloaded
+      ? imageRelativePath(meta, path.join(absoluteDir, downloaded))
+      : "";
+  } catch {
+    return "";
+  }
+}
+
+function findSavedImagePath(output, absoluteDir, before) {
+  try {
+    const parsed = JSON.parse(output);
+    const saved = findStringField(parsed, [
+      "saved_path",
+      "output",
+      "path",
+      "file",
+      "image_path",
+    ]);
+    if (saved) {
+      const candidate = path.isAbsolute(saved)
+        ? saved
+        : path.resolve(absoluteDir, saved);
+      if (fs.existsSync(candidate)) return candidate;
+    }
+  } catch {
+    // Inspect the directory instead.
+  }
+
+  const after = fs.existsSync(absoluteDir)
+    ? fs.readdirSync(absoluteDir)
+    : [];
+  const created = after
+    .filter((name) => !before.has(name))
+    .map((name) => path.join(absoluteDir, name))
+    .find((file) => /\.(png|jpe?g|webp|gif)$/i.test(file));
+  return created || "";
 }
 
 function currentContextTitle(markdown, offset) {
