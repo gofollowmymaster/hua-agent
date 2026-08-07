@@ -5,7 +5,7 @@ Wiki节点ID: "JSvJw1l4Xi2cx1kREr6cuBW0nPd"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex 操作指南 > 财务 > 应付账款 > BTR滞销费用"
 当前版本: "v1.0.0"
-source_file: feishu-doc
+source_type: feishu-doc
 ---
 
 # 飞书文档：BTR滞销费用

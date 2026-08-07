@@ -5,7 +5,7 @@ Wiki节点ID: "Q6IqwXa5Vi1bkoktADjcMxwWn8g"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex 操作指南 > 仪表盘 > 履约绩效 > VCDF绩效表现"
 当前版本: "v1.0.0"
-source_file: feishu-doc
+source_type: feishu-doc
 ---
 
 # 飞书文档：VCDF绩效表现

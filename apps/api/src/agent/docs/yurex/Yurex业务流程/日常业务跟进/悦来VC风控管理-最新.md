@@ -4,7 +4,7 @@
 Wiki节点ID: "Z1mEwaIy9iqo0gk08VlcRSq7n5g"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex业务流程 > 日常业务跟进 > 悦来VC风控管理-最新"
-source_file: feishu-doc
+source_type: feishu-doc
 ---
 
 # 飞书文档：悦来VC风控管理-最新

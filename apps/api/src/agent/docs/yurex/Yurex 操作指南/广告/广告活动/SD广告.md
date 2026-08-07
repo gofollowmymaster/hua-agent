@@ -5,7 +5,7 @@ Wiki节点ID: "MEwWwz64WiUEi0kkeUZcvjKFnMf"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex 操作指南 > 广告 > 广告活动 > SD广告"
 当前版本: "v1.0.2"
-source_file: feishu-doc
+source_type: feishu-doc
 ---
 
 # 飞书文档：SD广告

@@ -5,7 +5,7 @@ Wiki节点ID: "Ru7VwkfydiHA7QkcjXfcrFYynGf"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex 操作指南 > 统计 > ABA搜索词报告"
 当前版本: "v1.0.0"
-source_file: feishu-doc
+source_type: feishu-doc
 ---
 
 # 飞书文档：ABA搜索词报告

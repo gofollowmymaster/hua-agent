@@ -4,7 +4,7 @@
 Wiki节点ID: "JGTww87a7itO9okVBgrcNK9xnzf"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex业务流程 > Step4 订单处理流程 > BBO询价单处理"
-source_file: feishu-doc
+source_type: feishu-doc
 ---
 
 # 飞书文档：BBO询价单处理

@@ -4,7 +4,7 @@
 Wiki节点ID: "SXS7wsTKTieEujkohaacnp3Gnac"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex 操作指南 > 订单 > FBA订单"
-source_file: feishu-doc
+source_type: feishu-doc
 ---
 
 # 飞书文档：FBA订单

@@ -4,7 +4,7 @@
 Wiki节点ID: "CS1NwapFwi6hoik67O5cQa8Vnpe"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex经验分享 > 亚马逊VC知识 > 亚马逊基础知识了解 > 亚马逊Badge标"
-source_file: feishu-doc
+source_type: feishu-doc
 ---
 
 # 飞书文档：亚马逊Badge标

@@ -5,7 +5,7 @@ Wiki节点ID: "XM4iw0BXXiSUXbkFn31cpLeunTc"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex 操作指南 > 销售 > 营销推广 > Best Deals"
 当前版本: "v3.1.1"
-source_file: feishu-doc
+source_type: feishu-doc
 ---
 
 # 飞书文档：Best Deals

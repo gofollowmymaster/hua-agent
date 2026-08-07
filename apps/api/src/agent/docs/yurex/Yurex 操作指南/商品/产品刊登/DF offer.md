@@ -5,7 +5,7 @@ Wiki节点ID: "Lfh4wwPqcizpdBkQfQ3ccQqEnJg"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex 操作指南 > 商品 > 产品刊登 > DF offer"
 当前版本: "v1.0.0"
-source_file: feishu-doc
+source_type: feishu-doc
 ---
 
 # 飞书文档：DF offer

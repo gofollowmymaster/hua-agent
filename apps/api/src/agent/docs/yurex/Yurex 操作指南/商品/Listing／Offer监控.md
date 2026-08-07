@@ -4,7 +4,7 @@
 Wiki节点ID: "OpGqw9I0ciK1YLkzf79cWWTUnXe"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex 操作指南 > 商品 > Listing/Offer监控"
-source_file: feishu-doc
+source_type: feishu-doc
 ---
 
 # 飞书文档：Listing/Offer监控

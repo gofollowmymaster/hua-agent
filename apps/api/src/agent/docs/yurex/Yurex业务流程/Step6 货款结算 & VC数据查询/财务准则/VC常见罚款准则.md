@@ -4,7 +4,7 @@
 Wiki节点ID: "UTkFw4EIiiV2b6kfLrAcDNxAneg"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex业务流程 > Step6 货款结算 & VC数据查询 > 财务准则 > VC常见罚款准则"
-source_file: feishu-doc
+source_type: feishu-doc
 ---
 
 # 飞书文档：VC常见罚款准则

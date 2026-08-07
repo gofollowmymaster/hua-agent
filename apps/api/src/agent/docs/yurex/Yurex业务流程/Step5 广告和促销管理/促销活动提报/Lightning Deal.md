@@ -4,7 +4,7 @@
 Wiki节点ID: "Th86wzG4tiacX1kMcgycDpV9nFb"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex业务流程 > Step5 广告和促销管理 > 促销活动提报 > Lightning Deal"
-source_file: feishu-doc
+source_type: feishu-doc
 ---
 
 # 飞书文档：Lightning Deal

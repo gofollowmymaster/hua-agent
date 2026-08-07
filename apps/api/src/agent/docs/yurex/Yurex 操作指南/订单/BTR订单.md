@@ -4,7 +4,7 @@
 Wiki节点ID: "Un62wsV12iy4jgkRMZPcY6gPnEh"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex 操作指南 > 订单 > BTR订单"
-source_file: feishu-doc
+source_type: feishu-doc
 ---
 
 # 飞书文档：BTR订单

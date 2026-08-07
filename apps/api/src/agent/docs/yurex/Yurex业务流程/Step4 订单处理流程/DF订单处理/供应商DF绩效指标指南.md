@@ -4,7 +4,7 @@
 Wiki节点ID: "NDkDw0d7uiTHfLkvMjec6Lr6nSM"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex业务流程 > Step4 订单处理流程 > DF订单处理 > 供应商DF绩效指标指南"
-source_file: feishu-doc
+source_type: feishu-doc
 ---
 
 # 飞书文档：供应商DF绩效指标指南

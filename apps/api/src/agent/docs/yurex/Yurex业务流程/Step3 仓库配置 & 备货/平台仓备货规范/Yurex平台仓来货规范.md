@@ -1,10 +1,10 @@
 ---
-远程文档: ""
+远程文档: "https://q1njej8cpab.feishu.cn/wiki/HX7AwyfjLijbg0kKBWnc1PZBnse"
 文档ID: ""
-Wiki节点ID: ""
-最后修改时间: ""
+Wiki节点ID: "HX7AwyfjLijbg0kKBWnc1PZBnse"
+最后修改时间: "2026-03-31"
 文档路径面包屑: "Yurex业务流程 > Step3 仓库配置 & 备货 > 平台仓备货规范 > Yurex平台仓来货规范"
-source_file: ""
+source_type: "pdf"
 ---
 
 # Yurex平台仓来货规范 Ver.20260401

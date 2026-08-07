@@ -4,7 +4,7 @@
 Wiki节点ID: "XjBMww1XciZzBAkh4xQc7bQnnpg"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex经验分享 > 亚马逊VC知识 > 亚马逊促销说明 > BD 提报实操手册"
-source_file: feishu-doc
+source_type: feishu-doc
 ---
 
 # 飞书文档：BD 提报实操手册

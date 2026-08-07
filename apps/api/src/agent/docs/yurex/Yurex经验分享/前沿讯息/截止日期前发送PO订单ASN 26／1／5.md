@@ -4,7 +4,7 @@
 Wiki节点ID: "LKbfw0pM3ivL9gk9rj0cmKiGnaf"
 最后修改时间: "2026-08-06"
 文档路径面包屑: "Yurex经验分享 > 前沿讯息 > 截止日期前发送PO订单ASN 26/1/5"
-source_file: feishu-doc
+source_type: feishu-doc
 ---
 
 # 飞书文档：截止日期前发送PO订单ASN 26/1/5
