@@ -6,7 +6,7 @@ RAG Admin 通过 `@aplus-frontend/aplus-auth-sdk` 跳转登录中心。当前 `a
 
 **Goals:**
 
-- 用单一配置维护 A、C、D 的域名规则、服务商码和各环境登录地址。
+- 用单一配置维护 A、C、D 的域名规则、服务商码及各环境登录和认证 API 地址。
 - 统一 SDK 初始化、首次登录和退出登录的跳转参数。
 - 通过纯函数测试环境优先级、域名边界和默认行为。
 
@@ -23,11 +23,13 @@ RAG Admin 通过 `@aplus-frontend/aplus-auth-sdk` 跳转登录中心。当前 `a
 4. `auth.ts` 在模块加载时解析一次租户与环境，并用同一个登录参数对象配置 `redirectLoginExtraParams`、`ensureLogin` 和 `logout`，避免不同入口产生租户漂移。
 5. 使用 Vitest 测试纯配置解析和 mock 后的 SDK 调用。相比只做构建检查，测试能直接锁定安全敏感的域名与跳转矩阵。
 6. 保持 `@/stores/modules/user` 作为 user store 的公共入口，其他模块仅将旧 token 工具路径更新为 `@/stores/modules/user/token`。该目录调整不改变运行时行为或公共 store API。
+7. 登录 SDK 的 `apiUrl` 与登录地址使用同一个租户和认证环境解析结果，不再从独立的认证 API 环境变量或 RAG 业务接口的 `VITE_API_BASE_URL` 推导。`development` 使用空地址以保留本地同源代理行为，其他环境使用集中维护的服务商 API 地址。
 
 ## Risks / Trade-offs
 
 - [未知生产域名会回退 C] → 文档明确该产品约定，并测试后缀边界，新增域名时集中修改配置。
 - [静态登录地址可能随基础设施调整而过期] → 地址全部集中在单文件和 OpenSpec 中，便于审查与回滚。
+- [静态认证 API 地址可能随基础设施调整而过期] → API 地址与登录地址使用同一配置定义和自动化测试维护。
 - [SDK 初始化可能自行重定向] → 初始化与显式跳转始终使用相同配置，避免竞态导致目标不一致。
 
 ## Migration Plan

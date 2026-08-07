@@ -8,7 +8,7 @@
 
 - `index.ts`：用户登录状态、用户信息和登录生命周期编排。
 - `auth.ts`：登录中心初始化和登录流程相关逻辑。
-- `tenant-auth.config.ts`：租户域名匹配、认证环境规范化和登录中心地址矩阵。
+- `tenant-auth.config.ts`：租户域名匹配、认证环境规范化、登录中心和认证 API 地址矩阵。
 - `token.ts`：token cookie 的读写和清理。
 
 前端通过用户登录态获取 token，并在请求后端 API 时使用 `Authorization: Bearer <token>`。后端 RAG 管理接口使用 API app 的 Guard 与租户上下文处理用户身份。
@@ -35,6 +35,16 @@
 
 SDK 初始化自动跳转、`ensureLogin()` 和 `logout()` 必须复用同一解析结果，并统一携带 `locale`、`supplierCode` 和 `appCode`。
 
+### 登录 SDK API 地址
+
+登录 SDK 的 `apiUrl` 与登录中心地址使用同一个租户和认证环境解析结果，不从 RAG 业务请求的 `VITE_API_BASE_URL` 推导。`development` 使用空地址以保留当前 origin 和本地代理行为。
+
+| 租户 | development | dev | test | uat | prod |
+| --- | --- | --- | --- | --- | --- |
+| A | 空地址 | `http://api.dev-v2.elnkpro.com` | `https://api.test-com.elnkpro.com` | `https://api.uat.elnkpro.com` | `https://api.aplnk.com` |
+| C | 空地址 | `http://api.dev-v2.elnkpro.com` | `https://api.test-com.elnkpro.com` | `https://api.uat-cb.clouboat.com` | `https://api.clouboat.com` |
+| D | 空地址 | `http://api.dev-v2.elnkpro.com` | `https://api.test-com.elnkpro.com` | `https://api.uat.yurexcc.com` | `https://api.yurexcc.com` |
+
 ## 请求封装
 
 请求基础封装位于 `src/api/http.ts`，业务 API 方法位于 `src/api/rag-admin.ts`。
@@ -60,7 +70,7 @@ RAG Admin 默认同源调用 API。开发态由 Vite proxy 将 `/ai` 请求转�
 ## Token 与鉴权规则
 
 - token 读写统一通过 `src/stores/modules/user/token.ts`。
-- 租户与登录中心地址统一通过 `src/stores/modules/user/tenant-auth.config.ts` 解析，不在页面、store 或环境文件中固定服务商码。
+- 租户、登录中心和登录 SDK API 地址统一通过 `src/stores/modules/user/tenant-auth.config.ts` 解析，不在页面、store 或环境文件中固定服务商码。
 - 请求头注入统一在 axios 封装层完成。
 - 不在页面组件中手动拼接 `Authorization`。
 - 登录初始化和跳转逻辑放在 `src/stores/modules/user/auth.ts` 或路由守卫相关位置。

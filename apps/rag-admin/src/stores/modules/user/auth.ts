@@ -17,12 +17,6 @@ function getAuthAppCode() {
   return import.meta.env.VITE_AUTH_APP_CODE || 'ADMIN';
 }
 
-function getApiBaseUrl() {
-  return (
-    import.meta.env.VITE_AUTH_API_URL || import.meta.env.VITE_API_BASE_URL || ''
-  );
-}
-
 function getAuthUrlPrefix() {
   return import.meta.env.VITE_AUTH_URL_PREFIX || '';
 }
@@ -43,7 +37,7 @@ function createAuthClient() {
     used: 'site',
     env: authEnv,
     debug: authEnv !== 'prod',
-    apiUrl: getApiBaseUrl(),
+    apiUrl: tenantAuthConfig.apiUrl,
     urlPrefix: getAuthUrlPrefix(),
     customRedirectUrls: tenantAuthConfig.redirectUrls,
     redirectLoginExtraParams: getRedirectLoginParams()

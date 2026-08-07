@@ -56,6 +56,7 @@ describe('tenant-aware auth redirects', () => {
     expect(mocks.authHub).toHaveBeenCalledWith(
       expect.objectContaining({
         env: 'test',
+        apiUrl: 'https://api.test-com.elnkpro.com',
         customRedirectUrls: expect.objectContaining({
           test: 'https://auth.test.yurexcc.com/admin.html#/'
         }),
@@ -74,6 +75,20 @@ describe('tenant-aware auth redirects', () => {
     expect(mocks.client.redirectLogin).toHaveBeenNthCalledWith(
       2,
       redirectParams
+    );
+  });
+
+  it('uses the current origin for the development auth environment', async () => {
+    vi.stubEnv('VITE_AUTH_ENV', 'development');
+
+    const auth = await import('./auth');
+    await auth.ensureLogin();
+
+    expect(mocks.authHub).toHaveBeenCalledWith(
+      expect.objectContaining({
+        env: 'development',
+        apiUrl: ''
+      })
     );
   });
 });

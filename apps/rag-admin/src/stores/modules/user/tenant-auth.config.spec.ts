@@ -65,4 +65,30 @@ describe('resolveTenantAuthConfig', () => {
   ])('selects the login URL for %s in %s', (hostname, env, loginUrl) => {
     expect(resolveTenantAuthConfig(hostname, env).loginUrl).toBe(loginUrl);
   });
+
+  it.each<[string, AuthEnv, string]>([
+    ['admin.aplnk.com', 'development', ''],
+    ['admin.aplnk.com', 'dev', 'http://api.dev-v2.elnkpro.com'],
+    ['admin.aplnk.com', 'test', 'https://api.test-com.elnkpro.com'],
+    ['admin.aplnk.com', 'uat', 'https://api.uat.elnkpro.com'],
+    ['admin.aplnk.com', 'prod', 'https://api.aplnk.com'],
+    ['admin.clouboat.com', 'development', ''],
+    ['admin.clouboat.com', 'dev', 'http://api.dev-v2.elnkpro.com'],
+    ['admin.clouboat.com', 'test', 'https://api.test-com.elnkpro.com'],
+    ['admin.clouboat.com', 'uat', 'https://api.uat-cb.clouboat.com'],
+    ['admin.clouboat.com', 'prod', 'https://api.clouboat.com'],
+    ['admin.yurexcc.com', 'development', ''],
+    ['admin.yurexcc.com', 'dev', 'http://api.dev-v2.elnkpro.com'],
+    ['admin.yurexcc.com', 'test', 'https://api.test-com.elnkpro.com'],
+    ['admin.yurexcc.com', 'uat', 'https://api.uat.yurexcc.com'],
+    ['admin.yurexcc.com', 'prod', 'https://api.yurexcc.com']
+  ])('selects the API URL for %s in %s', (hostname, env, apiUrl) => {
+    expect(resolveTenantAuthConfig(hostname, env).apiUrl).toBe(apiUrl);
+  });
+
+  it('uses the C API URL matrix for an unmatched hostname', () => {
+    expect(resolveTenantAuthConfig('localhost', 'uat').apiUrl).toBe(
+      'https://api.uat-cb.clouboat.com'
+    );
+  });
 });

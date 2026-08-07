@@ -6,11 +6,16 @@ export interface TenantAuthConfig {
   supplierCode: TenantSupplierCode;
   hostSuffixes: readonly string[];
   redirectUrls: Readonly<Record<AuthEnv, string>>;
+  apiUrls: Readonly<Record<AuthEnv, string>>;
   authEnv: AuthEnv;
   loginUrl: string;
+  apiUrl: string;
 }
 
-type TenantAuthDefinition = Omit<TenantAuthConfig, 'authEnv' | 'loginUrl'>;
+type TenantAuthDefinition = Omit<
+  TenantAuthConfig,
+  'authEnv' | 'loginUrl' | 'apiUrl'
+>;
 
 const tenantAuthDefinitions: readonly TenantAuthDefinition[] = [
   {
@@ -27,6 +32,13 @@ const tenantAuthDefinitions: readonly TenantAuthDefinition[] = [
       test: 'https://auth.test-xw.elnkpro.com/admin.html#/',
       uat: 'https://auth.uat.elnkpro.com/admin.html#/',
       prod: 'https://auth.aplnk.com/admin.html#/'
+    },
+    apiUrls: {
+      development: '',
+      dev: 'http://api.dev-v2.elnkpro.com',
+      test: 'https://api.test-com.elnkpro.com',
+      uat: 'https://api.uat.elnkpro.com',
+      prod: 'https://api.aplnk.com'
     }
   },
   {
@@ -38,6 +50,13 @@ const tenantAuthDefinitions: readonly TenantAuthDefinition[] = [
       test: 'https://auth.test-com.elnkpro.com/admin.html#/',
       uat: 'https://auth.uat-cb.clouboat.com/admin.html#/',
       prod: 'https://auth.clouboat.com/admin.html#/'
+    },
+    apiUrls: {
+      development: '',
+      dev: 'http://api.dev-v2.elnkpro.com',
+      test: 'https://api.test-com.elnkpro.com',
+      uat: 'https://api.uat-cb.clouboat.com',
+      prod: 'https://api.clouboat.com'
     }
   },
   {
@@ -49,6 +68,13 @@ const tenantAuthDefinitions: readonly TenantAuthDefinition[] = [
       test: 'https://auth.test.yurexcc.com/admin.html#/',
       uat: 'https://auth.uat.yurexcc.com/admin.html#/',
       prod: 'https://auth.yurexcc.com/admin.html#/'
+    },
+    apiUrls: {
+      development: '',
+      dev: 'http://api.dev-v2.elnkpro.com',
+      test: 'https://api.test-com.elnkpro.com',
+      uat: 'https://api.uat.yurexcc.com',
+      prod: 'https://api.yurexcc.com'
     }
   }
 ];
@@ -97,6 +123,7 @@ export function resolveTenantAuthConfig(
   return {
     ...definition,
     authEnv,
-    loginUrl: definition.redirectUrls[authEnv]
+    loginUrl: definition.redirectUrls[authEnv],
+    apiUrl: definition.apiUrls[authEnv]
   };
 }
