@@ -4,7 +4,7 @@ import {
   GlobalAdminTenantDetailDto,
   GlobalAdminTenantSummaryDto,
   SupplierCode,
-} from './dto/global-admin-tenant.dto';
+} from './dto/tenant.dto';
 
 type TenantDefinition = {
   supplierCode: SupplierCode;

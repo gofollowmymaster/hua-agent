@@ -1,5 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
-import { GlobalAdminTenantService } from './global-admin-tenant.service';
+import { GlobalAdminTenantService } from './tenant.service';
 
 describe('GlobalAdminTenantService', () => {
   const service = new GlobalAdminTenantService();

@@ -27,6 +27,10 @@ RAG Admin 登录和后端接口以 JWT `supplierCode` 建立 `TenantContext`。`
 
 `GlobalAdminGuard` 先调用现有 `AuthGuard`，再检查 `request.user.appCode` 是否等于 `GLOBAL_ADMIN_APP_CODE`（默认 `GLOBAL`）。相比修改 `AuthGuard`，组合方式不会改变已有接口；相比只在前端判断，后端 Guard 才是授权边界。
 
+### Global Admin 聚合模块边界
+
+`src/global-admin/` 是总控台后端逻辑的唯一业务归属。`GlobalAdminModule` 统一注册专用 Guard、Controller 和 Service；租户管理作为 `tenant/` 业务子模块保存 Controller、Service、DTO 与测试，专用鉴权保存在模块内部的 `common/guard/`。按照 API 子模块规范不额外创建 `TenantModule`，也不把 Global Admin 专用 Guard 下沉到全局通用 `GuardModule`。
+
 ### 在 middleware 注册边界排除总控台
 
 `AppModule.configure()` 对 `/global-admin`、其子路径及 `/public/global-admin` 静态路径排除 `TenantMiddleware`，但保留 LoggerMiddleware 和 DiscardMiddleware。Global Admin 请求不创建默认 TenantContext，也不运行 supplierCode/hostTag 校验。

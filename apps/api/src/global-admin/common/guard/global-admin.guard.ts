@@ -7,7 +7,7 @@ import {
 import { NodeConfigService } from '@src/config/node-config.service';
 import { UserContext } from '@src/type/global';
 import { Request } from 'express';
-import { AuthGuard } from './auth';
+import { AuthGuard } from '@src/common/guard/auth';
 
 type AuthenticatedRequest = Request & { user?: UserContext };
 

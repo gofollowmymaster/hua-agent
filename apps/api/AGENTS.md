@@ -280,6 +280,7 @@ pnpm env:prod
 | `project-architecture.md` | 整体架构、启动链路、中间件链、请求生命周期 | 理解系统全貌 |
 | `directory-structure.md` | src 整体目录结构说明 | 新增模块/文件 |
 | `auth-and-tenant.md` | 鉴权、Guard、租户上下文、Redis key 隔离 | 鉴权/多租户变更 |
+| `global-admin.md` | Global Admin 聚合模块与业务子模块边界 | 总控台后端变更 |
 | `feishu-integration.md` | 飞书分层：client/helper/table/card/event | 飞书相关变更 |
 
 ### API 开发规范 (`docs/standard/`)

@@ -1,18 +1,18 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { GlobalAdminGuard } from '@src/common/guard/global-admin';
+import { GlobalAdminGuard } from '../common/guard/global-admin.guard';
 import {
   GlobalAdminTenantDetailDto,
   GlobalAdminTenantSummaryDto,
-} from './dto/global-admin-tenant.dto';
-import { GLOBAL_ADMIN_ROUTE_PREFIX } from './global-admin.constants';
-import { GlobalAdminTenantService } from './global-admin-tenant.service';
+} from './dto/tenant.dto';
+import { GLOBAL_ADMIN_ROUTE_PREFIX } from '../global-admin.constants';
+import { GlobalAdminTenantService } from './tenant.service';
 
 /** 提供不依赖 TenantContext 的总控台只读接口。 */
 @ApiTags('Global Admin 总控台')
 @UseGuards(GlobalAdminGuard)
 @Controller(GLOBAL_ADMIN_ROUTE_PREFIX)
-export class GlobalAdminController {
+export class GlobalAdminTenantController {
   constructor(private readonly tenantService: GlobalAdminTenantService) {}
 
   /** 返回所有已配置租户的脱敏摘要。 */

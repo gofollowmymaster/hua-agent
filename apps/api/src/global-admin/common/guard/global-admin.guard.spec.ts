@@ -1,7 +1,7 @@
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
+import { AuthGuard } from '@src/common/guard/auth';
 import { NodeConfigService } from '@src/config/node-config.service';
-import { AuthGuard } from './auth';
-import { GlobalAdminGuard } from './global-admin';
+import { GlobalAdminGuard } from './global-admin.guard';
 
 describe('GlobalAdminGuard', () => {
   let authGuard: { canActivate: jest.Mock };

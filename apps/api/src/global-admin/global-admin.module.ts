@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { GuardModule } from '@src/common/guard/guard.module';
-import { GlobalAdminController } from './global-admin.controller';
-import { GlobalAdminTenantService } from './global-admin-tenant.service';
+import { GlobalAdminGuard } from './common/guard/global-admin.guard';
+import { GlobalAdminTenantController } from './tenant/tenant.controller';
+import { GlobalAdminTenantService } from './tenant/tenant.service';
 
-/** 注册无租户总控台的授权和只读租户目录。 */
+/** 统一装配无租户总控台的专用鉴权和业务子模块。 */
 @Module({
   imports: [GuardModule],
-  controllers: [GlobalAdminController],
-  providers: [GlobalAdminTenantService],
+  controllers: [GlobalAdminTenantController],
+  providers: [GlobalAdminGuard, GlobalAdminTenantService],
 })
 export class GlobalAdminModule {}

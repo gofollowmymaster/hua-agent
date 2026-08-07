@@ -101,7 +101,7 @@ Global Admin 是明确的例外：`/global-admin` API 及 `/public/global-admin`
 
 ### GlobalAdminGuard
 
-适用于无租户总控台接口。它先复用 AuthGuard 完成 JWT 验签和过期校验，再要求 payload 的 appCode 等于 `globalAdminAppCode`（默认 `GLOBAL`）。该 Guard 不使用 TenantContext，也不接受客户端 header 作为授权依据。
+适用于无租户总控台接口。它位于 `src/global-admin/common/guard/`，先复用 AuthGuard 完成 JWT 验签和过期校验，再要求 payload 的 appCode 等于 `globalAdminAppCode`（默认 `GLOBAL`）。该 Guard 不使用 TenantContext，也不接受客户端 header 作为授权依据。这里的 `common` 仅表示 Global Admin 模块内部公共层，专用 Guard 不注册到全局通用 `GuardModule`。
 
 ## 鉴权使用现状
 
@@ -111,6 +111,8 @@ Global Admin 是明确的例外：`/global-admin` API 及 `/public/global-admin`
 - 同时兼容用户和系统调用的接口通常使用 `CompositeAuthOrSecretGuard`。
 - 无租户总控台接口使用 `GlobalAdminGuard`，并保持在 TenantMiddleware 排除范围内。
 - 公开 webhook/callback 会结合来源校验、challenge 处理、幂等和异常上报策略。
+
+Global Admin 的完整模块边界见 `global-admin.md`。
 
 ## 租户配置
 

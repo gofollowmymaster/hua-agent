@@ -31,6 +31,7 @@
 - `apps/api/src/fd-copilot/`：前端 Copilot 文档同步与处理。
 - `apps/api/src/devops/`：DevOps、云效发布通知和定时处理。
 - `apps/api/src/demo-plugin/`：插件演示与 MID 相关能力。
+- `apps/api/src/global-admin/`：无租户总控台聚合模块；专用鉴权和租户管理等业务能力必须按子模块收拢在此目录。
 - `apps/api/src/mock-server/`：历史 mock server 能力，当前访问会被 `DiscardMiddleware` 阻断。
 
 业务模块下的子模块目录布局、Controller 放置和通用模块结构见 `apps/api/docs/standard/module-design.md`。

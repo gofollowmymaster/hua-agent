@@ -21,6 +21,7 @@
 - [x] 4.1 更新根命令、lint-staged、workspace lockfile 和 Global Admin 静态构建输出
 - [x] 4.2 新增 Global Admin AGENTS、架构和开发规范文档
 - [x] 4.3 更新根治理入口以及 UI Kit、HTTP Client 消费者和验证说明
+- [x] 4.4 将租户管理与专用鉴权收拢为 Global Admin 内部子模块，并记录模块边界约束
 
 ## 5. 验证
 
