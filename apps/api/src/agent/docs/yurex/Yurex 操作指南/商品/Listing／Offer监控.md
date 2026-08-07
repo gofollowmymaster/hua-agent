@@ -150,7 +150,7 @@ source_file: feishu-doc
 
 可根据产品信息、异常类型、最近更新时间、产品负责人和处理状态搜索
 
-![Listing/Offer监控的异常产品列表筛选区，可按产品信息、异常类型、最近更新时间、产品负责人和处理状态搜索。](./assets/images/图片展示了-addCriterion()-eb3780b813cc.png)
+![Listing/Offer监控的异常产品列表筛选区，可按产品信息、异常类型、最近更新时间、产品负责人和处理状态搜索。](./assets/images/图片展示了Listing-Offer监控筛选区-eb3780b813cc.png)
 
 ### Listing 列表字段
 
