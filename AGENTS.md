@@ -58,8 +58,8 @@ pnpm format
 - 修改 `apps/api/**`：读 `apps/api/AGENTS.md`
 - 修改 `apps/rag-admin/**`：读 `apps/rag-admin/AGENTS.md`
 - 修改 `packages/shared/**`：读 `packages/shared/docs/architecture/README.md` 和 `packages/shared/docs/standard/README.md`
-- 修改 `packages/ui-kit/**`：读 `packages/ui-kit/README.md`、RAG Admin 前端规范和整体产品设计规范
-- 修改 `packages/http-client/**`：读 `packages/http-client/README.md` 和受影响前端的 API client 架构文档
+- 修改 `packages/ui-kit/**`：读 `packages/ui-kit/docs/architecture/README.md`、`packages/ui-kit/docs/standard/README.md`、受影响前端规范和整体产品设计规范
+- 修改 `packages/http-client/**`：读 `packages/http-client/docs/architecture/README.md`、`packages/http-client/docs/standard/README.md` 和受影响前端的 API client 架构文档
 - 修改跨端契约、根脚本、构建/部署边界：读 `AGENTS.md`、`docs/ai-governance/README.md` 和受影响子项目文档
 
 ## 文档读取路由
@@ -73,7 +73,8 @@ AI 任务默认先读：
    - RAG Admin：`apps/rag-admin/docs/architecture/README.md`、`apps/rag-admin/docs/standard/README.md`
    - 整体产品设计：`docs/standard/design/README.md`（前端、UI、交互相关任务必读）
    - Shared：`packages/shared/docs/architecture/README.md`、`packages/shared/docs/standard/README.md`
-   - 前端共享包：`packages/ui-kit/README.md`、`packages/http-client/README.md` + 受影响前端文档
+   - UI Kit：`packages/ui-kit/docs/architecture/README.md`、`packages/ui-kit/docs/standard/README.md` + 受影响前端文档
+   - HTTP Client：`packages/http-client/docs/architecture/README.md`、`packages/http-client/docs/standard/README.md` + 受影响前端文档
    - Cross-app：`AGENTS.md`、`docs/ai-governance/README.md` + 受影响子项目文档
 3. 需要执行或交付时读 `docs/ai-governance/development-workflow.md` 和 `docs/ai-governance/testing-and-verification.md`
 

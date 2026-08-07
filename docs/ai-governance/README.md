@@ -19,7 +19,7 @@
 | `api` | NestJS 后端、Prisma、Redis、BullMQ、飞书、多租户 | `apps/api/docs/architecture/README.md`、`apps/api/docs/standard/README.md` |
 | `rag-admin` | Vue/Vite 前端、页面、路由、store、API client、样式 | `apps/rag-admin/docs/architecture/README.md`、`apps/rag-admin/docs/standard/README.md`、`docs/standard/design/README.md` |
 | `shared` | 共享类型、无副作用工具、跨包导出 | `packages/shared/docs/architecture/README.md`、`packages/shared/docs/standard/README.md` |
-| `frontend-packages` | Vue 公共组件/hooks、HTTP client、前端公共导出 | `packages/ui-kit/README.md`、`packages/http-client/README.md`、受影响前端文档 |
+| `frontend-packages` | Vue 公共组件/hooks、HTTP client、前端公共导出 | 对应 package 的 `docs/architecture/README.md`、`docs/standard/README.md`、受影响前端文档 |
 | `cross-app` | 前后端接口契约、登录链路、静态资源发布、shared 消费 | `workspace` 入口 + 受影响子项目入口 |
 | `docs-only` | 文档治理、架构说明、规范说明 | `docs/ai-governance/testing-and-verification.md` |
 
@@ -58,7 +58,7 @@
 - API 鉴权、租户、Redis key、飞书表格或飞书回调：读 `apps/api/docs/architecture/auth-and-tenant.md`、`apps/api/docs/architecture/feishu-integration.md` 和 `testing-and-verification.md`。
 - RAG Admin 登录、API client、路由、构建输出：读 `apps/rag-admin/docs/architecture/auth-and-api-client.md`、`apps/rag-admin/docs/architecture/build-and-runtime.md`、`apps/rag-admin/docs/standard/README.md` 和 `docs/standard/design/README.md`。
 - shared 导出或跨端类型：读 `packages/shared/docs/architecture/package-boundary.md`、`packages/shared/docs/standard/package-design.md`。
-- 前端 UI/hooks 或 HTTP client 公共导出：读对应 package README、RAG Admin 前端规范和所有消费 app。
+- 前端 UI/hooks 或 HTTP client 公共导出：读对应 package 的架构与规范入口、RAG Admin 前端规范和所有消费 app。
 - 根脚本、依赖、部署/构建边界：读 `AGENTS.md` 和受影响子项目入口。
 
 ## 与其他文档的分工

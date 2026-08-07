@@ -2,6 +2,8 @@
 
 `@aplus-sql/ui-kit` 是同 workspace Vue 3/Vite 应用共享的源码包，承载基于 aplus-ui 的稳定组件和 hooks。
 
+架构说明见 `docs/architecture/README.md`，开发规范见 `docs/standard/README.md`。
+
 ## Public API
 
 - 根入口：`@aplus-sql/ui-kit`

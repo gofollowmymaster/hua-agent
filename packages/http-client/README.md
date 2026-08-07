@@ -2,6 +2,8 @@
 
 `@aplus-sql/http-client` 为同 workspace 前端应用提供可注入认证策略的 axios client，不依赖 Vue、Pinia、cookie 或具体登录 SDK。
 
+架构说明见 `docs/architecture/README.md`，开发规范见 `docs/standard/README.md`。
+
 ## Usage
 
 ```ts
