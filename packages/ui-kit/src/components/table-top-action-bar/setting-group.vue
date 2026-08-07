@@ -1,10 +1,6 @@
 <template>
   <div class="table-top-action-bar-actions">
     <slot />
-    <ApTable.Setting
-      v-if="settings && settings.hidden !== true"
-      :config="tableSettingConfig"
-    />
     <button
       v-if="refreshConfig && refreshConfig.visible !== false"
       class="table-top-action-bar-icon-button"
@@ -14,6 +10,10 @@
     >
       <RefreshIcon />
     </button>
+    <ApTable.Setting
+      v-if="settings && settings.hidden !== true"
+      :config="tableSettingConfig"
+    />
   </div>
 </template>
 
