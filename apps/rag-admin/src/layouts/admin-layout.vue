@@ -110,8 +110,8 @@ const userMenuItems: ItemType[] = [
 
 const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
   const menu = leafMenus.find((item) => item.name === key);
-  if (menu && route.path !== menu.path) {
-    void router.push(menu.path);
+  if (menu && route.name !== menu.name) {
+    void router.push({ name: menu.name });
   }
 };
 

@@ -52,8 +52,8 @@ src/views/<page>/
 
 当前项目暂无独立详情页。可参考以下只读展示能力：
 
-- `src/views/document-manager/sections/document-chunk-panel/index.vue`：只读抽屉内容 + 分页列表。
-- `src/views/session-records/index.vue`：列表 + 右侧详情卡片。
+- `src/views/knowledge/document-manager/sections/document-chunk-panel/index.vue`：只读抽屉内容 + 分页列表。
+- `src/views/knowledge/session-records/index.vue`：列表 + 右侧详情卡片。
 
 新增详情页按蓝图目录落地。
 

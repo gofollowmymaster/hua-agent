@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getToken } from '@/auth/token';
+import { getToken } from '@/stores/modules/user/token';
 import { useUserStore } from '@/stores/modules/user';
 
 interface ApiResponse<T> {

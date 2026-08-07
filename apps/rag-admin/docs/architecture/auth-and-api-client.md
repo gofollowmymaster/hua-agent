@@ -4,8 +4,9 @@
 
 ## 登录与 token
 
-登录相关代码位于 `src/auth/`：
+登录相关代码与 user store 一起位于 `src/stores/modules/user/`：
 
+- `index.ts`：用户登录状态、用户信息和登录生命周期编排。
 - `auth.ts`：登录中心初始化和登录流程相关逻辑。
 - `tenant-auth.config.ts`：租户域名匹配、认证环境规范化和登录中心地址矩阵。
 - `token.ts`：token cookie 的读写和清理。
@@ -58,11 +59,11 @@ RAG Admin 默认同源调用 API。开发态由 Vite proxy 将 `/ai` 请求转�
 
 ## Token 与鉴权规则
 
-- token 读写统一通过 `src/auth/token.ts`。
-- 租户与登录中心地址统一通过 `src/auth/tenant-auth.config.ts` 解析，不在页面、store 或环境文件中固定服务商码。
+- token 读写统一通过 `src/stores/modules/user/token.ts`。
+- 租户与登录中心地址统一通过 `src/stores/modules/user/tenant-auth.config.ts` 解析，不在页面、store 或环境文件中固定服务商码。
 - 请求头注入统一在 axios 封装层完成。
 - 不在页面组件中手动拼接 `Authorization`。
-- 登录初始化和跳转逻辑放在 `src/auth/auth.ts` 或路由守卫相关位置。
+- 登录初始化和跳转逻辑放在 `src/stores/modules/user/auth.ts` 或路由守卫相关位置。
 
 ## 契约变更规则
 

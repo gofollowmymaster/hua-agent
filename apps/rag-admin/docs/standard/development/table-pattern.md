@@ -6,7 +6,7 @@
 
 ## 标准骨架
 
-列表页默认采用 `AgGrid + usePageListAgGrid` 模式。当前项目成熟参考为 `document-manager/index.vue` 和 `session-records/index.vue`，可参考其行为、组件用法和列配置；它们同时是 `page-structure-blueprint.md` 目录结构的示例。
+列表页默认采用 `AgGrid + usePageListAgGrid` 模式。当前项目成熟参考为 `knowledge/document-manager/index.vue` 和 `knowledge/session-records/index.vue`，可参考其行为、组件用法和列配置；它们同时是 `page-structure-blueprint.md` 目录结构的示例。
 
 新增复杂列表页按 `page-structure-blueprint.md` 落地，推荐文件组织：
 
@@ -67,8 +67,8 @@ src/views/<page>/
 
 用户未指定参考页时，以下页面可作为成熟列表页行为参考：
 
-- `src/views/document-manager/index.vue`：搜索 + 表格 + 分页 + 顶部操作 + 行操作 + 弹窗/抽屉。
-- `src/views/session-records/index.vue`：列表 + 右侧详情卡片。
+- `src/views/knowledge/document-manager/index.vue`：搜索 + 表格 + 分页 + 顶部操作 + 行操作 + 弹窗/抽屉。
+- `src/views/knowledge/session-records/index.vue`：列表 + 右侧详情卡片。
 
 参考页均按 `page-structure-blueprint.md` 目录落地；新增页面同样遵循。
 

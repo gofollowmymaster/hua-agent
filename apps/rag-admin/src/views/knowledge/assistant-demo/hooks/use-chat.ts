@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { Chat } from '@ai-sdk/vue';
 import { DefaultChatTransport, type UIMessage } from 'ai';
-import { getToken } from '@/auth/token';
+import { getToken } from '@/stores/modules/user/token';
 import { useUserStore } from '@/stores/modules/user';
 import type { RagMessageItem } from '@/api/rag-admin';
 

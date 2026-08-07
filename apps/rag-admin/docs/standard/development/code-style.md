@@ -17,7 +17,7 @@
 
 - 页面级组件放在 `src/views/`。
 - 可复用布局放在 `src/layouts/`。
-- 组件内复杂请求、鉴权和数据转换逻辑应下沉到 `api/`、`auth/` 或 store。
+- 组件内复杂请求、鉴权和数据转换逻辑应下沉到 `api/` 或对应 store 功能目录；用户认证逻辑统一放在 `stores/modules/user/`。
 - 不在模板中堆叠复杂表达式；复杂展示逻辑放入 computed 或局部函数。
 - 单个 `.vue` 文件不超过 400 行；接近上限时优先拆分子组件、组合函数、API 类型或纯工具函数。
 - 组件只承担单一职责。一个组件不同时负责大块页面布局、远程请求、复杂数据转换和多个弹窗/抽屉交互。
@@ -25,7 +25,7 @@
 
 ## 文件命名
 
-- 页面目录使用 `kebab-case`，页面入口统一为 `index.vue`，例如 `document-manager/index.vue`、`session-records/index.vue`。
+- 页面目录使用 `kebab-case`，页面入口统一为 `index.vue`，例如 `knowledge/document-manager/index.vue`、`knowledge/session-records/index.vue`。
 - 布局组件文件使用 `kebab-case.vue`，例如 `admin-layout.vue`。
 - 模块公共展示组件文件使用 `kebab-case.vue`，放在页面同级 `components/`；业务弹窗、抽屉和页面区块按业务模块放在 `sections/`；跨项目稳定复用组件放在 `src/components/`。
 - 普通 TypeScript 模块使用 `kebab-case.ts` 或沿用既有短语义命名，例如 `rag-admin.ts`、`http.ts`、`routes.ts`。

@@ -15,7 +15,6 @@
 - `main.ts`：Vue app 入口。
 - `app.vue`：根组件。
 - `api/`：axios 实例和业务 API 封装。
-- `auth/`：登录中心、token cookie 和鉴权相关前端逻辑。
 - `config/`：全局 UI 主题与 Design Token 预设。
 - `hooks/`：跨页面共享 hooks，例如文档预览弹窗 hook。
 - `layouts/`：后台布局组件。
@@ -25,6 +24,7 @@
 - `stores/`：Pinia store 入口和模块。
 - `stores/modules/`：按业务拆分的 Pinia store 模块。
 - `stores/modules/layout-drawer.ts`：全局抽屉状态 store。
+- `stores/modules/user/`：用户 store、登录 SDK、token cookie、租户认证配置及相关测试。
 - `styles/`：全局样式。
 - `views/`：页面目录，页面入口统一为 `views/<page>/index.vue`。
 - `views/<page>/components/`：模块内公共展示组件，供 sections 或多个页面复用。
@@ -75,6 +75,7 @@
 - 只有跨组件共享、需要缓存或需要统一生命周期的数据才进入 Pinia。
 - 页面局部状态优先留在组件内。
 - store 模块放在 `stores/modules/`，文件名使用业务名。
+- 用户登录与认证配套逻辑放在 `stores/modules/user/` 功能目录；token 工具保持可独立导入，避免请求层依赖 Pinia 实例。
 - store 只管理跨页面状态和生命周期，不处理 DOM、不直接承担复杂页面展示逻辑。
 
 ## 抽象边界
@@ -89,5 +90,5 @@
 - 一个文件是否只有一个主要职责。
 - 页面是否只负责组合和编排，而不是同时处理请求封装、数据缓存、复杂转换和多个弹窗细节。
 - 组件是否可以通过名称看出用途。
-- API、auth、store、router、styles 是否仍在各自目录中维护。
+- API、store、router、styles 是否仍在各自目录中维护，用户认证逻辑是否集中在 user store 功能目录。
 - 单文件是否低于 400 行。

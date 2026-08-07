@@ -9,13 +9,13 @@ const componentMap: Record<DrawerKey, Component> = {
   'document-chunks': defineAsyncComponent(
     () =>
       import(
-        '@/views/document-manager/sections/document-chunk-panel/index.vue'
+        '@/views/knowledge/document-manager/sections/document-chunk-panel/index.vue'
       ),
   ),
   'session-messages': defineAsyncComponent(
     () =>
       import(
-        '@/views/session-records/sections/session-messages-panel/index.vue'
+        '@/views/knowledge/session-records/sections/session-messages-panel/index.vue'
       ),
   ),
 };

@@ -2,7 +2,6 @@ import { RouterView, type RouteRecordRaw } from 'vue-router';
 import AdminLayout from '@/layouts/admin-layout.vue';
 
 export interface AdminMenuItem {
-  path: string;
   name: string;
   title: string;
 }
@@ -12,61 +11,6 @@ export interface AdminMenuGroup {
   title: string;
   children: AdminMenuItem[];
 }
-
-export const adminMenus: AdminMenuGroup[] = [
-  {
-    name: 'knowledge-qa',
-    title: '知识问答',
-    children: [
-      {
-        path: '/knowledge/documents',
-        name: 'documents',
-        title: '文档管理',
-      },
-      {
-        path: '/knowledge/sessions',
-        name: 'sessions',
-        title: '消息对话记录',
-      },
-      {
-        path: '/knowledge/assistant',
-        name: 'assistant',
-        title: '问答助手',
-      },
-    ],
-  },
-  {
-    name: 'business-agent',
-    title: '业务Agent',
-    children: [
-      {
-        path: '/business-agent/knowledge',
-        name: 'agent-knowledge',
-        title: '业务知识库管理',
-      },
-      {
-        path: '/business-agent/skills',
-        name: 'agent-skills',
-        title: 'Skill 管理',
-      },
-      {
-        path: '/business-agent/sessions',
-        name: 'agent-sessions',
-        title: '会话管理',
-      },
-      {
-        path: '/business-agent/config',
-        name: 'agent-config',
-        title: '配置中心',
-      },
-      {
-        path: '/business-agent/demo',
-        name: 'agent-demo',
-        title: '演示 Demo',
-      },
-    ],
-  },
-];
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -79,11 +23,15 @@ export const routes: RouteRecordRaw[] = [
         name: 'knowledge-qa',
         component: RouterView,
         redirect: '/knowledge/documents',
+        meta: {
+          menuTitle: '知识问答',
+        },
         children: [
           {
             path: 'documents',
             name: 'documents',
-            component: () => import('@/views/document-manager/index.vue'),
+            component: () =>
+              import('@/views/knowledge/document-manager/index.vue'),
             meta: {
               title: '文档管理',
               menuTitle: '文档管理',
@@ -94,7 +42,8 @@ export const routes: RouteRecordRaw[] = [
           {
             path: 'sessions',
             name: 'sessions',
-            component: () => import('@/views/session-records/index.vue'),
+            component: () =>
+              import('@/views/knowledge/session-records/index.vue'),
             meta: {
               title: '消息对话记录',
               menuTitle: '消息对话记录',
@@ -104,7 +53,8 @@ export const routes: RouteRecordRaw[] = [
           {
             path: 'assistant',
             name: 'assistant',
-            component: () => import('@/views/assistant-demo/index.vue'),
+            component: () =>
+              import('@/views/knowledge/assistant-demo/index.vue'),
             meta: {
               title: '问答助手',
               menuTitle: '问答助手',
@@ -118,6 +68,9 @@ export const routes: RouteRecordRaw[] = [
         name: 'business-agent',
         component: RouterView,
         redirect: '/business-agent/knowledge',
+        meta: {
+          menuTitle: '业务Agent',
+        },
         children: [
           {
             path: 'knowledge',
@@ -192,3 +145,28 @@ export const routes: RouteRecordRaw[] = [
     redirect: '/knowledge/documents',
   },
 ];
+
+const adminRoute = routes[0];
+
+function createAdminMenus(route: RouteRecordRaw): AdminMenuGroup[] {
+  return (route.children ?? []).flatMap((group) => {
+    const { name, meta } = group;
+    const title = meta?.menuTitle;
+
+    if (typeof name !== 'string' || typeof title !== 'string') return [];
+
+    const children = (group.children ?? []).flatMap((item) => {
+      const itemTitle = item.meta?.menuTitle;
+
+      if (typeof item.name !== 'string' || typeof itemTitle !== 'string') {
+        return [];
+      }
+
+      return [{ name: item.name, title: itemTitle }];
+    });
+
+    return [{ name, title, children }];
+  });
+}
+
+export const adminMenus: AdminMenuGroup[] = createAdminMenus(adminRoute);

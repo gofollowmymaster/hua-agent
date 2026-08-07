@@ -2,9 +2,9 @@ import { defineStore } from 'pinia';
 import {
   ensureLogin as loginWithAuthCenter,
   getCurrentUserInfo,
-  logout as redirectLogout,
-} from '@/auth/auth';
-import { getToken, setToken } from '@/auth/token';
+  logout as redirectLogout
+} from './auth';
+import { getToken, setToken } from './token';
 
 export interface LoginUser {
   userId?: string;
@@ -34,7 +34,7 @@ function parseJwtPayload(token: string): Record<string, unknown> {
         .atob(normalized)
         .split('')
         .map((char) => `%${char.charCodeAt(0).toString(16).padStart(2, '0')}`)
-        .join(''),
+        .join('')
     );
     return JSON.parse(json) as Record<string, unknown>;
   } catch {
@@ -58,7 +58,7 @@ function resolveUserInfo(token?: string): LoginUser {
     userId: readString(payload, ['userId', 'user_id', 'sub', 'id']),
     userName: readString(payload, ['userName', 'username', 'name', 'nickname']),
     email: readString(payload, ['email', 'mail']),
-    avatar: readString(payload, ['avatar', 'avatarUrl']),
+    avatar: readString(payload, ['avatar', 'avatarUrl'])
   };
 }
 
@@ -72,7 +72,7 @@ function normalizeSdkUserInfo(userInfo: unknown): LoginUser {
     email: readString(data, ['email']),
     avatar: readString(data, ['avatar']),
     tenantCode: readString(data, ['tenantCode']),
-    tenantName: readString(data, ['tenantName']),
+    tenantName: readString(data, ['tenantName'])
   };
 }
 
@@ -82,15 +82,20 @@ export const useUserStore = defineStore('user', {
     userInfo: resolveUserInfo(getToken()),
     loginReady: Boolean(getToken()),
     loginLoading: false,
-    loginError: '',
+    loginError: ''
   }),
   getters: {
     displayName(state) {
-      return state.userInfo.userName || state.userInfo.email || state.userInfo.userId || '已登录用户';
+      return (
+        state.userInfo.userName ||
+        state.userInfo.email ||
+        state.userInfo.userId ||
+        '已登录用户'
+      );
     },
     isLoggedIn(state) {
       return Boolean(state.token);
-    },
+    }
   },
   actions: {
     setLoginError(message: string) {
@@ -105,7 +110,7 @@ export const useUserStore = defineStore('user', {
     setUserInfo(userInfo: LoginUser) {
       this.userInfo = {
         ...this.userInfo,
-        ...userInfo,
+        ...userInfo
       };
     },
     async ensureLogin() {
@@ -128,6 +133,6 @@ export const useUserStore = defineStore('user', {
     logout() {
       this.setToken(undefined);
       redirectLogout();
-    },
-  },
+    }
+  }
 });

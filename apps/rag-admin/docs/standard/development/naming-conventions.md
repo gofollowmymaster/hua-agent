@@ -64,7 +64,7 @@ rag-admin -> 业务域 -> 模块名 -> 动作 / 表语义
 {
   path: '/knowledge/documents',
   name: 'documents',
-  component: () => import('@/views/document-manager/index.vue'),
+  component: () => import('@/views/knowledge/document-manager/index.vue'),
   meta: { title: '文档管理' },
 }
 ```

@@ -14,3 +14,10 @@
 
 - [x] 3.1 更新 RAG Admin 登录架构文档
 - [x] 3.2 运行前端测试、ESLint 只检查和生产构建
+
+## 4. 用户认证目录收拢
+
+- [x] 4.1 将 user store、认证实现、token 工具、租户配置及测试移动到 `stores/modules/user/`
+- [x] 4.2 更新 token 调用方 import 并删除旧顶层认证目录
+- [x] 4.3 同步 RAG Admin 规则与架构文档中的认证目录说明
+- [x] 4.4 运行测试、ESLint、构建、格式与残留引用验证
