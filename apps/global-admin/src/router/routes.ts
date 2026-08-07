@@ -16,6 +16,16 @@ export const routes: RouteRecordRaw[] = [
           menuTitle: '租户管理',
           menuGroup: '平台管理'
         }
+      },
+      {
+        path: 'schedules',
+        name: 'schedules',
+        component: () => import('@/views/schedules/index.vue'),
+        meta: {
+          title: '定时任务管理',
+          menuTitle: '定时任务管理',
+          menuGroup: '平台管理'
+        }
       }
     ]
   },

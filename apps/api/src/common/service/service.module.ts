@@ -5,6 +5,9 @@ import { LoggerService } from './logger/logger.service';
 import { TenantContext } from './context/tenant.context';
 import { PrismaService } from './prisma/prisma.service';
 import WikiFixedTokenService from './fixed-user-token/wiki-fixed-user-token';
+import { RagPrismaService } from './rag-prisma/rag-prisma.service';
+import { ScheduledTaskRegistryService } from './schedule-task/schedule-task.registry.service';
+import { ScheduledTaskSyncService } from './schedule-task/schedule-task.sync.service';
 @Global()
 @Module({
   providers: [
@@ -14,6 +17,9 @@ import WikiFixedTokenService from './fixed-user-token/wiki-fixed-user-token';
     TenantContext,
     PrismaService,
     WikiFixedTokenService,
+    RagPrismaService,
+    ScheduledTaskRegistryService,
+    ScheduledTaskSyncService,
   ],
   exports: [
     RedisProvider,
@@ -22,6 +28,9 @@ import WikiFixedTokenService from './fixed-user-token/wiki-fixed-user-token';
     TenantContext,
     PrismaService,
     WikiFixedTokenService,
+    RagPrismaService,
+    ScheduledTaskRegistryService,
+    ScheduledTaskSyncService,
   ],
 })
 export class GlobalServiceModule {}

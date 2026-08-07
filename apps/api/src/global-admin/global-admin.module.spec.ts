@@ -4,6 +4,8 @@ import { GlobalAdminGuard } from './common/guard/global-admin.guard';
 import { GlobalAdminModule } from './global-admin.module';
 import { GlobalAdminTenantController } from './tenant/tenant.controller';
 import { GlobalAdminTenantService } from './tenant/tenant.service';
+import { GlobalAdminScheduleController } from './schedule/schedule.controller';
+import { GlobalAdminScheduleService } from './schedule/schedule.service';
 
 describe('GlobalAdminModule', () => {
   it('owns the tenant submodule and dedicated guard providers', () => {
@@ -16,8 +18,15 @@ describe('GlobalAdminModule', () => {
       GlobalAdminModule,
     );
 
-    expect(controllers).toEqual([GlobalAdminTenantController]);
-    expect(providers).toEqual([GlobalAdminGuard, GlobalAdminTenantService]);
+    expect(controllers).toEqual([
+      GlobalAdminTenantController,
+      GlobalAdminScheduleController,
+    ]);
+    expect(providers).toEqual([
+      GlobalAdminGuard,
+      GlobalAdminTenantService,
+      GlobalAdminScheduleService,
+    ]);
   });
 
   it('keeps the dedicated guard out of the common GuardModule exports', () => {

@@ -80,7 +80,8 @@
   );
 
   const menuItems: ItemType[] = [
-    { key: 'tenants', label: '租户管理', title: '租户管理' }
+    { key: 'tenants', label: '租户管理', title: '租户管理' },
+    { key: 'schedules', label: '定时任务管理', title: '定时任务管理' }
   ];
   const userMenuItems: ItemType[] = [
     { key: 'logout', label: '退出登录', title: '退出登录' }
@@ -89,6 +90,9 @@
   const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
     if (key === 'tenants' && route.name !== key) {
       void router.push({ name: 'tenants' });
+    }
+    if (key === 'schedules' && route.name !== key) {
+      void router.push({ name: 'schedules' });
     }
   };
 

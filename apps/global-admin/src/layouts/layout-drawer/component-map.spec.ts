@@ -17,4 +17,13 @@ describe('resolveDrawerFromQuery', () => {
       resolveDrawerFromQuery({ drawer: 'unknown', drawerCode: 'boat' })
     ).toBeNull();
   });
+
+  it('restores schedule details from a valid URL query', () => {
+    expect(
+      resolveDrawerFromQuery({
+        drawer: 'schedule-detail',
+        drawerCode: 'Alert Statistic Per Day'
+      })
+    ).toMatchObject({ data: { drawerCode: 'Alert Statistic Per Day' } });
+  });
 });

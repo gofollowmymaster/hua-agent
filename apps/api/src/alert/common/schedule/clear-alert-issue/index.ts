@@ -6,7 +6,10 @@ import PageIssueStatisticService from './services/page-issue.service';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import BaseSchedule from '@src/common/base/base.schedule';
 import { NodeConfigService } from '@src/config/node-config.service';
+import { ScheduleInfo } from '@src/common/decorator/schedule-info.decorator';
+import { ScheduledTaskRegistryService } from '@src/common/service/schedule-task/schedule-task.registry.service';
 
+@ScheduleInfo({ module: '告警', description: '每日清理告警统计数量' })
 @Injectable()
 export default class ClearAlertPerDayService extends BaseSchedule {
   protected readonly isOpen = ['prod', 'production'].includes(
@@ -21,8 +24,9 @@ export default class ClearAlertPerDayService extends BaseSchedule {
     protected readonly pageIssueService: PageIssueStatisticService,
     protected readonly tenantContext: TenantContext,
     protected schedulerRegistry: SchedulerRegistry,
+    protected readonly taskRegistry: ScheduledTaskRegistryService,
   ) {
-    super(tenantContext, schedulerRegistry);
+    super(tenantContext, schedulerRegistry, taskRegistry);
   }
 
   protected initContext() {

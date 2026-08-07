@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { NodeConfigService } from '@src/config/node-config.service';
 import { LoggerService } from '@src/common/service/logger/logger.service';
-import { RagPrismaService } from '../../prisma/rag-prisma.service';
+import { RagPrismaService } from '@src/common/service/rag-prisma/rag-prisma.service';
 import {
   BaseRagRetriever,
   type RagRetrievalRow,

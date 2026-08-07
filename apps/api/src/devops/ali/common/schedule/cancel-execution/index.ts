@@ -9,7 +9,10 @@ import { DevopsApiService } from '../../ali-api/ali-devops.helper';
 import { DevopsOptionService } from '../../service/devops-option.service';
 import BaseSchedule from '@src/common/base/base.schedule';
 import { TenantContext } from '@src/common/service/context/tenant.context';
+import { ScheduleInfo } from '@src/common/decorator/schedule-info.decorator';
+import { ScheduledTaskRegistryService } from '@src/common/service/schedule-task/schedule-task.registry.service';
 
+@ScheduleInfo({ module: 'DevOps', description: '取消研发流水线等待中的执行' })
 @Injectable()
 export default class CancelExecutionServer extends BaseSchedule {
   //每30分钟运行一次
@@ -25,8 +28,9 @@ export default class CancelExecutionServer extends BaseSchedule {
     protected readonly devopsOptionService: DevopsOptionService,
     protected readonly tenantContext: TenantContext,
     protected schedulerRegistry: SchedulerRegistry,
+    protected readonly taskRegistry: ScheduledTaskRegistryService,
   ) {
-    super(tenantContext, schedulerRegistry);
+    super(tenantContext, schedulerRegistry, taskRegistry);
     this.redis = redisService.getClient();
   }
 

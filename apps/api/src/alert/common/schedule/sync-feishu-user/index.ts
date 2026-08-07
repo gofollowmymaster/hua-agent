@@ -8,7 +8,10 @@ import { TenantContext } from '@src/common/service/context/tenant.context';
 import { RedisService } from '@src/common/service/redis/redis.service';
 import { PrismaService } from '@src/common/service/prisma/prisma.service';
 import Redis from 'ioredis';
+import { ScheduleInfo } from '@src/common/decorator/schedule-info.decorator';
+import { ScheduledTaskRegistryService } from '@src/common/service/schedule-task/schedule-task.registry.service';
 
+@ScheduleInfo({ module: '告警', description: '每日同步飞书通讯录用户' })
 @Injectable()
 export default class SyncFeishuUser extends BaseSchedule {
   protected readonly cron = '0 0 0 * * *';
@@ -21,8 +24,9 @@ export default class SyncFeishuUser extends BaseSchedule {
     protected readonly feishuUserHelper: FeishuUserHelper,
     protected readonly tenantContext: TenantContext,
     protected schedulerRegistry: SchedulerRegistry,
+    protected readonly taskRegistry: ScheduledTaskRegistryService,
   ) {
-    super(tenantContext, schedulerRegistry);
+    super(tenantContext, schedulerRegistry, taskRegistry);
     this.redis = redisService.getClient();
   }
 

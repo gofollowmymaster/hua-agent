@@ -9,7 +9,10 @@ import { PushIssueCardToUserParams } from '../../type/sentry-issue';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import BaseSchedule from '@src/common/base/base.schedule';
 import { NodeConfigService } from '@src/config/node-config.service';
+import { ScheduleInfo } from '@src/common/decorator/schedule-info.decorator';
+import { ScheduledTaskRegistryService } from '@src/common/service/schedule-task/schedule-task.registry.service';
 
+@ScheduleInfo({ module: '告警', description: '每日统计告警问题并推送卡片' })
 @Injectable()
 export default class AlertStatisticService extends BaseSchedule {
   protected readonly isOpen = ['prod', 'production'].includes(
@@ -25,8 +28,9 @@ export default class AlertStatisticService extends BaseSchedule {
     protected readonly pageIssueService: PageIssueStatisticService,
     protected readonly tenantContext: TenantContext,
     protected schedulerRegistry: SchedulerRegistry,
+    protected readonly taskRegistry: ScheduledTaskRegistryService,
   ) {
-    super(tenantContext, schedulerRegistry);
+    super(tenantContext, schedulerRegistry, taskRegistry);
     this.redis = redisService.getClient();
   }
 

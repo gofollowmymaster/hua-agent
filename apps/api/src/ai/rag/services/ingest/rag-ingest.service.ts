@@ -16,7 +16,7 @@ import type {
   RawDocumentFile,
 } from '../../types/rag.type';
 import { DocumentLoaderService } from './document-loader.service';
-import { RagPrismaService } from '../prisma/rag-prisma.service';
+import { RagPrismaService } from '@src/common/service/rag-prisma/rag-prisma.service';
 
 /** 编排租户文档扫描、解析、切片、向量化和索引持久化。 */
 @Injectable()

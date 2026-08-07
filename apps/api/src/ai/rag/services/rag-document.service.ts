@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import { NodeConfigService } from '@src/config/node-config.service';
 import { TenantCode } from '@src/config/tenant';
-import { RagPrismaService } from './prisma/rag-prisma.service';
+import { RagPrismaService } from '@src/common/service/rag-prisma/rag-prisma.service';
 
 /** 管理当前租户已索引文档的查询和删除。 */
 @Injectable()

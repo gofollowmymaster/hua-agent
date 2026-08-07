@@ -15,7 +15,6 @@ import { RagController } from './rag/rag.controller';
 import { RagService } from './rag/rag.service';
 import { DocumentLoaderService } from './rag/services/ingest/document-loader.service';
 import { WecomRagBotService } from './rag/wecom-rag-bot.service';
-import { RagPrismaService } from './rag/services/prisma/rag-prisma.service';
 import { RagDocumentService } from './rag/services/rag-document.service';
 import { RagIngestService } from './rag/services/ingest/rag-ingest.service';
 import { RagMemoryService } from './rag/services/qa/rag-memory.service';
@@ -61,7 +60,6 @@ import { RagDocumentUploadService } from './rag-admin/rag-document-upload.servic
     RuleBasedReranker,
     Qwen3Reranker,
     RagQueryService,
-    RagPrismaService,
     RagIngestService,
     RagDocumentUploadService,
     RagDocumentService,

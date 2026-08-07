@@ -11,7 +11,7 @@ import type {
   RagResolvedSession,
   RagSessionInput,
 } from '../../types/rag.type';
-import { RagPrismaService } from '../prisma/rag-prisma.service';
+import { RagPrismaService } from '@src/common/service/rag-prisma/rag-prisma.service';
 
 const RAG_MEMORY_TTL_SECONDS = 60 * 60 * 48;
 const RAG_MEMORY_MAX_MESSAGES = 20;

@@ -10,7 +10,10 @@ import {
   TenantContextType,
 } from '@src/common/service/context/tenant.context';
 import { FeishuAuthType } from '@src/common/feishu/type/auth';
+import { ScheduleInfo } from '@src/common/decorator/schedule-info.decorator';
+import { ScheduledTaskRegistryService } from '@src/common/service/schedule-task/schedule-task.registry.service';
 
+@ScheduleInfo({ module: '公共', description: '定时刷新飞书固定 Token' })
 @Injectable()
 export default class FixedTokenService extends BaseSchedule {
   protected readonly isOpen = ['test', 'prod', 'production'].includes(
@@ -26,8 +29,9 @@ export default class FixedTokenService extends BaseSchedule {
     protected redisService: RedisService,
     protected readonly tenantContext: TenantContext,
     protected schedulerRegistry: SchedulerRegistry,
+    protected readonly taskRegistry: ScheduledTaskRegistryService,
   ) {
-    super(tenantContext, schedulerRegistry);
+    super(tenantContext, schedulerRegistry, taskRegistry);
     this.redis = redisService.getClient();
   }
 

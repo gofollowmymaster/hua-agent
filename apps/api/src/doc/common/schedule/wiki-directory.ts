@@ -11,7 +11,10 @@ import { TenantCode } from '@src/config/tenant';
 import BaseSchedule from '../../../common/base/base.schedule';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import Redis from 'ioredis';
+import { ScheduleInfo } from '@src/common/decorator/schedule-info.decorator';
+import { ScheduledTaskRegistryService } from '@src/common/service/schedule-task/schedule-task.registry.service';
 
+@ScheduleInfo({ module: '文档', description: '同步 Wiki 目录到缓存' })
 @Injectable()
 export default class WikiDirectoryService extends BaseSchedule {
   protected readonly isOpen = ['prod', 'production'].includes(
@@ -26,8 +29,9 @@ export default class WikiDirectoryService extends BaseSchedule {
     private readonly redisService: RedisService,
     protected readonly tenantContext: TenantContext,
     protected schedulerRegistry: SchedulerRegistry,
+    protected readonly taskRegistry: ScheduledTaskRegistryService,
   ) {
-    super(tenantContext, schedulerRegistry);
+    super(tenantContext, schedulerRegistry, taskRegistry);
     this.redis = redisService.getClient();
   }
   protected initContext() {
