@@ -127,15 +127,16 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, shallowRef, watch } from 'vue';
 import { ApButton } from '@aplus-frontend/ui';
+import { useDocumentPreviewModal } from '@aplus-sql/ui-kit';
 import { MdPreview } from 'md-editor-v3';
 import 'md-editor-v3/lib/preview.css';
 import {
   listSessionMessages,
   pageSessions,
+  getDocumentPreviewFile,
   type RagSessionItem,
 } from '@/api/rag-admin';
 import { useUserStore } from '@/stores/modules/user';
-import { useDocumentPreviewModal } from '@/components/document-preview-modal/use-document-preview-modal';
 import {
   createChatSession,
   createLocalChatId,
@@ -143,6 +144,7 @@ import {
   formatTime,
   resolvePreviewDocument,
   toUiMessages,
+  type PreviewDocumentItem,
 } from './hooks/use-chat';
 import AssistantComposer from './sections/assistant-composer/index.vue';
 import AssistantReasoning from './sections/assistant-reasoning/index.vue';
@@ -151,7 +153,9 @@ const HISTORY_PAGE_SIZE = 20;
 
 const userStore = useUserStore();
 const messagePaneRef = ref<HTMLElement>();
-const previewModal = useDocumentPreviewModal();
+const previewModal = useDocumentPreviewModal<PreviewDocumentItem>({
+  loadFile: (item) => getDocumentPreviewFile(item.id),
+});
 const input = ref('');
 const sessions = ref<RagSessionItem[]>([]);
 const selectedSessionId = ref('');

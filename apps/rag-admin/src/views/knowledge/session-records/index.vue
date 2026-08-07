@@ -7,7 +7,10 @@
             :selected-row-keys="selectedRowKeys"
             :clear-all="clearAll"
             :show-selected="false"
-            :settings="{ persistenceKey: 'session-records-list' }"
+            :settings="{
+              persistenceKey: 'rag_admin_table_sessions_session-records-list'
+            }"
+            :refresh-config="{ refresh: reload }"
           />
         </template>
       </AgGrid>
@@ -25,9 +28,8 @@
     usePageListAgGrid,
     type AgGridColumnType
   } from '@aplus-frontend/ui';
+  import { TableTopActionBar, useRowClickAction } from '@aplus-sql/ui-kit';
   import { pageSessionsGrid, type RagSessionItem } from '@/api/rag-admin';
-  import { useRowClickAction } from '@/hooks/use-row-click-action';
-  import TableTopActionBar from '@/components/table-top-action-bar/index.vue';
   import { ThemeColor } from '@/config/theme-color-token';
 
   const route = useRoute();
@@ -151,7 +153,7 @@
     }
   ];
 
-  const [gridProps] = usePageListAgGrid({
+  const [gridProps, { reload }] = usePageListAgGrid({
     api: pageSessionsGrid,
     rowKey: 'id',
     onRowClicked(record, event) {

@@ -7,7 +7,11 @@
             :selected-row-keys="selectedRowKeys"
             :clear-all="clearAll"
             :show-selected="false"
-            :settings="{ persistenceKey: 'document-manager-list' }"
+            :settings="{
+              persistenceKey:
+                'rag_admin_table_documents_document-manager-list'
+            }"
+            :refresh-config="{ refresh }"
           >
             <template #suffix>
               <Space class="header-actions">
@@ -45,14 +49,17 @@
     type AgGridColumnType
   } from '@aplus-frontend/ui';
   import {
+    TableTopActionBar,
+    useDocumentPreviewModal,
+    useRowClickAction
+  } from '@aplus-sql/ui-kit';
+  import {
     deleteDocument,
+    getDocumentPreviewFile,
     ingestDocuments,
     pageDocumentsGrid,
     type RagDocumentItem
   } from '@/api/rag-admin';
-  import { useRowClickAction } from '@/hooks/use-row-click-action';
-  import { useDocumentPreviewModal } from '@/components/document-preview-modal/use-document-preview-modal';
-  import TableTopActionBar from '@/components/table-top-action-bar/index.vue';
   import { useDocumentMetadataModal } from './sections/document-metadata-modal/use-document-metadata-modal';
   import { useDocumentUploadModal } from './sections/document-upload-modal/use-document-upload-modal';
   import { ThemeColor } from '@/config/theme-color-token';
@@ -61,7 +68,9 @@
   const ingesting = ref(false);
   const { onRowClick, getPointerRowClassName, clickAction } =
     useRowClickAction('documents');
-  const previewModal = useDocumentPreviewModal();
+  const previewModal = useDocumentPreviewModal<RagDocumentItem>({
+    loadFile: (item) => getDocumentPreviewFile(item.id)
+  });
   const uploadModal = useDocumentUploadModal({ onUploaded: refresh });
   const metadataModal = useDocumentMetadataModal({ onSaved: refresh });
   const statusValueEnum = {
