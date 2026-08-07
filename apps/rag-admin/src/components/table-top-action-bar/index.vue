@@ -15,10 +15,7 @@
         </div>
       </template>
       <template #suffix>
-        <SettingGroup
-          :settings="settings"
-          :refresh-config="refreshConfig"
-        >
+        <SettingGroup :settings="settings" :refresh-config="refreshConfig">
           <slot name="setting" />
         </SettingGroup>
       </template>
@@ -28,10 +25,7 @@
       <div v-if="hasHeaderContent" class="table-top-action-bar-header">
         <slot name="header" />
       </div>
-      <SettingGroup
-        :settings="settings"
-        :refresh-config="refreshConfig"
-      >
+      <SettingGroup :settings="settings" :refresh-config="refreshConfig">
         <slot name="setting" />
       </SettingGroup>
     </div>
@@ -79,5 +73,4 @@
     display: flex;
     align-items: center;
   }
-
 </style>
