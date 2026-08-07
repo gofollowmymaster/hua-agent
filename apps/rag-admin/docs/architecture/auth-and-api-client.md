@@ -7,9 +7,32 @@
 登录相关代码位于 `src/auth/`：
 
 - `auth.ts`：登录中心初始化和登录流程相关逻辑。
+- `tenant-auth.config.ts`：租户域名匹配、认证环境规范化和登录中心地址矩阵。
 - `token.ts`：token cookie 的读写和清理。
 
 前端通过用户登录态获取 token，并在请求后端 API 时使用 `Authorization: Bearer <token>`。后端 RAG 管理接口使用 API app 的 Guard 与租户上下文处理用户身份。
+
+### 租户解析
+
+登录前根据当前页面 hostname 选择服务商码和登录中心：
+
+- A：`aplnk.com`、`dev-v2.elnkpro.com`、`test-xw.elnkpro.com`、`uat.elnkpro.com`。
+- C：`clouboat.com`、`test-com.elnkpro.com`。
+- D：`yurexcc.com`。
+
+匹配使用大小写无关的完整域名或点分后缀，不使用普通字符串包含判断。localhost、空 hostname 和未配置域名统一回退 C。RAG Admin 不提供登录后的租户切换；后端继续从 JWT `supplierCode` 解析真实租户上下文。
+
+### 认证环境与登录地址
+
+认证环境优先使用非空 `VITE_AUTH_ENV`，否则使用 Vite `MODE`。`production` 映射为登录 SDK 的 `prod`，无法识别的环境回退 `dev`。显式配置 `VITE_AUTH_ENV` 可覆盖 Vite mode，例如开发构建连接 UAT 登录中心。
+
+| 租户 | development / dev | test | uat | prod |
+| --- | --- | --- | --- | --- |
+| A | `http://auth.dev-v2.elnkpro.com/admin.html#/` | `https://auth.test-xw.elnkpro.com/admin.html#/` | `https://auth.uat.elnkpro.com/admin.html#/` | `https://auth.aplnk.com/admin.html#/` |
+| C | `http://auth.dev-v2.clouboat.com/admin.html#/` | `https://auth.test-com.elnkpro.com/admin.html#/` | `https://auth.uat-cb.clouboat.com/admin.html#/` | `https://auth.clouboat.com/admin.html#/` |
+| D | `http://auth.dev-v2.yurexcc.com/admin.html#/` | `https://auth.test.yurexcc.com/admin.html#/` | `https://auth.uat.yurexcc.com/admin.html#/` | `https://auth.yurexcc.com/admin.html#/` |
+
+SDK 初始化自动跳转、`ensureLogin()` 和 `logout()` 必须复用同一解析结果，并统一携带 `locale`、`supplierCode` 和 `appCode`。
 
 ## 请求封装
 
@@ -36,6 +59,7 @@ RAG Admin 默认同源调用 API。开发态由 Vite proxy 将 `/ai` 请求转�
 ## Token 与鉴权规则
 
 - token 读写统一通过 `src/auth/token.ts`。
+- 租户与登录中心地址统一通过 `src/auth/tenant-auth.config.ts` 解析，不在页面、store 或环境文件中固定服务商码。
 - 请求头注入统一在 axios 封装层完成。
 - 不在页面组件中手动拼接 `Authorization`。
 - 登录初始化和跳转逻辑放在 `src/auth/auth.ts` 或路由守卫相关位置。

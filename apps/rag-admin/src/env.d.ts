@@ -9,7 +9,6 @@ interface ImportMetaEnv {
   readonly VITE_AUTH_ENV?: string;
   readonly VITE_AUTH_PLATFORM?: string;
   readonly VITE_AUTH_APP_CODE?: string;
-  readonly VITE_SUPPLIER_CODE?: string;
 }
 
 interface ImportMeta {

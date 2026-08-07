@@ -1,28 +1,20 @@
 import { authHub, type authClass } from '@aplus-frontend/aplus-auth-sdk';
+import { resolveAuthEnv, resolveTenantAuthConfig } from './tenant-auth.config';
 import { getToken, setToken } from './token';
 
 let authClient: authClass | undefined;
 
-type AuthEnv = 'dev' | 'development' | 'test' | 'uat' | 'prod';
+const authEnv = resolveAuthEnv(
+  import.meta.env.VITE_AUTH_ENV,
+  import.meta.env.MODE
+);
+const tenantAuthConfig = resolveTenantAuthConfig(
+  window.location.hostname,
+  authEnv
+);
 
 function getAuthAppCode() {
   return import.meta.env.VITE_AUTH_APP_CODE || 'ADMIN';
-}
-
-function getAuthEnv(): AuthEnv {
-  const authEnv =
-    import.meta.env.VITE_AUTH_ENV || import.meta.env.MODE || 'dev';
-  if (
-    authEnv === 'dev' ||
-    authEnv === 'development' ||
-    authEnv === 'test' ||
-    authEnv === 'uat' ||
-    authEnv === 'prod'
-  ) {
-    return authEnv;
-  }
-
-  return 'dev';
 }
 
 function getApiBaseUrl() {
@@ -35,28 +27,26 @@ function getAuthUrlPrefix() {
   return import.meta.env.VITE_AUTH_URL_PREFIX || '';
 }
 
+function getRedirectLoginParams() {
+  return {
+    locale: 'zh_CN',
+    supplierCode: tenantAuthConfig.supplierCode,
+    appCode: getAuthAppCode()
+  };
+}
+
 function createAuthClient() {
   if (authClient) return authClient;
 
   authClient = authHub({
     platform: import.meta.env.VITE_AUTH_PLATFORM || 'rag-admin',
     used: 'site',
-    env: getAuthEnv(),
-    debug: getAuthEnv() !== 'prod',
+    env: authEnv,
+    debug: authEnv !== 'prod',
     apiUrl: getApiBaseUrl(),
     urlPrefix: getAuthUrlPrefix(),
-    customRedirectUrls: {
-      development: 'http://auth.dev-v2.clouboat.com/admin.html#/',
-      dev: 'http://auth.dev-v2.clouboat.com/admin.html#/',
-      test: 'https://auth.test-com.elnkpro.com/admin.html#/',
-      uat: 'https://auth.uat-cb.clouboat.com/admin.html#/',
-      prod: 'https://auth.clouboat.com/admin.html#/',
-    },
-    redirectLoginExtraParams: {
-      locale: 'zh_CN',
-      supplierCode: import.meta.env.VITE_SUPPLIER_CODE || 'aplus',
-      appCode: getAuthAppCode(),
-    },
+    customRedirectUrls: tenantAuthConfig.redirectUrls,
+    redirectLoginExtraParams: getRedirectLoginParams()
   });
   authClient.init();
   return authClient;
@@ -74,11 +64,7 @@ export async function ensureLogin() {
     return token;
   }
 
-  client.redirectLogin({
-    locale: 'zh_CN',
-    supplierCode: import.meta.env.VITE_SUPPLIER_CODE || 'aplus',
-    appCode: getAuthAppCode(),
-  });
+  client.redirectLogin(getRedirectLoginParams());
   return undefined;
 }
 
@@ -88,9 +74,5 @@ export async function getCurrentUserInfo() {
 
 export function logout() {
   setToken(undefined);
-  createAuthClient().redirectLogin({
-    locale: 'zh_CN',
-    supplierCode: import.meta.env.VITE_SUPPLIER_CODE || 'aplus',
-    appCode: getAuthAppCode(),
-  });
+  createAuthClient().redirectLogin(getRedirectLoginParams());
 }
