@@ -6,6 +6,8 @@
 
 项目通过 `TenantMiddleware` 在每个请求开始阶段解析用户与租户，并通过 `TenantContext` 保存到 `AsyncLocalStorage`。
 
+Global Admin 是明确的例外：`/global-admin` API 及 `/public/global-admin` 静态路径在 middleware 注册层被排除，不创建 TenantContext，也不回退默认租户。
+
 业务代码通过注入 `TenantContext` 获取：
 
 - `tenant`：当前租户码。
@@ -97,12 +99,17 @@
 
 适合场景：同一个接口既允许前端用户调用，也允许内部系统调用。
 
+### GlobalAdminGuard
+
+适用于无租户总控台接口。它先复用 AuthGuard 完成 JWT 验签和过期校验，再要求 payload 的 appCode 等于 `globalAdminAppCode`（默认 `GLOBAL`）。该 Guard 不使用 TenantContext，也不接受客户端 header 作为授权依据。
+
 ## 鉴权使用现状
 
 - 用户登录态接口通常使用 `AuthGuard`。
 - 内部系统固定密钥接口通常使用 `SecretAuthGuard`。
 - 第三方或 Aily 风格签名接口通常使用 `SignAuthGuard`。
 - 同时兼容用户和系统调用的接口通常使用 `CompositeAuthOrSecretGuard`。
+- 无租户总控台接口使用 `GlobalAdminGuard`，并保持在 TenantMiddleware 排除范围内。
 - 公开 webhook/callback 会结合来源校验、challenge 处理、幂等和异常上报策略。
 
 ## 租户配置

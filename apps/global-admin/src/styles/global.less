@@ -1,0 +1,33 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
+
+.page {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  height: 100%;
+}
+
+.grid-fill {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.grid-fill > .@{namespace}-ag-grid {
+  width: 100%;
+  min-height: 320px;
+}
+
+.ag-grid-row-grid-util-pointer {
+  cursor: pointer;
+}

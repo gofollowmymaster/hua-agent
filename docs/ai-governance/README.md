@@ -18,6 +18,7 @@
 | `workspace` | 根脚本、pnpm workspace、依赖放置、部署/构建边界 | `AGENTS.md`、`docs/ai-governance/README.md` |
 | `api` | NestJS 后端、Prisma、Redis、BullMQ、飞书、多租户 | `apps/api/docs/architecture/README.md`、`apps/api/docs/standard/README.md` |
 | `rag-admin` | Vue/Vite 前端、页面、路由、store、API client、样式 | `apps/rag-admin/docs/architecture/README.md`、`apps/rag-admin/docs/standard/README.md`、`docs/standard/design/README.md` |
+| `global-admin` | 无租户总控台、GLOBAL 登录、租户目录、静态输出 | `apps/global-admin/docs/architecture/README.md`、`apps/global-admin/docs/standard/README.md`、`docs/standard/design/README.md` |
 | `shared` | 共享类型、无副作用工具、跨包导出 | `packages/shared/docs/architecture/README.md`、`packages/shared/docs/standard/README.md` |
 | `frontend-packages` | Vue 公共组件/hooks、HTTP client、前端公共导出 | 对应 package 的 `docs/architecture/README.md`、`docs/standard/README.md`、受影响前端文档 |
 | `cross-app` | 前后端接口契约、登录链路、静态资源发布、shared 消费 | `workspace` 入口 + 受影响子项目入口 |
@@ -39,7 +40,7 @@
 | L1 低风险 | 注释、纯文档、小范围无行为变化修正 | 可直接修改；验证路径、链接和引用准确性。 |
 | L2 常规 | 单 app 局部 bugfix、单页面调整、单模块内部逻辑、小范围配置读取 | 先搜索现有实现；遵守对应子项目规范；运行相关验证或说明原因。 |
 | L3 高风险 | 新增接口、行为语义变化、跨 app 契约、shared 导出、跨模块公共能力、外部系统集成 | 优先判断 OpenSpec；读取 workspace 和受影响子项目专题；补充测试或构建验证。 |
-| L4 关键风险 | Prisma schema、迁移、鉴权、多租户、Redis 隔离、飞书回调/表格写入、登录 token 链路、生产静态资源路径 | 必须读取相关 API/RAG Admin/workspace 专题和验证规范；明确风险与回滚关注点。 |
+| L4 关键风险 | Prisma schema、迁移、鉴权、多租户、Redis 隔离、飞书回调/表格写入、登录 token 链路、生产静态资源路径 | 必须读取相关 API、受影响前端 app 和 workspace 专题及验证规范；明确风险与回滚关注点。 |
 
 ## OpenSpec 判断
 
@@ -57,8 +58,9 @@
 
 - API 鉴权、租户、Redis key、飞书表格或飞书回调：读 `apps/api/docs/architecture/auth-and-tenant.md`、`apps/api/docs/architecture/feishu-integration.md` 和 `testing-and-verification.md`。
 - RAG Admin 登录、API client、路由、构建输出：读 `apps/rag-admin/docs/architecture/auth-and-api-client.md`、`apps/rag-admin/docs/architecture/build-and-runtime.md`、`apps/rag-admin/docs/standard/README.md` 和 `docs/standard/design/README.md`。
+- Global Admin 登录、无租户 API、middleware 排除和构建输出：读 `apps/global-admin/docs/architecture/`、`apps/api/docs/architecture/auth-and-tenant.md` 和验证规范。
 - shared 导出或跨端类型：读 `packages/shared/docs/architecture/package-boundary.md`、`packages/shared/docs/standard/package-design.md`。
-- 前端 UI/hooks 或 HTTP client 公共导出：读对应 package 的架构与规范入口、RAG Admin 前端规范和所有消费 app。
+- 前端 UI/hooks 或 HTTP client 公共导出：读对应 package 的架构与规范入口以及所有消费 app。
 - 根脚本、依赖、部署/构建边界：读 `AGENTS.md` 和受影响子项目入口。
 
 ## 与其他文档的分工

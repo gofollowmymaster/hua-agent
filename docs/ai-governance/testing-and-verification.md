@@ -24,7 +24,7 @@
 - 使用 `find apps packages docs -maxdepth 5 -type f -name '*.md' | sort` 查看文档结构。
 - 检查新增链接路径是否真实存在。
 - 检查文档中引用的关键代码路径是否真实存在。
-- 确认文档职责没有重复冲突，例如 `apps/api/docs/standard` 写 API 规范，`apps/rag-admin/docs/standard` 写前端规范，`packages/shared/docs/standard` 写 shared 规范，`docs/ai-governance` 写 AI 治理。
+- 确认文档职责没有重复冲突，例如 `apps/api/docs/standard` 写 API 规范，各前端 app 的 `docs/standard` 写自身规范，package 文档写共享边界，`docs/ai-governance` 写 AI 治理。
 
 ## Workspace 变更
 
@@ -32,7 +32,7 @@
 
 - 根 `package.json`、`pnpm-workspace.yaml` 和受影响 app 的 `package.json` 是否一致。
 - API 命令是否正确使用环境加载器。
-- RAG Admin 命令是否使用前端脚本，不混用 API dotenv。
+- 两个前端 app 的命令是否使用各自前端脚本，不混用 API dotenv。
 - 跨包引用是否符合 `AGENTS.md`。
 - 根据受影响子项目追加 API、RAG Admin 或 shared 验证。
 
@@ -55,6 +55,10 @@
 
 若构建无法运行，需要说明原因，例如依赖未安装、网络受限或环境变量缺失。
 
+## Global Admin 前端变更
+
+优先验证 `pnpm global-admin:test`、`pnpm global-admin:build`、lint/stylelint/format check。涉及登录、proxy、详情 query 或静态输出时启动 dev server 做浏览器验证，并同步验证 GlobalAdminGuard 和 TenantMiddleware 排除范围。
+
 ## Shared 包变更
 
 修改 `packages/shared` 时检查：
@@ -62,7 +66,7 @@
 - 是否符合 `packages/shared/docs/standard/package-design.md` 的导出和依赖边界。
 - 是否搜索并更新所有消费者。
 - API 消费者受影响时运行相关 API 验证。
-- RAG Admin 消费者受影响时运行 `pnpm rag-admin:build`。
+- 任一前端消费者受影响时运行对应 app 的生产构建；共享前端包变更默认同时运行 `pnpm admin:build` 和 `pnpm global-admin:build`。
 
 ## Cross-app 变更
 
@@ -71,7 +75,7 @@
 - 后端 Controller 路由、HTTP 方法、Guard、DTO、返回结构和错误语义。
 - 前端 API client、调用页面、路由、store 和错误/空状态。
 - shared 导出类型是否仍匹配所有消费者。
-- 至少执行受影响 API 验证和 `pnpm rag-admin:build`，无法执行时说明原因。
+- 至少执行受影响 API 验证和受影响前端 app 的生产构建，无法执行时说明原因。
 
 ## 接口变更
 
@@ -133,7 +137,8 @@
 涉及鉴权、租户上下文、固定 token、Redis key、租户配置、前端登录 token 时检查：
 
 - API Guard 是否符合 `apps/api/docs/architecture/auth-and-tenant.md` 中的鉴权使用现状。
-- RAG Admin token 读取、保存和请求头注入是否集中在 `src/auth` 与 `src/api`。
+- 前端 token 读取、保存和请求头注入是否集中在各 app 的用户 store 与 `src/api`。
+- Global Admin API 是否使用 GlobalAdminGuard、排除 TenantMiddleware 且不读取默认 TenantContext。
 - 后台任务是否显式处理租户，而不是依赖请求上下文。
 - Redis key 是否租户隔离，批量删除是否有范围保护。
 - 租户化配置是否通过 `NodeConfigService` 读取。

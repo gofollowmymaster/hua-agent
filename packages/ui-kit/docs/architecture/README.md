@@ -8,7 +8,7 @@
 - 目录：`packages/ui-kit`。
 - 根入口：`packages/ui-kit/src/index.ts`。
 - 子路径入口：`@aplus-sql/ui-kit/components`、`@aplus-sql/ui-kit/hooks`。
-- 当前消费者：`apps/rag-admin`。
+- 当前消费者：`apps/rag-admin`、`apps/global-admin`。
 - 当前通过 package exports 直接暴露 TypeScript/Vue 源码，不生成独立 `dist`。
 
 ## 运行边界

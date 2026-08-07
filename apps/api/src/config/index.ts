@@ -38,6 +38,7 @@ const globalConfig: GlobalConfigType = Object.freeze({
   ...db,
   jwtSecret: process.env.JWT_SECRET,
   jwtTokenExpired: process.env.JWT_TOKEN_EXPIRED_TIME,
+  globalAdminAppCode: process.env.GLOBAL_ADMIN_APP_CODE || 'GLOBAL',
 
   sentryIntegrationToken: process.env.SENTRY_API_TOKEN,
 

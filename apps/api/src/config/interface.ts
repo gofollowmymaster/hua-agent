@@ -50,6 +50,7 @@ export type GlobalConfigType = {
 
   jwtSecret: string;
   jwtTokenExpired: string;
+  globalAdminAppCode: string;
 
   sentryIntegrationToken: string;
 

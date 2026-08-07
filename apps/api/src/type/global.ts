@@ -40,7 +40,7 @@ export type UserContext = {
   supplierName?: string;
   loginId?: string;
   tenantCode?: string;
-  appCode?: 'APLUS' | 'ADMIN' | 'QUICK';
+  appCode?: 'APLUS' | 'ADMIN' | 'QUICK' | 'GLOBAL';
   supplierCode?: string;
   userId?: number;
   userCode?: string;

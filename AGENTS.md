@@ -6,12 +6,13 @@
 
 - API 后端：`apps/api/AGENTS.md`
 - RAG Admin 前端：`apps/rag-admin/AGENTS.md`
+- Global Admin 总控台：`apps/global-admin/AGENTS.md`
 
 ## Workspace
 
 - **包管理器**: pnpm workspace
 - **后端 app**: `apps/api`（NestJS + TypeScript）
-- **前端 app**: `apps/rag-admin`（Vue 3 + Vite + TypeScript）
+- **前端 app**: `apps/rag-admin`、`apps/global-admin`（Vue 3 + Vite + TypeScript）
 - **共享包**: `packages/shared`、`packages/ui-kit`、`packages/http-client`
 - **根目录职责**: workspace 调度、兼容脚本、OpenSpec、部署入口和 AI 治理入口
 
@@ -34,6 +35,11 @@ pnpm admin:format       # 转发到 RAG Admin Prettier（--write）
 pnpm admin:format:check # 转发到 RAG Admin Prettier（只检查）
 pnpm admin:stylelint       # 转发到 RAG Admin Stylelint（--fix）
 pnpm admin:stylelint:check # 转发到 RAG Admin Stylelint（只检查）
+pnpm global-admin:dev      # Global Admin 开发服务
+pnpm global-admin:build    # Global Admin 类型检查和生产构建
+pnpm global-admin:test     # Global Admin Vitest
+pnpm global-admin:lint:check      # Global Admin ESLint（只检查）
+pnpm global-admin:stylelint:check # Global Admin Stylelint（只检查）
 pnpm ui-kit:build          # UI Kit 类型检查
 pnpm ui-kit:test           # UI Kit Vitest
 pnpm http-client:build     # HTTP Client 类型检查
@@ -57,6 +63,7 @@ pnpm format
 
 - 修改 `apps/api/**`：读 `apps/api/AGENTS.md`
 - 修改 `apps/rag-admin/**`：读 `apps/rag-admin/AGENTS.md`
+- 修改 `apps/global-admin/**`：读 `apps/global-admin/AGENTS.md`
 - 修改 `packages/shared/**`：读 `packages/shared/docs/architecture/README.md` 和 `packages/shared/docs/standard/README.md`
 - 修改 `packages/ui-kit/**`：读 `packages/ui-kit/docs/architecture/README.md`、`packages/ui-kit/docs/standard/README.md`、受影响前端规范和整体产品设计规范
 - 修改 `packages/http-client/**`：读 `packages/http-client/docs/architecture/README.md`、`packages/http-client/docs/standard/README.md` 和受影响前端的 API client 架构文档
@@ -71,6 +78,7 @@ AI 任务默认先读：
    - workspace：`AGENTS.md`、`docs/ai-governance/README.md`
    - API：`apps/api/docs/architecture/README.md`、`apps/api/docs/standard/README.md`
    - RAG Admin：`apps/rag-admin/docs/architecture/README.md`、`apps/rag-admin/docs/standard/README.md`
+   - Global Admin：`apps/global-admin/docs/architecture/README.md`、`apps/global-admin/docs/standard/README.md`
    - 整体产品设计：`docs/standard/design/README.md`（前端、UI、交互相关任务必读）
    - Shared：`packages/shared/docs/architecture/README.md`、`packages/shared/docs/standard/README.md`
    - UI Kit：`packages/ui-kit/docs/architecture/README.md`、`packages/ui-kit/docs/standard/README.md` + 受影响前端文档
@@ -92,7 +100,7 @@ AI 任务默认先读：
 
 ## 全局风格
 
-- Prettier: API 使用 `apps/api/.prettierrc`（单引号、尾随逗号）；RAG Admin 使用 `apps/rag-admin/prettier.config.cjs`（单引号、无尾随逗号）；前端共享包使用各自 package 配置
+- Prettier: API 使用 `apps/api/.prettierrc`（单引号、尾随逗号）；两个前端 app 使用各自 `prettier.config.cjs`（单引号、无尾随逗号）；前端共享包使用各自 package 配置
 - ESLint: TypeScript 推荐规则（关闭 no-explicit-any）
 - ESLint / Prettier 及配套插件版本统一由 `pnpm-workspace.yaml` 的 `catalog` 管理，子项目通过 `catalog:` 引用
 - TypeScript: 关闭 strictNullChecks、关闭 noImplicitAny
