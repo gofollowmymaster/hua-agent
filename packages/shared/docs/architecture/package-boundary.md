@@ -16,6 +16,8 @@
 - 浏览器专属或 Node 专属运行时代码。
 - 飞书、Redis、BullMQ、axios 实例等基础设施封装。
 
+前端专属公共组件和 hooks 放入 `packages/ui-kit`，可注入认证策略的前端请求封装放入 `packages/http-client`，不得放入本 shared 包。
+
 ## 当前约束
 
 shared 包必须保持轻量。没有真实跨端复用需求时，不要提前抽象到 shared。跨端通过 HTTP API 契约协作，shared 只承载稳定且值得共享的类型或工具。

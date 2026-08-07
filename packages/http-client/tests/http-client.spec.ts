@@ -34,7 +34,11 @@ describe('createHttpClient', () => {
     let requestConfig: InternalAxiosRequestConfig | undefined;
     client.http.defaults.adapter = async (config) => {
       requestConfig = config;
-      return createResponse(config, { code: 200, body: { ok: true }, message: '' });
+      return createResponse(config, {
+        code: 200,
+        body: { ok: true },
+        message: '',
+      });
     };
 
     await expect(client.get<{ ok: boolean }>('/demo')).resolves.toEqual({
@@ -92,9 +96,7 @@ describe('createHttpClient', () => {
       return createResponse(config, blob);
     };
 
-    await expect(
-      client.getBlob('/file', { timeout: 999 }),
-    ).resolves.toBe(blob);
+    await expect(client.getBlob('/file', { timeout: 999 })).resolves.toBe(blob);
     expect(requestConfig?.responseType).toBe('blob');
     expect(requestConfig?.timeout).toBe(999);
   });

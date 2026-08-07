@@ -17,7 +17,7 @@ type EventType = Event | null | undefined;
 
 const hasClassInChildren = (
   element: HTMLElement | null | undefined,
-  className: string
+  className: string,
 ): boolean => {
   if (!element) {
     return false;
@@ -26,7 +26,7 @@ const hasClassInChildren = (
     return true;
   }
   return Array.from(element.children).some((child) =>
-    hasClassInChildren(child as HTMLElement, className)
+    hasClassInChildren(child as HTMLElement, className),
   );
 };
 
@@ -40,11 +40,11 @@ const transformAgGridRowClicked = <RecordType = any>(option: {
   const includeClassNameList = [
     'ag-cell',
     'ag-cell-value',
-    ...(option.includeClassNameList ?? [])
+    ...(option.includeClassNameList ?? []),
   ];
   const excludeClassNameList = [
     'ag-grid-summary-cell',
-    ...(option.excludeClassNameList ?? [])
+    ...(option.excludeClassNameList ?? []),
   ];
 
   const hasAuth = () =>
@@ -60,14 +60,14 @@ const transformAgGridRowClicked = <RecordType = any>(option: {
 
     const target = event?.target as HTMLElement | undefined;
     const isInCell = includeClassNameList.some((className) =>
-      Boolean(target?.closest?.(`.${className}`))
+      Boolean(target?.closest?.(`.${className}`)),
     );
     if (!isInCell) {
       return;
     }
     if (
       excludeClassNameList.some((className) =>
-        target?.classList?.contains(className)
+        target?.classList?.contains(className),
       )
     ) {
       return;
@@ -114,21 +114,21 @@ export function useRowClickAction(routerName: string) {
   const onRowClick = (
     event: EventType,
     extraParams: RowClickExtraParams,
-    expandAuth?: RowClickPermission
+    expandAuth?: RowClickPermission,
   ) => {
     const rowClick = transformAgGridRowClicked({
       rowClicked() {
         const { replace, ...routeExtraParams } = extraParams;
         const target: RouteLocationRaw = {
           name: routerName,
-          ...routeExtraParams
+          ...routeExtraParams,
         };
         const navigate = replace ? router.replace : router.push;
         void navigate(target).catch(() => undefined);
       },
       auth: () => routerHasPermission(expandAuth),
       includeClassNameList: [DETAIL_ACTION_CLASS],
-      actionItemClassName
+      actionItemClassName,
     });
 
     rowClick({}, event);
@@ -141,11 +141,11 @@ export function useRowClickAction(routerName: string) {
     text: h(
       'span',
       {
-        class: DETAIL_ACTION_CLASS
+        class: DETAIL_ACTION_CLASS,
       },
-      options?.text ?? '详情'
+      options?.text ?? '详情',
     ),
-    visible: routerHasPermission(options?.expandAuth)
+    visible: routerHasPermission(options?.expandAuth),
   });
 
   const getPointerRowClassName = (expandAuth?: RowClickPermission) =>
@@ -155,7 +155,7 @@ export function useRowClickAction(routerName: string) {
     onRowClick,
     routerHasPermission,
     getPointerRowClassName,
-    clickAction
+    clickAction,
   };
 }
 

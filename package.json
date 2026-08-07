@@ -40,11 +40,20 @@
     "admin:format": "pnpm --filter @aplus-sql/rag-admin format",
     "admin:format:check": "pnpm --filter @aplus-sql/rag-admin format:check",
     "admin:stylelint": "pnpm --filter @aplus-sql/rag-admin stylelint",
-    "admin:stylelint:check": "pnpm --filter @aplus-sql/rag-admin stylelint:check"
+    "admin:stylelint:check": "pnpm --filter @aplus-sql/rag-admin stylelint:check",
+    "ui-kit:build": "pnpm --filter @aplus-sql/ui-kit build",
+    "ui-kit:test": "pnpm --filter @aplus-sql/ui-kit test",
+    "ui-kit:lint:check": "pnpm --filter @aplus-sql/ui-kit lint:check",
+    "ui-kit:stylelint:check": "pnpm --filter @aplus-sql/ui-kit stylelint:check",
+    "http-client:build": "pnpm --filter @aplus-sql/http-client build",
+    "http-client:test": "pnpm --filter @aplus-sql/http-client test",
+    "http-client:lint:check": "pnpm --filter @aplus-sql/http-client lint:check"
   },
   "lint-staged": {
     "apps/api/**/*.ts": "pnpm --filter @aplus-sql/api exec eslint --max-warnings 0",
-    "apps/rag-admin/src/**/*.{ts,vue}": "pnpm --filter @aplus-sql/rag-admin exec eslint --max-warnings 0"
+    "apps/rag-admin/src/**/*.{ts,vue}": "pnpm --filter @aplus-sql/rag-admin exec eslint --max-warnings 0",
+    "packages/ui-kit/**/*.{ts,vue}": "pnpm --filter @aplus-sql/ui-kit exec eslint --max-warnings 0",
+    "packages/http-client/**/*.ts": "pnpm --filter @aplus-sql/http-client exec eslint --max-warnings 0"
   },
   "commitlint": {
     "extends": [

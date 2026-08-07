@@ -20,10 +20,7 @@ export function isJsonBlob(blob: Blob) {
   return blob.type.includes('application/json');
 }
 
-export function toPreviewFile(
-  source: Blob | File,
-  item: PreviewDocumentItem,
-) {
+export function toPreviewFile(source: Blob | File, item: PreviewDocumentItem) {
   if (isJsonBlob(source)) {
     throw new Error('Preview endpoint returned JSON');
   }

@@ -16,7 +16,6 @@
 - `app.vue`：根组件。
 - `api/`：axios 实例和业务 API 封装。
 - `config/`：全局 UI 主题与 Design Token 预设。
-- `hooks/`：跨页面共享 hooks，例如文档预览弹窗 hook。
 - `layouts/`：后台布局组件。
 - `layouts/layout-drawer.vue`：全局详情抽屉容器。
 - `layouts/layout-drawer/`：全局抽屉组件解析和 URL query 操作。
@@ -29,8 +28,9 @@
 - `views/`：页面目录，页面入口统一为 `views/<page>/index.vue`。
 - `views/<page>/components/`：模块内公共展示组件，供 sections 或多个页面复用。
 - `views/<page>/sections/`：页面业务模块，包含页面区块、业务弹窗、业务抽屉；多页面共用的业务模块也放这里。
-- `components/`：跨项目稳定复用组件，例如文档预览弹窗。
 - `env.d.ts`：Vite/TypeScript 环境类型声明。
+
+跨项目稳定复用的 Vue 组件和 hooks 位于 `packages/ui-kit`；通用 HTTP client 位于 `packages/http-client`。RAG Admin 只在 `src/api/http.ts` 中保留本应用的 token、退出登录和环境配置注入。
 
 ## 新增页面
 
@@ -39,7 +39,7 @@
 - 页面统一放入 `views/<page>/index.vue`，并按 `page-structure-blueprint.md` 组织同级 `hooks/`、`components/`、`sections/`。
 - 模块内被多个 section 或页面复用的公共展示组件放入页面 `components/`。
 - 业务弹窗、抽屉和页面区块按业务模块放入 `sections/`。
-- 跨项目稳定复用组件放入 `src/components/`。
+- 跨项目稳定复用组件或 hooks 放入 `packages/ui-kit`，并通过公开 exports 暴露。
 - 路由配置放入 `router/routes.ts`。
 - 需要统一布局时复用 `admin-layout.vue` 或既有布局。
 - 页面中的表格、表单、详情、弹窗、抽屉等后台标准交互优先使用 `@aplus-frontend/ui` 或基于 aplus-ui 的既有封装。
@@ -53,7 +53,7 @@
 
 - 模块内被多个 section 或页面复用的公共展示组件放入页面 `components/`。
 - 业务弹窗、抽屉和页面区块按业务模块放入 `sections/`。
-- 跨项目稳定复用组件放入 `src/components/`；新增前必须确认真实复用需求。
+- 跨项目稳定复用组件放入 `packages/ui-kit`；新增前必须确认真实复用需求并避免导入 app 业务源码。
 - 组件文件使用 `kebab-case.vue`。
 - 新增业务组件优先组合 aplus-ui 成熟组件；只有 aplus-ui 不满足职责时才从更底层控件实现。
 - 组件只负责一个明确展示或交互职责，例如一个抽屉、一个预览弹窗、一个筛选区域。
@@ -64,7 +64,7 @@
 新增请求时：
 
 - 在 `api/rag-admin.ts` 或对应业务 API 文件中封装。
-- 复用 `api/http.ts` 的 axios 实例。
+- 复用 `api/http.ts` 基于 `@aplus-sql/http-client` 创建的应用实例。
 - 明确请求参数和响应类型。
 - 涉及后端接口变化时同步检查 API app 的 DTO、Controller 和 Service。
 - API 类型命名使用业务语义，例如 `RagDocumentItem`、`RagSessionPageParams`。

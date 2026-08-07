@@ -9,7 +9,7 @@
 | `selectedRowKeys` | `(string \| number)[]` | 表格选中行 key。 |
 | `clearAll` | `() => void` | 清空表格选中项。 |
 | `settings` | `ApTableSettingType & { hidden?: boolean }` | 表格列设置配置，`hidden` 可隐藏设置入口。 |
-| `refreshConfig` | `{ refresh: () => void; tooltip?: string; visible?: boolean }` | 可选刷新配置；不传时默认显示刷新入口并使用表格上下文刷新，`visible: false` 可隐藏。 |
+| `refreshConfig` | `{ refresh: () => void; tooltip?: string; visible?: boolean }` | 可选刷新配置；不传时不显示刷新入口，`visible: false` 可隐藏。 |
 | `showSelected` | `boolean` | 是否展示批量选中主体，默认 `true`。 |
 
 ## Slots
@@ -25,7 +25,8 @@
   :selected-row-keys="selectedRowKeys"
   :clear-all="clearAll"
   :show-selected="false"
-  :settings="{ persistenceKey: 'document-manager-list' }"
+  :settings="{ persistenceKey: 'app_documents_document-manager-list' }"
+  :refresh-config="{ refresh: reload }"
 >
   <template #suffix>
     <ApButton type="primary">新增</ApButton>

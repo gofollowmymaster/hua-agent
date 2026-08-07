@@ -12,7 +12,7 @@
 - **包管理器**: pnpm workspace
 - **后端 app**: `apps/api`（NestJS + TypeScript）
 - **前端 app**: `apps/rag-admin`（Vue 3 + Vite + TypeScript）
-- **共享包**: `packages/shared`
+- **共享包**: `packages/shared`、`packages/ui-kit`、`packages/http-client`
 - **根目录职责**: workspace 调度、兼容脚本、OpenSpec、部署入口和 AI 治理入口
 
 ## 根目录命令
@@ -34,6 +34,10 @@ pnpm admin:format       # 转发到 RAG Admin Prettier（--write）
 pnpm admin:format:check # 转发到 RAG Admin Prettier（只检查）
 pnpm admin:stylelint       # 转发到 RAG Admin Stylelint（--fix）
 pnpm admin:stylelint:check # 转发到 RAG Admin Stylelint（只检查）
+pnpm ui-kit:build          # UI Kit 类型检查
+pnpm ui-kit:test           # UI Kit Vitest
+pnpm http-client:build     # HTTP Client 类型检查
+pnpm http-client:test      # HTTP Client Vitest
 ```
 
 格式化和 lint 命令会改写文件，执行前确认这是当前任务的一部分：
@@ -54,6 +58,8 @@ pnpm format
 - 修改 `apps/api/**`：读 `apps/api/AGENTS.md`
 - 修改 `apps/rag-admin/**`：读 `apps/rag-admin/AGENTS.md`
 - 修改 `packages/shared/**`：读 `packages/shared/docs/architecture/README.md` 和 `packages/shared/docs/standard/README.md`
+- 修改 `packages/ui-kit/**`：读 `packages/ui-kit/README.md`、RAG Admin 前端规范和整体产品设计规范
+- 修改 `packages/http-client/**`：读 `packages/http-client/README.md` 和受影响前端的 API client 架构文档
 - 修改跨端契约、根脚本、构建/部署边界：读 `AGENTS.md`、`docs/ai-governance/README.md` 和受影响子项目文档
 
 ## 文档读取路由
@@ -67,10 +73,11 @@ AI 任务默认先读：
    - RAG Admin：`apps/rag-admin/docs/architecture/README.md`、`apps/rag-admin/docs/standard/README.md`
    - 整体产品设计：`docs/standard/design/README.md`（前端、UI、交互相关任务必读）
    - Shared：`packages/shared/docs/architecture/README.md`、`packages/shared/docs/standard/README.md`
+   - 前端共享包：`packages/ui-kit/README.md`、`packages/http-client/README.md` + 受影响前端文档
    - Cross-app：`AGENTS.md`、`docs/ai-governance/README.md` + 受影响子项目文档
 3. 需要执行或交付时读 `docs/ai-governance/development-workflow.md` 和 `docs/ai-governance/testing-and-verification.md`
 
-长期架构事实写入 `apps/*/docs/architecture/` 或 `packages/shared/docs/architecture/`，完整子项目开发规范写入 `apps/*/docs/standard/` 或 `packages/shared/docs/standard/`，整体产品设计规范写入 `docs/standard/design/`，AI 工作流写入 `docs/ai-governance/`。不要把完整子项目规范复制到根 `AGENTS.md`。
+长期架构事实写入 `apps/*/docs/architecture/` 或对应 `packages/*` 文档，完整子项目开发规范写入 `apps/*/docs/standard/` 或对应 package 文档，整体产品设计规范写入 `docs/standard/design/`，AI 工作流写入 `docs/ai-governance/`。不要把完整子项目规范复制到根 `AGENTS.md`。
 
 ## OpenSpec 工作流
 
@@ -84,7 +91,7 @@ AI 任务默认先读：
 
 ## 全局风格
 
-- Prettier: API 使用 `apps/api/.prettierrc`（单引号、尾随逗号）；RAG Admin 使用 `apps/rag-admin/prettier.config.cjs`（单引号、无尾随逗号）
+- Prettier: API 使用 `apps/api/.prettierrc`（单引号、尾随逗号）；RAG Admin 使用 `apps/rag-admin/prettier.config.cjs`（单引号、无尾随逗号）；前端共享包使用各自 package 配置
 - ESLint: TypeScript 推荐规则（关闭 no-explicit-any）
 - ESLint / Prettier 及配套插件版本统一由 `pnpm-workspace.yaml` 的 `catalog` 管理，子项目通过 `catalog:` 引用
 - TypeScript: 关闭 strictNullChecks、关闭 noImplicitAny

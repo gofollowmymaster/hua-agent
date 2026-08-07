@@ -47,7 +47,7 @@ SDK 初始化自动跳转、`ensureLogin()` 和 `logout()` 必须复用同一解
 
 ## 请求封装
 
-请求基础封装位于 `src/api/http.ts`，业务 API 方法位于 `src/api/rag-admin.ts`。
+通用 axios、业务 envelope 和 401 处理能力位于 `@aplus-sql/http-client`。`src/api/http.ts` 负责创建 RAG Admin 实例并注入 base URL、user store/cookie token 和 logout；业务 API 方法位于 `src/api/rag-admin.ts`。
 
 ## API 路径
 
@@ -61,7 +61,7 @@ RAG Admin 默认同源调用 API。开发态由 Vite proxy 将 `/ai` 请求转�
 
 ## 请求入口规则
 
-- axios 实例统一维护在 `src/api/http.ts`。
+- axios 实例通过 `createHttpClient` 在 `src/api/http.ts` 统一创建，不在页面或业务 API 文件中重复配置 interceptor。
 - 业务请求方法维护在 `src/api/` 下的业务文件中。
 - 页面组件只调用业务 API 方法，不直接创建 axios 实例。
 - API 文件只负责请求、响应类型和轻量参数整理，不承担页面状态和展示逻辑。
@@ -71,7 +71,7 @@ RAG Admin 默认同源调用 API。开发态由 Vite proxy 将 `/ai` 请求转�
 
 - token 读写统一通过 `src/stores/modules/user/token.ts`。
 - 租户、登录中心和登录 SDK API 地址统一通过 `src/stores/modules/user/tenant-auth.config.ts` 解析，不在页面、store 或环境文件中固定服务商码。
-- 请求头注入统一在 axios 封装层完成。
+- 请求头注入统一由 `@aplus-sql/http-client` 完成，token 获取与 logout 回调由 RAG Admin 适配层注入。
 - 不在页面组件中手动拼接 `Authorization`。
 - 登录初始化和跳转逻辑放在 `src/stores/modules/user/auth.ts` 或路由守卫相关位置。
 

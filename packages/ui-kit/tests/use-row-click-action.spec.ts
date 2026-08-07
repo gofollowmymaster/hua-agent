@@ -1,5 +1,5 @@
 import { defineComponent, h, nextTick, ref } from 'vue';
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { createMemoryHistory, createRouter } from 'vue-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -29,6 +29,7 @@ async function setup(routerName = 'detail') {
     ],
   });
   await router.push('/');
+  await router.isReady();
 
   let action: ReturnType<typeof useRowClickAction>;
   const wrapper = mount(
@@ -52,7 +53,7 @@ describe('useRowClickAction', () => {
     vi.spyOn(window, 'getSelection').mockReturnValue(null);
 
     action.onRowClick({ target } as unknown as Event, { query: { id: '1' } });
-    await nextTick();
+    await flushPromises();
     await nextTick();
 
     expect(router.currentRoute.value.name).toBe('detail');

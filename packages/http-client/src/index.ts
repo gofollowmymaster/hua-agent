@@ -42,9 +42,7 @@ function isApiResponse(data: unknown): data is ApiResponse<unknown> {
 /**
  * 创建与具体前端应用解耦的 axios client，并统一处理 token、业务 envelope 和未授权响应。
  */
-export function createHttpClient(
-  options: CreateHttpClientOptions,
-): HttpClient {
+export function createHttpClient(options: CreateHttpClientOptions): HttpClient {
   const defaults: CreateAxiosDefaults = {
     baseURL: options.baseURL,
     timeout: options.timeout ?? 60000,
@@ -66,7 +64,7 @@ export function createHttpClient(
   });
 
   http.interceptors.response.use(
-    (response) => {
+    (response): any => {
       const data = response.data as unknown;
       if (!isApiResponse(data)) {
         return data;
@@ -92,11 +90,7 @@ export function createHttpClient(
     get<Response>(url: string, config?: AxiosRequestConfig) {
       return http.get<unknown, Response>(url, config);
     },
-    post<Response>(
-      url: string,
-      data?: unknown,
-      config?: AxiosRequestConfig,
-    ) {
+    post<Response>(url: string, data?: unknown, config?: AxiosRequestConfig) {
       return http.post<unknown, Response>(url, data, config);
     },
     del<Response>(url: string, config?: AxiosRequestConfig) {

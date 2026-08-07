@@ -81,7 +81,6 @@ function handlePreviewError() {
 function handlePreviewUnsupported() {
   errorText.value = '当前文件格式暂不支持在线预览。';
 }
-
 </script>
 
 <style lang="less">

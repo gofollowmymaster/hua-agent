@@ -20,6 +20,7 @@ export default typescriptEslint.config(
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
       '@typescript-eslint/consistent-type-imports': 'error',
+      'vue/one-component-per-file': 'off',
     },
   },
   {
@@ -39,6 +40,7 @@ export default typescriptEslint.config(
       'vue/max-attributes-per-line': 'off',
       'vue/multi-word-component-names': 'off',
       'vue/multiline-html-element-content-newline': 'off',
+      'vue/one-component-per-file': 'off',
       'vue/require-default-prop': 'off',
       'vue/singleline-html-element-content-newline': 'off',
     },

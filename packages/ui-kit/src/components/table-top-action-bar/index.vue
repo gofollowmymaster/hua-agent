@@ -33,44 +33,44 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, useSlots } from 'vue';
-  import type { VNode } from 'vue';
-  import { ApBatchAction } from '@aplus-frontend/ui';
-  import type { TableTopActionBarProps } from './interface';
-  import SettingGroup from './setting-group.vue';
+import { computed, useSlots } from 'vue';
+import type { VNode } from 'vue';
+import { ApBatchAction } from '@aplus-frontend/ui';
+import type { TableTopActionBarProps } from './interface';
+import SettingGroup from './setting-group.vue';
 
-  withDefaults(defineProps<TableTopActionBarProps>(), {
-    showSelected: true
-  });
+withDefaults(defineProps<TableTopActionBarProps>(), {
+  showSelected: true,
+});
 
-  const slots = useSlots();
+const slots = useSlots();
 
-  const hasSlotContent = (slot?: () => VNode[]) => {
-    if (!slot) {
-      return false;
-    }
-    return slot().some((node) => node.type !== Symbol.for('v-cmt'));
-  };
+const hasSlotContent = (slot?: () => VNode[]) => {
+  if (!slot) {
+    return false;
+  }
+  return slot().some((node) => node.type !== Symbol.for('v-cmt'));
+};
 
-  const hasHeaderContent = computed(() => hasSlotContent(slots.header));
-  const hasSuffixContent = computed(() => hasSlotContent(slots.suffix));
+const hasHeaderContent = computed(() => hasSlotContent(slots.header));
+const hasSuffixContent = computed(() => hasSlotContent(slots.suffix));
 </script>
 
 <style lang="less" scoped>
-  .table-top-action-bar {
-    margin-bottom: 8px;
-  }
+.table-top-action-bar {
+  margin-bottom: 8px;
+}
 
-  .table-top-action-bar-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-  }
+.table-top-action-bar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
 
-  .table-top-action-bar-header,
-  .table-top-action-bar-suffix {
-    display: flex;
-    align-items: center;
-  }
+.table-top-action-bar-header,
+.table-top-action-bar-suffix {
+  display: flex;
+  align-items: center;
+}
 </style>

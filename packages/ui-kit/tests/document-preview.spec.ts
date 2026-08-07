@@ -2,8 +2,13 @@ import { defineComponent, h } from 'vue';
 import { mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const destroy = vi.fn();
-const createModal = vi.fn(() => ({ destroy }));
+const { createModal, destroy } = vi.hoisted(() => {
+  const destroy = vi.fn();
+  return {
+    destroy,
+    createModal: vi.fn((_config: Record<string, any>) => ({ destroy })),
+  };
+});
 
 vi.mock('@aplus-frontend/ui', () => ({
   ApModal: { createModal },
@@ -55,7 +60,7 @@ describe('document preview', () => {
 
     modal!.open({ fileName: 'demo.pdf', fileType: 'pdf' });
     expect(createModal).toHaveBeenCalledOnce();
-    const config = createModal.mock.calls[0][0];
+    const config = createModal.mock.calls[0]![0];
     expect(config.title).toBe('demo.pdf');
     expect(config.content.props.loadFile).toBe(loadFile);
 
