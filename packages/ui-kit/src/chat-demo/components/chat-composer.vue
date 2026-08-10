@@ -1,16 +1,16 @@
 <template>
-  <form class="assistant-composer" @submit.prevent="handleSubmit">
+  <form class="chat-demo-composer" @submit.prevent="handleSubmit">
     <textarea
       :value="modelValue"
-      class="assistant-input"
+      class="chat-demo-input"
       :disabled="busy || messageLoading"
       placeholder="输入问题，Enter 发送，Shift+Enter 换行"
       rows="3"
       @input="handleInput"
       @keydown="handleInputKeydown"
     />
-    <div class="assistant-composer-footer">
-      <span class="assistant-state">{{ stateText }}</span>
+    <div class="chat-demo-composer-footer">
+      <span class="chat-demo-state">{{ stateText }}</span>
       <ApButton
         type="primary"
         html-type="submit"
@@ -57,7 +57,6 @@ function handleSubmit() {
     emit('stop');
     return;
   }
-
   emit('send');
 }
 
@@ -67,21 +66,20 @@ function handleInput(event: Event) {
 
 function handleInputKeydown(event: KeyboardEvent) {
   if (event.key !== 'Enter' || event.shiftKey) return;
-
   event.preventDefault();
   handleSubmit();
 }
 </script>
 
 <style lang="less" scoped>
-.assistant-composer {
+.chat-demo-composer {
   flex: 0 0 auto;
   padding: 14px;
   border-top: 1px solid @border-color;
   background: @card-bg-color;
 }
 
-.assistant-input {
+.chat-demo-input {
   width: 100%;
   min-height: 86px;
   max-height: 180px;
@@ -95,17 +93,17 @@ function handleInputKeydown(event: KeyboardEvent) {
   resize: vertical;
 }
 
-.assistant-input:focus {
+.chat-demo-input:focus {
   border-color: @green-color;
   box-shadow: 0 0 0 3px fade(@green-color, 16%);
 }
 
-.assistant-input:disabled {
+.chat-demo-input:disabled {
   background: @fill-hover-color;
   color: @text-tertiary-color;
 }
 
-.assistant-composer-footer {
+.chat-demo-composer-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -113,7 +111,7 @@ function handleInputKeydown(event: KeyboardEvent) {
   margin-top: 10px;
 }
 
-.assistant-state {
+.chat-demo-state {
   color: @text-secondary-color;
   font-size: 13px;
 }

@@ -600,6 +600,9 @@ importers:
 
   packages/ui-kit:
     devDependencies:
+      '@ai-sdk/vue':
+        specifier: 3.0.148
+        version: 3.0.148(vue@3.5.22(typescript@5.7.2))(zod@3.25.76)
       '@aplus-frontend/ui':
         specifier: 7.26.8
         version: 7.26.8(@aplus-frontend/antdv@2.2.0(vue@3.5.22(typescript@5.7.2)))(@aplus-frontend/icon@2.1.5)(@aplus-frontend/oss@2.0.4(@types/lodash-es@4.17.12)(lodash-es@4.18.1)(lodash@4.17.21))(@types/lodash-es@4.17.12)(exceljs@4.4.0)(lodash-es@4.18.1)(lodash@4.17.21)(vue@3.5.22(typescript@5.7.2))(vxe-table@4.19.22(vue@3.5.22(typescript@5.7.2)))
@@ -618,6 +621,9 @@ importers:
       '@vue/test-utils':
         specifier: ^2.4.6
         version: 2.4.11(@vue/compiler-dom@3.5.39)(@vue/server-renderer@3.5.22(vue@3.5.22(typescript@5.7.2)))(vue@3.5.22(typescript@5.7.2))
+      ai:
+        specifier: 6.0.148
+        version: 6.0.148(zod@3.25.76)
       eslint:
         specifier: 'catalog:'
         version: 9.39.5(jiti@2.6.1)
@@ -633,6 +639,9 @@ importers:
       less:
         specifier: ^4.8.1
         version: 4.8.1
+      md-editor-v3:
+        specifier: 6.5.3
+        version: 6.5.3(vue@3.5.22(typescript@5.7.2))
       pdfjs-dist:
         specifier: 6.1.200
         version: 6.1.200
