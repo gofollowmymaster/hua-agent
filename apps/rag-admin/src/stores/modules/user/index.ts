@@ -6,18 +6,9 @@ import {
   tenantAuthConfig
 } from './auth';
 import { resolveTenantDisplayName } from './tenant-auth.config';
-import { getToken, setToken } from './token';
+import { normalizeSdkUserInfo, resolveUserInfo, type LoginUser } from './jwt';
 
-export interface LoginUser {
-  userId?: string;
-  userName?: string;
-  email?: string;
-  avatar?: string;
-  supplierCode?: string;
-  supplierName?: string;
-  tenantCode?: string;
-  tenantName?: string;
-}
+export type { LoginUser } from './jwt';
 
 interface UserState {
   token?: string;
@@ -27,70 +18,11 @@ interface UserState {
   loginError: string;
 }
 
-function parseJwtPayload(token: string): Record<string, unknown> {
-  const [, payload] = token.split('.');
-  if (!payload) return {};
-
-  try {
-    const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
-    const json = decodeURIComponent(
-      window
-        .atob(normalized)
-        .split('')
-        .map((char) => `%${char.charCodeAt(0).toString(16).padStart(2, '0')}`)
-        .join('')
-    );
-    return JSON.parse(json) as Record<string, unknown>;
-  } catch {
-    return {};
-  }
-}
-
-function readString(payload: Record<string, unknown>, keys: string[]) {
-  for (const key of keys) {
-    const value = payload[key];
-    if (typeof value === 'string' && value) return value;
-  }
-  return undefined;
-}
-
-function resolveUserInfo(token?: string): LoginUser {
-  if (!token) return {};
-
-  const payload = parseJwtPayload(token);
-  return {
-    userId: readString(payload, ['userId', 'user_id', 'sub', 'id']),
-    userName: readString(payload, ['userName', 'username', 'name', 'nickname']),
-    email: readString(payload, ['email', 'mail']),
-    avatar: readString(payload, ['avatar', 'avatarUrl']),
-    supplierCode: readString(payload, ['supplierCode', 'supplier_code']),
-    supplierName: readString(payload, ['supplierName', 'supplier_name']),
-    tenantCode: readString(payload, ['tenantCode', 'tenant_code']),
-    tenantName: readString(payload, ['tenantName', 'tenant_name'])
-  };
-}
-
-function normalizeSdkUserInfo(userInfo: unknown): LoginUser {
-  if (!userInfo || typeof userInfo !== 'object') return {};
-
-  const data = userInfo as Record<string, unknown>;
-  return {
-    userId: readString(data, ['userCode', 'unionId', 'id']),
-    userName: readString(data, ['userName', 'realName', 'name']),
-    email: readString(data, ['email']),
-    avatar: readString(data, ['avatar']),
-    supplierCode: readString(data, ['supplierCode', 'supplier_code']),
-    supplierName: readString(data, ['supplierName', 'supplier_name']),
-    tenantCode: readString(data, ['tenantCode']),
-    tenantName: readString(data, ['tenantName'])
-  };
-}
-
 export const useUserStore = defineStore('user', {
   state: (): UserState => ({
-    token: getToken(),
-    userInfo: resolveUserInfo(getToken()),
-    loginReady: Boolean(getToken()),
+    token: undefined,
+    userInfo: {},
+    loginReady: false,
     loginLoading: false,
     loginError: ''
   }),
@@ -128,7 +60,6 @@ export const useUserStore = defineStore('user', {
       this.token = token;
       this.userInfo = resolveUserInfo(token);
       this.loginReady = Boolean(token);
-      setToken(token);
     },
     setUserInfo(userInfo: LoginUser) {
       const merged = { ...this.userInfo };
@@ -145,6 +76,7 @@ export const useUserStore = defineStore('user', {
       this.loginError = '';
       try {
         const token = await loginWithAuthCenter();
+        console.log('[ token ] >', token);
         if (token) {
           this.setToken(token);
           const userInfo = await getCurrentUserInfo();
@@ -158,6 +90,17 @@ export const useUserStore = defineStore('user', {
     logout() {
       this.setToken(undefined);
       redirectLogout();
+    }
+  },
+  persist: {
+    key: 'authToken',
+    pick: ['token', 'userInfo'],
+    afterHydrate(context) {
+      const store = context.store as unknown as UserState & {
+        setUserInfo: (userInfo: LoginUser) => void;
+      };
+      store.loginReady = Boolean(store.token);
+      if (store.token) store.setUserInfo(resolveUserInfo(store.token));
     }
   }
 });

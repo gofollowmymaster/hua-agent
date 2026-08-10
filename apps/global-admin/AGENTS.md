@@ -24,7 +24,7 @@
 
 - Global Admin API 使用 `GlobalAdminGuard`，前端不得携带或伪造 `supplierCode`、`supplier`、`ignore-supplier-check`。
 - 业务 API 统一放在 `src/api/`；页面不得直接创建 axios 实例。
-- token、登录 SDK 和用户状态统一放在 `src/stores/modules/user/`。
+- token、登录 SDK 和用户状态统一放在 `src/stores/modules/user/`，token 由 `pinia-plugin-persistedstate` 持久化到 `localStorage['authToken']`。
 - 详情使用全局 LayoutDrawer 和 URL query，不新建页面私有 Drawer。
 - 只展示 API 返回的脱敏字段，不推导或展示租户敏感配置。
 - aplus-ui 组件使用前先通过 CLI 查询公开 API；禁止内部深路径 import。

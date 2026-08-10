@@ -9,17 +9,11 @@ const mocks = vi.hoisted(() => {
   };
   return {
     authHub: vi.fn(() => client),
-    client,
-    getToken: vi.fn(),
-    setToken: vi.fn()
+    client
   };
 });
 
 vi.mock('@aplus-frontend/aplus-auth-sdk', () => ({ authHub: mocks.authHub }));
-vi.mock('./token', () => ({
-  getToken: mocks.getToken,
-  setToken: mocks.setToken
-}));
 
 describe('global admin auth', () => {
   beforeEach(() => {
@@ -28,11 +22,14 @@ describe('global admin auth', () => {
     vi.stubEnv('VITE_AUTH_ENV', 'test');
     vi.stubEnv('VITE_AUTH_API_URL', 'https://auth-api.test.example.com');
     vi.stubEnv('VITE_AUTH_APP_CODE', 'GLOBAL');
-    mocks.getToken.mockReturnValue(undefined);
+    vi.stubGlobal('alert', vi.fn());
     mocks.client.getAuthToken.mockResolvedValue('');
   });
 
-  afterEach(() => vi.unstubAllEnvs());
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
 
   it('uses GLOBAL without adding supplierCode to login parameters', async () => {
     const auth = await import('./auth');
@@ -44,13 +41,21 @@ describe('global admin auth', () => {
         platform: 'global-admin',
         apiUrl: 'https://auth-api.test.example.com',
         customRedirectUrls: expect.objectContaining({
-          test: 'https://global.test.elnkpro.com'
+          test: 'http://auth.test-com.elnkpro.com/console.html'
         }),
         redirectLoginExtraParams: redirectParams
       })
     );
     expect(mocks.client.redirectLogin).toHaveBeenCalledWith(redirectParams);
     expect(redirectParams).not.toHaveProperty('supplierCode');
+  });
+
+  it('returns the SDK token without redirecting', async () => {
+    mocks.client.getAuthToken.mockResolvedValue('sdk-token');
+    const auth = await import('./auth');
+
+    await expect(auth.ensureLogin()).resolves.toBe('sdk-token');
+    expect(mocks.client.redirectLogin).not.toHaveBeenCalled();
   });
 
   it('reports a missing auth API URL before creating the SDK client', async () => {

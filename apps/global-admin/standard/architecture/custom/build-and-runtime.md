@@ -28,7 +28,7 @@
 
 - `VITE_AUTH_ENV`：认证环境（development / test / uat / prod）。
 - `VITE_AUTH_API_URL`：认证 SDK API 地址，必须由部署环境显式配置。
-- `VITE_AUTH_PLATFORM`：SDK platform 与 token cookie 前缀，默认 `global-admin`。
+- `VITE_AUTH_PLATFORM`：SDK platform，默认 `global-admin`；token 持久化固定使用 `localStorage['authToken']`。
 - `VITE_AUTH_APP_CODE`：appCode，默认 `GLOBAL`。
 - `VITE_API_BASE_URL`：业务 API base URL，默认同源空串。
 - `VITE_API_PROXY_TARGET`：开发代理目标。

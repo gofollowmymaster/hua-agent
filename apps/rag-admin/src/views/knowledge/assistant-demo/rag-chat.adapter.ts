@@ -4,14 +4,13 @@ import { DefaultChatTransport } from 'ai';
 import { useDocumentPreviewModal } from '@aplus-sql/ui-kit';
 import type {
   ChatDemoAdapter,
-  ChatDemoMessage,
+  ChatDemoMessage
 } from '@aplus-sql/ui-kit/chat-demo';
-import { getToken } from '@/stores/modules/user/token';
 import { useUserStore } from '@/stores/modules/user';
 import {
   listSessionMessages,
   pageSessions,
-  type RagMessageItem,
+  type RagMessageItem
 } from '@/api/knowledge-qa/sessions';
 import { getDocumentPreviewFile } from '@/api/knowledge-qa/documents';
 
@@ -27,7 +26,7 @@ const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 export function createRagChatAdapter(): ChatDemoAdapter {
   const userStore = useUserStore();
   const previewModal = useDocumentPreviewModal<PreviewDocumentItem>({
-    loadFile: (item) => getDocumentPreviewFile(item.id),
+    loadFile: (item) => getDocumentPreviewFile(item.id)
   });
 
   return {
@@ -44,8 +43,8 @@ export function createRagChatAdapter(): ChatDemoAdapter {
         transport: new DefaultChatTransport({
           api: `${apiBaseUrl}/ai/rag/chat`,
           headers: () => buildAuthHeaders(userStore),
-          body: () => ({ participantId }),
-        }),
+          body: () => ({ participantId })
+        })
       });
     },
     pageSessions: (params) => pageSessions(params),
@@ -55,12 +54,12 @@ export function createRagChatAdapter(): ChatDemoAdapter {
     formatTime,
     onMarkdownClick(event) {
       handleMarkdownClick(event, previewModal);
-    },
+    }
   };
 }
 
 function buildAuthHeaders(userStore: ReturnType<typeof useUserStore>) {
-  const token = userStore.token || getToken();
+  const token = userStore.token;
   const headers: Record<string, string> = {};
   if (token) headers.Authorization = `Bearer ${token}`;
   return headers;
@@ -69,18 +68,22 @@ function buildAuthHeaders(userStore: ReturnType<typeof useUserStore>) {
 function toUiMessages(historyMessages: RagMessageItem[]): ChatDemoMessage[] {
   return historyMessages
     .filter(
-      (message) => message.role === 'user' || message.role === 'assistant',
+      (message) => message.role === 'user' || message.role === 'assistant'
     )
     .map((message) => ({
       id: String(message.id),
       role: message.role as 'user' | 'assistant',
-      parts: [{ type: 'text' as const, text: message.content }],
+      parts: [{ type: 'text' as const, text: message.content }]
     })) as ChatDemoMessage[];
 }
 
 function formatStatus(data: unknown) {
   if (!data || typeof data !== 'object') return '状态更新';
-  const statusData = data as { stage?: string; message?: string; chunks?: number };
+  const statusData = data as {
+    stage?: string;
+    message?: string;
+    chunks?: number;
+  };
   if (statusData.chunks != null) {
     return `${statusData.message || '状态更新'} · ${statusData.chunks} 个片段`;
   }
@@ -93,14 +96,14 @@ function formatTime(value?: string) {
 
 function handleMarkdownClick(
   event: MouseEvent,
-  previewModal: ReturnType<typeof useDocumentPreviewModal<PreviewDocumentItem>>,
+  previewModal: ReturnType<typeof useDocumentPreviewModal<PreviewDocumentItem>>
 ) {
   const link = (event.target as HTMLElement | null)?.closest('a');
   if (!link) return;
 
   const previewItem = resolvePreviewDocument({
     href: link.getAttribute('href') || '',
-    label: link.textContent || '',
+    label: link.textContent || ''
   });
   if (!previewItem) return;
 
@@ -110,7 +113,7 @@ function handleMarkdownClick(
 
 function resolvePreviewDocument(segment: { href: string; label: string }) {
   const match = segment.href.match(
-    /^\/(?:api\/)?ai\/rag\/admin\/documents\/([^/]+)\/preview$/,
+    /^\/(?:api\/)?ai\/rag\/admin\/documents\/([^/]+)\/preview$/
   );
   if (!match) return null;
 
@@ -118,7 +121,7 @@ function resolvePreviewDocument(segment: { href: string; label: string }) {
   return {
     id: decodeURIComponent(match[1]),
     fileName,
-    fileType: inferFileType(fileName),
+    fileType: inferFileType(fileName)
   } satisfies PreviewDocumentItem;
 }
 

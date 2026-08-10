@@ -8,10 +8,9 @@
 
 - `index.ts`：用户登录状态、用户信息和登录生命周期编排。
 - `auth.ts`：登录 SDK 初始化和登录流程相关逻辑。
-- `token.ts`：token cookie 的读写和清理。
 - `auth.spec.ts`：登录相关单测。
 
-前端通过登录 SDK 获取 token，并在请求后端 API 时使用 `Authorization: Bearer <token>`。token cookie key 为 `<platform>-auth-access-token`（`platform` 默认 `global-admin`），与 RAG Admin 隔离。
+前端通过登录 SDK 获取 token，并在请求后端 API 时使用 `Authorization: Bearer <token>`。Global Admin 与 RAG Admin 共用 `pinia-plugin-persistedstate`，将 user store 的 `token` / `userInfo` 持久化到 `localStorage['authToken']`。旧 `global-admin-auth-access-token` cookie 仅在 `authToken` 不存在时迁移一次，迁移后清理。
 
 ### 登录参数
 
@@ -43,7 +42,7 @@
 
 ## 请求封装与 API 路径
 
-通用 axios、业务 envelope 和 401 处理能力位于 `@aplus-sql/http-client`。`src/api/http.ts` 负责创建 Global Admin 实例并注入 base URL、user store/cookie token 和 logout；业务 API 方法位于 `src/api/global-admin.ts`（租户目录）和 `src/api/schedule.ts`（定时任务）。
+通用 axios、业务 envelope 和 401 处理能力位于 `@aplus-sql/http-client`。`src/api/http.ts` 负责创建 Global Admin 实例并注入 base URL、user store token 和 logout；业务 API 方法位于 `src/api/global-admin.ts`（租户目录）和 `src/api/schedule.ts`（定时任务）。
 
 Global Admin 默认同源调用 API。开发态由 Vite proxy 将 `/global-admin` 请求转发到 API 后端；生产态由 API app 同时提供静态资源和后端接口。当前 Global Admin 接口前缀属于 API app 的 `global-admin` 能力（见 `apps/api/docs/architecture/global-admin.md`）。
 

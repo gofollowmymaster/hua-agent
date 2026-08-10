@@ -46,7 +46,7 @@ export class AgentChatAgentService {
   /** 初始化模型、harness profile 和编译后的 Deep Agent 单例。 */
   constructor(private readonly toolService: AgentChatToolService) {
     this.model = new ChatOpenAI({
-      temperature: 50,
+      temperature: 0.5,
       model: NodeConfigService.get('modelName'),
       apiKey: NodeConfigService.get('openAiApiKey'),
       configuration: {

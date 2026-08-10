@@ -4,7 +4,6 @@ import {
   getCurrentUserInfo,
   logout as redirectLogout
 } from './auth';
-import { getToken, setToken } from './token';
 
 export interface LoginUser {
   userId?: string;
@@ -73,9 +72,9 @@ function normalizeSdkUserInfo(userInfo: unknown): LoginUser {
 
 export const useUserStore = defineStore('user', {
   state: (): UserState => ({
-    token: getToken(),
-    userInfo: resolveUserInfo(getToken()),
-    loginReady: Boolean(getToken()),
+    token: undefined,
+    userInfo: {},
+    loginReady: false,
     loginLoading: false,
     loginError: ''
   }),
@@ -87,17 +86,27 @@ export const useUserStore = defineStore('user', {
         state.userInfo.userId ||
         '总管理员'
       );
+    },
+    isLoggedIn(state) {
+      return Boolean(state.token);
     }
   },
   actions: {
     setLoginError(message: string) {
       this.loginError = message;
     },
+    setUserInfo(userInfo: LoginUser) {
+      const merged = { ...this.userInfo };
+      (Object.keys(userInfo) as Array<keyof LoginUser>).forEach((key) => {
+        const value = userInfo[key];
+        if (value !== undefined) merged[key] = value;
+      });
+      this.userInfo = merged;
+    },
     setToken(token?: string) {
       this.token = token;
       this.userInfo = resolveUserInfo(token);
       this.loginReady = Boolean(token);
-      setToken(token);
     },
     async ensureLogin() {
       if (this.loginReady && this.token) return this.token;
@@ -107,10 +116,7 @@ export const useUserStore = defineStore('user', {
         const token = await loginWithAuthCenter();
         if (token) {
           this.setToken(token);
-          this.userInfo = {
-            ...this.userInfo,
-            ...normalizeSdkUserInfo(await getCurrentUserInfo())
-          };
+          this.setUserInfo(normalizeSdkUserInfo(await getCurrentUserInfo()));
         }
         return token;
       } finally {
@@ -120,6 +126,17 @@ export const useUserStore = defineStore('user', {
     logout() {
       this.setToken(undefined);
       redirectLogout();
+    }
+  },
+  persist: {
+    key: 'authToken',
+    pick: ['token', 'userInfo'],
+    afterHydrate(context) {
+      const store = context.store as unknown as UserState & {
+        setUserInfo: (userInfo: LoginUser) => void;
+      };
+      store.loginReady = Boolean(store.token);
+      if (store.token) store.setUserInfo(resolveUserInfo(store.token));
     }
   }
 });

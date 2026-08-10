@@ -1,6 +1,6 @@
 # Global Admin 架构说明
 
-`apps/global-admin` 是供总管理员使用的无租户 Vue/Vite 总控台。它拥有独立登录、token、路由和静态输出，不共享 RAG Admin 的租户解析结果。
+`apps/global-admin` 是供总管理员使用的无租户 Vue/Vite 总控台。它拥有独立登录、路由和静态输出，不共享 RAG Admin 的租户解析结果；token 持久化与 RAG Admin 共用 `localStorage['authToken']`。
 
 `apps/global-admin/standard/architecture/` 是本 app 的架构入口；Global Admin 特有架构事实见本目录 `custom/`。两个前端 app 共用的架构约定见 `docs/standard/frontend/architecture/README.md`，目录与模块代码文件组织结构规范见 `docs/standard/frontend/development/directory-structure.md`。
 

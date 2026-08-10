@@ -9,9 +9,8 @@
 - `index.ts`：用户登录状态、用户信息和登录生命周期编排。
 - `auth.ts`：登录中心初始化和登录流程相关逻辑。
 - `tenant-auth.config.ts`：租户域名匹配、认证环境规范化、登录中心和认证 API 地址矩阵。
-- `token.ts`：token cookie 的读写和清理。
 
-前端通过用户登录态获取 token，并在请求后端 API 时使用 `Authorization: Bearer <token>`。后端 RAG 管理接口使用 API app 的 Guard 与租户上下文处理用户身份。
+前端通过用户登录态获取 token，并在请求后端 API 时使用 `Authorization: Bearer <token>`。两个管理后台统一使用 `pinia-plugin-persistedstate` 将 user store 的 `token` / `userInfo` 持久化到 `localStorage['authToken']`（无平台前缀）。旧 `rag-admin-auth-access-token` cookie 仅在 `authToken` 不存在时迁移一次，迁移后清理。后端 RAG 管理接口使用 API app 的 Guard 与租户上下文处理用户身份。
 
 ### 租户解析
 
@@ -47,7 +46,7 @@ SDK 初始化自动跳转、`ensureLogin()` 和 `logout()` 必须复用同一解
 
 ## 请求封装与 API 路径
 
-通用 axios、业务 envelope 和 401 处理能力位于 `@aplus-sql/http-client`。`src/api/common/http.ts` 负责创建 RAG Admin 实例并注入 base URL、user store/cookie token 和 logout；业务 API 方法按“模块目录 + 菜单文件”维护在 `src/api/<module>/<menu>.ts`，公共类型和参数清洗统一放在 `src/api/common/`。
+通用 axios、业务 envelope 和 401 处理能力位于 `@aplus-sql/http-client`。`src/api/common/http.ts` 负责创建 RAG Admin 实例并注入 base URL、user store token 和 logout；业务 API 方法按“模块目录 + 菜单文件”维护在 `src/api/<module>/<menu>.ts`，公共类型和参数清洗统一放在 `src/api/common/`。
 
 RAG Admin 开发/测试环境通过 `VITE_API_BASE_URL=/api` 统一携带 `/api` 前缀，开发态由 Vite proxy 将 `/api` 请求转发到 API 后端并去掉前缀；生产态保持同源调用，由 API app 同时提供静态资源和后端接口。
 

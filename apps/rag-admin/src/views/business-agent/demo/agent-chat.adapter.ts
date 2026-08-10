@@ -3,15 +3,14 @@ import { Chat } from '@ai-sdk/vue';
 import { DefaultChatTransport } from 'ai';
 import type {
   ChatDemoAdapter,
-  ChatDemoMessage,
+  ChatDemoMessage
 } from '@aplus-sql/ui-kit/chat-demo';
-import { getToken } from '@/stores/modules/user/token';
 import { useUserStore } from '@/stores/modules/user';
 import {
   agentChatApiUrl,
   listAgentChatMessages,
   pageAgentChatSessions,
-  type AgentChatMessageItem,
+  type AgentChatMessageItem
 } from '@/api/business-agent/chat';
 
 /** 创建业务 Agent Demo 的共享聊天 adapter。 */
@@ -32,8 +31,8 @@ export function createAgentChatAdapter(): ChatDemoAdapter {
         transport: new DefaultChatTransport({
           api: agentChatApiUrl,
           headers: () => buildAuthHeaders(userStore),
-          body: () => ({ participantId }),
-        }),
+          body: () => ({ participantId })
+        })
       });
     },
     pageSessions: (params) => pageAgentChatSessions(params),
@@ -41,28 +40,28 @@ export function createAgentChatAdapter(): ChatDemoAdapter {
     toUiMessages: (messages) =>
       toUiMessages(messages as AgentChatMessageItem[]),
     formatStatus,
-    formatTime,
+    formatTime
   };
 }
 
 function buildAuthHeaders(userStore: ReturnType<typeof useUserStore>) {
-  const token = userStore.token || getToken();
+  const token = userStore.token;
   const headers: Record<string, string> = {};
   if (token) headers.Authorization = `Bearer ${token}`;
   return headers;
 }
 
 function toUiMessages(
-  historyMessages: AgentChatMessageItem[],
+  historyMessages: AgentChatMessageItem[]
 ): ChatDemoMessage[] {
   return historyMessages
     .filter(
-      (message) => message.role === 'user' || message.role === 'assistant',
+      (message) => message.role === 'user' || message.role === 'assistant'
     )
     .map((message) => ({
       id: String(message.id),
       role: message.role as 'user' | 'assistant',
-      parts: [{ type: 'text' as const, text: message.content }],
+      parts: [{ type: 'text' as const, text: message.content }]
     })) as ChatDemoMessage[];
 }
 

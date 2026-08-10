@@ -24,7 +24,7 @@
 - `stores/`：Pinia store 入口和模块。
 - `stores/modules/`：按业务拆分的 Pinia store 模块。
 - `stores/modules/layout-drawer.ts`：全局抽屉状态 store。
-- `stores/modules/user/`：用户 store、登录 SDK、token cookie、认证配置及相关测试。
+- `stores/modules/user/`：用户 store、登录 SDK、token 持久化（pinia-plugin-persistedstate + `localStorage['authToken']`）、认证配置及相关测试。
 - `styles/`：全局样式。
 - `views/`：页面目录，页面入口统一为 `views/<page>/index.vue`。
 - `views/<page>/components/`：模块内公共展示组件，供 sections 或多个页面复用。

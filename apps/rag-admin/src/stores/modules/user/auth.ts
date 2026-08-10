@@ -1,6 +1,5 @@
 import { authHub, type authClass } from '@aplus-frontend/aplus-auth-sdk';
 import { resolveAuthEnv, resolveTenantAuthConfig } from './tenant-auth.config';
-import { getToken, setToken } from './token';
 
 let authClient: authClass | undefined;
 
@@ -47,19 +46,10 @@ function createAuthClient() {
 }
 
 export async function ensureLogin() {
-  const existingToken = getToken();
-  if (existingToken) return existingToken;
-
   const client = createAuthClient();
-
   const token = await client.getAuthToken();
-  if (token) {
-    setToken(token);
-    return token;
-  }
-
-  client.redirectLogin(getRedirectLoginParams());
-  return undefined;
+  if (!token) client.redirectLogin(getRedirectLoginParams());
+  return token;
 }
 
 export async function getCurrentUserInfo() {
@@ -67,6 +57,5 @@ export async function getCurrentUserInfo() {
 }
 
 export function logout() {
-  setToken(undefined);
   createAuthClient().redirectLogin(getRedirectLoginParams());
 }

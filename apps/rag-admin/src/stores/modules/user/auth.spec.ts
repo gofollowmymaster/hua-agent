@@ -10,19 +10,12 @@ const mocks = vi.hoisted(() => {
 
   return {
     authHub: vi.fn(() => client),
-    client,
-    getToken: vi.fn(),
-    setToken: vi.fn()
+    client
   };
 });
 
 vi.mock('@aplus-frontend/aplus-auth-sdk', () => ({
   authHub: mocks.authHub
-}));
-
-vi.mock('./token', () => ({
-  getToken: mocks.getToken,
-  setToken: mocks.setToken
 }));
 
 describe('tenant-aware auth redirects', () => {
@@ -34,7 +27,6 @@ describe('tenant-aware auth redirects', () => {
     vi.stubGlobal('window', {
       location: { hostname: 'admin.yurexcc.com' }
     });
-    mocks.getToken.mockReturnValue(undefined);
     mocks.client.getAuthToken.mockResolvedValue('');
   });
 
@@ -71,11 +63,18 @@ describe('tenant-aware auth redirects', () => {
 
     auth.logout();
 
-    expect(mocks.setToken).toHaveBeenCalledWith(undefined);
     expect(mocks.client.redirectLogin).toHaveBeenNthCalledWith(
       2,
       redirectParams
     );
+  });
+
+  it('returns the SDK token without redirecting', async () => {
+    mocks.client.getAuthToken.mockResolvedValue('sdk-token');
+    const auth = await import('./auth');
+
+    await expect(auth.ensureLogin()).resolves.toBe('sdk-token');
+    expect(mocks.client.redirectLogin).not.toHaveBeenCalled();
   });
 
   it('uses the current origin for the development auth environment', async () => {

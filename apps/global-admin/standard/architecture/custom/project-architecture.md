@@ -28,7 +28,7 @@
 ## 状态与请求
 
 - 用户 store 位于 `src/stores/modules/user/index.ts`。
-- 登录 SDK、token cookie 和 user store 一起位于 `src/stores/modules/user/`。
+- 登录 SDK、token 持久化（pinia-plugin-persistedstate + `localStorage['authToken']`）和 user store 一起位于 `src/stores/modules/user/`。
 - 全局详情抽屉状态位于 `src/stores/modules/layout-drawer.ts`。
 - 后端请求通过 `src/api/http.ts` 的 axios 实例和 `src/api/global-admin.ts`、`src/api/schedule.ts` 的业务 API 方法封装。
 

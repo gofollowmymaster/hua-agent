@@ -1,12 +1,12 @@
 import { createPinia, setActivePinia } from 'pinia';
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
+import { createApp, nextTick } from 'vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   ensureLogin: vi.fn(),
   getCurrentUserInfo: vi.fn(),
-  logout: vi.fn(),
-  getToken: vi.fn(),
-  setToken: vi.fn()
+  logout: vi.fn()
 }));
 
 vi.mock('./auth', () => ({
@@ -16,12 +16,22 @@ vi.mock('./auth', () => ({
   tenantAuthConfig: { supplierCode: 'D' }
 }));
 
-vi.mock('./token', () => ({
-  getToken: mocks.getToken,
-  setToken: mocks.setToken
-}));
-
 import { useUserStore } from './index';
+
+interface MemoryStorage {
+  getItem: (key: string) => string | null;
+  setItem: (key: string, value: string) => void;
+}
+
+function createMemoryStorage(): MemoryStorage {
+  const data = new Map<string, string>();
+  return {
+    getItem: (key) => data.get(key) ?? null,
+    setItem: (key, value) => {
+      data.set(key, value);
+    }
+  };
+}
 
 function encodeBase64(value: string) {
   return Buffer.from(value, 'utf8')
@@ -37,13 +47,22 @@ function createJwt(payload: Record<string, unknown>) {
   return `${header}.${body}.signature`;
 }
 
-describe('useUserStore tenant info', () => {
+describe('useUserStore', () => {
+  let storage: MemoryStorage;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    storage = createMemoryStorage();
     vi.stubGlobal('window', {
-      atob: (value: string) => Buffer.from(value, 'base64').toString('binary')
+      atob: (value: string) => Buffer.from(value, 'base64').toString('binary'),
+      localStorage: storage,
+      document: { cookie: '' }
     });
-    setActivePinia(createPinia());
+
+    const pinia = createPinia();
+    pinia.use(piniaPluginPersistedstate);
+    createApp({}).use(pinia);
+    setActivePinia(pinia);
   });
 
   afterEach(() => {
@@ -51,15 +70,15 @@ describe('useUserStore tenant info', () => {
   });
 
   it('parses tenant info from the JWT payload', () => {
-    mocks.getToken.mockReturnValue(
+    const store = useUserStore();
+
+    store.setToken(
       createJwt({
         tenantName: '小往',
         supplierCode: 'C',
         tenantCode: 'boat'
       })
     );
-
-    const store = useUserStore();
 
     expect(store.userInfo).toMatchObject({
       tenantName: '小往',
@@ -71,14 +90,14 @@ describe('useUserStore tenant info', () => {
   });
 
   it('supports snake_case JWT claims', () => {
-    mocks.getToken.mockReturnValue(
+    const store = useUserStore();
+
+    store.setToken(
       createJwt({
         tenant_name: 'Aplus',
         supplier_code: 'A'
       })
     );
-
-    const store = useUserStore();
 
     expect(store.userInfo).toMatchObject({
       tenantName: 'Aplus',
@@ -88,56 +107,103 @@ describe('useUserStore tenant info', () => {
   });
 
   it('uses supplierName when tenantName is missing', () => {
-    mocks.getToken.mockReturnValue(
+    const store = useUserStore();
+
+    store.setToken(
       createJwt({
         supplierName: 'Yurex',
         supplierCode: 'D'
       })
     );
 
-    const store = useUserStore();
-
     expect(store.tenantDisplayName).toBe('Yurex');
   });
 
   it('falls back to the resolved host tenant when token has no tenant info', () => {
-    mocks.getToken.mockReturnValue(undefined);
-
     const store = useUserStore();
 
     expect(store.supplierCode).toBe('D');
     expect(store.tenantDisplayName).toBe('Yurex');
   });
 
-  it('re-parses tenant info when setToken is called', () => {
-    mocks.getToken.mockReturnValue(undefined);
-    const store = useUserStore();
-
-    store.setToken(
-      createJwt({
-        tenantName: 'Aplus',
-        supplierCode: 'A'
-      })
-    );
-
-    expect(store.userInfo.tenantName).toBe('Aplus');
-    expect(store.supplierCode).toBe('A');
-    expect(store.tenantDisplayName).toBe('Aplus');
-  });
-
   it('keeps token tenant info when SDK user info omits it', () => {
-    mocks.getToken.mockReturnValue(
-      createJwt({
-        tenantName: 'Aplus',
-        supplierCode: 'A'
-      })
-    );
+    const token = createJwt({
+      tenantName: 'Aplus',
+      supplierCode: 'A'
+    });
     const store = useUserStore();
+    store.setToken(token);
 
     store.setUserInfo({ userName: 'Alice' });
 
     expect(store.userInfo.tenantName).toBe('Aplus');
     expect(store.tenantDisplayName).toBe('Aplus');
     expect(store.userInfo.userName).toBe('Alice');
+  });
+
+  it('persists token and userInfo under authToken', async () => {
+    const token = createJwt({
+      tenantName: 'Aplus',
+      supplierCode: 'A',
+      userName: 'Alice'
+    });
+    const store = useUserStore();
+
+    expect(store.$persist).toBeTypeOf('function');
+    store.setToken(token);
+    await nextTick();
+
+    expect(JSON.parse(storage.getItem('authToken')!)).toMatchObject({
+      token,
+      userInfo: {
+        tenantName: 'Aplus',
+        supplierCode: 'A',
+        userName: 'Alice'
+      }
+    });
+  });
+
+  it('restores loginReady and user info from persisted authToken', () => {
+    const token = createJwt({
+      tenantName: 'Aplus',
+      supplierCode: 'A'
+    });
+    storage.setItem('authToken', JSON.stringify({ token }));
+
+    const store = useUserStore();
+
+    expect(store.token).toBe(token);
+    expect(store.loginReady).toBe(true);
+    expect(store.userInfo.tenantName).toBe('Aplus');
+  });
+
+  it('clears persisted token on logout', async () => {
+    const store = useUserStore();
+    store.setToken(createJwt({ tenantName: 'Aplus', supplierCode: 'A' }));
+
+    store.logout();
+    await nextTick();
+
+    expect(JSON.parse(storage.getItem('authToken')!)).not.toHaveProperty(
+      'token'
+    );
+    expect(mocks.logout).toHaveBeenCalledOnce();
+  });
+
+  it('merges SDK user info without clearing token claims', async () => {
+    const token = createJwt({
+      tenantName: 'Aplus',
+      supplierCode: 'A'
+    });
+    mocks.ensureLogin.mockResolvedValue(token);
+    mocks.getCurrentUserInfo.mockResolvedValue({ userName: 'Alice' });
+    const store = useUserStore();
+
+    await store.ensureLogin();
+
+    expect(store.token).toBe(token);
+    expect(store.userInfo.tenantName).toBe('Aplus');
+    expect(store.userInfo.userName).toBe('Alice');
+    expect(store.loginReady).toBe(true);
   });
 });

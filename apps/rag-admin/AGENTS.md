@@ -106,7 +106,7 @@ pnpm admin:stylelint:check
 - `src/layouts/`：布局组件。
 - `src/router/`：路由实例、路由表和路由守卫。
 - `src/stores/`：Pinia store。
-- `src/stores/modules/user/`：用户 store、登录中心、token cookie 和租户认证配置。
+- `src/stores/modules/user/`：用户 store、登录中心、pinia-plugin-persistedstate 持久化和租户认证配置。
 - `src/styles/`：全局样式。
 - `src/views/`：页面级组件。
 - `src/views/<page>/index.vue`：页面统一入口目录结构，页面私有逻辑放同级 `hooks/`、`components/`、`sections/`。
@@ -122,7 +122,7 @@ pnpm admin:stylelint:check
 - 页面统一按 `standard/development/page-structure-blueprint.md` 使用 `src/views/<page>/index.vue`，页面私有逻辑放同级 `hooks/`、`components/`、`sections/`。
 - 跨页面稳定复用组件放 `src/components/`。
 - 请求统一封装到 `src/api/`，复用 `src/api/common/http.ts`。
-- token 读写统一通过 `src/stores/modules/user/token.ts`，登录流程集中在 `src/stores/modules/user/` 或路由守卫。
+- token 读写统一通过 user store 的 `setToken`，并由 `pinia-plugin-persistedstate` 持久化到 `localStorage['authToken']`；登录流程集中在 `src/stores/modules/user/` 或路由守卫。
 - 跨页面共享或需要缓存的数据才进入 Pinia；页面局部状态优先留在组件内。
 - 全局样式放 `src/styles/global.css`，页面私有样式优先放对应 `.vue` 文件。
 - 不新增第二套同职责 UI 框架。
