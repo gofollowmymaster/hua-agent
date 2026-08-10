@@ -2,6 +2,7 @@ import { authHub, type authClass } from '@aplus-frontend/aplus-auth-sdk';
 import { resolveAuthEnv, resolveTenantAuthConfig } from './tenant-auth.config';
 
 let authClient: authClass | undefined;
+let redirecting = false;
 
 const authEnv = resolveAuthEnv(
   import.meta.env.VITE_AUTH_ENV,
@@ -28,6 +29,12 @@ function getRedirectLoginParams() {
   };
 }
 
+function redirectToLogin() {
+  if (redirecting) return;
+  redirecting = true;
+  void createAuthClient().redirectLogin(getRedirectLoginParams());
+}
+
 function createAuthClient() {
   if (authClient) return authClient;
 
@@ -48,7 +55,7 @@ function createAuthClient() {
 export async function ensureLogin() {
   const client = createAuthClient();
   const token = await client.getAuthToken();
-  if (!token) client.redirectLogin(getRedirectLoginParams());
+  if (!token) redirectToLogin();
   return token;
 }
 
@@ -57,5 +64,5 @@ export async function getCurrentUserInfo() {
 }
 
 export function logout() {
-  createAuthClient().redirectLogin(getRedirectLoginParams());
+  redirectToLogin();
 }

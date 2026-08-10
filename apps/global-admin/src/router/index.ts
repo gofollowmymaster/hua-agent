@@ -12,7 +12,8 @@ export const router = createRouter({
 
 router.beforeEach(async (to) => {
   const userStore = useUserStore();
-  await prepareGlobalAdminRoute(userStore);
+  const allowed = await prepareGlobalAdminRoute(userStore);
+  if (!allowed) return false;
 
   const title = typeof to.meta.title === 'string' ? to.meta.title : '';
   document.title = title

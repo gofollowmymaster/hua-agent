@@ -5,6 +5,7 @@ import type {
   ChatDemoAdapter,
   ChatDemoMessage
 } from '@aplus-sql/ui-kit/chat-demo';
+import { createUnauthorizedFetch } from '@/api/common/unauthorized-fetch';
 import { useUserStore } from '@/stores/modules/user';
 import {
   agentChatApiUrl,
@@ -16,6 +17,7 @@ import {
 /** 创建业务 Agent Demo 的共享聊天 adapter。 */
 export function createAgentChatAdapter(): ChatDemoAdapter {
   const userStore = useUserStore();
+  const unauthorizedFetch = createUnauthorizedFetch(() => userStore.logout());
 
   return {
     chatApi: agentChatApiUrl,
@@ -30,6 +32,7 @@ export function createAgentChatAdapter(): ChatDemoAdapter {
         id,
         transport: new DefaultChatTransport({
           api: agentChatApiUrl,
+          fetch: unauthorizedFetch,
           headers: () => buildAuthHeaders(userStore),
           body: () => ({ participantId })
         })

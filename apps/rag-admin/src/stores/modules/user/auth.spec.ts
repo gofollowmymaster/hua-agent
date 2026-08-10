@@ -35,7 +35,7 @@ describe('tenant-aware auth redirects', () => {
     vi.unstubAllGlobals();
   });
 
-  it('uses the resolved tenant for SDK initialization, login, and logout', async () => {
+  it('uses the resolved tenant for SDK initialization and redirects once', async () => {
     const auth = await import('./auth');
     const redirectParams = {
       locale: 'zh_CN',
@@ -56,17 +56,11 @@ describe('tenant-aware auth redirects', () => {
       })
     );
     expect(mocks.client.init).toHaveBeenCalledOnce();
-    expect(mocks.client.redirectLogin).toHaveBeenNthCalledWith(
-      1,
-      redirectParams
-    );
+    expect(mocks.client.redirectLogin).toHaveBeenCalledWith(redirectParams);
 
     auth.logout();
 
-    expect(mocks.client.redirectLogin).toHaveBeenNthCalledWith(
-      2,
-      redirectParams
-    );
+    expect(mocks.client.redirectLogin).toHaveBeenCalledTimes(1);
   });
 
   it('returns the SDK token without redirecting', async () => {
@@ -75,6 +69,15 @@ describe('tenant-aware auth redirects', () => {
 
     await expect(auth.ensureLogin()).resolves.toBe('sdk-token');
     expect(mocks.client.redirectLogin).not.toHaveBeenCalled();
+  });
+
+  it('does not redirect twice on repeated logout', async () => {
+    const auth = await import('./auth');
+
+    auth.logout();
+    auth.logout();
+
+    expect(mocks.client.redirectLogin).toHaveBeenCalledTimes(1);
   });
 
   it('uses the current origin for the development auth environment', async () => {

@@ -32,7 +32,7 @@
 | C | `http://auth.dev-v2.clouboat.com/admin.html#/` | `https://auth.test-com.elnkpro.com/admin.html#/` | `https://auth.uat-cb.clouboat.com/admin.html#/` | `https://auth.clouboat.com/admin.html#/` |
 | D | `http://auth.dev-v2.yurexcc.com/admin.html#/` | `https://auth.test.yurexcc.com/admin.html#/` | `https://auth.uat.yurexcc.com/admin.html#/` | `https://auth.yurexcc.com/admin.html#/` |
 
-SDK 初始化自动跳转、`ensureLogin()` 和 `logout()` 必须复用同一解析结果，并统一携带 `locale`、`supplierCode` 和 `appCode`。
+SDK 初始化自动跳转、`ensureLogin()` 和 `logout()` 必须复用同一解析结果，并统一携带 `locale`、`supplierCode` 和 `appCode`。`auth.ts` 内的 `redirectToLogin()` 是幂等入口：无 token、手动退出和接口 401 都通过它跳转认证中心，同一页面生命周期内最多触发一次。路由守卫 `prepareRagAdminRoute()` 在无 token 时显式清理登录态并阻止进入后台壳。
 
 ### 登录 SDK API 地址
 
@@ -46,7 +46,7 @@ SDK 初始化自动跳转、`ensureLogin()` 和 `logout()` 必须复用同一解
 
 ## 请求封装与 API 路径
 
-通用 axios、业务 envelope 和 401 处理能力位于 `@aplus-sql/http-client`。`src/api/common/http.ts` 负责创建 RAG Admin 实例并注入 base URL、user store token 和 logout；业务 API 方法按“模块目录 + 菜单文件”维护在 `src/api/<module>/<menu>.ts`，公共类型和参数清洗统一放在 `src/api/common/`。
+通用 axios、业务 envelope 和 401 处理能力位于 `@aplus-sql/http-client`。`src/api/common/http.ts` 负责创建 RAG Admin 实例并注入 base URL、user store token 和 logout；聊天流式 adapter 通过 `src/api/common/unauthorized-fetch.ts` 的自定义 fetch 处理 HTTP 401。业务 API 方法按“模块目录 + 菜单文件”维护在 `src/api/<module>/<menu>.ts`，公共类型和参数清洗统一放在 `src/api/common/`。
 
 RAG Admin 开发/测试环境通过 `VITE_API_BASE_URL=/api` 统一携带 `/api` 前缀，开发态由 Vite proxy 将 `/api` 请求转发到 API 后端并去掉前缀；生产态保持同源调用，由 API app 同时提供静态资源和后端接口。
 

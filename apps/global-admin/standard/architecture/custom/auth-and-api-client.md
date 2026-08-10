@@ -17,7 +17,8 @@
 - SDK platform：`VITE_AUTH_PLATFORM`，默认 `global-admin`。
 - appCode：`VITE_AUTH_APP_CODE`，默认 `GLOBAL`。
 - 登录参数只包含 `locale: 'zh_CN'` 和 `appCode`，不包含 supplierCode。
-- 初始化自动跳转、`ensureLogin()` 和 `logout()` 必须复用同一套参数。
+- 初始化自动跳转、`ensureLogin()` 和 `logout()` 必须复用同一套参数。`auth.ts` 内的 `redirectToLogin()` 是幂等入口，无 token、手动退出和接口 401 都通过它跳转认证中心，同一页面生命周期内最多触发一次。
+- 路由守卫 `prepareGlobalAdminRoute()` 在无 token 时显式清理登录态并返回 false 阻止进入后台壳。
 
 ### 认证环境与登录地址
 

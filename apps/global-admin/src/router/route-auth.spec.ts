@@ -10,21 +10,41 @@ describe('global admin route auth', () => {
         ensureLogin: vi
           .fn()
           .mockRejectedValue(new Error('缺少 VITE_AUTH_API_URL')),
-        setLoginError
+        setLoginError,
+        logout: vi.fn()
       })
-    ).resolves.toBeUndefined();
+    ).resolves.toBe(true);
 
     expect(setLoginError).toHaveBeenCalledWith('缺少 VITE_AUTH_API_URL');
   });
 
-  it('does not set an error after successful authentication', async () => {
+  it('allows navigation after successful authentication', async () => {
     const setLoginError = vi.fn();
+    const logout = vi.fn();
 
-    await prepareGlobalAdminRoute({
-      ensureLogin: vi.fn().mockResolvedValue('token'),
-      setLoginError
-    });
+    await expect(
+      prepareGlobalAdminRoute({
+        ensureLogin: vi.fn().mockResolvedValue('token'),
+        setLoginError,
+        logout
+      })
+    ).resolves.toBe(true);
 
+    expect(logout).not.toHaveBeenCalled();
     expect(setLoginError).not.toHaveBeenCalled();
+  });
+
+  it('logs out and blocks navigation without a token', async () => {
+    const logout = vi.fn();
+
+    await expect(
+      prepareGlobalAdminRoute({
+        ensureLogin: vi.fn().mockResolvedValue(''),
+        setLoginError: vi.fn(),
+        logout
+      })
+    ).resolves.toBe(false);
+
+    expect(logout).toHaveBeenCalledOnce();
   });
 });

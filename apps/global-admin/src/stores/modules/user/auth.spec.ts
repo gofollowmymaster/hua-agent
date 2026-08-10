@@ -48,6 +48,10 @@ describe('global admin auth', () => {
     );
     expect(mocks.client.redirectLogin).toHaveBeenCalledWith(redirectParams);
     expect(redirectParams).not.toHaveProperty('supplierCode');
+
+    auth.logout();
+
+    expect(mocks.client.redirectLogin).toHaveBeenCalledTimes(1);
   });
 
   it('returns the SDK token without redirecting', async () => {
@@ -56,6 +60,15 @@ describe('global admin auth', () => {
 
     await expect(auth.ensureLogin()).resolves.toBe('sdk-token');
     expect(mocks.client.redirectLogin).not.toHaveBeenCalled();
+  });
+
+  it('does not redirect twice on repeated logout', async () => {
+    const auth = await import('./auth');
+
+    auth.logout();
+    auth.logout();
+
+    expect(mocks.client.redirectLogin).toHaveBeenCalledTimes(1);
   });
 
   it('reports a missing auth API URL before creating the SDK client', async () => {

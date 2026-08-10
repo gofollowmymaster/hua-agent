@@ -6,6 +6,7 @@ import type {
   ChatDemoAdapter,
   ChatDemoMessage
 } from '@aplus-sql/ui-kit/chat-demo';
+import { createUnauthorizedFetch } from '@/api/common/unauthorized-fetch';
 import { useUserStore } from '@/stores/modules/user';
 import {
   listSessionMessages,
@@ -25,6 +26,7 @@ const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 /** 创建知识问答 Demo 的共享聊天 adapter。 */
 export function createRagChatAdapter(): ChatDemoAdapter {
   const userStore = useUserStore();
+  const unauthorizedFetch = createUnauthorizedFetch(() => userStore.logout());
   const previewModal = useDocumentPreviewModal<PreviewDocumentItem>({
     loadFile: (item) => getDocumentPreviewFile(item.id)
   });
@@ -42,6 +44,7 @@ export function createRagChatAdapter(): ChatDemoAdapter {
         id,
         transport: new DefaultChatTransport({
           api: `${apiBaseUrl}/ai/rag/chat`,
+          fetch: unauthorizedFetch,
           headers: () => buildAuthHeaders(userStore),
           body: () => ({ participantId })
         })

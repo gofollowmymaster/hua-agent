@@ -5,6 +5,7 @@ import {
 } from '@/config/global-auth.config';
 
 let authClient: authClass | undefined;
+let redirecting = false;
 
 const authConfig = resolveGlobalAuthConfig(
   import.meta.env.VITE_AUTH_ENV,
@@ -21,6 +22,12 @@ function getRedirectLoginParams() {
     locale: 'zh_CN',
     appCode: getAuthAppCode()
   };
+}
+
+function redirectToLogin() {
+  if (redirecting) return;
+  redirecting = true;
+  void createAuthClient().redirectLogin(getRedirectLoginParams());
 }
 
 function createAuthClient() {
@@ -43,7 +50,7 @@ function createAuthClient() {
 export async function ensureLogin() {
   const client = createAuthClient();
   const token = await client.getAuthToken();
-  if (!token) client.redirectLogin(getRedirectLoginParams());
+  if (!token) redirectToLogin();
   return token;
 }
 
@@ -52,5 +59,5 @@ export async function getCurrentUserInfo() {
 }
 
 export function logout() {
-  createAuthClient().redirectLogin(getRedirectLoginParams());
+  redirectToLogin();
 }
