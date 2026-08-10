@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   resolveAuthEnv,
+  resolveTenantDisplayName,
   resolveTenantAuthConfig,
   type AuthEnv,
   type TenantSupplierCode
@@ -47,9 +48,9 @@ describe('resolveTenantAuthConfig', () => {
   });
 
   it.each(['', 'localhost', 'aplnk.com.example.com', 'fake-aplnk.com'])(
-    'falls back to C for unmatched hostname %s',
+    'falls back to D for unmatched hostname %s',
     (hostname) => {
-      expect(resolveTenantAuthConfig(hostname, 'dev').supplierCode).toBe('C');
+      expect(resolveTenantAuthConfig(hostname, 'dev').supplierCode).toBe('D');
     }
   );
 
@@ -61,7 +62,7 @@ describe('resolveTenantAuthConfig', () => {
       'https://auth.test-com.elnkpro.com/admin.html#/'
     ],
     ['admin.yurexcc.com', 'uat', 'https://auth.uat.yurexcc.com/admin.html#/'],
-    ['localhost', 'development', 'http://auth.dev-v2.clouboat.com/admin.html#/']
+    ['localhost', 'development', 'http://auth.dev-v2.yurexcc.com/admin.html#/']
   ])('selects the login URL for %s in %s', (hostname, env, loginUrl) => {
     expect(resolveTenantAuthConfig(hostname, env).loginUrl).toBe(loginUrl);
   });
@@ -86,9 +87,24 @@ describe('resolveTenantAuthConfig', () => {
     expect(resolveTenantAuthConfig(hostname, env).apiUrl).toBe(apiUrl);
   });
 
-  it('uses the C API URL matrix for an unmatched hostname', () => {
+  it('uses the D API URL matrix for an unmatched hostname', () => {
     expect(resolveTenantAuthConfig('localhost', 'uat').apiUrl).toBe(
-      'https://api.uat-cb.clouboat.com'
+      'https://api.uat.yurexcc.com'
     );
+  });
+});
+
+describe('resolveTenantDisplayName', () => {
+  it.each<[TenantSupplierCode, string]>([
+    ['A', 'Aplus'],
+    ['C', '小往'],
+    ['D', 'Yurex']
+  ])('maps %s to %s', (supplierCode, displayName) => {
+    expect(resolveTenantDisplayName(supplierCode)).toBe(displayName);
+  });
+
+  it('returns undefined for unknown or empty supplier code', () => {
+    expect(resolveTenantDisplayName('X')).toBeUndefined();
+    expect(resolveTenantDisplayName(undefined)).toBeUndefined();
   });
 });

@@ -2,6 +2,14 @@ export type AuthEnv = 'dev' | 'development' | 'test' | 'uat' | 'prod';
 
 export type TenantSupplierCode = 'A' | 'C' | 'D';
 
+export const TENANT_DISPLAY_NAMES: Readonly<
+  Record<TenantSupplierCode, string>
+> = {
+  A: 'Aplus',
+  C: '小往',
+  D: 'Yurex'
+};
+
 export interface TenantAuthConfig {
   supplierCode: TenantSupplierCode;
   hostSuffixes: readonly string[];
@@ -126,4 +134,10 @@ export function resolveTenantAuthConfig(
     loginUrl: definition.redirectUrls[authEnv],
     apiUrl: definition.apiUrls[authEnv]
   };
+}
+
+/** 将服务商编码转换为展示用的租户名，未匹配时返回空。 */
+export function resolveTenantDisplayName(supplierCode?: string) {
+  if (!supplierCode) return undefined;
+  return TENANT_DISPLAY_NAMES[supplierCode as TenantSupplierCode];
 }

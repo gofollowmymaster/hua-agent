@@ -20,7 +20,8 @@ router.beforeEach(async (to) => {
   }
 
   const title = typeof to.meta.title === 'string' ? to.meta.title : '';
-  document.title = title ? `${title} - RAG 管理后台` : 'RAG 管理后台';
+  const brandTitle = `${userStore.tenantDisplayName} 管理后台`;
+  document.title = title ? `${title} - ${brandTitle}` : brandTitle;
   return true;
 });
 

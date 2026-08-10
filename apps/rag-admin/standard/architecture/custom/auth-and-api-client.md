@@ -21,7 +21,7 @@
 - C：`clouboat.com`、`test-com.elnkpro.com`。
 - D：`yurexcc.com`。
 
-匹配使用大小写无关的完整域名或点分后缀，不使用普通字符串包含判断。localhost、空 hostname 和未配置域名统一回退 C。RAG Admin 不提供登录后的租户切换；后端继续从 JWT `supplierCode` 解析真实租户上下文。
+匹配使用大小写无关的完整域名或点分后缀，不使用普通字符串包含判断。localhost、空 hostname 和未配置域名统一回退 D。RAG Admin 不提供登录后的租户切换；后端继续从 JWT `supplierCode` 解析真实租户上下文。
 
 ### 认证环境与登录地址
 

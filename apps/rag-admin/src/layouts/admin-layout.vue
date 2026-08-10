@@ -2,9 +2,9 @@
   <Layout class="app-shell">
     <LayoutSider class="app-sider" :width="232">
       <div class="brand">
-        <div class="brand-mark">R</div>
+        <div class="brand-mark">{{ brandMark }}</div>
         <div>
-          <div class="brand-title">RAG 管理后台</div>
+          <div class="brand-title">{{ brandTitle }}</div>
           <div class="brand-subtitle">Knowledge Console</div>
         </div>
       </div>
@@ -79,8 +79,10 @@ const router = useRouter();
 const userInitial = computed(() =>
   userStore.displayName.slice(0, 1).toUpperCase(),
 );
+const brandMark = computed(() => userStore.supplierCode);
+const brandTitle = computed(() => `${userStore.tenantDisplayName} 管理后台`);
 const selectedKeys = computed(() => [String(route.name || 'documents')]);
-const currentTitle = computed(() => String(route.meta.title || 'RAG 管理后台'));
+const currentTitle = computed(() => String(route.meta.title || brandTitle.value));
 const currentSubtitle = computed(() =>
   String(route.meta.subtitle || 'RAG 文档与对话运营后台'),
 );

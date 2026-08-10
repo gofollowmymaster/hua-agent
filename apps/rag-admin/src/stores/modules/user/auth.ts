@@ -8,7 +8,7 @@ const authEnv = resolveAuthEnv(
   import.meta.env.VITE_AUTH_ENV,
   import.meta.env.MODE
 );
-const tenantAuthConfig = resolveTenantAuthConfig(
+export const tenantAuthConfig = resolveTenantAuthConfig(
   window.location.hostname,
   authEnv
 );
