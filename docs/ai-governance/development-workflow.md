@@ -40,7 +40,7 @@
 - shared 任务：查找 `packages/shared` 导出和所有 workspace 消费者。
 - cross-app 任务：同时查后端 DTO/Controller/Service 和前端 API client/页面调用方。
 
-优先复用对应子项目既有结构。不确定边界时，先读对应子项目的 `docs/architecture/README.md`。
+优先复用对应子项目既有结构。不确定边界时，先读对应子项目的 `docs/architecture/README.md`（前端 app 为 `standard/architecture/README.md`）。
 
 ## 4. 命令执行规则
 
@@ -58,7 +58,7 @@
 - 不修改与任务无关的文件。
 - 不回退用户或其他 agent 已经做出的改动。
 - 不为了当前需求做大范围顺手重构。
-- 代码实现遵守对应子项目规范：`apps/api/docs/standard/`、`apps/rag-admin/docs/standard/`、`packages/shared/docs/standard/` 或 `AGENTS.md`。
+- 代码实现遵守对应子项目规范：`apps/api/docs/standard/`、`apps/rag-admin/standard/development/`、`packages/shared/docs/standard/` 或 `AGENTS.md`。
 - 需要项目事实或集成现状时，补读对应子项目的 `docs/architecture/` 专题。
 - 跨 app 变更必须同时维护契约两端，不能只改前端或只改后端。
 

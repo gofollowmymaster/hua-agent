@@ -1,76 +1,44 @@
 <template>
   <section class="page">
-    <Alert
-      v-if="errorMessage"
-      class="page-alert"
-      type="error"
-      show-icon
-      :message="errorTitle"
-      :description="errorMessage"
-    >
-      <template #action>
-        <ApButton size="small" @click="load">重试</ApButton>
-      </template>
-    </Alert>
-
-    <template v-else>
-      <div class="filter-bar">
-        <Input
-          v-model:value="keyword"
-          class="filter-keyword"
-          placeholder="模块 / 功能描述"
-          allow-clear
-        />
-        <Select
-          v-model:value="status"
-          class="filter-status"
-          placeholder="状态"
-          allow-clear
-          :options="statusOptions"
-        />
-      </div>
-
-      <div class="grid-fill">
-        <AgGrid
-          :columns="columns"
-          :data-source="filteredSchedules"
-          :loading="loading"
-          :search-form="false"
-          :pagination="false"
-          :wrapper-style="{ height: '100%' }"
-          :row-class-name="getPointerRowClassName()"
-          row-key="taskKey"
-          browser-tooltips
-          column-resizable
-          @row-clicked="handleRowClicked"
-        >
-          <template #title="{ selectedRowKeys, clearAll }">
-            <TableTopActionBar
-              :selected-row-keys="selectedRowKeys"
-              :clear-all="clearAll"
-              :show-selected="false"
-              :settings="{
-                persistenceKey: 'global_admin_table_schedules_task-list'
-              }"
-              :refresh-config="{ refresh: load }"
-            />
-          </template>
-        </AgGrid>
-      </div>
-    </template>
+    <div class="grid-fill">
+      <AgGrid
+        ref="gridRef"
+        :columns="columns"
+        :request="fetchSchedules"
+        :pagination="false"
+        :wrapper-style="{ height: '100%' }"
+        :row-class-name="getPointerRowClassName()"
+        row-key="taskKey"
+        browser-tooltips
+        column-resizable
+        @row-clicked="handleRowClicked"
+      >
+        <template #title="{ selectedRowKeys, clearAll }">
+          <TableTopActionBar
+            :selected-row-keys="selectedRowKeys"
+            :clear-all="clearAll"
+            :show-selected="false"
+            :settings="{
+              persistenceKey: 'global_admin_table_schedules_task-list'
+            }"
+            :refresh-config="{ refresh: refreshGrid }"
+          />
+        </template>
+      </AgGrid>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
-  import { computed, h, onMounted, ref } from 'vue';
+  import { h, ref } from 'vue';
   import { useRoute } from 'vue-router';
-  import { Alert, Input, Select, message } from '@aplus-frontend/antdv';
+  import { message } from '@aplus-frontend/antdv';
   import {
     AgGrid,
-    ApButton,
     ApModal,
     ApTag,
-    type AgGridColumnType
+    type AgGridColumnType,
+    type AgGridExpose
   } from '@aplus-frontend/ui';
   import { TableTopActionBar, useRowClickAction } from '@aplus-sql/ui-kit';
   import {
@@ -83,35 +51,15 @@
   import { ThemeColor } from '@/config/theme-color-token';
 
   const route = useRoute();
-  const loading = ref(false);
-  const schedules = ref<ScheduledTaskSummary[]>([]);
-  const keyword = ref('');
-  const status = ref<ScheduledTaskStatus | undefined>();
-  const errorMessage = ref('');
-  const errorTitle = computed(() =>
-    errorMessage.value.includes('无总控台访问权限')
-      ? '无访问权限'
-      : '定时任务加载失败'
-  );
+  const gridRef = ref<AgGridExpose>();
+
   const { onRowClick, getPointerRowClassName, clickAction } =
     useRowClickAction('schedules');
 
-  const statusOptions = [
-    { label: '启用', value: 'enabled' },
-    { label: '停用', value: 'disabled' }
-  ];
-
-  const filteredSchedules = computed(() => {
-    const text = keyword.value.trim().toLowerCase();
-    return schedules.value.filter((item) => {
-      const matchKeyword =
-        !text ||
-        item.module.toLowerCase().includes(text) ||
-        item.description.toLowerCase().includes(text);
-      const matchStatus = !status.value || item.status === status.value;
-      return matchKeyword && matchStatus;
-    });
-  });
+  const statusValueEnum = {
+    enabled: { text: '启用' },
+    disabled: { text: '停用' }
+  };
 
   const formatTime = (value: string | null | undefined) =>
     value ? new Date(value).toLocaleString('zh-CN', { hour12: false }) : '-';
@@ -133,9 +81,23 @@
 
   const columns: AgGridColumnType<ScheduledTaskSummary>[] = [
     {
+      title: '关键词',
+      key: 'keyword',
+      dataIndex: 'keyword',
+      valueType: 'text',
+      hideInTable: true,
+      fieldProps: {
+        placeholder: '模块 / 功能描述',
+        field: {
+          allowClear: true
+        }
+      }
+    },
+    {
       title: '模块',
       key: 'module',
       dataIndex: 'module',
+      hideInSearch: true,
       width: 130,
       valueType: 'text'
     },
@@ -145,6 +107,7 @@
       dataIndex: 'description',
       minWidth: 240,
       flex: 1,
+      hideInSearch: true,
       valueType: 'text'
     },
     {
@@ -152,6 +115,7 @@
       key: 'cron',
       dataIndex: 'cron',
       width: 160,
+      hideInSearch: true,
       valueType: 'text'
     },
     {
@@ -159,7 +123,14 @@
       key: 'status',
       dataIndex: 'status',
       width: 90,
-      valueType: 'text',
+      valueType: 'select',
+      valueEnum: statusValueEnum,
+      fieldProps: {
+        placeholder: '全部状态',
+        field: {
+          allowClear: true
+        }
+      },
       customRender: ({ record }) => statusTag(record)
     },
     {
@@ -167,6 +138,7 @@
       key: 'lastRunTime',
       dataIndex: 'lastRunTime',
       width: 170,
+      hideInSearch: true,
       valueType: 'text',
       customRender: ({ record }) => formatTime(record.lastRunTime)
     },
@@ -175,6 +147,7 @@
       key: 'lastRunResult',
       dataIndex: 'lastRunResult',
       width: 110,
+      hideInSearch: true,
       valueType: 'text',
       customRender: ({ record }) => resultTag(record.lastRunResult)
     },
@@ -184,6 +157,7 @@
       dataIndex: 'actions',
       width: 140,
       fixed: 'right',
+      hideInSearch: true,
       valueType: 'action',
       fieldProps({ record }) {
         if (!record) {
@@ -205,18 +179,21 @@
     }
   ];
 
-  async function load() {
-    loading.value = true;
-    errorMessage.value = '';
-    try {
-      schedules.value = await listSchedules();
-    } catch (error) {
-      schedules.value = [];
-      errorMessage.value =
-        error instanceof Error ? error.message : String(error);
-    } finally {
-      loading.value = false;
-    }
+  async function fetchSchedules(params: {
+    current?: number;
+    pageSize?: number;
+    keyword?: string;
+    status?: ScheduledTaskStatus;
+  }) {
+    const data = await listSchedules({
+      keyword: params.keyword,
+      status: params.status
+    });
+    return { data, total: data.length };
+  }
+
+  function refreshGrid() {
+    gridRef.value?.refresh();
   }
 
   function handleRowClicked(
@@ -246,30 +223,8 @@
       async onOk() {
         await triggerSchedule(record.taskKey);
         message.success('任务已触发执行');
-        await load();
+        refreshGrid();
       }
     });
   }
-
-  onMounted(load);
 </script>
-
-<style lang="less" scoped>
-  .page-alert {
-    margin: 4px;
-  }
-
-  .filter-bar {
-    display: flex;
-    gap: 12px;
-    padding: 12px 16px 0;
-  }
-
-  .filter-keyword {
-    width: 260px;
-  }
-
-  .filter-status {
-    width: 140px;
-  }
-</style>

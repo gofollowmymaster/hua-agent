@@ -19,4 +19,4 @@
 - 修改飞书、鉴权、多租户、固定 token、租户配置等后端能力。
 - 调整 API app 构建、Swagger、静态资源服务或后端环境变量。
 
-涉及前端调用方时，同时阅读 `apps/rag-admin/docs/architecture/README.md` 和 `AGENTS.md`。
+涉及前端调用方时，同时阅读 `apps/rag-admin/standard/architecture/README.md` 和 `AGENTS.md`。

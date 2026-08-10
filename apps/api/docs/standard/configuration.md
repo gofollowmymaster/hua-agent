@@ -20,7 +20,7 @@
 
 不要绕过 `pnpm env:<env> -- ...` 直接执行依赖环境变量的命令。
 
-前端 `apps/rag-admin` 使用 Vite 自身的环境加载机制，具体规则见 `apps/rag-admin/docs/architecture/build-and-runtime.md` 与 `apps/rag-admin/docs/standard/README.md`。不要把后端数据库、机器人 secret、JWT secret 等敏感配置写入前端环境文件。
+前端 `apps/rag-admin` 使用 Vite 自身的环境加载机制，具体规则见 `apps/rag-admin/standard/architecture/custom/build-and-runtime.md` 与 `apps/rag-admin/standard/development/README.md`。不要把后端数据库、机器人 secret、JWT secret 等敏感配置写入前端环境文件。
 
 ## 配置归属判断
 

@@ -18,16 +18,17 @@
 
 RAG Admin 任务按需读取：
 
-- RAG Admin 架构入口：`docs/architecture/README.md`
-- RAG Admin 规范索引：`docs/standard/README.md`
-- 前端构建与运行：`docs/architecture/build-and-runtime.md`
-- 前端 API client 规范：`docs/architecture/auth-and-api-client.md`
-- 目录与模块设计：`docs/architecture/directory-structure.md`
-- 项目架构与路由状态：`docs/architecture/project-architecture.md`
-- 页面结构与开发：`docs/standard/development/page-structure-blueprint.md`、`docs/standard/development/page-development.md`
-- 页面实现最佳实践：`docs/standard/development/page-implementation-best-practices.md`
-- 页面类型规范：`docs/standard/development/table-pattern.md`、`docs/standard/development/form-pattern.md`、`docs/standard/development/detail-pattern.md`
-- 命名规范：`docs/standard/development/naming-conventions.md`
+- RAG Admin 架构入口：`standard/architecture/README.md`
+- RAG Admin 规范索引：`standard/development/README.md`
+- 多前端 app 共用架构约定与共享规范索引：`../../docs/standard/frontend/architecture/README.md`、`../../docs/standard/frontend/README.md`
+- 前端构建与运行：`standard/architecture/custom/build-and-runtime.md`
+- 前端 API client 规范：`standard/architecture/custom/auth-and-api-client.md`
+- 目录与模块设计（共享规范，软连接到 `docs/standard/frontend/development/`）：`standard/development/directory-structure.md`
+- 项目架构与路由状态：`standard/architecture/custom/project-architecture.md`
+- 页面结构与开发（共享规范，软连接到 `docs/standard/frontend/development/`）：`standard/development/page-structure-blueprint.md`、`standard/development/page-development.md`
+- 页面实现最佳实践：`standard/development/page-implementation-best-practices.md`
+- 页面类型规范：`standard/development/table-pattern.md`、`standard/development/form-pattern.md`、`standard/development/detail-pattern.md`
+- 命名规范：`standard/development/naming-conventions.md`
 - 整体产品设计规范：`../../docs/standard/design/README.md`
 - 页面开发执行：`../../.agents/skills/fd-page-dev/SKILL.md`，涉及 `@aplus-frontend/ui` 时同时读 `../../.agents/skills/aplus-ui/SKILL.md`
 - 涉及后端接口契约时，补读 `../api/docs/architecture/README.md` 和 `../api/docs/standard/README.md`
@@ -118,7 +119,7 @@ pnpm admin:stylelint:check
 - 编写或改造 aplus-ui 组件前先查询组件 API 和示例，不凭记忆猜 props；必要时使用 `aplus info <Component> --format json`、`aplus demo <Component> ... --format json`。
 - 只有 aplus-ui 没有合适能力、现有业务封装已覆盖，或有明确技术原因时，才使用 `@aplus-frontend/antdv`、原生控件或新增自定义封装，并在代码/交付说明中说明取舍。
 - 页面级组件放 `src/views/`，跨页面布局放 `src/layouts/`。
-- 页面统一按 `docs/standard/development/page-structure-blueprint.md` 使用 `src/views/<page>/index.vue`，页面私有逻辑放同级 `hooks/`、`components/`、`sections/`。
+- 页面统一按 `standard/development/page-structure-blueprint.md` 使用 `src/views/<page>/index.vue`，页面私有逻辑放同级 `hooks/`、`components/`、`sections/`。
 - 跨页面稳定复用组件放 `src/components/`。
 - 请求统一封装到 `src/api/`，复用 `src/api/http.ts`。
 - token 读写统一通过 `src/stores/modules/user/token.ts`，登录流程集中在 `src/stores/modules/user/` 或路由守卫。

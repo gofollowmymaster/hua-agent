@@ -51,18 +51,26 @@
                 placeholder="执行结果"
                 allow-clear
                 :options="logResultOptions"
-                @change="handleResultFilterChange"
               />
             </div>
-            <Table
-              :data-source="logs"
-              :columns="logColumns"
-              :loading="logsLoading"
-              :pagination="pagination"
-              row-key="id"
-              size="small"
-              @change="handleTableChange"
-            />
+            <div class="logs-table">
+              <AgGrid
+                ref="gridRef"
+                :columns="logColumns"
+                :request="fetchLogs"
+                :params="{ result: logResult }"
+                :pagination="{
+                  defaultPageSize: 10,
+                  showSizeChanger: true,
+                  showTotal: true
+                }"
+                row-key="id"
+                size="mini"
+                :wrapper-style="{ height: '100%' }"
+                column-resizable
+                browser-tooltips
+              />
+            </div>
           </div>
         </template>
       </Spin>
@@ -71,19 +79,16 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, h, onMounted, ref, watch } from 'vue';
-  import {
-    Alert,
-    Select,
-    Spin,
-    message,
-    type TableColumnsType
-  } from '@aplus-frontend/antdv';
+  import { h, onMounted, ref, watch } from 'vue';
+  import { Alert, Select, Spin, message } from '@aplus-frontend/antdv';
   import {
     ApButton,
     ApDescriptions,
     ApModal,
     ApTag,
+    AgGrid,
+    type AgGridColumnType,
+    type AgGridExpose,
     type DescriptionsItemSchema
   } from '@aplus-frontend/ui';
   import {
@@ -100,15 +105,11 @@
   const props = defineProps<{ drawerCode: string }>();
   const layoutDrawer = useLayoutDrawer();
   const loading = ref(false);
-  const logsLoading = ref(false);
   const triggering = ref(false);
   const errorMessage = ref('');
   const detail = ref<ScheduledTaskDetail>();
-  const logs = ref<ScheduledTaskLogItem[]>([]);
   const logResult = ref<ScheduledTaskRunResult | undefined>();
-  const page = ref(1);
-  const pageSize = ref(10);
-  const total = ref(0);
+  const gridRef = ref<AgGridExpose>();
 
   const logResultOptions = [
     { label: '成功', value: 'success' },
@@ -184,7 +185,7 @@
     }
   ];
 
-  const logColumns: TableColumnsType<ScheduledTaskLogItem> = [
+  const logColumns: AgGridColumnType<ScheduledTaskLogItem>[] = [
     {
       title: '执行时间',
       key: 'executeTime',
@@ -215,14 +216,6 @@
     }
   ];
 
-  const pagination = computed(() => ({
-    current: page.value,
-    pageSize: pageSize.value,
-    total: total.value,
-    showSizeChanger: true,
-    showTotal: (count: number) => `共 ${count} 条`
-  }));
-
   async function loadDetail() {
     loading.value = true;
     errorMessage.value = '';
@@ -237,39 +230,22 @@
     }
   }
 
-  async function loadLogs(
-    targetPage = page.value,
-    targetPageSize = pageSize.value
-  ) {
-    logsLoading.value = true;
+  async function fetchLogs(params: {
+    current: number;
+    pageSize: number;
+    result?: ScheduledTaskRunResult;
+  }) {
     try {
       const result = await listScheduleLogs(props.drawerCode, {
-        result: logResult.value,
-        page: targetPage,
-        pageSize: targetPageSize
+        result: params.result,
+        page: params.current,
+        pageSize: params.pageSize
       });
-      logs.value = result.list;
-      total.value = result.total;
-      page.value = result.page;
-      pageSize.value = result.pageSize;
+      return { data: result.list, total: result.total };
     } catch (error) {
-      logs.value = [];
-      total.value = 0;
       message.error(error instanceof Error ? error.message : String(error));
-    } finally {
-      logsLoading.value = false;
+      return { data: [], total: 0 };
     }
-  }
-
-  function handleResultFilterChange() {
-    loadLogs(1);
-  }
-
-  function handleTableChange(paginationConfig: {
-    current?: number;
-    pageSize?: number;
-  }) {
-    loadLogs(paginationConfig.current || 1, paginationConfig.pageSize || 10);
   }
 
   function confirmTrigger() {
@@ -284,7 +260,7 @@
           await triggerSchedule(props.drawerCode);
           message.success('任务已触发执行');
           await loadDetail();
-          await loadLogs(1);
+          gridRef.value?.submitWith(true);
         } finally {
           triggering.value = false;
         }
@@ -294,7 +270,7 @@
 
   function reloadAll() {
     loadDetail();
-    loadLogs(1);
+    gridRef.value?.submitWith(true);
   }
 
   function close() {
@@ -302,7 +278,7 @@
   }
 
   watch(() => props.drawerCode, reloadAll);
-  onMounted(reloadAll);
+  onMounted(loadDetail);
 </script>
 
 <style lang="less" scoped>
@@ -360,5 +336,9 @@
 
   .logs-filter {
     width: 120px;
+  }
+
+  .logs-table {
+    height: 420px;
   }
 </style>

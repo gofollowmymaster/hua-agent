@@ -24,6 +24,39 @@ export default typescriptEslint.config(
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }
       ],
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@aplus-frontend/antdv',
+              importNames: [
+                'Table',
+                'TableColumn',
+                'TableColumnGroup',
+                'TableSummary',
+                'TableSummaryRow',
+                'TableSummaryCell'
+              ],
+              message:
+                '禁止在管理后台使用 antdv Table 系列组件，表格请使用 @aplus-frontend/ui 的 AgGrid（参考 apps/global-admin/standard/architecture/custom/table-pattern.md）'
+            },
+            {
+              name: '@aplus-frontend/antdv',
+              importNames: [
+                'TableProps',
+                'TableColumnsType',
+                'TableColumnType',
+                'TableColumnGroupType',
+                'TableColumnProps',
+                'TablePaginationConfig'
+              ],
+              message:
+                '禁止在管理后台使用 antdv Table 系列类型，表格列请使用 AgGridColumnType（参考 apps/global-admin/standard/architecture/custom/table-pattern.md）'
+            }
+          ]
+        }
+      ],
       'no-unused-vars': 'off',
       'no-undef': 'off'
     }

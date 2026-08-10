@@ -77,8 +77,9 @@ AI 任务默认先读：
 2. 按任务范围读取对应架构和规范：
    - workspace：`AGENTS.md`、`docs/ai-governance/README.md`
    - API：`apps/api/docs/architecture/README.md`、`apps/api/docs/standard/README.md`
-   - RAG Admin：`apps/rag-admin/docs/architecture/README.md`、`apps/rag-admin/docs/standard/README.md`
-   - Global Admin：`apps/global-admin/docs/architecture/README.md`、`apps/global-admin/docs/standard/README.md`
+   - 前端通用架构与规范（RAG/Global Admin 共用）：`docs/standard/frontend/README.md`、`docs/standard/frontend/architecture/README.md`、`docs/standard/frontend/development/`
+   - RAG Admin：`apps/rag-admin/standard/architecture/README.md`、`apps/rag-admin/standard/development/README.md`
+   - Global Admin：`apps/global-admin/standard/architecture/README.md`、`apps/global-admin/standard/development/README.md`
    - 整体产品设计：`docs/standard/design/README.md`（前端、UI、交互相关任务必读）
    - Shared：`packages/shared/docs/architecture/README.md`、`packages/shared/docs/standard/README.md`
    - UI Kit：`packages/ui-kit/docs/architecture/README.md`、`packages/ui-kit/docs/standard/README.md` + 受影响前端文档
@@ -86,7 +87,7 @@ AI 任务默认先读：
    - Cross-app：`AGENTS.md`、`docs/ai-governance/README.md` + 受影响子项目文档
 3. 需要执行或交付时读 `docs/ai-governance/development-workflow.md` 和 `docs/ai-governance/testing-and-verification.md`
 
-长期架构事实写入 `apps/*/docs/architecture/` 或对应 `packages/*` 文档，完整子项目开发规范写入 `apps/*/docs/standard/` 或对应 package 文档，整体产品设计规范写入 `docs/standard/design/`，AI 工作流写入 `docs/ai-governance/`。不要把完整子项目规范复制到根 `AGENTS.md`。
+长期架构事实写入 `apps/*/docs/architecture/` 或对应 `packages/*` 文档（前端 app 为 `apps/*/standard/architecture/`），多前端 app 共用架构约定写入 `docs/standard/frontend/`，完整子项目开发规范写入 `apps/*/docs/standard/` 或对应 package 文档（前端 app 为 `apps/*/standard/development/`），整体产品设计规范写入 `docs/standard/design/`，AI 工作流写入 `docs/ai-governance/`。不要把完整子项目规范复制到根 `AGENTS.md`。
 
 ## OpenSpec 工作流
 

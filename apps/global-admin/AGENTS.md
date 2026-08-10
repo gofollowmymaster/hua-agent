@@ -12,11 +12,13 @@
 
 ## 必读文档
 
-1. `docs/architecture/README.md`
-2. `docs/standard/README.md`
-3. `../../docs/standard/design/README.md`
+1. `standard/architecture/README.md`
+2. `standard/development/README.md`
+3. `../../docs/standard/frontend/architecture/README.md`
+4. `../../docs/standard/frontend/README.md`（共享规范索引）
+5. `../../docs/standard/design/README.md`
 
-涉及 API、鉴权、middleware 或静态发布时，同时读取根 `AGENTS.md`、API 鉴权文档和 AI 验证治理。
+页面开发规范（`standard/development/*.md`）为 `docs/standard/frontend/development/` 共享规范的软连接；`standard/architecture/custom/table-pattern.md` 是本 app 自有版本。涉及 API、鉴权、middleware 或静态发布时，同时读取根 `AGENTS.md`、API 鉴权文档和 AI 验证治理。
 
 ## 边界规则
 

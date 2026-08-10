@@ -23,7 +23,7 @@
   import { useLayoutDrawer } from './layout-drawer/use-layout-drawer';
 
   withDefaults(defineProps<{ width?: string | number }>(), {
-    width: 'min(560px, calc(100vw - 24px))'
+    width: 'min(860px, calc(100vw - 24px))'
   });
 
   const route = useRoute();

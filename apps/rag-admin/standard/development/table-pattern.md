@@ -1,0 +1,1 @@
+../../../../docs/standard/frontend/development/table-pattern.md

@@ -22,19 +22,19 @@ description: 根据需求文档、UI设计图和接口代码，在 RAG Admin（a
 
 - 根目录 `AGENTS.md`
 - `apps/rag-admin/AGENTS.md`
-- `apps/rag-admin/docs/architecture/README.md`
-- `apps/rag-admin/docs/standard/README.md`
-- `apps/rag-admin/docs/standard/development/page-development.md`
-- `apps/rag-admin/docs/standard/development/page-structure-blueprint.md`
-- `apps/rag-admin/docs/standard/development/page-implementation-best-practices.md`
-- `apps/rag-admin/docs/standard/development/naming-conventions.md`
+- `docs/standard/frontend/architecture/README.md`
+- `docs/standard/frontend/README.md`
+- `docs/standard/frontend/development/page-development.md`
+- `docs/standard/frontend/development/page-structure-blueprint.md`
+- `docs/standard/frontend/development/page-implementation-best-practices.md`
+- `docs/standard/frontend/development/naming-conventions.md`
 - `docs/standard/design/README.md`
 
 按页面类型追加：
 
-- 列表页：`apps/rag-admin/docs/standard/development/table-pattern.md`。
-- 表单页：`apps/rag-admin/docs/standard/development/form-pattern.md`。
-- 详情页：`apps/rag-admin/docs/standard/development/detail-pattern.md`。
+- 列表页：`docs/standard/frontend/development/table-pattern.md`。
+- 表单页：`docs/standard/frontend/development/form-pattern.md`。
+- 详情页：`docs/standard/frontend/development/detail-pattern.md`。
 
 涉及 `AgGrid`、`ApForm`、`ApDescriptions`、`ApLabel`、`ApStatus` 等 `@aplus-frontend/ui` 能力时，同时使用 `aplus-ui` skill 查询 API / demo，不凭记忆猜 props。
 
@@ -49,7 +49,7 @@ description: 根据需求文档、UI设计图和接口代码，在 RAG Admin（a
 ## 本 skill 不负责
 
 - 重新定义页面、表单、列表、命名等技术标准。
-- 绕过 `apps/rag-admin/AGENTS.md`、`apps/rag-admin/docs/standard/` 或根 `AGENTS.md` 中的禁止项。
+- 绕过 `apps/rag-admin/AGENTS.md`、`docs/standard/frontend/development/` 或根 `AGENTS.md` 中的禁止项。
 - 手工修改后端 DTO、Controller、Service 或跨端 shared 契约；契约变化先走 OpenSpec 工作流。
 - 在聚合根目录执行 `pnpm dev`、`pnpm build`、`pnpm install`。
 - 处理线上问题或测试期缺陷的专属流程；如项目无专属流程，按通用交付流程处理。
@@ -82,7 +82,7 @@ description: 根据需求文档、UI设计图和接口代码，在 RAG Admin（a
 
 1. **读取目标规则**
    - 读根目录 `AGENTS.md` 和 `apps/rag-admin/AGENTS.md`。
-   - 读 `apps/rag-admin/docs/standard/README.md`，再按页面类型读对应标准。
+   - 读 `docs/standard/frontend/README.md`（共享规范索引），再按页面类型读 `docs/standard/frontend/development/` 下对应标准。
    - 涉及 `@aplus-frontend/ui` 时，同时使用 `aplus-ui` skill 查询 API / demo。
 
 2. **解析需求**
@@ -154,10 +154,10 @@ description: 根据需求文档、UI设计图和接口代码，在 RAG Admin（a
 
 ## 参考资源
 
-- `apps/rag-admin/docs/standard/development/page-development.md`
-- `apps/rag-admin/docs/standard/development/page-structure-blueprint.md`
-- `apps/rag-admin/docs/standard/development/page-implementation-best-practices.md`
-- `apps/rag-admin/docs/standard/development/table-pattern.md`
-- `apps/rag-admin/docs/standard/development/form-pattern.md`
-- `apps/rag-admin/docs/standard/development/detail-pattern.md`
-- `apps/rag-admin/docs/standard/development/naming-conventions.md`
+- `docs/standard/frontend/development/page-development.md`
+- `docs/standard/frontend/development/page-structure-blueprint.md`
+- `docs/standard/frontend/development/page-implementation-best-practices.md`
+- `docs/standard/frontend/development/table-pattern.md`
+- `docs/standard/frontend/development/form-pattern.md`
+- `docs/standard/frontend/development/detail-pattern.md`
+- `docs/standard/frontend/development/naming-conventions.md`

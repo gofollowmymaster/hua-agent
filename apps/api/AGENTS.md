@@ -27,7 +27,7 @@ AI 收到任务后，**按任务类型读取对应文档**，不可跳过。多�
 | 飞书集成 / 表格 / 卡片 / 回调 | `docs/architecture/feishu-integration.md` | ClientFactory、分层方式 |
 | 配置变更 / 环境变量 | `docs/standard/configuration.md` | NodeConfigService，禁止 process.env |
 | 公共能力抽取 | `docs/standard/code-style.md` + `docs/standard/module-design.md` | 跨模块复用才进 common |
-| 跨端接口 / RAG Admin 调用 | `../../AGENTS.md` + `../rag-admin/docs/architecture/README.md` | 同步检查前后端 |
+| 跨端接口 / RAG Admin 调用 | `../../AGENTS.md` + `../rag-admin/standard/architecture/README.md` | 同步检查前后端 |
 
 **操作要求**：读取文档后，在回复中列明确认过的关键规则（至少 3 条），再开始编码。
 
