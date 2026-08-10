@@ -67,10 +67,11 @@ describe('AgentChatToolService', () => {
   });
 
   it('executes knowledge search tool', async () => {
-    const result = await service.execute('search_knowledge', {
-      query: 'PO 订单',
-      topK: 5,
-    });
+    const tool = service
+      .getTools()
+      .find((item) => item.name === 'search_knowledge');
+    expect(tool).toBeDefined();
+    const result = await tool!.invoke({ query: 'PO 订单', topK: 5 });
 
     expect(knowledgeSearchService.search).toHaveBeenCalledWith(
       'PO 订单',
@@ -80,16 +81,56 @@ describe('AgentChatToolService', () => {
   });
 
   it('executes calculate tool', async () => {
-    const result = await service.execute('calculate', {
-      expression: '1+2*3',
-    });
+    const tool = service.getTools().find((item) => item.name === 'calculate');
+    expect(tool).toBeDefined();
+    const result = await tool!.invoke({ expression: '1+2*3' });
 
     expect(JSON.parse(result)).toMatchObject({ result: 7 });
   });
 
   it('returns current time', async () => {
-    const result = await service.execute('get_current_time', {});
+    const tool = service
+      .getTools()
+      .find((item) => item.name === 'get_current_time');
+    expect(tool).toBeDefined();
+    const result = await tool!.invoke({});
 
     expect(result).toContain('2026');
+  });
+
+  it('returns document detail and chunks', async () => {
+    const documentTool = service
+      .getTools()
+      .find((item) => item.name === 'get_document');
+    const chunksTool = service
+      .getTools()
+      .find((item) => item.name === 'get_document_chunks');
+
+    const document = await documentTool!.invoke({ documentId: '1' });
+    const chunks = await chunksTool!.invoke({
+      documentId: '1',
+      page: 2,
+      pageSize: 5,
+    });
+
+    expect(JSON.parse(document)).toMatchObject({
+      id: '1',
+      fileName: 'guide.md',
+    });
+    expect(knowledgeService.pageDocumentChunks).toHaveBeenCalledWith(1, {
+      page: 2,
+      pageSize: 5,
+    });
+    expect(JSON.parse(chunks)).toMatchObject({ total: 1 });
+  });
+
+  it('exposes only business tools', () => {
+    expect(service.getTools().map((item) => item.name)).toEqual([
+      'search_knowledge',
+      'get_document',
+      'get_document_chunks',
+      'get_current_time',
+      'calculate',
+    ]);
   });
 });

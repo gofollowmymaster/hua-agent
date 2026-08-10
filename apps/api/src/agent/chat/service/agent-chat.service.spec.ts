@@ -1,84 +1,174 @@
-import { HumanMessage } from '@langchain/core/messages';
+import { createUIMessageStream } from 'ai';
 import { AgentChatService } from './agent-chat.service';
 
-const mockInvoke = jest.fn();
-const mockStream = jest.fn();
-
-jest.mock('@langchain/openai', () => ({
-  ChatOpenAI: jest.fn().mockImplementation(() => ({
-    bindTools: jest.fn().mockReturnThis(),
-    invoke: mockInvoke,
-    stream: mockStream,
-  })),
-}));
-
-jest.mock('@src/config/node-config.service', () => ({
-  NodeConfigService: {
-    get: jest.fn((key: string) => {
-      const values: Record<string, unknown> = {
-        modelName: 'test-model',
-        openAiApiKey: 'test-key',
-        openAiBaseUrl: 'http://localhost',
-      };
-      return values[key];
-    }),
-  },
+jest.mock('ai', () => ({
+  createUIMessageStream: jest.fn(),
 }));
 
 describe('AgentChatService', () => {
   let logger: { setContext: jest.Mock; warn: jest.Mock };
-  let memoryService: { loadRecentMessages: jest.Mock };
-  let toolService: { getTools: jest.Mock; execute: jest.Mock };
+  let memoryService: {
+    resolveSession: jest.Mock;
+    loadRecentMessages: jest.Mock;
+    appendUserMessage: jest.Mock;
+    appendAssistantMessage: jest.Mock;
+  };
+  let agentService: { stream: jest.Mock };
   let service: AgentChatService;
+  let executeHandler: (params: { writer: unknown }) => Promise<void>;
 
   beforeEach(() => {
     jest.clearAllMocks();
     logger = { setContext: jest.fn(), warn: jest.fn() };
-    memoryService = { loadRecentMessages: jest.fn().mockResolvedValue([]) };
-    toolService = {
-      getTools: jest.fn().mockReturnValue([]),
-      execute: jest.fn().mockResolvedValue('7'),
+    memoryService = {
+      resolveSession: jest.fn().mockReturnValue({
+        channel: 'agent-web',
+        tenantCode: 'yurex',
+        sessionKey: 'session',
+        conversationId: 'conversation',
+      }),
+      loadRecentMessages: jest.fn().mockResolvedValue([]),
+      appendUserMessage: jest.fn().mockResolvedValue(undefined),
+      appendAssistantMessage: jest.fn().mockResolvedValue(undefined),
+    };
+    agentService = {
+      stream: jest.fn().mockImplementation(async function* () {
+        yield { type: 'text_delta', delta: '结果' };
+        yield { type: 'text_delta', delta: '是 7' };
+        yield {
+          type: 'done',
+          answer: '结果是 7',
+          toolCalls: [
+            {
+              name: 'calculate',
+              arguments: { expression: '1+2*3' },
+              result: '7',
+            },
+          ],
+        };
+      }),
     };
     service = new AgentChatService(
       logger as any,
       memoryService as any,
-      toolService as any,
+      agentService as any,
     );
 
-    mockInvoke
-      .mockResolvedValueOnce({
-        tool_calls: [
-          {
-            id: 'call-1',
-            name: 'calculate',
-            args: { expression: '1+2*3' },
-          },
-        ],
-      })
-      .mockResolvedValueOnce({ content: '结果是 7' });
-    mockStream.mockImplementation(async function* () {
-      yield { content: '结果' };
-      yield { content: '是 7' };
-    });
+    (createUIMessageStream as jest.Mock).mockImplementation(
+      ({
+        execute,
+      }: {
+        execute: (params: { writer: unknown }) => Promise<void>;
+      }) => {
+        executeHandler = execute;
+        return {};
+      },
+    );
   });
 
-  it('runs tool loop and streams final answer', async () => {
-    const writer = {
-      write: jest.fn(),
-    };
-    const result = await (service as any).runToolLoop(
-      [new HumanMessage('1+2*3')],
-      writer,
-      'text-1',
-    );
-
-    expect(toolService.execute).toHaveBeenCalledWith('calculate', {
-      expression: '1+2*3',
+  it('streams agent events and persists messages', async () => {
+    agentService.stream.mockImplementation(async function* () {
+      yield {
+        type: 'tool_start',
+        name: 'calculate',
+        arguments: { expression: '1+2*3' },
+      };
+      yield {
+        type: 'tool_end',
+        name: 'calculate',
+        arguments: { expression: '1+2*3' },
+        result: '7',
+      };
+      yield { type: 'text_delta', delta: '结果' };
+      yield { type: 'text_delta', delta: '是 7' };
+      yield {
+        type: 'done',
+        answer: '结果是 7',
+        toolCalls: [
+          {
+            name: 'calculate',
+            arguments: { expression: '1+2*3' },
+            result: '7',
+          },
+        ],
+      };
     });
-    expect(result.answer).toBe('结果是 7');
-    expect(result.toolCalls).toHaveLength(1);
-    expect(writer.write).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'text-end', id: 'text-1' }),
+
+    const writer = { write: jest.fn() };
+    service.createChatStream({
+      messages: [
+        {
+          role: 'user',
+          id: 'q-1',
+          parts: [{ type: 'text', text: '1+2*3' }],
+        },
+      ],
+    });
+    await executeHandler({ writer });
+
+    expect(agentService.stream).toHaveBeenCalledWith(
+      expect.arrayContaining([expect.objectContaining({})]),
+    );
+    const parts = writer.write.mock.calls.map(([part]) => part);
+    expect(parts.map((part) => part.type)).toEqual([
+      'data-status',
+      'data-status',
+      'data-status',
+      'text-start',
+      'text-delta',
+      'text-delta',
+      'text-end',
+      'data-status',
+    ]);
+    expect(parts[1]).toMatchObject({
+      type: 'data-status',
+      data: { stage: 'tool_call', tool: 'calculate' },
+    });
+    expect(parts[2]).toMatchObject({
+      type: 'data-status',
+      data: { stage: 'generate_start' },
+    });
+    expect(memoryService.appendUserMessage).toHaveBeenCalledWith(
+      expect.objectContaining({ channel: 'agent-web' }),
+      '1+2*3',
+      'q-1',
+    );
+    expect(memoryService.appendAssistantMessage).toHaveBeenCalledWith(
+      expect.objectContaining({ channel: 'agent-web' }),
+      '结果是 7',
+      [
+        {
+          name: 'calculate',
+          arguments: { expression: '1+2*3' },
+          result: '7',
+        },
+      ],
+    );
+  });
+
+  it('falls back when agent returns no answer', async () => {
+    agentService.stream.mockImplementation(async function* () {
+      yield { type: 'done', answer: '', toolCalls: [] };
+    });
+
+    const writer = { write: jest.fn() };
+    service.createChatStream({
+      messages: [
+        {
+          role: 'user',
+          id: 'q-2',
+          parts: [{ type: 'text', text: 'hello' }],
+        },
+      ],
+    });
+    await executeHandler({ writer });
+
+    const parts = writer.write.mock.calls.map(([part]) => part);
+    expect(parts.some((part) => part.type === 'text-delta')).toBe(true);
+    expect(memoryService.appendAssistantMessage).toHaveBeenCalledWith(
+      expect.objectContaining({ channel: 'agent-web' }),
+      '抱歉，我暂时无法生成回答，请稍后重试。',
+      [],
     );
   });
 });

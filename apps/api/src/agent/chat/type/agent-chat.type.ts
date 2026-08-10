@@ -31,3 +31,28 @@ export interface AgentChatToolCallRecord {
   arguments: Record<string, unknown>;
   result: string;
 }
+
+export type AgentChatAgentEvent =
+  | {
+      type: 'tool_start';
+      name: string;
+      arguments: Record<string, unknown>;
+    }
+  | {
+      type: 'tool_end';
+      name: string;
+      arguments: Record<string, unknown>;
+      result: string;
+    }
+  | { type: 'text_delta'; delta: string }
+  | { type: 'done'; answer: string; toolCalls: AgentChatToolCallRecord[] };
+
+export type AgentChatWriter = {
+  write: (
+    part:
+      | { type: 'data-status'; data: Record<string, unknown> }
+      | { type: 'text-start'; id: string }
+      | { type: 'text-delta'; id: string; delta: string }
+      | { type: 'text-end'; id: string },
+  ) => void;
+};
