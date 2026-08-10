@@ -3,7 +3,7 @@ import { Chat } from '@ai-sdk/vue';
 import { DefaultChatTransport, type UIMessage } from 'ai';
 import { getToken } from '@/stores/modules/user/token';
 import { useUserStore } from '@/stores/modules/user';
-import type { RagMessageItem } from '@/api/rag-admin';
+import type { RagMessageItem } from '@/api/knowledge-qa/sessions';
 
 export interface RagStatusData {
   stage?: string;

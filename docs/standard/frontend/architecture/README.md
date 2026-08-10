@@ -16,12 +16,12 @@
 
 - 跨项目稳定复用的组件、hooks 放入 `packages/ui-kit`，并通过公开 exports 暴露，不导入 app 业务源码。
 - 通用 HTTP client 放入 `packages/http-client`：`createHttpClient` 提供 base URL、token 注入、业务 envelope 与 401 处理。
-- 各 app 只在 `src/api/http.ts` 保留本应用的 base URL、token 获取与退出登录适配。
+- 各 app 只在 `src/api/common/http.ts` 保留本应用的 base URL、token 获取与退出登录适配。
 
 ## 请求封装规则
 
-- axios 实例通过 `createHttpClient` 在 `src/api/http.ts` 统一创建，不在页面或业务 API 文件中重复配置 interceptor。
-- 业务请求方法维护在 `src/api/<app>.ts`（如 `rag-admin.ts`、`global-admin.ts`），明确请求参数和响应类型。
+- axios 实例通过 `createHttpClient` 在 `src/api/common/http.ts` 统一创建，不在页面或业务 API 文件中重复配置 interceptor。
+- 业务请求方法按“模块目录 + 菜单文件”维护在 `src/api/<module>/<menu>.ts`，同一模块放在同一目录，同一菜单放在同一文件；公共类型、分页参数清洗等定义统一放 `src/api/common/`。
 - 页面组件只调用业务 API 方法，不直接创建 axios 实例，不手动拼接 `Authorization`。
 - 单个 API 文件不超过 400 行，超过时按业务子域拆分。
 - 修改请求路径、HTTP 方法、参数/响应字段、错误语义或鉴权方式时，同步检查 API app 的 DTO、Controller、Service 和 Guard，并检查所有前端调用方。

@@ -47,7 +47,7 @@ SDK 初始化自动跳转、`ensureLogin()` 和 `logout()` 必须复用同一解
 
 ## 请求封装与 API 路径
 
-通用 axios、业务 envelope 和 401 处理能力位于 `@aplus-sql/http-client`。`src/api/http.ts` 负责创建 RAG Admin 实例并注入 base URL、user store/cookie token 和 logout；业务 API 方法位于 `src/api/rag-admin.ts`。
+通用 axios、业务 envelope 和 401 处理能力位于 `@aplus-sql/http-client`。`src/api/common/http.ts` 负责创建 RAG Admin 实例并注入 base URL、user store/cookie token 和 logout；业务 API 方法按“模块目录 + 菜单文件”维护在 `src/api/<module>/<menu>.ts`，公共类型和参数清洗统一放在 `src/api/common/`。
 
 RAG Admin 开发/测试环境通过 `VITE_API_BASE_URL=/api` 统一携带 `/api` 前缀，开发态由 Vite proxy 将 `/api` 请求转发到 API 后端并去掉前缀；生产态保持同源调用，由 API app 同时提供静态资源和后端接口。
 

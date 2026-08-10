@@ -4,7 +4,7 @@ import { ApModal } from '@aplus-frontend/ui';
 import {
   updateDocumentMetadata,
   type RagDocumentItem,
-} from '@/api/rag-admin';
+} from '@/api/knowledge-qa/documents';
 import DocumentMetadataForm from './index.vue';
 
 export function useDocumentMetadataModal(options?: {

@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import type { RagDocumentItem } from '@/api/rag-admin';
+import type { RagDocumentItem } from '@/api/knowledge-qa/documents';
 
 const props = defineProps<{
   item: RagDocumentItem;

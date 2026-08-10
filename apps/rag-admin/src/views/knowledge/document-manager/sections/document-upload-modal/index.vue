@@ -69,7 +69,7 @@ import {
   uploadDocuments,
   type RagDocumentUploadFileResult,
   type RagDocumentUploadResult,
-} from '@/api/rag-admin';
+} from '@/api/knowledge-qa/documents';
 import { ThemeColor } from '@/config/theme-color-token';
 
 const MAX_FILES = 20;

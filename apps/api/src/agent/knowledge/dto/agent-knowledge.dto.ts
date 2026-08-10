@@ -96,3 +96,21 @@ export class AgentKnowledgeDocumentPageDto {
   @Max(100)
   pageSize?: number = 20;
 }
+
+/** 定义业务 Agent 知识库文档切片分页查询条件。 */
+export class AgentKnowledgeChunkPageDto {
+  @ApiPropertyOptional({ description: '页码，从 1 开始', default: 1 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number = 1;
+
+  @ApiPropertyOptional({ description: '每页数量，最大 100', default: 20 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  pageSize?: number = 20;
+}

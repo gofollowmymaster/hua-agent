@@ -5,6 +5,7 @@ jest.mock('@src/config/node-config.service', () => ({
   NodeConfigService: {
     get: jest.fn((key: string) => {
       if (key === 'defaultTenant') return 'aplus';
+      if (key === 'agentKnowledge') return { docsDir: 'src/agent/docs' };
       return undefined;
     }),
   },
@@ -17,6 +18,10 @@ describe('AgentKnowledgeService', () => {
       findMany: jest.Mock;
       findUnique: jest.Mock;
       delete: jest.Mock;
+    };
+    agentChunk: {
+      count: jest.Mock;
+      findMany: jest.Mock;
     };
   };
   let ingestService: { ingest: jest.Mock };
@@ -57,6 +62,20 @@ describe('AgentKnowledgeService', () => {
         ]),
         findUnique: jest.fn(),
         delete: jest.fn().mockResolvedValue({}),
+      },
+      agentChunk: {
+        count: jest.fn().mockResolvedValue(1),
+        findMany: jest.fn().mockResolvedValue([
+          {
+            id: BigInt(101),
+            tenantCode: 'yurex',
+            documentId: BigInt(1),
+            chunkIndex: 0,
+            content: 'chunk content',
+            metadata: {},
+            createdAt: new Date('2026-01-02T00:00:00.000Z'),
+          },
+        ]),
       },
     };
     ingestService = { ingest: jest.fn().mockResolvedValue({ ok: true }) };
@@ -114,6 +133,94 @@ describe('AgentKnowledgeService', () => {
       tenantCode: 'yurex',
       actualChunkCount: 2,
     });
+  });
+
+  it('returns document detail for current tenant', async () => {
+    ragPrisma.agentDocument.findUnique.mockResolvedValue({
+      id: BigInt(1),
+      tenantCode: 'yurex',
+      category: '业务流程',
+      sourcePath: 'yurex/Yurex业务流程/guide.md',
+      fileName: 'guide.md',
+      fileType: 'md',
+      fileHash: 'hash',
+      fileSize: BigInt(12),
+      chunkCount: 2,
+      status: 'ready',
+      error: null,
+      metadata: {},
+      remoteUrl: null,
+      docId: null,
+      wikiNodeId: null,
+      lastModifiedAt: null,
+      breadcrumb: null,
+      sourceType: null,
+      currentVersion: null,
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-01-02T00:00:00.000Z'),
+      ingestedAt: new Date('2026-01-02T00:00:00.000Z'),
+      _count: { chunks: 2 },
+    });
+
+    const result = await service.getDocument(1);
+
+    expect(result).toMatchObject({
+      id: '1',
+      tenantCode: 'yurex',
+      category: '业务流程',
+      actualChunkCount: 2,
+    });
+  });
+
+  it('rejects document detail for another tenant', async () => {
+    ragPrisma.agentDocument.findUnique.mockResolvedValue({
+      id: BigInt(9),
+      tenantCode: 'aplus',
+    });
+
+    await expect(service.getDocument(9)).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
+  });
+
+  it('returns paginated chunks for current tenant document', async () => {
+    ragPrisma.agentDocument.findUnique.mockResolvedValue({
+      id: BigInt(1),
+      tenantCode: 'yurex',
+    });
+
+    const result = await service.pageDocumentChunks(1, {
+      page: 1,
+      pageSize: 20,
+    });
+
+    expect(ragPrisma.agentChunk.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { tenantCode: 'yurex', documentId: 1 },
+        skip: 0,
+        take: 20,
+      }),
+    );
+    expect(result.list[0]).toMatchObject({
+      id: '101',
+      tenantCode: 'yurex',
+      chunkIndex: 0,
+    });
+  });
+
+  it('rejects preview when source path escapes docs root', async () => {
+    ragPrisma.agentDocument.findUnique.mockResolvedValue({
+      id: BigInt(9),
+      tenantCode: 'yurex',
+      sourcePath: '../../outside.md',
+      fileName: 'outside.md',
+      fileType: 'md',
+      fileSize: BigInt(12),
+    });
+
+    await expect(service.getDocumentPreviewFile(9)).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
   });
 
   it('rejects deletion of documents belonging to another tenant', async () => {

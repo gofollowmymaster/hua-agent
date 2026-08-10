@@ -3,7 +3,10 @@ import type { Component } from 'vue';
 import type { LocationQuery } from 'vue-router';
 import type { LayoutDrawerContent } from '@/stores/modules/layout-drawer';
 
-export type DrawerKey = 'document-chunks' | 'session-messages';
+export type DrawerKey =
+  | 'document-chunks'
+  | 'session-messages'
+  | 'agent-knowledge-chunks';
 
 const componentMap: Record<DrawerKey, Component> = {
   'document-chunks': defineAsyncComponent(
@@ -18,6 +21,12 @@ const componentMap: Record<DrawerKey, Component> = {
         '@/views/knowledge/session-records/sections/session-messages-panel/index.vue'
       ),
   ),
+  'agent-knowledge-chunks': defineAsyncComponent(
+    () =>
+      import(
+        '@/views/business-agent/knowledge/sections/document-chunk-panel/index.vue'
+      ),
+  ),
 };
 
 export function resolveDrawerFromQuery(
@@ -27,7 +36,9 @@ export function resolveDrawerFromQuery(
   const drawerCode = query.drawerCode;
 
   if (
-    (drawer === 'document-chunks' || drawer === 'session-messages') &&
+    (drawer === 'document-chunks' ||
+      drawer === 'session-messages' ||
+      drawer === 'agent-knowledge-chunks') &&
     typeof drawerCode === 'string' &&
     drawerCode
   ) {

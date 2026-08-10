@@ -91,7 +91,7 @@ import {
   pageDocumentChunks,
   type RagDocumentChunkItem,
   type RagDocumentItem,
-} from '@/api/rag-admin';
+} from '@/api/knowledge-qa/documents';
 import { useLayoutDrawer } from '@/layouts/layout-drawer/use-layout-drawer';
 import { ThemeColor } from '@/config/theme-color-token';
 

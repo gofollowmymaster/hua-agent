@@ -133,9 +133,9 @@ import 'md-editor-v3/lib/preview.css';
 import {
   listSessionMessages,
   pageSessions,
-  getDocumentPreviewFile,
   type RagSessionItem,
-} from '@/api/rag-admin';
+} from '@/api/knowledge-qa/sessions';
+import { getDocumentPreviewFile } from '@/api/knowledge-qa/documents';
 import { useUserStore } from '@/stores/modules/user';
 import {
   createChatSession,

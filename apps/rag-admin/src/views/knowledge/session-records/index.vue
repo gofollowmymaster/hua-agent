@@ -29,7 +29,10 @@
     type AgGridColumnType
   } from '@aplus-frontend/ui';
   import { TableTopActionBar, useRowClickAction } from '@aplus-sql/ui-kit';
-  import { pageSessionsGrid, type RagSessionItem } from '@/api/rag-admin';
+  import {
+    pageSessionsGrid,
+    type RagSessionItem,
+  } from '@/api/knowledge-qa/sessions';
   import { ThemeColor } from '@/config/theme-color-token';
 
   const route = useRoute();

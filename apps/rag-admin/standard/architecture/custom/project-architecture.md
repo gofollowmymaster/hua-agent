@@ -28,7 +28,7 @@
 
 - 用户 store 位于 `src/stores/modules/user/index.ts`。
 - 登录 SDK、token cookie 与租户认证配置和 user store 一起位于 `src/stores/modules/user/`。
-- 后端请求通过 `src/api/http.ts` 的 axios 实例和 `src/api/rag-admin.ts` 的业务 API 方法封装。
+- 后端请求通过 `src/api/common/http.ts` 的 axios 实例封装，业务 API 方法按“模块目录 + 菜单文件”维护在 `src/api/<module>/<menu>.ts`。
 
 ## UI 与预览能力
 

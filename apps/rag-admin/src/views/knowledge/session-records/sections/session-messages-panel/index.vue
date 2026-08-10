@@ -43,7 +43,10 @@ import { ref, watch } from 'vue';
 import dayjs from 'dayjs';
 import { Alert, Empty, Spin } from '@aplus-frontend/antdv';
 import { ApButton } from '@aplus-frontend/ui';
-import { listSessionMessages, type RagMessageItem } from '@/api/rag-admin';
+import {
+  listSessionMessages,
+  type RagMessageItem,
+} from '@/api/knowledge-qa/sessions';
 import { useLayoutDrawer } from '@/layouts/layout-drawer/use-layout-drawer';
 
 const props = defineProps<{

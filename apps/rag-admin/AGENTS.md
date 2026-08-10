@@ -102,7 +102,7 @@ pnpm admin:stylelint:check
 
 - `src/main.ts`：Vue app 入口。
 - `src/app.vue`：根组件。
-- `src/api/`：axios 实例和业务 API 方法。
+- `src/api/`：`common/` 存放公共 HTTP 客户端和公共类型，`<module>/<menu>.ts` 按模块和菜单拆分业务 API 方法。
 - `src/layouts/`：布局组件。
 - `src/router/`：路由实例、路由表和路由守卫。
 - `src/stores/`：Pinia store。
@@ -121,7 +121,7 @@ pnpm admin:stylelint:check
 - 页面级组件放 `src/views/`，跨页面布局放 `src/layouts/`。
 - 页面统一按 `standard/development/page-structure-blueprint.md` 使用 `src/views/<page>/index.vue`，页面私有逻辑放同级 `hooks/`、`components/`、`sections/`。
 - 跨页面稳定复用组件放 `src/components/`。
-- 请求统一封装到 `src/api/`，复用 `src/api/http.ts`。
+- 请求统一封装到 `src/api/`，复用 `src/api/common/http.ts`。
 - token 读写统一通过 `src/stores/modules/user/token.ts`，登录流程集中在 `src/stores/modules/user/` 或路由守卫。
 - 跨页面共享或需要缓存的数据才进入 Pinia；页面局部状态优先留在组件内。
 - 全局样式放 `src/styles/global.css`，页面私有样式优先放对应 `.vue` 文件。

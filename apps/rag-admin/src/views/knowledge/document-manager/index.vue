@@ -59,7 +59,7 @@
     ingestDocuments,
     pageDocumentsGrid,
     type RagDocumentItem
-  } from '@/api/rag-admin';
+  } from '@/api/knowledge-qa/documents';
   import { useDocumentMetadataModal } from './sections/document-metadata-modal/use-document-metadata-modal';
   import { useDocumentUploadModal } from './sections/document-upload-modal/use-document-upload-modal';
   import { ThemeColor } from '@/config/theme-color-token';
