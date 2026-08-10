@@ -114,6 +114,7 @@ describe('AgentChatService', () => {
       'data-status',
       'data-status',
       'data-status',
+      'data-status',
       'text-start',
       'text-delta',
       'text-delta',
@@ -125,6 +126,10 @@ describe('AgentChatService', () => {
       data: { stage: 'tool_call', tool: 'calculate' },
     });
     expect(parts[2]).toMatchObject({
+      type: 'data-status',
+      data: { stage: 'tool_result', tool: 'calculate' },
+    });
+    expect(parts[3]).toMatchObject({
       type: 'data-status',
       data: { stage: 'generate_start' },
     });
@@ -144,6 +149,74 @@ describe('AgentChatService', () => {
         },
       ],
     );
+  });
+
+  it('streams reasoning parts and search result summary', async () => {
+    agentService.stream.mockImplementation(async function* () {
+      yield {
+        type: 'tool_start',
+        name: 'search_knowledge',
+        arguments: { query: '退货流程' },
+      };
+      yield {
+        type: 'tool_end',
+        name: 'search_knowledge',
+        arguments: { query: '退货流程' },
+        result: JSON.stringify([
+          { fileName: '退货流程.md' },
+          { fileName: '售后指南.md' },
+          { fileName: '退款说明.md' },
+          { fileName: '客户服务.md' },
+        ]),
+      };
+      yield { type: 'reasoning_delta', delta: '先检索知识库' };
+      yield { type: 'text_delta', delta: '根据资料' };
+      yield { type: 'text_delta', delta: '，请按流程操作。' };
+      yield {
+        type: 'done',
+        answer: '根据资料，请按流程操作。',
+        toolCalls: [],
+      };
+    });
+
+    const writer = { write: jest.fn() };
+    service.createChatStream({
+      messages: [
+        {
+          role: 'user',
+          id: 'q-3',
+          parts: [{ type: 'text', text: '退货流程是什么？' }],
+        },
+      ],
+    });
+    await executeHandler({ writer });
+
+    const parts = writer.write.mock.calls.map(([part]) => part);
+    expect(parts).toContainEqual({
+      type: 'data-status',
+      data: {
+        stage: 'tool_result',
+        tool: 'search_knowledge',
+        message:
+          '检索到 4 个相关文档：退货流程.md、售后指南.md、退款说明.md 等',
+      },
+    });
+    expect(parts).toContainEqual({
+      type: 'reasoning-start',
+      id: expect.any(String),
+    });
+    expect(parts).toContainEqual({
+      type: 'reasoning-delta',
+      id: expect.any(String),
+      delta: '先检索知识库',
+    });
+    expect(parts).toContainEqual({
+      type: 'reasoning-end',
+      id: expect.any(String),
+    });
+    expect(
+      parts.findIndex((part) => part.type === 'reasoning-start'),
+    ).toBeLessThan(parts.findIndex((part) => part.type === 'text-start'));
   });
 
   it('falls back when agent returns no answer', async () => {

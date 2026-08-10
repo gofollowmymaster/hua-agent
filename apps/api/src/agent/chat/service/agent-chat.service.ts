@@ -63,8 +63,21 @@ export class AgentChatService {
         let answer = '';
         const toolCalls: AgentChatToolCallRecord[] = [];
         let textStarted = false;
+        const reasoningId = randomUUID();
+        let reasoningStarted = false;
+        const startReasoning = () => {
+          if (reasoningStarted) return;
+          streamWriter.write({ type: 'reasoning-start', id: reasoningId });
+          reasoningStarted = true;
+        };
+        const endReasoning = () => {
+          if (!reasoningStarted) return;
+          streamWriter.write({ type: 'reasoning-end', id: reasoningId });
+          reasoningStarted = false;
+        };
         const startText = () => {
           if (textStarted) return;
+          endReasoning();
           streamWriter.write({
             type: 'data-status',
             data: { stage: 'generate_start', message: '开始生成答案' },
@@ -74,7 +87,17 @@ export class AgentChatService {
         };
 
         for await (const event of this.agentService.stream(messages)) {
+          if (event.type === 'reasoning_delta') {
+            startReasoning();
+            streamWriter.write({
+              type: 'reasoning-delta',
+              id: reasoningId,
+              delta: event.delta,
+            });
+            continue;
+          }
           if (event.type === 'tool_start') {
+            endReasoning();
             streamWriter.write({
               type: 'data-status',
               data: {
@@ -86,10 +109,16 @@ export class AgentChatService {
             continue;
           }
           if (event.type === 'tool_end') {
-            toolCalls.push({
+            const toolCall: AgentChatToolCallRecord = {
               name: event.name,
               arguments: event.arguments,
               result: event.result,
+            };
+            endReasoning();
+            toolCalls.push(toolCall);
+            streamWriter.write({
+              type: 'data-status',
+              data: this.buildToolResultStatus(toolCall),
             });
             continue;
           }
@@ -148,6 +177,99 @@ export class AgentChatService {
       onError: (error) =>
         error instanceof Error ? error.message : String(error),
     });
+  }
+
+  /** 将工具返回结果转换为过程区可展示的状态摘要。 */
+  private buildToolResultStatus(
+    toolCall: AgentChatToolCallRecord,
+  ): Record<string, unknown> {
+    const message = this.buildToolResultMessage(toolCall);
+    return {
+      stage: 'tool_result',
+      tool: toolCall.name,
+      message,
+    };
+  }
+
+  /** 为知识检索和文档切片工具生成摘要，其余工具回退到通用文案。 */
+  private buildToolResultMessage(toolCall: AgentChatToolCallRecord): string {
+    if (toolCall.name === 'search_knowledge') {
+      return this.buildSearchKnowledgeSummary(toolCall.result);
+    }
+    if (toolCall.name === 'get_document') {
+      return this.buildDocumentSummary(toolCall.result);
+    }
+    if (toolCall.name === 'get_document_chunks') {
+      return this.buildDocumentChunksSummary(toolCall.result);
+    }
+    return `工具执行完成：${toolCall.name}`;
+  }
+
+  /** 格式化知识库检索命中摘要。 */
+  private buildSearchKnowledgeSummary(result: string): string {
+    const hits = this.parseJsonArray(result);
+    if (!hits || hits.length === 0) return '未检索到相关文档';
+    const names = hits
+      .map((hit) => {
+        const record =
+          typeof hit === 'object' && hit
+            ? (hit as Record<string, unknown>)
+            : null;
+        return record && typeof record.fileName === 'string'
+          ? record.fileName
+          : '';
+      })
+      .filter(Boolean);
+    if (names.length === 0) {
+      return `检索到 ${hits.length} 个相关文档`;
+    }
+    const visible = names.slice(0, 3).join('、');
+    const suffix = hits.length > names.slice(0, 3).length ? ' 等' : '';
+    return `检索到 ${hits.length} 个相关文档：${visible}${suffix}`;
+  }
+
+  /** 格式化文档详情工具摘要。 */
+  private buildDocumentSummary(result: string): string {
+    const document = this.parseJsonObject(result);
+    if (
+      document &&
+      typeof document.fileName === 'string' &&
+      document.fileName
+    ) {
+      return `已获取文档：${document.fileName}`;
+    }
+    return '已获取文档详情';
+  }
+
+  /** 格式化文档切片工具摘要。 */
+  private buildDocumentChunksSummary(result: string): string {
+    const data = this.parseJsonObject(result);
+    if (!data) return '已获取文档切片';
+    const list = Array.isArray(data.list) ? data.list : [];
+    const total = typeof data.total === 'number' ? data.total : list.length;
+    return `已获取 ${list.length}/${total} 个文档切片`;
+  }
+
+  /** 安全解析 JSON 数组，失败返回 null。 */
+  private parseJsonArray(result: string): unknown[] | null {
+    try {
+      const value = JSON.parse(result);
+      return Array.isArray(value) ? value : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /** 安全解析 JSON 对象，失败返回 null。 */
+  private parseJsonObject(result: string): Record<string, unknown> | null {
+    try {
+      const value = JSON.parse(result);
+      return value && typeof value === 'object' && !Array.isArray(value)
+        ? (value as Record<string, unknown>)
+        : null;
+    } catch {
+      return null;
+    }
   }
 
   /** 从 AGUI 消息中提取最近一条有效用户文本问题。 */

@@ -53,5 +53,11 @@ describe('createAgentChatAdapter', () => {
     expect(adapter.formatStatus({ tool: 'search_knowledge' })).toBe(
       '调用工具：search_knowledge',
     );
+    expect(
+      adapter.formatStatus({
+        tool: 'search_knowledge',
+        message: '检索到 2 个相关文档',
+      }),
+    ).toBe('检索到 2 个相关文档');
   });
 });

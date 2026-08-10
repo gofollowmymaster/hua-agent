@@ -64,4 +64,5 @@ export interface ChatDemoOptions {
   historyTitle?: string;
   emptyTitle?: string;
   emptyDescription?: string;
+  collapseProcessAfterAnswer?: boolean;
 }

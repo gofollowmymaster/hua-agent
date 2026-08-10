@@ -33,6 +33,7 @@ export interface AgentChatToolCallRecord {
 }
 
 export type AgentChatAgentEvent =
+  | { type: 'reasoning_delta'; delta: string }
   | {
       type: 'tool_start';
       name: string;
@@ -51,6 +52,9 @@ export type AgentChatWriter = {
   write: (
     part:
       | { type: 'data-status'; data: Record<string, unknown> }
+      | { type: 'reasoning-start'; id: string }
+      | { type: 'reasoning-delta'; id: string; delta: string }
+      | { type: 'reasoning-end'; id: string }
       | { type: 'text-start'; id: string }
       | { type: 'text-delta'; id: string; delta: string }
       | { type: 'text-end'; id: string },

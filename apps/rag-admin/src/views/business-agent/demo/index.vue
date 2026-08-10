@@ -13,5 +13,6 @@ const options = {
   historyTitle: '历史会话',
   emptyTitle: '开始 Agent 演示',
   emptyDescription: 'Agent 会调用知识库和通用工具，以流式方式返回答案。',
+  collapseProcessAfterAnswer: true,
 };
 </script>

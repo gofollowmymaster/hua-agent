@@ -133,6 +133,41 @@ describe('AgentChatAgentService', () => {
     ]);
   });
 
+  it('extracts reasoning content as reasoning_delta before text', async () => {
+    mockStream.mockResolvedValue(
+      (async function* () {
+        yield [
+          'messages',
+          [
+            {
+              content: [{ type: 'text', text: '结果是 7' }],
+              additional_kwargs: { reasoning_content: '先计算表达式' },
+            },
+            {},
+          ],
+        ];
+      })(),
+    );
+
+    const service = new AgentChatAgentService(
+      toolService as unknown as AgentChatToolService,
+    );
+    const events: unknown[] = [];
+    for await (const event of service.stream([])) {
+      events.push(event);
+    }
+
+    expect(events).toEqual([
+      { type: 'reasoning_delta', delta: '先计算表达式' },
+      { type: 'text_delta', delta: '结果是 7' },
+      {
+        type: 'done',
+        answer: '结果是 7',
+        toolCalls: [],
+      },
+    ]);
+  });
+
   it('records tool errors as tool_end results', async () => {
     mockStream.mockResolvedValue(
       (async function* () {

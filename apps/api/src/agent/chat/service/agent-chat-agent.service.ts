@@ -76,14 +76,20 @@ export class AgentChatAgentService {
     for await (const chunk of graphStream) {
       if (!Array.isArray(chunk)) continue;
       const [mode, data] = chunk as unknown as DeepAgentStreamChunk;
+      console.log('[ mode ] >', mode);
       if (mode === 'messages') {
         const [messageChunk] = data;
+        const reasoning = this.extractReasoningText(messageChunk);
+        if (reasoning) {
+          yield { type: 'reasoning_delta', delta: reasoning };
+        }
         const text = this.extractContentText(messageChunk.content);
         if (!text) continue;
         answer += text;
         yield { type: 'text_delta', delta: text };
         continue;
       }
+      console.log('[ data ] >', data);
 
       if (data.event === 'on_tool_start') {
         const callId = data.toolCallId ?? data.name;
@@ -142,23 +148,47 @@ export class AgentChatAgentService {
   /** 将模型内容统一提取为纯文本。 */
   private extractContentText(content: unknown): string {
     if (typeof content === 'string') return content;
-    if (Array.isArray(content)) {
-      return content
-        .map((part) => {
-          if (typeof part === 'string') return part;
-          if (
-            part &&
-            typeof part === 'object' &&
-            'text' in part &&
-            typeof part.text === 'string'
-          ) {
-            return part.text;
-          }
-          return '';
-        })
-        .join('');
+    if (!Array.isArray(content)) return '';
+
+    return content
+      .map((part) => {
+        if (typeof part === 'string') return part;
+        if (!part || typeof part !== 'object') return '';
+
+        const item = part as Record<string, unknown>;
+        if (item.type === 'reasoning') return '';
+        if (typeof item.text === 'string') return item.text;
+        if (typeof item.content === 'string') return item.content;
+
+        return '';
+      })
+      .join('');
+  }
+
+  /** 从模型附加字段或 reasoning 内容块中提取过程文本。 */
+  private extractReasoningText(chunk: unknown): string {
+    if (!chunk || typeof chunk !== 'object') return '';
+
+    const value = chunk as Record<string, unknown>;
+    const additionalKwargs = value.additional_kwargs;
+    if (additionalKwargs && typeof additionalKwargs === 'object') {
+      const reasoningContent = (additionalKwargs as Record<string, unknown>)
+        .reasoning_content;
+      if (typeof reasoningContent === 'string' && reasoningContent) {
+        return reasoningContent;
+      }
     }
-    return String(content ?? '');
+
+    if (!Array.isArray(value.content)) return '';
+    return value.content
+      .map((part) => {
+        if (!part || typeof part !== 'object') return '';
+        const item = part as Record<string, unknown>;
+        if (item.type !== 'reasoning') return '';
+        if (typeof item.reasoning === 'string') return item.reasoning;
+        return typeof item.text === 'string' ? item.text : '';
+      })
+      .join('');
   }
 
   /** 将工具输入归一化为可持久化的参数对象。 */

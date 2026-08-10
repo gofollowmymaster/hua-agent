@@ -72,8 +72,9 @@ function formatStatus(data: unknown) {
     message?: string;
     tool?: string;
   };
+  if (statusData.message) return statusData.message;
   if (statusData.tool) return `调用工具：${statusData.tool}`;
-  return statusData.message || statusData.stage || '状态更新';
+  return statusData.stage || '状态更新';
 }
 
 function formatTime(value?: string) {

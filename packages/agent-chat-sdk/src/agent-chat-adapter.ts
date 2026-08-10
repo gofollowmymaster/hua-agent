@@ -129,11 +129,12 @@ function formatStatus(data: unknown) {
     tool?: string;
     chunks?: number;
   };
+  if (statusData.message) return statusData.message;
   if (statusData.tool) return `调用工具：${statusData.tool}`;
   if (statusData.chunks != null) {
-    return `${statusData.message || '状态更新'} · ${statusData.chunks} 个片段`;
+    return `状态更新 · ${statusData.chunks} 个片段`;
   }
-  return statusData.message || statusData.stage || '状态更新';
+  return statusData.stage || '状态更新';
 }
 
 function formatTime(value?: string) {

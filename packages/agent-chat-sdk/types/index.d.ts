@@ -13,6 +13,7 @@ export interface AgentChatSdkOptions {
     historyTitle?: string;
     emptyTitle?: string;
     emptyDescription?: string;
+    collapseProcessAfterAnswer?: boolean;
   };
   getToken?: () => string;
 }

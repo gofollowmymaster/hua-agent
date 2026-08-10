@@ -15,12 +15,21 @@
         {{ message.role === 'user' ? userLabel : assistantName }}
       </div>
       <div class="chat-demo-message-body">
+        <ChatProcessBlock
+          v-if="
+            collapseProcessAfterAnswer && getProcessParts(message).length > 0
+          "
+          :key="`${message.id}-process`"
+          :parts="getProcessParts(message)"
+          :open="!hasFinalText(message)"
+          :format-status="formatStatus"
+        />
         <template
-          v-for="(part, index) in message.parts"
+          v-for="(part, index) in getVisibleParts(message)"
           :key="`${message.id}-${index}`"
         >
           <ChatReasoningBlock
-            v-if="part.type === 'reasoning'"
+            v-if="!collapseProcessAfterAnswer && part.type === 'reasoning'"
             :state="part.state"
             :text="part.text"
           />
@@ -36,7 +45,9 @@
             />
           </div>
           <ChatStatusCard
-            v-else-if="part.type === 'data-status'"
+            v-else-if="
+              !collapseProcessAfterAnswer && part.type === 'data-status'
+            "
             :text="formatStatus(part.data)"
           />
         </template>
@@ -49,6 +60,7 @@
 import { nextTick, ref, watch } from 'vue';
 import { MdPreview } from 'md-editor-v3';
 import 'md-editor-v3/lib/preview.css';
+import ChatProcessBlock from './chat-process-block.vue';
 import ChatReasoningBlock from './chat-reasoning-block.vue';
 import ChatStatusCard from './chat-status-card.vue';
 import type { ChatDemoMessage } from '../types';
@@ -61,10 +73,32 @@ const props = defineProps<{
   emptyTitle?: string;
   emptyDescription?: string;
   autoScrollKey?: string;
+  collapseProcessAfterAnswer?: boolean;
   onMarkdownClick?: (event: MouseEvent) => void;
 }>();
 
 const messagePaneRef = ref<HTMLElement>();
+
+function getProcessParts(message: ChatDemoMessage) {
+  return message.parts.filter(
+    (part) => part.type === 'reasoning' || part.type === 'data-status',
+  );
+}
+
+function getVisibleParts(message: ChatDemoMessage) {
+  if (!props.collapseProcessAfterAnswer) return message.parts;
+  return message.parts.filter(
+    (part) => part.type !== 'reasoning' && part.type !== 'data-status',
+  );
+}
+
+function hasFinalText(message: ChatDemoMessage) {
+  return message.parts.some(
+    (part) =>
+      part.type === 'text' &&
+      (part.state === 'streaming' || part.state === 'done'),
+  );
+}
 
 function handleMarkdownClick(event: MouseEvent) {
   props.onMarkdownClick?.(event);
