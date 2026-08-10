@@ -12,7 +12,7 @@ import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { pipeUIMessageStreamToResponse } from 'ai';
 import { SkipTransform } from '@src/common/decorator/skip-transform.decorator';
-import { AuthGuard } from '@src/common/guard/auth';
+import { CompositeAuthOrSecretGuard } from '@src/common/guard/composite-auth';
 import { AgentChatSessionPageDto } from './dto/agent-chat.dto';
 import { AgentChatMemoryService } from './service/agent-chat-memory.service';
 import { AgentChatService } from './service/agent-chat.service';
@@ -21,7 +21,7 @@ import type { AgentChatRequest } from './type/agent-chat.type';
 /** 提供业务 Agent 多工具聊天、会话和消息接口。 */
 @ApiTags('业务 Agent Chat')
 @Controller('agent/chat')
-@UseGuards(AuthGuard)
+@UseGuards(CompositeAuthOrSecretGuard)
 export class AgentChatController {
   constructor(
     private readonly agentChatService: AgentChatService,

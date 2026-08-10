@@ -5,7 +5,14 @@
         <h2>{{ title }}</h2>
         <p>{{ loading ? '加载中' : `${sessions.length} 个会话` }}</p>
       </div>
-      <ApButton :disabled="loading" @click="emit('refresh')">刷新</ApButton>
+      <button
+        type="button"
+        class="chat-demo-refresh"
+        :disabled="loading"
+        @click="emit('refresh')"
+      >
+        刷新
+      </button>
     </div>
 
     <div class="chat-demo-history-list">
@@ -41,7 +48,6 @@
 </template>
 
 <script setup lang="ts">
-import { ApButton } from '@aplus-frontend/ui';
 import type { ChatDemoSessionItem } from '../types';
 
 const props = defineProps<{
@@ -83,9 +89,9 @@ function formatFallbackTime(value: string) {
   min-width: 0;
   min-height: 0;
   overflow: hidden;
-  border: 1px solid @border-color;
+  border: 1px solid var(--agent-chat-border-color, #d9d9d9);
   border-radius: 8px;
-  background: @card-bg-color;
+  background: var(--agent-chat-card-bg-color, #fff);
 }
 
 .chat-demo-history-head {
@@ -95,21 +101,37 @@ function formatFallbackTime(value: string) {
   justify-content: space-between;
   gap: 12px;
   padding: 14px;
-  border-bottom: 1px solid @border-color;
+  border-bottom: 1px solid var(--agent-chat-border-color, #d9d9d9);
 }
 
 .chat-demo-history-head h2 {
   margin: 0;
-  color: @text-primary-color;
+  color: var(--agent-chat-text-primary-color, #1f2329);
   font-size: 16px;
   line-height: 22px;
 }
 
 .chat-demo-history-head p {
   margin: 4px 0 0;
-  color: @text-secondary-color;
+  color: var(--agent-chat-text-secondary-color, #646a73);
   font-size: 12px;
   line-height: 18px;
+}
+
+.chat-demo-refresh {
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--agent-chat-border-color, #d9d9d9);
+  border-radius: 6px;
+  background: var(--agent-chat-card-bg-color, #fff);
+  color: var(--agent-chat-text-primary-color, #1f2329);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.chat-demo-refresh:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .chat-demo-history-list {
@@ -129,19 +151,19 @@ function formatFallbackTime(value: string) {
   border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
-  color: @text-primary-color;
+  color: var(--agent-chat-text-primary-color, #1f2329);
   text-align: left;
   cursor: pointer;
   gap: 6px;
 }
 
 .chat-demo-history-item:hover {
-  background: @fill-hover-color;
+  background: var(--agent-chat-fill-hover-color, #fafafa);
 }
 
 .chat-demo-history-item.active {
-  border-color: @green-color;
-  background: @green-disabled-color;
+  border-color: var(--agent-chat-green-color, #52c41a);
+  background: var(--agent-chat-green-disabled-color, #f6ffed);
 }
 
 .chat-demo-history-title {
@@ -155,7 +177,7 @@ function formatFallbackTime(value: string) {
 }
 
 .chat-demo-history-meta {
-  color: @text-secondary-color;
+  color: var(--agent-chat-text-secondary-color, #646a73);
   font-size: 12px;
   line-height: 18px;
 }
@@ -164,7 +186,7 @@ function formatFallbackTime(value: string) {
   display: grid;
   min-height: 160px;
   place-items: center;
-  color: @text-secondary-color;
+  color: var(--agent-chat-text-secondary-color, #646a73);
 }
 
 @media (width <= 900px) {

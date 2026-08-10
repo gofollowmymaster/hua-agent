@@ -1,11 +1,24 @@
 <template>
-  <section class="page chat-demo-page">
+  <section class="chat-demo-page">
     <div class="chat-demo-actions">
-      <ApButton type="primary" @click="startNewSession">新建会话</ApButton>
-      <ApButton v-if="busy" @click="stopChat">停止</ApButton>
-      <ApButton :disabled="busy && messages.length === 0" @click="clearChat">
+      <button
+        type="button"
+        class="chat-demo-action is-primary"
+        @click="startNewSession"
+      >
+        新建会话
+      </button>
+      <button v-if="busy" type="button" class="chat-demo-action" @click="stopChat">
+        停止
+      </button>
+      <button
+        type="button"
+        class="chat-demo-action"
+        :disabled="busy && messages.length === 0"
+        @click="clearChat"
+      >
         清空
-      </ApButton>
+      </button>
     </div>
 
     <div class="chat-demo-workspace">
@@ -33,7 +46,9 @@
 
         <div v-if="errorMessage" class="chat-demo-error" role="alert">
           <span>{{ errorMessage }}</span>
-          <ApButton type="link" @click="clearError">关闭</ApButton>
+          <button type="button" class="chat-demo-close" @click="clearError">
+            关闭
+          </button>
         </div>
 
         <ChatComposer
@@ -53,7 +68,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { ApButton } from '@aplus-frontend/ui';
 import { useChatDemo } from '../use-chat-demo';
 import ChatComposer from './chat-composer.vue';
 import ChatHistorySidebar from './chat-history-sidebar.vue';
@@ -104,6 +118,11 @@ const displayOptions = computed(() => ({
 
 <style lang="less" scoped>
 .chat-demo-page {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
   gap: 16px;
 }
 
@@ -111,6 +130,29 @@ const displayOptions = computed(() => ({
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+
+.chat-demo-action {
+  min-width: 72px;
+  height: 32px;
+  padding: 0 16px;
+  border: 1px solid var(--agent-chat-border-color, #d9d9d9);
+  border-radius: 6px;
+  background: var(--agent-chat-card-bg-color, #fff);
+  color: var(--agent-chat-text-primary-color, #1f2329);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.chat-demo-action.is-primary {
+  border-color: transparent;
+  background: var(--agent-chat-primary-color, #1677ff);
+  color: #fff;
+}
+
+.chat-demo-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .chat-demo-workspace {
@@ -127,9 +169,9 @@ const displayOptions = computed(() => ({
   min-width: 0;
   min-height: 0;
   overflow: hidden;
-  border: 1px solid @border-color;
+  border: 1px solid var(--agent-chat-border-color, #d9d9d9);
   border-radius: 8px;
-  background: @card-bg-color;
+  background: var(--agent-chat-card-bg-color, #fff);
 }
 
 .chat-demo-error {
@@ -138,10 +180,19 @@ const displayOptions = computed(() => ({
   align-items: center;
   justify-content: space-between;
   padding: 8px 14px;
-  border-top: 1px solid fade(@red-color, 30%);
-  background: @red-disabled-color;
-  color: @red-color;
+  border-top: 1px solid var(--agent-chat-red-border, rgb(255 77 79 / 30%));
+  background: var(--agent-chat-red-disabled-color, #fff2f0);
+  color: var(--agent-chat-red-color, #ff4d4f);
   gap: 12px;
+}
+
+.chat-demo-close {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--agent-chat-red-color, #ff4d4f);
+  font-size: 13px;
+  cursor: pointer;
 }
 
 @media (width <= 900px) {

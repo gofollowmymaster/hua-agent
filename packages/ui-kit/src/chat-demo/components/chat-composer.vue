@@ -11,21 +11,20 @@
     />
     <div class="chat-demo-composer-footer">
       <span class="chat-demo-state">{{ stateText }}</span>
-      <ApButton
-        type="primary"
-        html-type="submit"
-        :danger="busy"
+      <button
+        type="submit"
+        class="chat-demo-submit"
+        :class="{ 'is-danger': busy }"
         :disabled="buttonDisabled"
       >
         {{ buttonText }}
-      </ApButton>
+      </button>
     </div>
   </form>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { ApButton } from '@aplus-frontend/ui';
 
 const props = defineProps<{
   modelValue: string;
@@ -75,8 +74,8 @@ function handleInputKeydown(event: KeyboardEvent) {
 .chat-demo-composer {
   flex: 0 0 auto;
   padding: 14px;
-  border-top: 1px solid @border-color;
-  background: @card-bg-color;
+  border-top: 1px solid var(--agent-chat-border-color, #d9d9d9);
+  background: var(--agent-chat-card-bg-color, #fff);
 }
 
 .chat-demo-input {
@@ -84,23 +83,23 @@ function handleInputKeydown(event: KeyboardEvent) {
   min-height: 86px;
   max-height: 180px;
   padding: 10px 12px;
-  border: 1px solid @border-color;
+  border: 1px solid var(--agent-chat-border-color, #d9d9d9);
   border-radius: 8px;
   outline: none;
-  background: @card-bg-color;
-  color: @text-primary-color;
+  background: var(--agent-chat-card-bg-color, #fff);
+  color: var(--agent-chat-text-primary-color, #1f2329);
   line-height: 1.6;
   resize: vertical;
 }
 
 .chat-demo-input:focus {
-  border-color: @green-color;
-  box-shadow: 0 0 0 3px fade(@green-color, 16%);
+  border-color: var(--agent-chat-green-color, #52c41a);
+  box-shadow: 0 0 0 3px var(--agent-chat-focus-shadow, rgb(82 196 26 / 16%));
 }
 
 .chat-demo-input:disabled {
-  background: @fill-hover-color;
-  color: @text-tertiary-color;
+  background: var(--agent-chat-fill-hover-color, #fafafa);
+  color: var(--agent-chat-text-tertiary-color, #a6a6a6);
 }
 
 .chat-demo-composer-footer {
@@ -112,7 +111,28 @@ function handleInputKeydown(event: KeyboardEvent) {
 }
 
 .chat-demo-state {
-  color: @text-secondary-color;
+  color: var(--agent-chat-text-secondary-color, #646a73);
   font-size: 13px;
+}
+
+.chat-demo-submit {
+  min-width: 72px;
+  height: 32px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: var(--agent-chat-primary-color, #1677ff);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.chat-demo-submit.is-danger {
+  background: var(--agent-chat-red-color, #ff4d4f);
+}
+
+.chat-demo-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>

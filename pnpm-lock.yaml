@@ -583,6 +583,60 @@ importers:
         specifier: ^2.2.4
         version: 2.2.12(typescript@5.7.2)
 
+  packages/agent-chat-sdk:
+    devDependencies:
+      '@ai-sdk/vue':
+        specifier: 3.0.148
+        version: 3.0.148(vue@3.5.22(typescript@5.7.2))(zod@4.4.3)
+      '@aplus-sql/ui-kit':
+        specifier: workspace:*
+        version: link:../ui-kit
+      '@eslint/js':
+        specifier: 'catalog:'
+        version: 9.39.5
+      '@vitejs/plugin-vue':
+        specifier: ^5.2.1
+        version: 5.2.4(vite@7.1.12(@types/node@22.20.0)(jiti@2.6.1)(less@4.8.1)(terser@5.31.1)(yaml@2.9.0))(vue@3.5.22(typescript@5.7.2))
+      '@vue/test-utils':
+        specifier: ^2.4.6
+        version: 2.4.11(@vue/compiler-dom@3.5.39)(@vue/server-renderer@3.5.22(vue@3.5.22(typescript@5.7.2)))(vue@3.5.22(typescript@5.7.2))
+      ai:
+        specifier: 6.0.148
+        version: 6.0.148(zod@4.4.3)
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.5(jiti@2.6.1)
+      eslint-config-prettier:
+        specifier: 'catalog:'
+        version: 10.1.8(eslint@9.39.5(jiti@2.6.1))
+      eslint-plugin-vue:
+        specifier: 'catalog:'
+        version: 10.10.0(@typescript-eslint/parser@8.66.0(eslint@9.39.5(jiti@2.6.1))(typescript@5.7.2))(eslint@9.39.5(jiti@2.6.1))(vue-eslint-parser@10.4.1(eslint@9.39.5(jiti@2.6.1)))
+      happy-dom:
+        specifier: ^18.0.1
+        version: 18.0.1
+      md-editor-v3:
+        specifier: 6.5.3
+        version: 6.5.3(vue@3.5.22(typescript@5.7.2))
+      typescript:
+        specifier: 5.7.2
+        version: 5.7.2
+      typescript-eslint:
+        specifier: 'catalog:'
+        version: 8.66.0(eslint@9.39.5(jiti@2.6.1))(typescript@5.7.2)
+      vite:
+        specifier: 7.1.12
+        version: 7.1.12(@types/node@22.20.0)(jiti@2.6.1)(less@4.8.1)(terser@5.31.1)(yaml@2.9.0)
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/debug@4.1.12)(@types/node@22.20.0)(happy-dom@18.0.1)(jiti@2.6.1)(less@4.8.1)(terser@5.31.1)(yaml@2.9.0)
+      vue:
+        specifier: 3.5.22
+        version: 3.5.22(typescript@5.7.2)
+      vue-eslint-parser:
+        specifier: 'catalog:'
+        version: 10.4.1(eslint@9.39.5(jiti@2.6.1))
+
   packages/http-client:
     dependencies:
       axios:

@@ -14,10 +14,10 @@ defineProps<{
   max-width: 100%;
   margin: 0 0 8px;
   padding: 5px 8px;
-  border: 1px solid @border-color;
+  border: 1px solid var(--agent-chat-border-color, #d9d9d9);
   border-radius: 6px;
-  background: @fill-hover-color;
-  color: @text-secondary-color;
+  background: var(--agent-chat-fill-hover-color, #fafafa);
+  color: var(--agent-chat-text-secondary-color, #646a73);
   font-size: 12px;
   line-height: 18px;
   overflow-wrap: anywhere;

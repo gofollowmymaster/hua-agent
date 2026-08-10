@@ -1,0 +1,50 @@
+{
+  "name": "aplus-agent-chat",
+  "version": "0.0.0",
+  "description": "Framework-agnostic Agent Chat Web Component for Aplus business agents.",
+  "private": false,
+  "type": "module",
+  "main": "./dist/aplus-agent-chat.umd.cjs",
+  "module": "./dist/aplus-agent-chat.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/aplus-agent-chat.js",
+      "require": "./dist/aplus-agent-chat.umd.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "build": "vite build && cp types/index.d.ts dist/index.d.ts",
+    "test": "vitest run",
+    "lint:check": "eslint \"src/**/*.{ts,vue}\" \"tests/**/*.ts\""
+  },
+  "devDependencies": {
+    "@aplus-sql/ui-kit": "workspace:*",
+    "@ai-sdk/vue": "3.0.148",
+    "@eslint/js": "catalog:",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/test-utils": "^2.4.6",
+    "ai": "6.0.148",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "eslint-plugin-vue": "catalog:",
+    "happy-dom": "^18.0.1",
+    "md-editor-v3": "6.5.3",
+    "typescript": "5.7.2",
+    "typescript-eslint": "catalog:",
+    "vite": "7.1.12",
+    "vitest": "^3.2.4",
+    "vue": "3.5.22",
+    "vue-eslint-parser": "catalog:"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
