@@ -15,7 +15,9 @@
 - `knowledge/document-manager/index.vue`：RAG 文档管理。
 - `knowledge/session-records/index.vue`：会话与消息记录查看。
 - `knowledge/assistant-demo/index.vue`：助手演示页面。
-- `business-agent/knowledge|skills|sessions|config|demo/index.vue`：业务 Agent 骨架占位页面。
+- `business-agent/knowledge/index.vue`：业务知识库管理。
+- `business-agent/demo/index.vue`：多工具 Agent 聊天演示。
+- `business-agent/skills|sessions|config/index.vue`：业务 Agent 骨架占位页面。
 
 模块公共展示组件位于对应页面目录的 `components/`，业务弹窗、抽屉和页面区块位于 `sections/`；跨页面复用的展示组件位于 `src/components/`，例如文档预览弹窗。
 

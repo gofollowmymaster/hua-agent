@@ -122,7 +122,7 @@ export const routes: RouteRecordRaw[] = [
             meta: {
               title: '演示 Demo',
               menuTitle: '演示 Demo',
-              subtitle: '业务 Agent 模块骨架。',
+              subtitle: '体验业务 Agent 多工具对话与历史会话。',
             },
           },
         ],

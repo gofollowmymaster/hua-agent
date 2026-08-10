@@ -24,7 +24,7 @@
 - `apps/api/src/manage/`：管理类业务。
 - `apps/api/src/robot/`：飞书机器人消息与表格操作入口。
 - `apps/api/src/ai/`：AI、Aily、日志操作相关能力。
-- `apps/api/src/agent/`：业务 Agent 独立业务域入口，当前为模块骨架。
+- `apps/api/src/agent/`：业务 Agent 独立业务域入口，承载知识库与多工具 Chat。
 - `apps/api/src/admin/`：管理后台相关能力，如缓存和管理表格。
 - `apps/api/src/doc/`：文档、知识库、文档检查相关能力。
 - `apps/api/src/alert/`：告警、Sentry webhook、飞书事件回调、告警统计与清理。
