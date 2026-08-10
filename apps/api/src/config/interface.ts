@@ -26,6 +26,13 @@ export type RagRetrievalConfig = {
   rerankTopN: number;
 };
 
+export type AgentKnowledgeConfig = {
+  docsDir: string;
+  chunkSize: number;
+  chunkOverlap: number;
+  embeddingBatchSize: number;
+};
+
 export type WecomRagBotConfig = {
   enabled: boolean;
   botId: string;
@@ -72,6 +79,7 @@ export type GlobalConfigType = {
   rerankTimeoutMs: number;
 
   vcHelper: RagConfig;
+  agentKnowledge: AgentKnowledgeConfig;
 
   feishuTables: {
     //报警表格相关

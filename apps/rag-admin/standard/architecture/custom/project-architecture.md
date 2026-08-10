@@ -36,7 +36,7 @@
 
 ## 与 API app 的关系
 
-RAG Admin 开发态通过 Vite proxy 将 `/ai` 请求转发到 API 后端。生产态构建产物输出到 `apps/api/public/rag-admin`，由 API app 的静态资源服务提供访问。
+RAG Admin 开发态通过 Vite proxy 将 `/api` 请求转发到 API 后端并去掉 `/api` 前缀。生产态构建产物输出到 `apps/api/public/rag-admin`，由 API app 的静态资源服务提供访问。
 
 前端与后端通过 HTTP API 契约协作，不直接 import `apps/api/src` 内部实现。
 

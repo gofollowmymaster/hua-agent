@@ -79,6 +79,12 @@ const globalConfig: GlobalConfigType = Object.freeze({
       rerankTopN: maxNumberEnv('RAG_RERANK_TOP_N', 30, 100),
     },
   },
+  agentKnowledge: {
+    docsDir: process.env.AGENT_DOCS_DIR ?? 'src/agent/docs',
+    chunkSize: numberEnv('AGENT_CHUNK_SIZE', 800),
+    chunkOverlap: numberEnv('AGENT_CHUNK_OVERLAP', 120),
+    embeddingBatchSize: maxNumberEnv('AGENT_EMBEDDING_BATCH_SIZE', 10, 10),
+  },
 
   feishuTables: {
     //报警表格相关

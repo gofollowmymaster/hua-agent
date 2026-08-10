@@ -32,6 +32,7 @@
     "pmd": "prisma migrate dev --schema prisma/schema.prisma",
     "pmSdo": "prisma studio --schema prisma/schema.prisma",
     "rag:db:init": "pnpm env:dev -- node scripts/rag-db-init.mjs",
+    "agent:ingest": "pnpm env:dev -- ts-node -r tsconfig-paths/register scripts/agent-knowledge-ingest.ts",
     "test": "jest",
     "test:cov": "jest --coverage"
   },

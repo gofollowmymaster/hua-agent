@@ -24,13 +24,15 @@ export interface PreviewDocumentItem {
   fileType: string;
 }
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+
 export function createChatSession(id: string, participantId: string) {
   const userStore = useUserStore();
 
   return new Chat<RagAssistantMessage>({
     id,
     transport: new DefaultChatTransport({
-      api: '/ai/rag/chat',
+      api: `${apiBaseUrl}/ai/rag/chat`,
       headers: () => {
         const token = userStore.token || getToken();
         const headers: Record<string, string> = {};
@@ -83,7 +85,7 @@ export function resolvePreviewDocument(segment: {
   label: string;
 }) {
   const match = segment.href.match(
-    /^\/ai\/rag\/admin\/documents\/([^/]+)\/preview$/,
+    /^\/(?:api\/)?ai\/rag\/admin\/documents\/([^/]+)\/preview$/,
   );
   if (!match) return null;
 

@@ -94,7 +94,7 @@ pnpm admin:stylelint:check
 - dev server 端口：`5174`
 - 路径别名：`@` → `src`
 - 构建输出：`../api/public/rag-admin`
-- proxy：`/ai` → `VITE_API_PROXY_TARGET`
+- proxy：`/api` → `VITE_API_PROXY_TARGET`（转发时去掉 `/api` 前缀）
 
 生产构建产物由 API app 的静态资源服务提供访问。修改 `base`、`outDir`、proxy 或静态资源路径时，必须同时检查 API app 文档、根 `AGENTS.md` 和 `docs/ai-governance/README.md`。
 

@@ -51,6 +51,56 @@ model AplusChunk {
   @@map("aplus_chunks")
 }
 
+model AgentDocument {
+  id             BigInt       @id @default(autoincrement())
+  tenantCode     String       @map("tenant_code") @db.Text
+  category       String       @map("category") @db.Text
+  sourcePath     String       @map("source_path") @db.Text
+  fileName       String       @map("file_name") @db.Text
+  fileType       String       @map("file_type") @db.Text
+  fileHash       String       @map("file_hash") @db.Text
+  fileSize       BigInt       @map("file_size")
+  chunkCount     Int          @default(0) @map("chunk_count")
+  status         String       @default("ready") @db.Text
+  error          String?      @db.Text
+  metadata       Json         @default("{}") @db.JsonB
+  remoteUrl      String?      @map("remote_url") @db.Text
+  docId          String?      @map("doc_id") @db.Text
+  wikiNodeId     String?      @map("wiki_node_id") @db.Text
+  lastModifiedAt String?      @map("last_modified_at") @db.Text
+  breadcrumb     String?      @map("breadcrumb") @db.Text
+  sourceType     String?      @map("source_type") @db.Text
+  currentVersion String?      @map("current_version") @db.Text
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime     @default(now()) @map("updated_at") @db.Timestamptz(6)
+  ingestedAt     DateTime?    @map("ingested_at") @db.Timestamptz(6)
+  chunks         AgentChunk[]
+
+  @@unique([tenantCode, sourcePath])
+  @@unique([tenantCode, fileHash], map: "agent_documents_tenant_code_file_hash_key")
+  @@index([tenantCode], map: "idx_agent_documents_tenant_code")
+  @@index([tenantCode, category], map: "idx_agent_documents_tenant_category")
+  @@map("agent_documents")
+}
+
+model AgentChunk {
+  id         BigInt                @id @default(autoincrement())
+  tenantCode String                @map("tenant_code") @db.Text
+  documentId BigInt                @map("document_id")
+  chunkIndex Int                   @map("chunk_index")
+  content    String                @db.Text
+  metadata   Json                  @default("{}") @db.JsonB
+  embedding  Unsupported("vector")
+  createdAt  DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  document   AgentDocument         @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantCode, documentId, chunkIndex])
+  @@index([tenantCode], map: "idx_agent_chunks_tenant_code")
+  @@index([documentId], map: "idx_agent_chunks_document_id")
+  @@index([tenantCode, documentId], map: "idx_agent_chunks_tenant_document")
+  @@map("agent_chunks")
+}
+
 model AplusRagSession {
   id               BigInt            @id @default(autoincrement())
   tenantCode       String            @map("tenant_code") @db.Text

@@ -1,5 +1,17 @@
 import { Module } from '@nestjs/common';
+import { AgentKnowledgeController } from './knowledge/agent-knowledge.controller';
+import { AgentKnowledgeService } from './knowledge/agent-knowledge.service';
+import { AgentKnowledgeIngestService } from './knowledge/service/agent-knowledge-ingest.service';
+import { AgentKnowledgeSearchService } from './knowledge/service/agent-knowledge-search.service';
 
 /** 业务 Agent 独立业务域入口，后续承载知识库、skill、会话、配置与演示能力。 */
-@Module({})
+@Module({
+  controllers: [AgentKnowledgeController],
+  providers: [
+    AgentKnowledgeService,
+    AgentKnowledgeIngestService,
+    AgentKnowledgeSearchService,
+  ],
+  exports: [AgentKnowledgeIngestService],
+})
 export class AgentModule {}

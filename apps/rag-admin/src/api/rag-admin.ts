@@ -60,6 +60,59 @@ export interface RagDocumentUploadResult {
   files: RagDocumentUploadFileResult[];
 }
 
+export interface AgentKnowledgeDocumentItem {
+  id: string | number;
+  tenantCode: string;
+  category: string;
+  sourcePath: string;
+  fileName: string;
+  fileType: string;
+  fileHash: string;
+  fileSize: string | number;
+  chunkCount: number;
+  actualChunkCount: number;
+  status: string;
+  error?: string;
+  metadata: Record<string, unknown>;
+  remoteUrl?: string | null;
+  docId?: string | null;
+  wikiNodeId?: string | null;
+  lastModifiedAt?: string | null;
+  breadcrumb?: string | null;
+  sourceType?: string | null;
+  currentVersion?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  ingestedAt?: string | null;
+}
+
+export interface AgentKnowledgeSearchHit {
+  id: string | number;
+  documentId: string | number;
+  tenantCode: string;
+  category: string;
+  chunkIndex: number;
+  content: string;
+  metadata: Record<string, unknown>;
+  score: number;
+  fileName: string;
+  sourcePath: string;
+  remoteUrl?: string | null;
+  docId?: string | null;
+  wikiNodeId?: string | null;
+  lastModifiedAt?: string | null;
+  breadcrumb?: string | null;
+  sourceType?: string | null;
+  currentVersion?: string | null;
+}
+
+export interface AgentKnowledgeSearchParams {
+  query: string;
+  mode?: 'fulltext' | 'vector' | 'hybrid';
+  category?: string;
+  topK?: number;
+}
+
 export interface RagSessionItem {
   id: string | number;
   channel: string;
@@ -145,6 +198,37 @@ export function pageDocumentChunks(
 
 export function ingestDocuments(force: boolean) {
   return post('/ai/rag/admin/ingest', { force });
+}
+
+export function pageAgentKnowledgeDocuments(
+  params: Record<string, unknown>,
+) {
+  return get<PageResult<AgentKnowledgeDocumentItem>>(
+    '/agent/knowledge/documents',
+    { params: normalizeGridPageParams(params) },
+  );
+}
+
+export async function pageAgentKnowledgeDocumentsGrid(
+  params: Record<string, unknown>,
+) {
+  const result = await pageAgentKnowledgeDocuments(params);
+  return {
+    records: result.list,
+    total: result.total,
+  } satisfies GridPageResult<AgentKnowledgeDocumentItem>;
+}
+
+export function ingestAgentKnowledge(force: boolean) {
+  return post('/agent/knowledge/ingest', { force });
+}
+
+export function deleteAgentKnowledgeDocument(id: string | number) {
+  return del(`/agent/knowledge/documents/${id}`);
+}
+
+export function searchAgentKnowledge(params: AgentKnowledgeSearchParams) {
+  return post<AgentKnowledgeSearchHit[]>('/agent/knowledge/search', params);
 }
 
 export function pageSessions(params: Record<string, unknown>) {

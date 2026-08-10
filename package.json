@@ -33,6 +33,7 @@
     "test": "pnpm --filter @aplus-sql/api test",
     "test:cov": "pnpm --filter @aplus-sql/api test:cov",
     "rag:db:init": "pnpm --filter @aplus-sql/api rag:db:init",
+    "agent:ingest": "pnpm --filter @aplus-sql/api agent:ingest",
     "admin:dev": "pnpm --filter @aplus-sql/rag-admin dev",
     "admin:build": "pnpm --filter @aplus-sql/rag-admin build",
     "admin:preview": "pnpm --filter @aplus-sql/rag-admin preview",

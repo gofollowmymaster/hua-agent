@@ -12,7 +12,7 @@
 - `base`：`/public/rag-admin/`。
 - 构建输出：`../api/public/rag-admin`。
 - dev server 端口：`5174`。
-- proxy：`/ai` 转发到 `VITE_API_PROXY_TARGET`，默认 `http://localhost:3000`。
+- proxy：`/api` 转发到 `VITE_API_PROXY_TARGET` 并去掉 `/api` 前缀，默认 `http://localhost:3000`。
 
 ## 环境变量
 

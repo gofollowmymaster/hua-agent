@@ -80,7 +80,8 @@ export const routes: RouteRecordRaw[] = [
             meta: {
               title: '业务知识库管理',
               menuTitle: '业务知识库管理',
-              subtitle: '业务 Agent 模块骨架。',
+              subtitle:
+                '查看、维护已入库的业务 Agent 文档，并可触发 docs 目录重新入库。',
             },
           },
           {
