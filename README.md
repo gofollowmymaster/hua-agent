@@ -46,6 +46,21 @@ API environment files live in `apps/api/.env*`. RAG admin environment files live
 $ pnpm install
 ```
 
+## Pipeline publishing
+
+Install dependencies and build all apps from the repository root:
+
+```bash
+$ pnpm install --frozen-lockfile
+$ pnpm build
+```
+
+`pnpm build` runs the dev build for the API and both admin consoles. Build artifacts are written to:
+
+- `apps/api/dist` for the API
+- `apps/api/public/rag-admin` for RAG Admin
+- `apps/api/public/global-admin` for Global Admin
+
 ## Running the app
 
 ```bash

@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "build": "pnpm -r --filter './apps/*' run build:dev",
     "build:dev": "pnpm --filter @aplus-sql/api build:dev",
     "build:test": "pnpm --filter @aplus-sql/api build:test",
     "build:prod": "pnpm --filter @aplus-sql/api build:prod",
