@@ -18225,7 +18225,7 @@ const x4 = ["open"], E4 = { class: "chat-demo-reasoning-content" }, k4 = /* @__P
       ], 2))), 128))
     ], 512));
   }
-}), T4 = /* @__PURE__ */ mr(I4, [["__scopeId", "data-v-91b001d8"]]), F4 = { class: "chat-demo-page" }, z4 = { class: "chat-demo-actions" }, M4 = ["disabled"], P4 = { class: "chat-demo-workspace" }, R4 = { class: "chat-demo-shell" }, j4 = {
+}), T4 = /* @__PURE__ */ mr(I4, [["__scopeId", "data-v-e22e12f0"]]), F4 = { class: "chat-demo-page" }, z4 = { class: "chat-demo-actions" }, M4 = ["disabled"], P4 = { class: "chat-demo-workspace" }, R4 = { class: "chat-demo-shell" }, j4 = {
   key: 0,
   class: "chat-demo-error",
   role: "alert"

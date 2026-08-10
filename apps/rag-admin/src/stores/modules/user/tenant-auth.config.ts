@@ -88,7 +88,7 @@ const tenantAuthDefinitions: readonly TenantAuthDefinition[] = [
 ];
 
 const defaultTenant = tenantAuthDefinitions.find(
-  ({ supplierCode }) => supplierCode === 'C'
+  ({ supplierCode }) => supplierCode === 'D'
 )!;
 
 export function resolveAuthEnv(authEnv?: string, viteMode?: string): AuthEnv {

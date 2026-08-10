@@ -145,6 +145,12 @@ watch(
   overflow-wrap: anywhere;
 }
 
+.chat-demo-markdown {
+  --md-bk-color: transparent;
+
+  background-color: transparent;
+}
+
 .chat-demo-markdown :deep(.md-editor-preview-wrapper) {
   padding: 0;
   background: transparent;
