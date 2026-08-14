@@ -183,11 +183,12 @@ export class AgentChatService {
   private buildToolResultStatus(
     toolCall: AgentChatToolCallRecord,
   ): Record<string, unknown> {
-    const message = this.buildToolResultMessage(toolCall);
     return {
       stage: 'tool_result',
       tool: toolCall.name,
-      message,
+      message: this.buildToolResultMessage(toolCall),
+      arguments: toolCall.arguments,
+      result: toolCall.result,
     };
   }
 
@@ -256,6 +257,7 @@ export class AgentChatService {
       const value = JSON.parse(result);
       return Array.isArray(value) ? value : null;
     } catch {
+      console.log('[ parseJsonArray result ] >', result);
       return null;
     }
   }
@@ -268,6 +270,8 @@ export class AgentChatService {
         ? (value as Record<string, unknown>)
         : null;
     } catch {
+      console.log('[ parseJsonObject result ] >', result);
+
       return null;
     }
   }

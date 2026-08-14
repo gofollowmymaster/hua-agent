@@ -66,7 +66,6 @@ export class AplusAgentChatElement extends HTMLElement {
         emptyDescription:
           this.getAttribute('empty-description') ||
           'Agent 会调用知识库和通用工具，以流式方式返回答案。',
-        collapseProcessAfterAnswer: true,
       },
     };
     this.app = createApp(AgentChatHost, {

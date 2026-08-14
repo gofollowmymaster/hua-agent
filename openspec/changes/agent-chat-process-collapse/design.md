@@ -6,21 +6,23 @@
 
 **Goals:**
 
-- 在流协议层面区分过程信息与最终结果。
-- 最终答案开始输出后自动收起过程信息，保留可展开入口。
-- 业务 Agent 所有入口（RAG Admin Demo 与 Web Component）行为一致。
+- 所有消息 part 按流式或历史返回的原始顺序展示。
+- reasoning、工具过程与最终答案全部保持展开，不折叠。
+- 业务 Agent 与知识问答 Demo 行为一致。
+- 历史会话展示已持久化的工具状态。
 
 **Non-Goals:**
 
-- 不把过程信息写入 DB，历史会话仍只返回最终答案。
+- 不新增 DB 字段；工具过程复用已持久化的 `toolCalls`，reasoning 与阶段状态不额外持久化。
 - 不新增 `process` 自定义流事件。
 
 ## Decisions
 
 - **复用 AI SDK reasoning 协议**：`AgentChatAgentService` 抽取模型 `reasoning_content` / `reasoning` 内容块并产出 `reasoning_delta`；`AgentChatService` 包装为 `reasoning-start/delta/end`。
 - **工具结果摘要使用 data-status**：`tool_end` 时对 `search_knowledge`、`get_document`、`get_document_chunks` 生成文档名或切片数摘要，解析失败回退通用文案。
-- **前端按 part 类型分组**：`ChatDemoOptions.collapseProcessAfterAnswer` 开启后，`reasoning` + `data-status` 进入同一个 `details` 过程区块；最终 `text` part 进入 `streaming` 即收起。
-- **默认只影响业务 Agent**：RAG Admin 业务 Agent Demo 与 SDK host 开启该选项，知识问答不开启。
+- **data-status 统一渲染**：所有 stage 均通过通用状态卡展示，文案由 `formatStatus` 生成；`tool_result` 额外内联展示工具入参与输出。
+- **历史会话复用 toolCalls**：RAG Admin 与 SDK 的 `toUiMessages` 把 `toolCalls` 映射为 `tool_result` 过程 part，按顺序出现在最终答案前。
+- **前端直接遍历 message.parts**：不引入过程分组，不保留折叠选项，reasoning 使用始终展开的普通区块。
 
 ## Risks / Trade-offs
 
@@ -30,9 +32,9 @@
 ## Migration Plan
 
 1. 后端增加 reasoning 抽取和工具摘要，同步更新类型与单测。
-2. UI Kit 增加可折叠过程区块与测试。
-3. 业务 Agent Demo 与 SDK 开启默认折叠。
-4. 运行 API、UI Kit、SDK 和 RAG Admin 验证。
+2. UI Kit 改为按原始顺序渲染并移除折叠组件与选项。
+3. 历史会话 adapter 恢复工具过程并补充测试。
+4. 更新 OpenSpec 与全部验证。
 
 ## Open Questions
 

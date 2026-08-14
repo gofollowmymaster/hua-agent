@@ -1,8 +1,8 @@
 <template>
-  <details class="chat-demo-reasoning" :open="state === 'streaming'">
-    <summary>思考摘要</summary>
+  <div class="chat-demo-reasoning">
+    <div class="chat-demo-reasoning-label">思考过程</div>
     <div class="chat-demo-reasoning-content">{{ text }}</div>
-  </details>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -21,13 +21,12 @@ defineProps<{
   color: var(--agent-chat-text-secondary-color, #646a73);
 }
 
-.chat-demo-reasoning summary {
+.chat-demo-reasoning-label {
   width: fit-content;
   padding: 4px 10px;
   color: var(--agent-chat-text-secondary-color, #646a73);
   font-size: 13px;
   font-weight: 600;
-  cursor: pointer;
 }
 
 .chat-demo-reasoning-content {

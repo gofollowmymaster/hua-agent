@@ -14,7 +14,21 @@ const message = {
     },
     {
       type: 'data-status',
-      data: { message: '检索到 2 个文档' },
+      data: { stage: 'analyze_start', message: '开始分析问题' },
+    },
+    {
+      type: 'data-status',
+      data: {
+        stage: 'tool_result',
+        tool: 'search_knowledge',
+        message: '检索到 1 个相关文档',
+        arguments: { query: '退货流程' },
+        result: JSON.stringify([{ fileName: '退货流程.md' }]),
+      },
+    },
+    {
+      type: 'data-status',
+      data: { stage: 'done', message: '生成完成' },
     },
     {
       type: 'text',
@@ -24,13 +38,14 @@ const message = {
   ],
 } as ChatDemoMessage;
 
-function mountList(collapseProcessAfterAnswer: boolean) {
+function mountList() {
   return mount(ChatMessageList, {
     props: {
       messages: [message],
       formatStatus: (data) =>
-        (data as { message?: string }).message || '状态更新',
-      collapseProcessAfterAnswer,
+        (data as { stage?: string; message?: string }).message ||
+        (data as { stage?: string }).stage ||
+        '状态更新',
     },
     global: {
       stubs: {
@@ -43,24 +58,35 @@ function mountList(collapseProcessAfterAnswer: boolean) {
   });
 }
 
-describe('ChatMessageList process grouping', () => {
-  it('groups process parts into a collapsible block when enabled', () => {
-    const wrapper = mountList(true);
+describe('ChatMessageList', () => {
+  it('renders reasoning, all data-status stages and text in original order', () => {
+    const wrapper = mountList();
+    const contentOrder = wrapper
+      .findAll(
+        '.chat-demo-reasoning-content, .chat-demo-status-card, .chat-demo-tool-output pre, .chat-demo-text',
+      )
+      .map((element) => element.text());
 
-    expect(wrapper.find('.chat-demo-process').exists()).toBe(true);
-    expect(wrapper.find('.chat-demo-process').text()).toContain('先检索知识库');
-    expect(wrapper.find('.chat-demo-process').text()).toContain(
-      '检索到 2 个文档',
-    );
-    expect(wrapper.text()).toContain('最终答案');
+    expect(contentOrder).toEqual([
+      '先检索知识库',
+      '开始分析问题',
+      '检索到 1 个相关文档',
+      expect.stringContaining('"query"'),
+      expect.stringContaining('"fileName"'),
+      '生成完成',
+      '最终答案',
+    ]);
   });
 
-  it('keeps legacy rendering when disabled', () => {
-    const wrapper = mountList(false);
+  it('keeps tool input and output inline without folding', () => {
+    const wrapper = mountList();
 
+    expect(wrapper.find('.chat-demo-tool-output').exists()).toBe(true);
+    expect(wrapper.text()).toContain('工具入参');
+    expect(wrapper.text()).toContain('工具输出');
+    expect(wrapper.text()).toContain('"query"');
+    expect(wrapper.text()).toContain('"fileName"');
     expect(wrapper.find('.chat-demo-process').exists()).toBe(false);
-    expect(wrapper.find('.chat-demo-reasoning').exists()).toBe(true);
-    expect(wrapper.find('.chat-demo-status-card').exists()).toBe(true);
-    expect(wrapper.text()).toContain('最终答案');
+    expect(wrapper.find('details').exists()).toBe(false);
   });
 });

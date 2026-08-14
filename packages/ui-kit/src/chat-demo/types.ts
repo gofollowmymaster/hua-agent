@@ -33,6 +33,8 @@ export interface ChatDemoStatusData {
   message?: string;
   tool?: string;
   chunks?: number;
+  arguments?: Record<string, unknown>;
+  result?: string;
   [key: string]: unknown;
 }
 
@@ -64,5 +66,4 @@ export interface ChatDemoOptions {
   historyTitle?: string;
   emptyTitle?: string;
   emptyDescription?: string;
-  collapseProcessAfterAnswer?: boolean;
 }

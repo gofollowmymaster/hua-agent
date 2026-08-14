@@ -1,5 +1,10 @@
 <template>
-  <div ref="messagePaneRef" class="chat-demo-messages" role="log" aria-live="polite">
+  <div
+    ref="messagePaneRef"
+    class="chat-demo-messages"
+    role="log"
+    aria-live="polite"
+  >
     <div v-if="messages.length === 0" class="chat-demo-empty">
       <h2>{{ emptyTitle }}</h2>
       <p>{{ emptyDescription }}</p>
@@ -15,21 +20,12 @@
         {{ message.role === 'user' ? userLabel : assistantName }}
       </div>
       <div class="chat-demo-message-body">
-        <ChatProcessBlock
-          v-if="
-            collapseProcessAfterAnswer && getProcessParts(message).length > 0
-          "
-          :key="`${message.id}-process`"
-          :parts="getProcessParts(message)"
-          :open="!hasFinalText(message)"
-          :format-status="formatStatus"
-        />
         <template
-          v-for="(part, index) in getVisibleParts(message)"
+          v-for="(part, index) in message.parts"
           :key="`${message.id}-${index}`"
         >
           <ChatReasoningBlock
-            v-if="!collapseProcessAfterAnswer && part.type === 'reasoning'"
+            v-if="part.type === 'reasoning'"
             :state="part.state"
             :text="part.text"
           />
@@ -44,12 +40,25 @@
               @click.capture="handleMarkdownClick"
             />
           </div>
-          <ChatStatusCard
-            v-else-if="
-              !collapseProcessAfterAnswer && part.type === 'data-status'
-            "
-            :text="formatStatus(part.data)"
-          />
+          <template v-else-if="part.type === 'data-status'">
+            <ChatStatusCard :text="formatStatus(part.data)" />
+            <template v-if="part.data?.stage === 'tool_result'">
+              <div
+                v-if="hasToolArguments(part.data)"
+                class="chat-demo-tool-output"
+              >
+                <div class="chat-demo-tool-output-label">工具入参</div>
+                <pre>{{ formatJson(part.data?.arguments) }}</pre>
+              </div>
+              <div
+                v-if="part.data?.result !== undefined"
+                class="chat-demo-tool-output"
+              >
+                <div class="chat-demo-tool-output-label">工具输出</div>
+                <pre>{{ formatToolOutput(part.data?.result) }}</pre>
+              </div>
+            </template>
+          </template>
         </template>
       </div>
     </article>
@@ -60,10 +69,9 @@
 import { nextTick, ref, watch } from 'vue';
 import { MdPreview } from 'md-editor-v3';
 import 'md-editor-v3/lib/preview.css';
-import ChatProcessBlock from './chat-process-block.vue';
 import ChatReasoningBlock from './chat-reasoning-block.vue';
 import ChatStatusCard from './chat-status-card.vue';
-import type { ChatDemoMessage } from '../types';
+import type { ChatDemoMessage, ChatDemoStatusData } from '../types';
 
 const props = defineProps<{
   messages: ChatDemoMessage[];
@@ -73,31 +81,31 @@ const props = defineProps<{
   emptyTitle?: string;
   emptyDescription?: string;
   autoScrollKey?: string;
-  collapseProcessAfterAnswer?: boolean;
   onMarkdownClick?: (event: MouseEvent) => void;
 }>();
 
 const messagePaneRef = ref<HTMLElement>();
 
-function getProcessParts(message: ChatDemoMessage) {
-  return message.parts.filter(
-    (part) => part.type === 'reasoning' || part.type === 'data-status',
-  );
+function hasToolArguments(data?: ChatDemoStatusData) {
+  return data?.arguments !== undefined && Object.keys(data.arguments).length > 0;
 }
 
-function getVisibleParts(message: ChatDemoMessage) {
-  if (!props.collapseProcessAfterAnswer) return message.parts;
-  return message.parts.filter(
-    (part) => part.type !== 'reasoning' && part.type !== 'data-status',
-  );
+function formatJson(value: unknown) {
+  if (value === undefined) return '';
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return String(value);
+  }
 }
 
-function hasFinalText(message: ChatDemoMessage) {
-  return message.parts.some(
-    (part) =>
-      part.type === 'text' &&
-      (part.state === 'streaming' || part.state === 'done'),
-  );
+function formatToolOutput(result?: string) {
+  if (result === undefined) return '';
+  try {
+    return JSON.stringify(JSON.parse(result), null, 2);
+  } catch {
+    return result;
+  }
 }
 
 function handleMarkdownClick(event: MouseEvent) {
@@ -234,6 +242,31 @@ watch(
 .chat-demo-message--user .chat-demo-text {
   border-color: var(--agent-chat-green-color, #52c41a);
   background: var(--agent-chat-green-disabled-color, #f6ffed);
+}
+
+.chat-demo-tool-output {
+  margin: 0 0 10px;
+}
+
+.chat-demo-tool-output-label {
+  margin: 6px 0 4px;
+  color: var(--agent-chat-text-tertiary-color, #a6a6a6);
+  font-size: 12px;
+}
+
+.chat-demo-tool-output pre {
+  max-height: 320px;
+  margin: 0;
+  padding: 8px;
+  overflow: auto;
+  border: 1px solid var(--agent-chat-border-color, #d9d9d9);
+  border-radius: 6px;
+  background: var(--agent-chat-fill-hover-color, #fafafa);
+  color: var(--agent-chat-text-primary-color, #1f2329);
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 @media (width <= 900px) {

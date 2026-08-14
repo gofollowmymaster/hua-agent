@@ -168,6 +168,110 @@ describe('AgentChatAgentService', () => {
     ]);
   });
 
+  it('normalizes JSON string inputs and LangChain serialized outputs', async () => {
+    mockStream.mockResolvedValue(
+      (async function* () {
+        yield [
+          'tools',
+          {
+            event: 'on_tool_start',
+            name: 'search_knowledge',
+            toolCallId: 'call-1',
+            input: JSON.stringify({ query: '退货流程' }),
+          },
+        ];
+        yield [
+          'tools',
+          {
+            event: 'on_tool_end',
+            name: 'search_knowledge',
+            toolCallId: 'call-1',
+            output: {
+              lc: 1,
+              type: 'constructor',
+              id: ['langchain_core', 'messages', 'ToolMessage'],
+              kwargs: {
+                content: JSON.stringify([{ fileName: '退货流程.md' }]),
+              },
+            },
+          },
+        ];
+      })(),
+    );
+
+    const service = new AgentChatAgentService(
+      toolService as unknown as AgentChatToolService,
+    );
+    const events: unknown[] = [];
+    for await (const event of service.stream([])) {
+      events.push(event);
+    }
+
+    expect(events[0]).toMatchObject({
+      type: 'tool_start',
+      arguments: { query: '退货流程' },
+    });
+    expect(events[1]).toMatchObject({
+      type: 'tool_end',
+      arguments: { query: '退货流程' },
+      result: '[{"fileName":"退货流程.md"}]',
+    });
+  });
+
+  it('keeps tool args captured from tool_call_chunks', async () => {
+    mockStream.mockResolvedValue(
+      (async function* () {
+        yield [
+          'messages',
+          [
+            {
+              tool_call_chunks: [
+                { id: 'call-1', args: '{"query":"退货流程"}' },
+              ],
+              content: '',
+            },
+            {},
+          ],
+        ];
+        yield [
+          'tools',
+          {
+            event: 'on_tool_start',
+            name: 'search_knowledge',
+            toolCallId: 'call-1',
+          },
+        ];
+        yield [
+          'tools',
+          {
+            event: 'on_tool_end',
+            name: 'search_knowledge',
+            toolCallId: 'call-1',
+            output: '[{"fileName":"退货流程.md"}]',
+          },
+        ];
+      })(),
+    );
+
+    const service = new AgentChatAgentService(
+      toolService as unknown as AgentChatToolService,
+    );
+    const events: unknown[] = [];
+    for await (const event of service.stream([])) {
+      events.push(event);
+    }
+
+    expect(events[0]).toMatchObject({
+      type: 'tool_start',
+      arguments: { query: '退货流程' },
+    });
+    expect(events[1]).toMatchObject({
+      type: 'tool_end',
+      arguments: { query: '退货流程' },
+      result: '[{"fileName":"退货流程.md"}]',
+    });
+  });
+
   it('records tool errors as tool_end results', async () => {
     mockStream.mockResolvedValue(
       (async function* () {

@@ -40,7 +40,6 @@
           :user-label="displayOptions.userLabel"
           :empty-title="displayOptions.emptyTitle"
           :empty-description="displayOptions.emptyDescription"
-          :collapse-process-after-answer="displayOptions.collapseProcessAfterAnswer"
           :auto-scroll-key="autoScrollKey"
           :on-markdown-click="adapter.onMarkdownClick"
         />
@@ -114,8 +113,6 @@ const displayOptions = computed(() => ({
   emptyTitle: props.options.emptyTitle ?? '输入问题开始演示',
   emptyDescription:
     props.options.emptyDescription ?? '助手会检索知识库并以流式方式返回答案。',
-  collapseProcessAfterAnswer:
-    props.options.collapseProcessAfterAnswer ?? false,
 }));
 </script>
 

@@ -61,11 +61,35 @@ function toUiMessages(
     .filter(
       (message) => message.role === 'user' || message.role === 'assistant'
     )
-    .map((message) => ({
-      id: String(message.id),
-      role: message.role as 'user' | 'assistant',
-      parts: [{ type: 'text' as const, text: message.content }]
-    })) as ChatDemoMessage[];
+    .map((message) => {
+      const parts: ChatDemoMessage['parts'] = [];
+      if (Array.isArray(message.toolCalls)) {
+        for (const toolCall of message.toolCalls as AgentToolCallRecord[]) {
+          parts.push({
+            type: 'data-status',
+            data: {
+              stage: 'tool_result',
+              tool: toolCall.name,
+              message: `工具执行完成：${toolCall.name}`,
+              arguments: toolCall.arguments,
+              result: toolCall.result,
+            },
+          });
+        }
+      }
+      parts.push({ type: 'text', text: message.content });
+      return {
+        id: String(message.id),
+        role: message.role as 'user' | 'assistant',
+        parts,
+      };
+    }) as ChatDemoMessage[];
+}
+
+interface AgentToolCallRecord {
+  name: string;
+  arguments: Record<string, unknown>;
+  result: string;
 }
 
 function formatStatus(data: unknown) {

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ChatOpenAI } from '@langchain/openai';
-import type { BaseMessage } from '@langchain/core/messages';
+import { ToolMessage, type BaseMessage } from '@langchain/core/messages';
 import {
   createDeepAgent,
   createHarnessProfile,
@@ -76,10 +76,11 @@ export class AgentChatAgentService {
     for await (const chunk of graphStream) {
       if (!Array.isArray(chunk)) continue;
       const [mode, data] = chunk as unknown as DeepAgentStreamChunk;
-      console.log('[ mode ] >', mode);
       if (mode === 'messages') {
         const [messageChunk] = data;
+        this.collectToolArguments(messageChunk, pendingToolInputs);
         const reasoning = this.extractReasoningText(messageChunk);
+
         if (reasoning) {
           yield { type: 'reasoning_delta', delta: reasoning };
         }
@@ -89,15 +90,18 @@ export class AgentChatAgentService {
         yield { type: 'text_delta', delta: text };
         continue;
       }
-      console.log('[ data ] >', data);
 
       if (data.event === 'on_tool_start') {
         const callId = data.toolCallId ?? data.name;
-        pendingToolInputs.set(callId, this.normalizeInput(data.input));
+        const inputArgs = this.normalizeInput(data.input);
+        const existing = pendingToolInputs.get(callId);
+        const args =
+          existing && Object.keys(existing).length > 0 ? existing : inputArgs;
+        pendingToolInputs.set(callId, args);
         yield {
           type: 'tool_start',
           name: data.name,
-          arguments: this.normalizeInput(data.input),
+          arguments: args,
         };
         continue;
       }
@@ -193,20 +197,144 @@ export class AgentChatAgentService {
 
   /** 将工具输入归一化为可持久化的参数对象。 */
   private normalizeInput(input: unknown): Record<string, unknown> {
-    if (input && typeof input === 'object' && !Array.isArray(input)) {
-      return input as Record<string, unknown>;
+    if (typeof input === 'string') {
+      try {
+        return this.normalizeInput(JSON.parse(input));
+      } catch {
+        return {};
+      }
     }
-    return {};
+    if (!input || typeof input !== 'object' || Array.isArray(input)) {
+      return {};
+    }
+
+    const record = input as Record<string, unknown>;
+    if (
+      record.args &&
+      typeof record.args === 'object' &&
+      !Array.isArray(record.args)
+    ) {
+      return this.normalizeInput(record.args);
+    }
+    if (
+      record.kwargs &&
+      typeof record.kwargs === 'object' &&
+      !Array.isArray(record.kwargs)
+    ) {
+      return this.normalizeInput(record.kwargs);
+    }
+    if (
+      record.input &&
+      typeof record.input === 'object' &&
+      !Array.isArray(record.input)
+    ) {
+      return this.normalizeInput(record.input);
+    }
+    return record;
   }
 
-  /** 将工具输出统一转换为字符串，供会话消息持久化。 */
+  /** 从消息流中的 tool_calls/tool_call_chunks 提前补齐工具入参。 */
+  private collectToolArguments(
+    messageChunk: BaseMessage,
+    pendingToolInputs: Map<string, Record<string, unknown>>,
+  ) {
+    const chunk = messageChunk as unknown as {
+      tool_calls?: Array<{ id?: string; args?: Record<string, unknown> }>;
+      tool_call_chunks?: Array<{ id?: string; args?: string }>;
+    };
+
+    for (const call of chunk.tool_calls ?? []) {
+      if (call.id && call.args && typeof call.args === 'object') {
+        this.setPendingInput(
+          pendingToolInputs,
+          call.id,
+          this.normalizeInput(call.args),
+        );
+      }
+    }
+    for (const call of chunk.tool_call_chunks ?? []) {
+      if (call.id && typeof call.args === 'string' && call.args) {
+        try {
+          this.setPendingInput(
+            pendingToolInputs,
+            call.id,
+            this.normalizeInput(JSON.parse(call.args)),
+          );
+        } catch {
+          // 分片参数未完整时忽略，on_tool_start 会提供最终入参。
+        }
+      }
+    }
+  }
+
+  /** 仅当尚未拿到有效入参时写入工具参数。 */
+  private setPendingInput(
+    pendingToolInputs: Map<string, Record<string, unknown>>,
+    id: string,
+    args: Record<string, unknown>,
+  ) {
+    const existing = pendingToolInputs.get(id);
+    if (!existing || Object.keys(existing).length === 0) {
+      pendingToolInputs.set(id, args);
+    }
+  }
+
+  /** 将工具输出统一转换为字符串，并解包 LangChain ToolMessage。 */
   private normalizeResult(output: unknown): string {
+    if (output instanceof ToolMessage) {
+      return this.normalizeToolMessageContent(output.content);
+    }
     if (output instanceof Error) return output.message;
     if (typeof output === 'string') return output;
+    if (output && typeof output === 'object') {
+      const content = this.extractSerializedContent(output);
+      if (content !== undefined) {
+        return this.normalizeToolMessageContent(content);
+      }
+    }
     try {
       return JSON.stringify(output ?? '');
     } catch {
       return String(output ?? '');
+    }
+  }
+
+  /** 从 LangChain 序列化消息或普通对象中提取工具内容。 */
+  private extractSerializedContent(output: unknown): unknown {
+    if (!output || typeof output !== 'object') return undefined;
+    const record = output as Record<string, unknown>;
+    if ('content' in record) return record.content;
+    if (record.kwargs && typeof record.kwargs === 'object') {
+      const kwargs = record.kwargs as Record<string, unknown>;
+      if ('content' in kwargs) return kwargs.content;
+    }
+    return undefined;
+  }
+
+  /** 将 ToolMessage 内容归一化为字符串。 */
+  private normalizeToolMessageContent(content: unknown): string {
+    if (typeof content === 'string') return content;
+    if (Array.isArray(content)) {
+      return content
+        .map((part) => {
+          if (typeof part === 'string') return part;
+          if (
+            part &&
+            typeof part === 'object' &&
+            'text' in part &&
+            typeof (part as Record<string, unknown>).text === 'string'
+          ) {
+            return (part as Record<string, unknown>).text as string;
+          }
+          return '';
+        })
+        .join('');
+    }
+    if (content === undefined || content === null) return '';
+    try {
+      return JSON.stringify(content);
+    } catch {
+      return String(content);
     }
   }
 }

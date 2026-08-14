@@ -1,18 +1,19 @@
 ## Why
 
-业务 Agent 流式对话把工具调用、检索摘要、模型推理文本和最终答案混在同一个展示区，最终结果出现后过程信息仍常驻，用户需要反复滚动才能看到答案。
+业务 Agent 流式对话把工具调用、检索摘要、模型推理文本和最终答案按阶段输出，但分组与折叠会打乱消息顺序，用户需要额外点击才能查看过程内容。
 
 ## What Changes
 
 - 后端将模型推理文本以 `reasoning` 增量事件输出，并在工具结束时生成检索/切片摘要。
-- UI Kit 聊天组件支持把 `reasoning` 和 `data-status` 归入可折叠过程区块，最终答案开始输出后自动收起。
-- RAG Admin 业务 Agent Demo 与 `agent-chat-sdk` 默认启用折叠，知识问答 Demo 保持现状。
+- UI Kit 聊天组件按 `message.parts` 原始顺序渲染 `reasoning`、`data-status` 和 `text`，不分组、不折叠。
+- `data-status` 全量 stage 统一通过状态卡渲染，`tool_result` 额外内联保留工具入参与输出，reasoning 始终展开展示。
+- RAG Admin 业务 Agent Demo 与 `agent-chat-sdk`、知识问答 Demo 共用同一展示规则。
 
 ## Capabilities
 
 ### New Capabilities
 
-- `agent-chat-process-collapse`: 业务 Agent 区分过程信息与最终结果，并支持过程信息点击展开。
+- `agent-chat-process-order`: 聊天消息按原始顺序完整展示，不折叠任何输出。
 
 ### Modified Capabilities
 
@@ -26,6 +27,6 @@
 
 ## Non-goals
 
-- 不持久化过程轨迹到历史会话。
+- 不额外持久化 reasoning 文本或阶段状态，工具过程复用已保存的 `toolCalls`。
 - 不新增自定义 AGUI 流事件类型。
-- 不改变知识问答 Demo 的既有展示。
+- 不新增 `details` 折叠交互。

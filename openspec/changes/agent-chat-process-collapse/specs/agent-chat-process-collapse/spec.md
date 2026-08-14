@@ -9,22 +9,22 @@
 
 #### Scenario: 工具结果摘要
 - **WHEN** `search_knowledge` / `get_document` / `get_document_chunks` 执行结束
-- **THEN** 系统输出包含文档名或切片数的状态摘要
+- **THEN** 系统输出包含文档名或切片数的状态摘要，并携带完整入参与输出
 
-### Requirement: 过程信息可折叠
-业务 Agent 聊天界面 SHALL 在最终 `text` part 开始输出后收起过程信息，并保留可点击展开入口。
+### Requirement: 消息按原始顺序展示且不折叠
+聊天界面 SHALL 按 `message.parts` 的原始顺序渲染 `reasoning`、`data-status` 和 `text`，所有输出保持展开。
 
-#### Scenario: 最终答案开始输出
-- **WHEN** 助手消息出现首个 `text` part
-- **THEN** 过程信息自动收起，最终答案正常展示
+#### Scenario: 流式消息
+- **WHEN** 助手消息包含推理、工具状态和最终答案
+- **THEN** 三类内容按到达顺序依次展示，不分组也不折叠
 
-#### Scenario: 再次展开
-- **WHEN** 用户点击“过程信息”
-- **THEN** 可再次查看工具调用、检索摘要和推理文本
+#### Scenario: 多种 stage
+- **WHEN** `data-status` 包含任意 stage
+- **THEN** 页面统一渲染为状态卡；`tool_result` 额外内联展示工具入参与输出
 
-### Requirement: 历史会话只保留最终结果
-历史会话消息查询 SHALL 不返回过程轨迹，切换历史会话后只展示最终答案。
+### Requirement: 历史会话展示工具过程
+历史会话消息加载 SHALL 从已持久化的 `toolCalls` 恢复工具状态、入参与输出，并按顺序展示。
 
 #### Scenario: 切换历史会话
 - **WHEN** 用户打开历史会话
-- **THEN** 页面只渲染已持久化的最终答案
+- **THEN** 页面按原始顺序展示工具状态、入参与输出和最终答案

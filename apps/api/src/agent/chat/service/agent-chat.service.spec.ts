@@ -127,7 +127,13 @@ describe('AgentChatService', () => {
     });
     expect(parts[2]).toMatchObject({
       type: 'data-status',
-      data: { stage: 'tool_result', tool: 'calculate' },
+      data: {
+        stage: 'tool_result',
+        tool: 'calculate',
+        message: '工具执行完成：calculate',
+        arguments: { expression: '1+2*3' },
+        result: '7',
+      },
     });
     expect(parts[3]).toMatchObject({
       type: 'data-status',
@@ -199,6 +205,13 @@ describe('AgentChatService', () => {
         tool: 'search_knowledge',
         message:
           '检索到 4 个相关文档：退货流程.md、售后指南.md、退款说明.md 等',
+        arguments: { query: '退货流程' },
+        result: JSON.stringify([
+          { fileName: '退货流程.md' },
+          { fileName: '售后指南.md' },
+          { fileName: '退款说明.md' },
+          { fileName: '客户服务.md' },
+        ]),
       },
     });
     expect(parts).toContainEqual({

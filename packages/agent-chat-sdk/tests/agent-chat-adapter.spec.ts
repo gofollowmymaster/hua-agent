@@ -60,4 +60,37 @@ describe('createAgentChatAdapter', () => {
       }),
     ).toBe('检索到 2 个相关文档');
   });
+
+  it('maps history tool calls into process parts', () => {
+    const adapter = createAgentChatAdapter({});
+    const messages = adapter.toUiMessages([
+      {
+        id: '1',
+        role: 'assistant',
+        content: '最终答案',
+        createdAt: '2026-01-01T00:00:00.000Z',
+        toolCalls: [
+          {
+            name: 'search_knowledge',
+            arguments: { query: '退货流程' },
+            result: JSON.stringify([{ fileName: '退货流程.md' }]),
+          },
+        ],
+      },
+    ] as never);
+
+    expect(messages[0].parts[0]).toMatchObject({
+      type: 'data-status',
+      data: {
+        stage: 'tool_result',
+        tool: 'search_knowledge',
+        arguments: { query: '退货流程' },
+        result: JSON.stringify([{ fileName: '退货流程.md' }]),
+      },
+    });
+    expect(messages[0].parts[1]).toEqual({
+      type: 'text',
+      text: '最终答案',
+    });
+  });
 });
