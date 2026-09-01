@@ -1,9 +1,16 @@
 <template>
   <Layout class="app-shell">
-    <LayoutSider class="app-sider" :width="232">
-      <div class="brand">
+    <LayoutSider
+      class="app-sider"
+      :width="232"
+      :collapsed-width="64"
+      :collapsed="siderCollapsed"
+      collapsible
+      @update:collapsed="handleSiderCollapsedChange"
+    >
+      <div class="brand" :class="{ 'brand--collapsed': siderCollapsed }">
         <div class="brand-mark">{{ brandMark }}</div>
-        <div>
+        <div v-if="!siderCollapsed">
           <div class="brand-title">{{ brandTitle }}</div>
           <div class="brand-subtitle">Knowledge Console</div>
         </div>
@@ -53,8 +60,18 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, watch } from 'vue';
+  import { computed, h, ref, watch, type Component } from 'vue';
   import { RouterView, useRoute, useRouter } from 'vue-router';
+  import {
+    BookOutlined,
+    DatabaseOutlined,
+    FileTextOutlined,
+    MessageOutlined,
+    PlayCircleOutlined,
+    RobotOutlined,
+    SettingOutlined,
+    ThunderboltOutlined
+  } from '@ant-design/icons-vue';
   import {
     Avatar,
     Dropdown,
@@ -72,6 +89,8 @@
   import { adminMenus } from '@/router/routes';
   import { useUserStore } from '@/stores/modules/user';
 
+  const SIDER_COLLAPSED_STORAGE_KEY = 'rag-admin:sider-collapsed';
+
   const userStore = useUserStore();
   const route = useRoute();
   const router = useRouter();
@@ -88,18 +107,33 @@
   const currentSubtitle = computed(() =>
     String(route.meta.subtitle || 'RAG 文档与对话运营后台')
   );
+  const siderCollapsed = ref(readSiderCollapsedPreference());
   const openKeys = ref<string[]>([]);
   const leafMenus = adminMenus.flatMap((group) => group.children);
+  const menuIcons: Record<string, Component> = {
+    'knowledge-qa': BookOutlined,
+    documents: FileTextOutlined,
+    sessions: MessageOutlined,
+    assistant: RobotOutlined,
+    'business-agent': RobotOutlined,
+    'agent-knowledge': DatabaseOutlined,
+    'agent-skills': ThunderboltOutlined,
+    'agent-sessions': MessageOutlined,
+    'agent-config': SettingOutlined,
+    'agent-demo': PlayCircleOutlined
+  };
 
   const menuItems = computed<ItemType[]>(() =>
     adminMenus.map((group) => ({
       key: group.name,
       label: group.title,
       title: group.title,
+      icon: h(menuIcons[group.name]),
       children: group.children.map((menu) => ({
         key: menu.name,
         label: menu.title,
-        title: menu.title
+        title: menu.title,
+        icon: h(menuIcons[menu.name])
       }))
     }))
   );
@@ -123,6 +157,18 @@
     openKeys.value = keys.map(String);
   }
 
+  function handleSiderCollapsedChange(collapsed: boolean) {
+    siderCollapsed.value = collapsed;
+  }
+
+  function readSiderCollapsedPreference() {
+    try {
+      return window.localStorage.getItem(SIDER_COLLAPSED_STORAGE_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  }
+
   const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
     if (key === 'logout') userStore.logout();
   };
@@ -137,6 +183,17 @@
     },
     { immediate: true }
   );
+
+  watch(siderCollapsed, (collapsed) => {
+    try {
+      window.localStorage.setItem(
+        SIDER_COLLAPSED_STORAGE_KEY,
+        String(collapsed)
+      );
+    } catch {
+      // Local storage may be unavailable in private browsing contexts.
+    }
+  });
 </script>
 
 <style lang="less" scoped>
@@ -151,6 +208,7 @@
 
   .app-sider {
     min-height: 100vh;
+    overflow: hidden;
     background: @sider-dark-bg-color;
   }
 
@@ -161,6 +219,11 @@
     height: 76px;
     padding: 20px 18px;
     color: @sider-brand-text-color;
+  }
+
+  .brand--collapsed {
+    justify-content: center;
+    padding: 20px 14px;
   }
 
   .brand-mark {

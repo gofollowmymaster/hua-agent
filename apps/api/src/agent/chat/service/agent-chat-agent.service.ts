@@ -93,6 +93,7 @@ export class AgentChatAgentService {
 
       if (data.event === 'on_tool_start') {
         const callId = data.toolCallId ?? data.name;
+        console.log('[ on_tool_start callId ] >', callId);
         const inputArgs = this.normalizeInput(data.input);
         const existing = pendingToolInputs.get(callId);
         const args =
