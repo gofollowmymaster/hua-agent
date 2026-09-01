@@ -52,7 +52,7 @@ export class AgentKnowledgeSearchService {
     const topK = this.normalizeTopK(options.topK);
     const normalizedQuery = query.trim();
     if (!normalizedQuery) return [];
-
+    console.log('[ query options ] >', query, options);
     if (options.mode === 'fulltext') {
       return this.searchFullText(normalizedQuery, options, topK);
     }

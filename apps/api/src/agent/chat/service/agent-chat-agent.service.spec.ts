@@ -69,6 +69,13 @@ describe('AgentChatAgentService', () => {
         systemPrompt: expect.stringContaining('业务 Agent 助手'),
       }),
     );
+    expect(createDeepAgent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        systemPrompt: expect.stringContaining(
+          '当系统输出用户可见的思考过程时，仅使用简体中文。',
+        ),
+      }),
+    );
   });
 
   it('maps messages and tools stream events in order', async () => {

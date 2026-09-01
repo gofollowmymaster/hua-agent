@@ -62,7 +62,6 @@ export class AgentKnowledgeService {
         take: pageSize,
       }),
     ]);
-    console.log('[ documents ] >', documents);
 
     return {
       list: documents.map((document) => ({

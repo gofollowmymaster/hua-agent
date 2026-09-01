@@ -120,7 +120,9 @@ export class LoggingInterceptor<T> implements NestInterceptor<T, Response<T>> {
 
     // 根据状态码选择日志级别
     const logLevel = statusCode >= 400 ? 'warn' : 'info';
-    this.logger[logLevel]('响应信息:' + JSON.stringify(logEntry));
+    this.logger[logLevel](
+      '响应信息:' + JSON.stringify(logEntry).slice(0, 1000),
+    );
   }
 
   private logErrorResponse(

@@ -83,6 +83,7 @@ export class AgentChatAgentService {
 
         if (reasoning) {
           yield { type: 'reasoning_delta', delta: reasoning };
+          continue;
         }
         const text = this.extractContentText(messageChunk.content);
         if (!text) continue;
@@ -147,7 +148,8 @@ export class AgentChatAgentService {
 2. 只基于工具返回的资料回答，不编造业务事实。
 3. 引用资料时给出文档名或路径。
 4. 用户询问时间时调用 get_current_time，需要计算时调用 calculate。
-5. 工具结果不足时明确说明资料未覆盖，不猜测。`;
+5. 工具结果不足时明确说明资料未覆盖，不猜测。
+6. 当系统输出用户可见的思考过程时，仅使用简体中文。`;
   }
 
   /** 将模型内容统一提取为纯文本。 */
