@@ -6,7 +6,7 @@ import {
   registerHarnessProfile,
 } from 'deepagents';
 
-const mockStream = jest.fn();
+const mockStreamEvents = jest.fn();
 
 jest.mock('deepagents', () => ({
   createDeepAgent: jest.fn(),
@@ -37,7 +37,9 @@ describe('AgentChatAgentService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     toolService = { getTools: jest.fn().mockReturnValue([]) };
-    (createDeepAgent as jest.Mock).mockReturnValue({ stream: mockStream });
+    (createDeepAgent as jest.Mock).mockReturnValue({
+      streamEvents: mockStreamEvents,
+    });
     (createHarnessProfile as jest.Mock).mockImplementation(
       (options) => options,
     );
@@ -78,242 +80,145 @@ describe('AgentChatAgentService', () => {
     );
   });
 
-  it('maps messages and tools stream events in order', async () => {
-    mockStream.mockResolvedValue(
-      (async function* () {
-        yield ['messages', [{ content: '结果' }, {}]];
-        yield [
-          'tools',
+  it('streams AI text and reasoning separately from tool output', async () => {
+    const toolOutput = JSON.stringify([
+      { fileName: '退货流程.md', content: '完整检索内容'.repeat(500) },
+    ]);
+    mockStreamEvents.mockResolvedValue(
+      createRun({
+        messages: [
           {
-            event: 'on_tool_start',
-            name: 'calculate',
-            toolCallId: 'call-1',
-            input: { expression: '1+2*3' },
+            text: ['请按退货流程操作。'],
+            reasoning: ['先检索知识库。'],
           },
-        ];
-        yield [
-          'tools',
+        ],
+        toolCalls: [
           {
-            event: 'on_tool_end',
-            name: 'calculate',
-            toolCallId: 'call-1',
-            output: '7',
+            name: 'search_knowledge',
+            input: { query: '退货流程' },
+            status: 'finished',
+            output: toolOutput,
           },
-        ];
-        yield ['messages', [{ content: [{ type: 'text', text: '是 7' }] }, {}]];
-      })(),
+        ],
+      }),
     );
 
     const service = new AgentChatAgentService(
       toolService as unknown as AgentChatToolService,
     );
-    const events: unknown[] = [];
-    for await (const event of service.stream([])) {
-      events.push(event);
-    }
+    const events = await collectEvents(service);
 
-    expect(events).toEqual([
-      { type: 'text_delta', delta: '结果' },
-      {
-        type: 'tool_start',
-        name: 'calculate',
-        arguments: { expression: '1+2*3' },
-      },
-      {
-        type: 'tool_end',
-        name: 'calculate',
-        arguments: { expression: '1+2*3' },
-        result: '7',
-      },
-      { type: 'text_delta', delta: '是 7' },
-      {
-        type: 'done',
-        answer: '结果是 7',
+    expect(mockStreamEvents).toHaveBeenCalledWith(
+      { messages: [] },
+      { version: 'v3' },
+    );
+    expect(events).toEqual(
+      expect.arrayContaining([
+        { type: 'reasoning_delta', delta: '先检索知识库。' },
+        {
+          type: 'tool_start',
+          name: 'search_knowledge',
+          arguments: { query: '退货流程' },
+        },
+        {
+          type: 'tool_end',
+          name: 'search_knowledge',
+          arguments: { query: '退货流程' },
+          result: toolOutput,
+        },
+        { type: 'text_delta', delta: '请按退货流程操作。' },
+        {
+          type: 'done',
+          answer: '请按退货流程操作。',
+          toolCalls: [
+            {
+              name: 'search_knowledge',
+              arguments: { query: '退货流程' },
+              result: toolOutput,
+            },
+          ],
+        },
+      ]),
+    );
+    expect(events).not.toContainEqual({
+      type: 'text_delta',
+      delta: toolOutput,
+    });
+  });
+
+  it('records failed tool calls as tool_end results', async () => {
+    mockStreamEvents.mockResolvedValue(
+      createRun({
         toolCalls: [
           {
             name: 'calculate',
-            arguments: { expression: '1+2*3' },
-            result: '7',
-          },
-        ],
-      },
-    ]);
-  });
-
-  it('extracts reasoning content as reasoning_delta before text', async () => {
-    mockStream.mockResolvedValue(
-      (async function* () {
-        yield [
-          'messages',
-          [
-            {
-              content: [{ type: 'text', text: '结果是 7' }],
-              additional_kwargs: { reasoning_content: '先计算表达式' },
-            },
-            {},
-          ],
-        ];
-      })(),
-    );
-
-    const service = new AgentChatAgentService(
-      toolService as unknown as AgentChatToolService,
-    );
-    const events: unknown[] = [];
-    for await (const event of service.stream([])) {
-      events.push(event);
-    }
-
-    expect(events).toEqual([
-      { type: 'reasoning_delta', delta: '先计算表达式' },
-      { type: 'text_delta', delta: '结果是 7' },
-      {
-        type: 'done',
-        answer: '结果是 7',
-        toolCalls: [],
-      },
-    ]);
-  });
-
-  it('normalizes JSON string inputs and LangChain serialized outputs', async () => {
-    mockStream.mockResolvedValue(
-      (async function* () {
-        yield [
-          'tools',
-          {
-            event: 'on_tool_start',
-            name: 'search_knowledge',
-            toolCallId: 'call-1',
-            input: JSON.stringify({ query: '退货流程' }),
-          },
-        ];
-        yield [
-          'tools',
-          {
-            event: 'on_tool_end',
-            name: 'search_knowledge',
-            toolCallId: 'call-1',
-            output: {
-              lc: 1,
-              type: 'constructor',
-              id: ['langchain_core', 'messages', 'ToolMessage'],
-              kwargs: {
-                content: JSON.stringify([{ fileName: '退货流程.md' }]),
-              },
-            },
-          },
-        ];
-      })(),
-    );
-
-    const service = new AgentChatAgentService(
-      toolService as unknown as AgentChatToolService,
-    );
-    const events: unknown[] = [];
-    for await (const event of service.stream([])) {
-      events.push(event);
-    }
-
-    expect(events[0]).toMatchObject({
-      type: 'tool_start',
-      arguments: { query: '退货流程' },
-    });
-    expect(events[1]).toMatchObject({
-      type: 'tool_end',
-      arguments: { query: '退货流程' },
-      result: '[{"fileName":"退货流程.md"}]',
-    });
-  });
-
-  it('keeps tool args captured from tool_call_chunks', async () => {
-    mockStream.mockResolvedValue(
-      (async function* () {
-        yield [
-          'messages',
-          [
-            {
-              tool_call_chunks: [
-                { id: 'call-1', args: '{"query":"退货流程"}' },
-              ],
-              content: '',
-            },
-            {},
-          ],
-        ];
-        yield [
-          'tools',
-          {
-            event: 'on_tool_start',
-            name: 'search_knowledge',
-            toolCallId: 'call-1',
-          },
-        ];
-        yield [
-          'tools',
-          {
-            event: 'on_tool_end',
-            name: 'search_knowledge',
-            toolCallId: 'call-1',
-            output: '[{"fileName":"退货流程.md"}]',
-          },
-        ];
-      })(),
-    );
-
-    const service = new AgentChatAgentService(
-      toolService as unknown as AgentChatToolService,
-    );
-    const events: unknown[] = [];
-    for await (const event of service.stream([])) {
-      events.push(event);
-    }
-
-    expect(events[0]).toMatchObject({
-      type: 'tool_start',
-      arguments: { query: '退货流程' },
-    });
-    expect(events[1]).toMatchObject({
-      type: 'tool_end',
-      arguments: { query: '退货流程' },
-      result: '[{"fileName":"退货流程.md"}]',
-    });
-  });
-
-  it('records tool errors as tool_end results', async () => {
-    mockStream.mockResolvedValue(
-      (async function* () {
-        yield [
-          'tools',
-          {
-            event: 'on_tool_start',
-            name: 'calculate',
-            toolCallId: 'call-1',
             input: { expression: '1/0' },
-          },
-        ];
-        yield [
-          'tools',
-          {
-            event: 'on_tool_error',
-            name: 'calculate',
-            toolCallId: 'call-1',
+            status: 'error',
             error: 'division by zero',
           },
-        ];
-      })(),
+        ],
+      }),
     );
 
     const service = new AgentChatAgentService(
       toolService as unknown as AgentChatToolService,
     );
-    const events: unknown[] = [];
-    for await (const event of service.stream([])) {
-      events.push(event);
-    }
+    const events = await collectEvents(service);
 
-    expect(events[1]).toMatchObject({
+    expect(events).toContainEqual({
       type: 'tool_end',
+      name: 'calculate',
+      arguments: { expression: '1/0' },
       result: 'division by zero',
     });
   });
 });
+
+function createRun({
+  messages = [],
+  toolCalls = [],
+}: {
+  messages?: Array<{ text: string[]; reasoning: string[] }>;
+  toolCalls?: Array<{
+    name: string;
+    input: unknown;
+    status: 'finished' | 'error';
+    output?: unknown;
+    error?: string;
+  }>;
+}) {
+  return {
+    messages: toAsyncIterable(
+      messages.map((message) => ({
+        text: toAsyncIterable(message.text),
+        reasoning: toAsyncIterable(message.reasoning),
+      })),
+    ),
+    toolCalls: toAsyncIterable(
+      toolCalls.map((call) => ({
+        name: call.name,
+        input: call.input,
+        status: Promise.resolve(call.status),
+        output:
+          call.status === 'error'
+            ? Promise.reject(new Error(call.error))
+            : Promise.resolve(call.output),
+        error: Promise.resolve(call.error),
+      })),
+    ),
+  };
+}
+
+function toAsyncIterable<T>(values: T[]): AsyncIterable<T> {
+  return (async function* () {
+    yield* values;
+  })();
+}
+
+async function collectEvents(service: AgentChatAgentService) {
+  const events = [];
+  for await (const event of service.stream([])) {
+    events.push(event);
+  }
+  return events;
+}

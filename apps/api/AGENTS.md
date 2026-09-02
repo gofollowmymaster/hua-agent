@@ -139,6 +139,12 @@ pnpm env:prod
 - ❌ 禁止：在 DTO 中放业务逻辑、数据库操作
 - 飞书响应类型、业务类型分别放对应目录，不塞进全局类型文件
 
+### 文件与类型拆分规则
+
+- ✅ 除 DTO 文件外，一个 TypeScript 文件只允许声明一个 `class`；新增 Controller、Service、adapter、table、schedule、processor 等类必须拆到独立的、按职责命名的文件。
+- ✅ `type`、`interface`、`enum` 等类型声明必须放在独立类型文件，不得与 `class` 同文件声明；按归属放入模块的 `type/`、`common/type/`、`dto/` 或既有专用类型目录。
+- ❌ 禁止：为图方便在 Controller、Service、DTO 或 adapter 文件中内联声明业务类型。
+
 ### 异常处理规则
 
 - ✅ 优先使用 `src/common/exception/` 中已有的异常类
@@ -259,6 +265,7 @@ pnpm env:prod
 8. **禁止 Redis key 不含租户占位符** — 多租户场景的 key 必须含 `{tenant}`
 9. **禁止缓存不设 TTL** — 除非有明确的不失效设计理由并加注释
 10. **禁止 Controller 中写业务逻辑** — Controller 只做路由和参数透传
+11. **禁止在非 DTO 文件中声明多个 `class` 或在类文件内声明类型** — 非 DTO 类一文件一个，类型必须拆到独立类型文件
 
 ---
 

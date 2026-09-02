@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { tool, type DynamicStructuredTool } from '@langchain/core/tools';
+import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { TenantContext } from '@src/common/service/context/tenant.context';
 import { NodeConfigService } from '@src/config/node-config.service';
 import { calculateExpression } from '../agent-chat-calculator';
 import { AgentKnowledgeSearchService } from '../../knowledge/service/agent-knowledge-search.service';
 import { AgentKnowledgeService } from '../../knowledge/agent-knowledge.service';
-
-type AgentChatTool = DynamicStructuredTool<any, any, any, string>;
+import type { AgentChatTool } from '../type/agent-chat-runtime.type';
 
 /** 提供业务 Agent 可调用的知识库工具和通用工具。 */
 @Injectable()

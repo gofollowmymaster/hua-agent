@@ -9,7 +9,7 @@ import type {
   AgentChatRequest,
   AgentChatToolCallRecord,
   AgentChatWriter,
-} from '../type/agent-chat.type';
+} from '../type/agent-chat-contract.type';
 
 /** 编排业务 Agent 的请求解析、Deep Agents 运行和会话记忆持久化。 */
 @Injectable()

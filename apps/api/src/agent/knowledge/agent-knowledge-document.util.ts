@@ -1,7 +1,4 @@
-export interface ParsedAgentKnowledgeDocument {
-  metadata: Record<string, string>;
-  content: string;
-}
+import type { ParsedAgentKnowledgeDocument } from './type/agent-knowledge-document.type';
 
 const TENANT_DISPLAY_PREFIXES: Record<string, string> = {
   aplus: 'Aplus',

@@ -16,7 +16,7 @@ import {
 import type {
   AgentKnowledgeDocumentFile,
   AgentKnowledgeIngestSummary,
-} from '../type/agent-knowledge.type';
+} from '../type/agent-knowledge-document.type';
 
 const IGNORED_NAMES = new Set(['.DS_Store']);
 

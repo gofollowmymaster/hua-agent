@@ -8,7 +8,7 @@ import type {
   AgentChatResolvedSession,
   AgentChatSessionInput,
   AgentChatToolCallRecord,
-} from '../type/agent-chat.type';
+} from '../type/agent-chat-contract.type';
 
 /** 管理业务 Agent 独立会话、消息持久化和历史查询。 */
 @Injectable()

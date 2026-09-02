@@ -3,29 +3,10 @@ import { OpenAIEmbeddings } from '@langchain/openai';
 import { NodeConfigService } from '@src/config/node-config.service';
 import { RagPrismaService } from '@src/common/service/rag-prisma/rag-prisma.service';
 import type {
+  AgentKnowledgeRetrievalRow,
   AgentKnowledgeSearchHit,
   AgentKnowledgeSearchOptions,
-} from '../type/agent-knowledge.type';
-
-interface AgentKnowledgeRetrievalRow {
-  id: bigint | number | string;
-  tenant_code: string;
-  document_id: bigint | number | string;
-  chunk_index: number;
-  content: string;
-  metadata: Record<string, unknown> | null;
-  category: string;
-  file_name: string;
-  source_path: string;
-  remote_url?: string | null;
-  doc_id?: string | null;
-  wiki_node_id?: string | null;
-  last_modified_at?: string | null;
-  breadcrumb?: string | null;
-  source_type?: string | null;
-  current_version?: string | null;
-  score: number | string;
-}
+} from '../type/agent-knowledge-search.type';
 
 /** 提供业务 Agent 知识库的全文、向量和混合检索。 */
 @Injectable()

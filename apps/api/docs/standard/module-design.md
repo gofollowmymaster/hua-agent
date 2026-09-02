@@ -8,6 +8,8 @@
 - 模块内部可以按功能拆 controller、service、dto、table、adapter、schedule、processor。
 - 模块间协作应通过公开 Service 或明确 adapter，不要跨目录直接调用内部实现细节。
 - 新增公共能力前，必须确认至少有明确的跨模块复用需求。
+- 类以文件为边界：除 DTO 文件外，一个 TypeScript 文件只声明一个 `class`，不得将多个 Controller、Service 或其他类合并到同一文件；DTO 文件可按请求场景声明多个 DTO class。
+- 类型以独立文件为边界：`type`、`interface`、`enum` 等声明不得与 `class` 共存于同一文件；按类型归属放在 `type/`、`common/type/`、`dto/` 或专用类型目录。
 
 ## 推荐目录结构
 
@@ -98,6 +100,7 @@ src/<module>/<submodule>/
 - 模块内部类型放模块内 `type/` 或 `common/type/`。
 - 飞书 OpenAPI 类型放 `src/common/feishu/type/`。
 - 跨模块稳定类型才考虑放到 `src/type`。
+- 新增类型文件以其主要导出类型命名，并保持与类文件分离；不要在 Controller、Service、DTO、adapter、table、schedule 或 processor 文件中内联业务类型。
 
 ## table/adapter/helper 放置规则
 

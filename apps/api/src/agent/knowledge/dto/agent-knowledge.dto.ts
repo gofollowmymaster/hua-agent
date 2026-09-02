@@ -11,13 +11,10 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
-import type { AgentKnowledgeSearchMode } from '../type/agent-knowledge.type';
-
-export enum AgentKnowledgeSearchModeEnum {
-  fulltext = 'fulltext',
-  vector = 'vector',
-  hybrid = 'hybrid',
-}
+import {
+  AgentKnowledgeSearchModeEnum,
+  type AgentKnowledgeSearchMode,
+} from '../type/agent-knowledge-search.type';
 
 /** 定义触发业务 Agent 知识库入库时的执行策略。 */
 export class AgentKnowledgeIngestDto {

@@ -16,7 +16,7 @@ import { CompositeAuthOrSecretGuard } from '@src/common/guard/composite-auth';
 import { AgentChatSessionPageDto } from './dto/agent-chat.dto';
 import { AgentChatMemoryService } from './service/agent-chat-memory.service';
 import { AgentChatService } from './service/agent-chat.service';
-import type { AgentChatRequest } from './type/agent-chat.type';
+import type { AgentChatRequest } from './type/agent-chat-contract.type';
 
 /** 提供业务 Agent 多工具聊天、会话和消息接口。 */
 @ApiTags('业务 Agent Chat')

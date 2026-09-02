@@ -6,6 +6,8 @@
 
 - 优先定义明确类型，避免新增无意义的 `any`。
 - DTO、飞书响应、业务内部类型分别放到对应目录，不要都塞进全局类型。
+- 除 DTO 文件外，一个 TypeScript 文件只允许声明一个 `class`；Controller、Service、adapter、table、schedule 和 processor 等类各自使用独立且按职责命名的文件。DTO 文件可按请求场景声明多个 DTO class。
+- `type`、`interface`、`enum` 等类型声明必须位于独立类型文件，不得与 `class` 同文件声明；按归属放到模块的 `type/`、`common/type/`、`dto/` 或既有专用类型目录。
 - 使用项目已有路径别名，如 `@src/*`。
 - 保持导入路径和同模块既有风格一致。
 - AI 新增或实质修改类、类方法时，按 `docs/ai-governance/development-workflow.md` 添加简洁 JSDoc。
