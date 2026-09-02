@@ -7,24 +7,16 @@ import {
   registerHarnessProfile,
 } from 'deepagents';
 import { NodeConfigService } from '@src/config/node-config.service';
+import { AsyncEventQueue } from '../common/async-event-queue';
 import { AgentChatToolService } from './agent-chat-tool.service';
 import type {
   AgentChatAgentEvent,
   AgentChatToolCallRecord,
-} from '../type/agent-chat.type';
-
-type DeepAgentStreamChunk =
-  | ['messages', [BaseMessage, Record<string, unknown>]]
-  | ['tools', ToolStreamEvent];
-
-type ToolStreamEvent = {
-  event: 'on_tool_start' | 'on_tool_end' | 'on_tool_error' | 'on_tool_event';
-  name: string;
-  toolCallId?: string;
-  input?: unknown;
-  output?: unknown;
-  error?: unknown;
-};
+} from '../type/agent-chat-contract.type';
+import type {
+  AgentMessageStream,
+  AgentToolCallStream,
+} from '../type/agent-chat-runtime.type';
 
 const EXCLUDED_BUILTIN_TOOLS = [
   'ls',
@@ -65,60 +57,23 @@ export class AgentChatAgentService {
   async *stream(
     messages: BaseMessage[],
   ): AsyncGenerator<AgentChatAgentEvent, void, void> {
-    const pendingToolInputs = new Map<string, Record<string, unknown>>();
     const toolCalls: AgentChatToolCallRecord[] = [];
     let answer = '';
-    const graphStream = await this.agent.stream(
-      { messages },
-      { streamMode: ['messages', 'tools'] },
-    );
+    const run = await this.agent.streamEvents({ messages }, { version: 'v3' });
+    const events = new AsyncEventQueue<AgentChatAgentEvent>();
 
-    for await (const chunk of graphStream) {
-      if (!Array.isArray(chunk)) continue;
-      const [mode, data] = chunk as unknown as DeepAgentStreamChunk;
-      if (mode === 'messages') {
-        const [messageChunk] = data;
-        this.collectToolArguments(messageChunk, pendingToolInputs);
-        const reasoning = this.extractReasoningText(messageChunk);
+    void Promise.all([
+      this.consumeMessageStreams(run.messages, events),
+      this.consumeToolCalls(run.toolCalls, toolCalls, events),
+    ])
+      .then(() => events.close())
+      .catch((error) => events.fail(error));
 
-        if (reasoning) {
-          yield { type: 'reasoning_delta', delta: reasoning };
-          continue;
-        }
-        const text = this.extractContentText(messageChunk.content);
-        if (!text) continue;
-        answer += text;
-        yield { type: 'text_delta', delta: text };
-        continue;
+    for await (const event of events) {
+      if (event.type === 'text_delta') {
+        answer += event.delta;
       }
-
-      if (data.event === 'on_tool_start') {
-        const callId = data.toolCallId ?? data.name;
-        console.log('[ on_tool_start callId ] >', callId);
-        const inputArgs = this.normalizeInput(data.input);
-        const existing = pendingToolInputs.get(callId);
-        const args =
-          existing && Object.keys(existing).length > 0 ? existing : inputArgs;
-        pendingToolInputs.set(callId, args);
-        yield {
-          type: 'tool_start',
-          name: data.name,
-          arguments: args,
-        };
-        continue;
-      }
-
-      if (data.event === 'on_tool_end' || data.event === 'on_tool_error') {
-        const callId = data.toolCallId ?? data.name;
-        const args = pendingToolInputs.get(callId) ?? {};
-        pendingToolInputs.delete(callId);
-        const result =
-          data.event === 'on_tool_end'
-            ? this.normalizeResult(data.output)
-            : this.normalizeResult(data.error);
-        toolCalls.push({ name: data.name, arguments: args, result });
-        yield { type: 'tool_end', name: data.name, arguments: args, result };
-      }
+      yield event;
     }
 
     yield {
@@ -126,6 +81,70 @@ export class AgentChatAgentService {
       answer,
       toolCalls,
     };
+  }
+
+  /** 将模型文本和 reasoning 投影映射为界面可消费的流事件。 */
+  private async consumeMessageStreams(
+    messages: AsyncIterable<AgentMessageStream>,
+    events: AsyncEventQueue<AgentChatAgentEvent>,
+  ) {
+    for await (const message of messages) {
+      await Promise.all([
+        this.forwardDeltas(message.reasoning, 'reasoning_delta', events),
+        this.forwardDeltas(message.text, 'text_delta', events),
+      ]);
+    }
+  }
+
+  /** 将工具调用投影映射为开始和完成事件，并保留原始结果。 */
+  private async consumeToolCalls(
+    calls: AsyncIterable<AgentToolCallStream>,
+    toolCalls: AgentChatToolCallRecord[],
+    events: AsyncEventQueue<AgentChatAgentEvent>,
+  ) {
+    for await (const call of calls) {
+      const argumentsValue = this.normalizeInput(call.input);
+      events.push({
+        type: 'tool_start',
+        name: call.name,
+        arguments: argumentsValue,
+      });
+
+      const [status, outputResult, error] = await Promise.all([
+        call.status,
+        call.output.then(
+          (value) => ({ value }),
+          (outputError) => ({ outputError }),
+        ),
+        call.error,
+      ]);
+      const output =
+        'outputError' in outputResult
+          ? outputResult.outputError
+          : outputResult.value;
+      const result =
+        status === 'error'
+          ? (error ?? this.normalizeResult(output))
+          : this.normalizeResult(output);
+      const toolCall = {
+        name: call.name,
+        arguments: argumentsValue,
+        result,
+      };
+      toolCalls.push(toolCall);
+      events.push({ type: 'tool_end', ...toolCall });
+    }
+  }
+
+  /** 转发单个模型文本投影中的非空增量。 */
+  private async forwardDeltas(
+    deltas: AsyncIterable<string>,
+    type: 'reasoning_delta' | 'text_delta',
+    events: AsyncEventQueue<AgentChatAgentEvent>,
+  ) {
+    for await (const delta of deltas) {
+      if (delta) events.push({ type, delta });
+    }
   }
 
   /** 隐藏 deepagents 内置文件系统和任务工具，只保留业务工具。 */
@@ -150,52 +169,6 @@ export class AgentChatAgentService {
 4. 用户询问时间时调用 get_current_time，需要计算时调用 calculate。
 5. 工具结果不足时明确说明资料未覆盖，不猜测。
 6. 当系统输出用户可见的思考过程时，仅使用简体中文。`;
-  }
-
-  /** 将模型内容统一提取为纯文本。 */
-  private extractContentText(content: unknown): string {
-    if (typeof content === 'string') return content;
-    if (!Array.isArray(content)) return '';
-
-    return content
-      .map((part) => {
-        if (typeof part === 'string') return part;
-        if (!part || typeof part !== 'object') return '';
-
-        const item = part as Record<string, unknown>;
-        if (item.type === 'reasoning') return '';
-        if (typeof item.text === 'string') return item.text;
-        if (typeof item.content === 'string') return item.content;
-
-        return '';
-      })
-      .join('');
-  }
-
-  /** 从模型附加字段或 reasoning 内容块中提取过程文本。 */
-  private extractReasoningText(chunk: unknown): string {
-    if (!chunk || typeof chunk !== 'object') return '';
-
-    const value = chunk as Record<string, unknown>;
-    const additionalKwargs = value.additional_kwargs;
-    if (additionalKwargs && typeof additionalKwargs === 'object') {
-      const reasoningContent = (additionalKwargs as Record<string, unknown>)
-        .reasoning_content;
-      if (typeof reasoningContent === 'string' && reasoningContent) {
-        return reasoningContent;
-      }
-    }
-
-    if (!Array.isArray(value.content)) return '';
-    return value.content
-      .map((part) => {
-        if (!part || typeof part !== 'object') return '';
-        const item = part as Record<string, unknown>;
-        if (item.type !== 'reasoning') return '';
-        if (typeof item.reasoning === 'string') return item.reasoning;
-        return typeof item.text === 'string' ? item.text : '';
-      })
-      .join('');
   }
 
   /** 将工具输入归一化为可持久化的参数对象。 */
@@ -234,52 +207,6 @@ export class AgentChatAgentService {
       return this.normalizeInput(record.input);
     }
     return record;
-  }
-
-  /** 从消息流中的 tool_calls/tool_call_chunks 提前补齐工具入参。 */
-  private collectToolArguments(
-    messageChunk: BaseMessage,
-    pendingToolInputs: Map<string, Record<string, unknown>>,
-  ) {
-    const chunk = messageChunk as unknown as {
-      tool_calls?: Array<{ id?: string; args?: Record<string, unknown> }>;
-      tool_call_chunks?: Array<{ id?: string; args?: string }>;
-    };
-
-    for (const call of chunk.tool_calls ?? []) {
-      if (call.id && call.args && typeof call.args === 'object') {
-        this.setPendingInput(
-          pendingToolInputs,
-          call.id,
-          this.normalizeInput(call.args),
-        );
-      }
-    }
-    for (const call of chunk.tool_call_chunks ?? []) {
-      if (call.id && typeof call.args === 'string' && call.args) {
-        try {
-          this.setPendingInput(
-            pendingToolInputs,
-            call.id,
-            this.normalizeInput(JSON.parse(call.args)),
-          );
-        } catch {
-          // 分片参数未完整时忽略，on_tool_start 会提供最终入参。
-        }
-      }
-    }
-  }
-
-  /** 仅当尚未拿到有效入参时写入工具参数。 */
-  private setPendingInput(
-    pendingToolInputs: Map<string, Record<string, unknown>>,
-    id: string,
-    args: Record<string, unknown>,
-  ) {
-    const existing = pendingToolInputs.get(id);
-    if (!existing || Object.keys(existing).length === 0) {
-      pendingToolInputs.set(id, args);
-    }
   }
 
   /** 将工具输出统一转换为字符串，并解包 LangChain ToolMessage。 */
