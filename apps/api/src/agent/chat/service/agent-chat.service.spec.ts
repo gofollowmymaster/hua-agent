@@ -68,10 +68,15 @@ describe('AgentChatService', () => {
 
   it('streams agent events and persists messages', async () => {
     agentService.stream.mockImplementation(async function* () {
+      yield { type: 'text_delta', delta: '计算前的说明。' };
       yield {
         type: 'tool_start',
         name: 'calculate',
         arguments: { expression: '1+2*3' },
+      };
+      yield {
+        type: 'reasoning_delta',
+        delta: '根据计算结果整理答案。',
       };
       yield {
         type: 'tool_end',
@@ -79,8 +84,7 @@ describe('AgentChatService', () => {
         arguments: { expression: '1+2*3' },
         result: '7',
       };
-      yield { type: 'text_delta', delta: '结果' };
-      yield { type: 'text_delta', delta: '是 7' };
+      yield { type: 'text_delta', delta: '结果是 7' };
       yield {
         type: 'done',
         answer: '结果是 7',
@@ -110,22 +114,26 @@ describe('AgentChatService', () => {
       expect.arrayContaining([expect.objectContaining({})]),
     );
     const parts = writer.write.mock.calls.map(([part]) => part);
-    expect(parts.map((part) => part.type)).toEqual([
-      'data-status',
-      'data-status',
-      'data-status',
-      'data-status',
-      'text-start',
-      'text-delta',
-      'text-delta',
-      'text-end',
-      'data-status',
-    ]);
-    expect(parts[1]).toMatchObject({
+    const firstTextDeltaIndex = parts.findIndex(
+      (part) => part.type === 'text-delta' && part.delta === '计算前的说明。',
+    );
+    const toolCallIndex = parts.findIndex(
+      (part) => part.type === 'data-status' && part.data.stage === 'tool_call',
+    );
+    const secondTextDeltaIndex = parts.findIndex(
+      (part) => part.type === 'text-delta' && part.delta === '结果是 7',
+    );
+    const textStarts = parts.filter((part) => part.type === 'text-start');
+
+    expect(firstTextDeltaIndex).toBeLessThan(toolCallIndex);
+    expect(toolCallIndex).toBeLessThan(secondTextDeltaIndex);
+    expect(textStarts).toHaveLength(2);
+    expect(textStarts[0].id).not.toEqual(textStarts[1].id);
+    expect(parts[toolCallIndex]).toMatchObject({
       type: 'data-status',
       data: { stage: 'tool_call', tool: 'calculate' },
     });
-    expect(parts[2]).toMatchObject({
+    expect(parts).toContainEqual({
       type: 'data-status',
       data: {
         stage: 'tool_result',
@@ -134,10 +142,6 @@ describe('AgentChatService', () => {
         arguments: { expression: '1+2*3' },
         result: '7',
       },
-    });
-    expect(parts[3]).toMatchObject({
-      type: 'data-status',
-      data: { stage: 'generate_start' },
     });
     expect(memoryService.appendUserMessage).toHaveBeenCalledWith(
       expect.objectContaining({ channel: 'agent-web' }),
@@ -154,6 +158,18 @@ describe('AgentChatService', () => {
           result: '7',
         },
       ],
+      expect.arrayContaining([
+        { type: 'text', text: '计算前的说明。' },
+        {
+          type: 'data-status',
+          data: {
+            stage: 'tool_call',
+            tool: 'calculate',
+            message: '调用工具：calculate',
+          },
+        },
+        { type: 'text', text: '结果是 7' },
+      ]),
     );
   });
 
@@ -255,6 +271,12 @@ describe('AgentChatService', () => {
       expect.objectContaining({ channel: 'agent-web' }),
       '抱歉，我暂时无法生成回答，请稍后重试。',
       [],
+      expect.arrayContaining([
+        {
+          type: 'text',
+          text: '抱歉，我暂时无法生成回答，请稍后重试。',
+        },
+      ]),
     );
   });
 });

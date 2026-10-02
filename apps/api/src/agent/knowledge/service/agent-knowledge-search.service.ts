@@ -46,6 +46,8 @@ export class AgentKnowledgeSearchService {
       this.searchFullText(normalizedQuery, options, candidateLimit),
       this.searchVector(normalizedQuery, options, candidateLimit),
     ]);
+    console.log('[ fullTextHits ] >', fullTextHits);
+    console.log('[ vectorHits ] >', vectorHits);
     return this.mergeByRrf([fullTextHits, vectorHits], topK);
   }
 

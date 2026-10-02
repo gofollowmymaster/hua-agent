@@ -7,6 +7,7 @@ import { AgentChatAgentService } from './agent-chat-agent.service';
 import { AgentChatMemoryService } from './agent-chat-memory.service';
 import type {
   AgentChatRequest,
+  AgentChatMessagePart,
   AgentChatToolCallRecord,
   AgentChatWriter,
 } from '../type/agent-chat-contract.type';
@@ -28,11 +29,11 @@ export class AgentChatService {
     const question = this.extractLatestUserQuestion(params);
     const conversationId = params?.id?.trim() || randomUUID();
     const participantId = params?.participantId?.trim() || undefined;
-    const textId = randomUUID();
 
     return createUIMessageStream({
       execute: async ({ writer }) => {
         const streamWriter = writer as AgentChatWriter;
+        const parts: AgentChatMessagePart[] = [];
         const session = this.memoryService.resolveSession({
           channel: 'agent-web',
           conversationId,
@@ -43,6 +44,10 @@ export class AgentChatService {
         });
 
         streamWriter.write({
+          type: 'data-status',
+          data: { stage: 'analyze_start', message: '开始分析问题' },
+        });
+        parts.push({
           type: 'data-status',
           data: { stage: 'analyze_start', message: '开始分析问题' },
         });
@@ -62,49 +67,71 @@ export class AgentChatService {
 
         let answer = '';
         const toolCalls: AgentChatToolCallRecord[] = [];
-        let textStarted = false;
-        const reasoningId = randomUUID();
-        let reasoningStarted = false;
-        const startReasoning = () => {
-          if (reasoningStarted) return;
-          streamWriter.write({ type: 'reasoning-start', id: reasoningId });
-          reasoningStarted = true;
+        let activeTextId: string | undefined;
+        let activeReasoningId: string | undefined;
+        let generationStarted = false;
+        let hasText = false;
+        const closeText = () => {
+          if (!activeTextId) return;
+          streamWriter.write({ type: 'text-end', id: activeTextId });
+          activeTextId = undefined;
         };
-        const endReasoning = () => {
-          if (!reasoningStarted) return;
-          streamWriter.write({ type: 'reasoning-end', id: reasoningId });
-          reasoningStarted = false;
+        const closeReasoning = () => {
+          if (!activeReasoningId) return;
+          streamWriter.write({ type: 'reasoning-end', id: activeReasoningId });
+          activeReasoningId = undefined;
         };
-        const startText = () => {
-          if (textStarted) return;
-          endReasoning();
+        const writeStatus = (data: Record<string, unknown>) => {
+          closeText();
+          closeReasoning();
+          streamWriter.write({ type: 'data-status', data });
+          parts.push({ type: 'data-status', data });
+        };
+        const writeReasoning = (delta: string) => {
+          closeText();
+          if (!activeReasoningId) {
+            activeReasoningId = randomUUID();
+            streamWriter.write({
+              type: 'reasoning-start',
+              id: activeReasoningId,
+            });
+          }
           streamWriter.write({
-            type: 'data-status',
-            data: { stage: 'generate_start', message: '开始生成答案' },
+            type: 'reasoning-delta',
+            id: activeReasoningId,
+            delta,
           });
-          streamWriter.write({ type: 'text-start', id: textId });
-          textStarted = true;
+          this.appendPartText(parts, 'reasoning', delta);
+        };
+        const writeText = (delta: string) => {
+          hasText = true;
+          closeReasoning();
+          if (!generationStarted) {
+            generationStarted = true;
+            writeStatus({ stage: 'generate_start', message: '开始生成答案' });
+          }
+          if (!activeTextId) {
+            activeTextId = randomUUID();
+            streamWriter.write({ type: 'text-start', id: activeTextId });
+          }
+          streamWriter.write({
+            type: 'text-delta',
+            id: activeTextId,
+            delta,
+          });
+          this.appendPartText(parts, 'text', delta);
         };
 
         for await (const event of this.agentService.stream(messages)) {
           if (event.type === 'reasoning_delta') {
-            startReasoning();
-            streamWriter.write({
-              type: 'reasoning-delta',
-              id: reasoningId,
-              delta: event.delta,
-            });
+            writeReasoning(event.delta);
             continue;
           }
           if (event.type === 'tool_start') {
-            endReasoning();
-            streamWriter.write({
-              type: 'data-status',
-              data: {
-                stage: 'tool_call',
-                message: `调用工具：${event.name}`,
-                tool: event.name,
-              },
+            writeStatus({
+              stage: 'tool_call',
+              message: `调用工具：${event.name}`,
+              tool: event.name,
             });
             continue;
           }
@@ -114,22 +141,13 @@ export class AgentChatService {
               arguments: event.arguments,
               result: event.result,
             };
-            endReasoning();
             toolCalls.push(toolCall);
-            streamWriter.write({
-              type: 'data-status',
-              data: this.buildToolResultStatus(toolCall),
-            });
+            writeStatus(this.buildToolResultStatus(toolCall));
             continue;
           }
           if (event.type === 'text_delta') {
             answer += event.delta;
-            startText();
-            streamWriter.write({
-              type: 'text-delta',
-              id: textId,
-              delta: event.delta,
-            });
+            writeText(event.delta);
             continue;
           }
           if (event.type === 'done') {
@@ -139,24 +157,11 @@ export class AgentChatService {
           }
         }
 
-        if (!answer) {
-          answer = '抱歉，我暂时无法生成回答，请稍后重试。';
-          startText();
-          streamWriter.write({
-            type: 'text-delta',
-            id: textId,
-            delta: answer,
-          });
-        }
-        if (!textStarted) {
-          startText();
-          streamWriter.write({
-            type: 'text-delta',
-            id: textId,
-            delta: answer,
-          });
-        }
-        streamWriter.write({ type: 'text-end', id: textId });
+        if (!answer) answer = '抱歉，我暂时无法生成回答，请稍后重试。';
+        if (!hasText) writeText(answer);
+        closeText();
+        closeReasoning();
+        writeStatus({ stage: 'done', message: '生成完成' });
 
         await this.memoryService.appendUserMessage(
           session,
@@ -167,12 +172,8 @@ export class AgentChatService {
           session,
           answer,
           toolCalls,
+          parts,
         );
-
-        streamWriter.write({
-          type: 'data-status',
-          data: { stage: 'done', message: '生成完成' },
-        });
       },
       onError: (error) =>
         error instanceof Error ? error.message : String(error),
@@ -190,6 +191,20 @@ export class AgentChatService {
       arguments: toolCall.arguments,
       result: toolCall.result,
     };
+  }
+
+  /** 将连续同类文本增量合并为一个持久化 part。 */
+  private appendPartText(
+    parts: AgentChatMessagePart[],
+    type: 'reasoning' | 'text',
+    text: string,
+  ) {
+    const lastPart = parts.at(-1);
+    if (lastPart?.type === type) {
+      lastPart.text += text;
+      return;
+    }
+    parts.push({ type, text });
   }
 
   /** 为知识检索和文档切片工具生成摘要，其余工具回退到通用文案。 */

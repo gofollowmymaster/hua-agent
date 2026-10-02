@@ -164,6 +164,7 @@ CREATE TABLE IF NOT EXISTS agent_chat_messages (
   role TEXT NOT NULL,
   content TEXT NOT NULL,
   tool_calls JSONB NOT NULL DEFAULT '{}'::jsonb,
+  parts JSONB,
   sender_id TEXT,
   external_message_id TEXT,
   reply_to_message_id TEXT,
@@ -179,6 +180,9 @@ CREATE INDEX IF NOT EXISTS idx_agent_chat_sessions_last_active
 
 CREATE INDEX IF NOT EXISTS idx_agent_chat_messages_tenant_session_created
   ON agent_chat_messages (tenant_code, session_id, created_at);
+
+ALTER TABLE agent_chat_messages
+  ADD COLUMN IF NOT EXISTS parts JSONB;
 
 CREATE TABLE IF NOT EXISTS aplus_rag_sessions (
   id BIGSERIAL PRIMARY KEY,

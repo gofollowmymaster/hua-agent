@@ -5,6 +5,7 @@ import { RagPrismaService } from '@src/common/service/rag-prisma/rag-prisma.serv
 import type { AgentChatSessionPageDto } from '../dto/agent-chat.dto';
 import type {
   AgentChatHistoryMessage,
+  AgentChatMessagePart,
   AgentChatResolvedSession,
   AgentChatSessionInput,
   AgentChatToolCallRecord,
@@ -85,6 +86,7 @@ export class AgentChatMemoryService {
     session: AgentChatResolvedSession,
     content: string,
     toolCalls: AgentChatToolCallRecord[] = [],
+    parts?: AgentChatMessagePart[],
   ) {
     const sessionId = await this.resolveSessionId(session);
     await this.ragPrisma.$transaction([
@@ -95,6 +97,9 @@ export class AgentChatMemoryService {
           role: 'assistant',
           content,
           toolCalls: toolCalls as unknown as Prisma.InputJsonValue,
+          ...(parts
+            ? { parts: parts as unknown as Prisma.InputJsonValue }
+            : {}),
           replyToMessageId: session.messageId,
           metadata: this.buildMessageMetadata(session) as Prisma.InputJsonValue,
         },
@@ -185,6 +190,7 @@ export class AgentChatMemoryService {
       role: message.role,
       content: message.content,
       toolCalls: message.toolCalls,
+      parts: message.parts,
       senderId: message.senderId,
       externalMessageId: message.externalMessageId,
       replyToMessageId: message.replyToMessageId,

@@ -103,12 +103,36 @@ describe('AgentChatMemoryService', () => {
     });
 
     await service.appendUserMessage(session, 'question', 'msg-1');
-    await service.appendAssistantMessage(session, 'answer', [
-      { name: 'calculate', arguments: { expression: '1+1' }, result: '2' },
-    ]);
+    await service.appendAssistantMessage(
+      session,
+      'answer',
+      [{ name: 'calculate', arguments: { expression: '1+1' }, result: '2' }],
+      [
+        { type: 'text', text: '计算前的说明。' },
+        {
+          type: 'data-status',
+          data: { stage: 'tool_result', tool: 'calculate', result: '2' },
+        },
+        { type: 'text', text: 'answer' },
+      ],
+    );
 
     expect(ragPrisma.$transaction).toHaveBeenCalledTimes(2);
     expect(ragPrisma.agentChatMessage.create).toHaveBeenCalledTimes(2);
+    expect(ragPrisma.agentChatMessage.create).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          parts: [
+            { type: 'text', text: '计算前的说明。' },
+            {
+              type: 'data-status',
+              data: { stage: 'tool_result', tool: 'calculate', result: '2' },
+            },
+            { type: 'text', text: 'answer' },
+          ],
+        }),
+      }),
+    );
   });
 
   it('pages sessions with latest message', async () => {

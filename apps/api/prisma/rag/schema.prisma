@@ -145,6 +145,7 @@ model AgentChatMessage {
   role             String            @db.Text
   content          String            @db.Text
   toolCalls        Json              @default("{}") @map("tool_calls") @db.JsonB
+  parts            Json?             @db.JsonB
   senderId         String?           @map("sender_id") @db.Text
   externalMessageId String?          @map("external_message_id") @db.Text
   replyToMessageId String?           @map("reply_to_message_id") @db.Text

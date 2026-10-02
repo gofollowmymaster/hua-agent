@@ -11,7 +11,8 @@ import {
   agentChatApiUrl,
   listAgentChatMessages,
   pageAgentChatSessions,
-  type AgentChatMessageItem
+  type AgentChatMessageItem,
+  type AgentChatMessagePart
 } from '@/api/business-agent/chat';
 
 /** 创建业务 Agent Demo 的共享聊天 adapter。 */
@@ -54,7 +55,7 @@ function buildAuthHeaders(userStore: ReturnType<typeof useUserStore>) {
   return headers;
 }
 
-function toUiMessages(
+export function toUiMessages(
   historyMessages: AgentChatMessageItem[]
 ): ChatDemoMessage[] {
   return historyMessages
@@ -62,28 +63,55 @@ function toUiMessages(
       (message) => message.role === 'user' || message.role === 'assistant'
     )
     .map((message) => {
-      const parts: ChatDemoMessage['parts'] = [];
-      if (Array.isArray(message.toolCalls)) {
-        for (const toolCall of message.toolCalls as AgentToolCallRecord[]) {
-          parts.push({
-            type: 'data-status',
-            data: {
-              stage: 'tool_result',
-              tool: toolCall.name,
-              message: `工具执行完成：${toolCall.name}`,
-              arguments: toolCall.arguments,
-              result: toolCall.result,
-            },
-          });
-        }
-      }
-      parts.push({ type: 'text', text: message.content });
+      const parts = isOrderedParts(message.parts)
+        ? message.parts
+        : toLegacyParts(message);
       return {
         id: String(message.id),
         role: message.role as 'user' | 'assistant',
-        parts,
+        parts: parts as ChatDemoMessage['parts'],
       };
     }) as ChatDemoMessage[];
+}
+
+function isOrderedParts(
+  parts: AgentChatMessagePart[] | undefined
+): parts is AgentChatMessagePart[] {
+  return Array.isArray(parts) && parts.every(isOrderedPart);
+}
+
+function isOrderedPart(part: unknown): part is AgentChatMessagePart {
+  if (!part || typeof part !== 'object') return false;
+  const value = part as Record<string, unknown>;
+  if (value.type === 'text' || value.type === 'reasoning') {
+    return typeof value.text === 'string';
+  }
+  return (
+    value.type === 'data-status' &&
+    !!value.data &&
+    typeof value.data === 'object' &&
+    !Array.isArray(value.data)
+  );
+}
+
+function toLegacyParts(message: AgentChatMessageItem): AgentChatMessagePart[] {
+  const parts: AgentChatMessagePart[] = [];
+  if (Array.isArray(message.toolCalls)) {
+    for (const toolCall of message.toolCalls as AgentToolCallRecord[]) {
+      parts.push({
+        type: 'data-status',
+        data: {
+          stage: 'tool_result',
+          tool: toolCall.name,
+          message: `工具执行完成：${toolCall.name}`,
+          arguments: toolCall.arguments,
+          result: toolCall.result,
+        },
+      });
+    }
+  }
+  parts.push({ type: 'text', text: message.content });
+  return parts;
 }
 
 interface AgentToolCallRecord {

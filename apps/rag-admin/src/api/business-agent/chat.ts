@@ -29,12 +29,21 @@ export interface AgentChatMessageItem {
   role: string;
   content: string;
   toolCalls?: unknown;
+  parts?: AgentChatMessagePart[];
   senderId?: string;
   externalMessageId?: string;
   replyToMessageId?: string;
   metadata: Record<string, unknown>;
   createdAt: string;
 }
+
+export type AgentChatMessagePart =
+  | { type: 'reasoning'; text: string }
+  | { type: 'text'; text: string }
+  | {
+      type: 'data-status';
+      data: Record<string, unknown>;
+    };
 
 export const agentChatApiUrl = `${
   import.meta.env.VITE_API_BASE_URL || ''

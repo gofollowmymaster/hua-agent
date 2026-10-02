@@ -32,6 +32,11 @@ export interface AgentChatToolCallRecord {
   result: string;
 }
 
+export type AgentChatMessagePart =
+  | { type: 'reasoning'; text: string }
+  | { type: 'text'; text: string }
+  | { type: 'data-status'; data: Record<string, unknown> };
+
 export type AgentChatAgentEvent =
   | { type: 'reasoning_delta'; delta: string }
   | {
