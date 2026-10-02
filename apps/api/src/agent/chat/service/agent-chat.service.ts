@@ -122,7 +122,12 @@ export class AgentChatService {
           this.appendPartText(parts, 'text', delta);
         };
 
-        for await (const event of this.agentService.stream(messages)) {
+        for await (const event of this.agentService.stream(messages, {
+          tenantCode: session.tenantCode,
+          channel: session.channel,
+          conversationId: session.conversationId,
+          sessionKey: session.sessionKey,
+        })) {
           if (event.type === 'reasoning_delta') {
             writeReasoning(event.delta);
             continue;

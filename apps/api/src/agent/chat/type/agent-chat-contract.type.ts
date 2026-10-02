@@ -21,6 +21,13 @@ export interface AgentChatResolvedSession extends AgentChatSessionInput {
   sessionKey: string;
 }
 
+export interface AgentChatExecutionContext {
+  tenantCode: string;
+  channel: string;
+  conversationId?: string;
+  sessionKey: string;
+}
+
 export interface AgentChatHistoryMessage {
   role: 'user' | 'assistant';
   content: string;

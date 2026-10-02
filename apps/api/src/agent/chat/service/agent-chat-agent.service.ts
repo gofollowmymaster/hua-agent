@@ -8,9 +8,11 @@ import {
 } from 'deepagents';
 import { NodeConfigService } from '@src/config/node-config.service';
 import { AsyncEventQueue } from '../common/async-event-queue';
+import { AgentChatToolLoggingMiddlewareService } from './agent-chat-tool-logging-middleware.service';
 import { AgentChatToolService } from './agent-chat-tool.service';
 import type {
   AgentChatAgentEvent,
+  AgentChatExecutionContext,
   AgentChatToolCallRecord,
 } from '../type/agent-chat-contract.type';
 import type {
@@ -36,7 +38,10 @@ export class AgentChatAgentService {
   private readonly agent: ReturnType<typeof createDeepAgent>;
 
   /** 初始化模型、harness profile 和编译后的 Deep Agent 单例。 */
-  constructor(private readonly toolService: AgentChatToolService) {
+  constructor(
+    private readonly toolService: AgentChatToolService,
+    private readonly toolLoggingMiddleware: AgentChatToolLoggingMiddlewareService,
+  ) {
     this.model = new ChatOpenAI({
       temperature: 0.5,
       model: NodeConfigService.get('modelName'),
@@ -50,16 +55,21 @@ export class AgentChatAgentService {
       model: this.model,
       tools: this.toolService.getTools(),
       systemPrompt: this.buildSystemPrompt(),
+      middleware: [this.toolLoggingMiddleware.create()],
     });
   }
 
   /** 按顺序消费 deepagents 消息和工具事件，输出协议无关的 Agent 事件。 */
   async *stream(
     messages: BaseMessage[],
+    context: AgentChatExecutionContext,
   ): AsyncGenerator<AgentChatAgentEvent, void, void> {
     const toolCalls: AgentChatToolCallRecord[] = [];
     let answer = '';
-    const run = await this.agent.streamEvents({ messages }, { version: 'v3' });
+    const run = await this.agent.streamEvents(
+      { messages },
+      { version: 'v3', context },
+    );
     const events = new AsyncEventQueue<AgentChatAgentEvent>();
 
     void Promise.all([
@@ -149,9 +159,8 @@ export class AgentChatAgentService {
 
   /** 隐藏 deepagents 内置文件系统和任务工具，只保留业务工具。 */
   private registerHarnessProfile() {
-    const modelName = NodeConfigService.get('modelName');
     registerHarnessProfile(
-      `openai:${modelName}`,
+      'openai',
       createHarnessProfile({
         excludedTools: EXCLUDED_BUILTIN_TOOLS,
         generalPurposeSubagent: { enabled: false },
@@ -168,7 +177,8 @@ export class AgentChatAgentService {
 3. 引用资料时给出文档名或路径。
 4. 用户询问时间时调用 get_current_time，需要计算时调用 calculate。
 5. 工具结果不足时明确说明资料未覆盖，不猜测。
-6. 当系统输出用户可见的思考过程时，仅使用简体中文。`;
+6. 当系统输出用户可见的思考过程时，仅使用简体中文。
+7. 只能使用 SDK 提供的原生工具调用，不得用 XML、Markdown 或文本模拟工具调用。`;
   }
 
   /** 将工具输入归一化为可持久化的参数对象。 */

@@ -112,6 +112,12 @@ describe('AgentChatService', () => {
 
     expect(agentService.stream).toHaveBeenCalledWith(
       expect.arrayContaining([expect.objectContaining({})]),
+      {
+        tenantCode: 'yurex',
+        channel: 'agent-web',
+        conversationId: 'conversation',
+        sessionKey: 'session',
+      },
     );
     const parts = writer.write.mock.calls.map(([part]) => part);
     const firstTextDeltaIndex = parts.findIndex(

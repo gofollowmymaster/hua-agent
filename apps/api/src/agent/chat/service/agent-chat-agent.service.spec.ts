@@ -1,4 +1,5 @@
 import { AgentChatAgentService } from './agent-chat-agent.service';
+import { AgentChatToolLoggingMiddlewareService } from './agent-chat-tool-logging-middleware.service';
 import { AgentChatToolService } from './agent-chat-tool.service';
 import {
   createDeepAgent,
@@ -33,10 +34,16 @@ jest.mock('@src/config/node-config.service', () => ({
 
 describe('AgentChatAgentService', () => {
   let toolService: { getTools: jest.Mock };
+  let toolLoggingMiddleware: { create: jest.Mock };
 
   beforeEach(() => {
     jest.clearAllMocks();
     toolService = { getTools: jest.fn().mockReturnValue([]) };
+    toolLoggingMiddleware = {
+      create: jest
+        .fn()
+        .mockReturnValue({ name: 'AgentChatToolLoggingMiddleware' }),
+    };
     (createDeepAgent as jest.Mock).mockReturnValue({
       streamEvents: mockStreamEvents,
     });
@@ -46,10 +53,13 @@ describe('AgentChatAgentService', () => {
   });
 
   it('creates deep agent with business tools and hidden built-in tools', () => {
-    new AgentChatAgentService(toolService as unknown as AgentChatToolService);
+    new AgentChatAgentService(
+      toolService as unknown as AgentChatToolService,
+      toolLoggingMiddleware as unknown as AgentChatToolLoggingMiddlewareService,
+    );
 
     expect(registerHarnessProfile).toHaveBeenCalledWith(
-      'openai:test-model',
+      'openai',
       expect.objectContaining({
         excludedTools: [
           'ls',
@@ -68,6 +78,7 @@ describe('AgentChatAgentService', () => {
       expect.objectContaining({
         model: expect.any(Object),
         tools: [],
+        middleware: [{ name: 'AgentChatToolLoggingMiddleware' }],
         systemPrompt: expect.stringContaining('业务 Agent 助手'),
       }),
     );
@@ -75,6 +86,13 @@ describe('AgentChatAgentService', () => {
       expect.objectContaining({
         systemPrompt: expect.stringContaining(
           '当系统输出用户可见的思考过程时，仅使用简体中文。',
+        ),
+      }),
+    );
+    expect(createDeepAgent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        systemPrompt: expect.stringContaining(
+          '不得用 XML、Markdown 或文本模拟工具调用。',
         ),
       }),
     );
@@ -105,12 +123,21 @@ describe('AgentChatAgentService', () => {
 
     const service = new AgentChatAgentService(
       toolService as unknown as AgentChatToolService,
+      toolLoggingMiddleware as unknown as AgentChatToolLoggingMiddlewareService,
     );
     const events = await collectEvents(service);
 
     expect(mockStreamEvents).toHaveBeenCalledWith(
       { messages: [] },
-      { version: 'v3' },
+      {
+        version: 'v3',
+        context: {
+          tenantCode: 'yurex',
+          channel: 'agent-web',
+          conversationId: 'conversation-1',
+          sessionKey: 'conversation:conversation-1:user:u1',
+        },
+      },
     );
     expect(events).toEqual(
       expect.arrayContaining([
@@ -162,6 +189,7 @@ describe('AgentChatAgentService', () => {
 
     const service = new AgentChatAgentService(
       toolService as unknown as AgentChatToolService,
+      toolLoggingMiddleware as unknown as AgentChatToolLoggingMiddlewareService,
     );
     const events = await collectEvents(service);
 
@@ -217,7 +245,12 @@ function toAsyncIterable<T>(values: T[]): AsyncIterable<T> {
 
 async function collectEvents(service: AgentChatAgentService) {
   const events = [];
-  for await (const event of service.stream([])) {
+  for await (const event of service.stream([], {
+    tenantCode: 'yurex',
+    channel: 'agent-web',
+    conversationId: 'conversation-1',
+    sessionKey: 'conversation:conversation-1:user:u1',
+  })) {
     events.push(event);
   }
   return events;

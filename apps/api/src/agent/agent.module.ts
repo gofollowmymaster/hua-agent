@@ -7,6 +7,7 @@ import { AgentChatController } from './chat/agent-chat.controller';
 import { AgentChatAgentService } from './chat/service/agent-chat-agent.service';
 import { AgentChatMemoryService } from './chat/service/agent-chat-memory.service';
 import { AgentChatService } from './chat/service/agent-chat.service';
+import { AgentChatToolLoggingMiddlewareService } from './chat/service/agent-chat-tool-logging-middleware.service';
 import { AgentChatToolService } from './chat/service/agent-chat-tool.service';
 import { GuardModule } from '@src/common/guard/guard.module';
 
@@ -20,6 +21,7 @@ import { GuardModule } from '@src/common/guard/guard.module';
     AgentKnowledgeSearchService,
     AgentChatMemoryService,
     AgentChatToolService,
+    AgentChatToolLoggingMiddlewareService,
     AgentChatAgentService,
     AgentChatService,
   ],
