@@ -1,3 +1,5 @@
+import { ToolMessage } from '@langchain/core/messages';
+import { toolCallLimitMiddleware } from 'langchain';
 import { AgentChatAgentService } from './agent-chat-agent.service';
 import { AgentChatToolLoggingMiddlewareService } from './agent-chat-tool-logging-middleware.service';
 import { AgentChatToolService } from './agent-chat-tool.service';
@@ -13,6 +15,10 @@ jest.mock('deepagents', () => ({
   createDeepAgent: jest.fn(),
   createHarnessProfile: jest.fn(),
   registerHarnessProfile: jest.fn(),
+}));
+
+jest.mock('langchain', () => ({
+  toolCallLimitMiddleware: jest.fn(),
 }));
 
 jest.mock('@langchain/openai', () => ({
@@ -44,6 +50,9 @@ describe('AgentChatAgentService', () => {
         .fn()
         .mockReturnValue({ name: 'AgentChatToolLoggingMiddleware' }),
     };
+    (toolCallLimitMiddleware as jest.Mock).mockReturnValue({
+      name: 'ToolCallLimitMiddleware',
+    });
     (createDeepAgent as jest.Mock).mockReturnValue({
       streamEvents: mockStreamEvents,
     });
@@ -53,10 +62,7 @@ describe('AgentChatAgentService', () => {
   });
 
   it('creates deep agent with business tools and hidden built-in tools', () => {
-    new AgentChatAgentService(
-      toolService as unknown as AgentChatToolService,
-      toolLoggingMiddleware as unknown as AgentChatToolLoggingMiddlewareService,
-    );
+    createService();
 
     expect(registerHarnessProfile).toHaveBeenCalledWith(
       'openai',
@@ -74,11 +80,18 @@ describe('AgentChatAgentService', () => {
         generalPurposeSubagent: { enabled: false },
       }),
     );
+    expect(toolCallLimitMiddleware).toHaveBeenCalledWith({
+      runLimit: 5,
+      exitBehavior: 'continue',
+    });
     expect(createDeepAgent).toHaveBeenCalledWith(
       expect.objectContaining({
         model: expect.any(Object),
         tools: [],
-        middleware: [{ name: 'AgentChatToolLoggingMiddleware' }],
+        middleware: [
+          { name: 'ToolCallLimitMiddleware' },
+          { name: 'AgentChatToolLoggingMiddleware' },
+        ],
         systemPrompt: expect.stringContaining('业务 Agent 助手'),
       }),
     );
@@ -98,34 +111,23 @@ describe('AgentChatAgentService', () => {
     );
   });
 
-  it('streams AI text and reasoning separately from tool output', async () => {
+  it('streams reasoning, tool lifecycle, and text in raw protocol order', async () => {
     const toolOutput = JSON.stringify([
       { fileName: '退货流程.md', content: '完整检索内容'.repeat(500) },
     ]);
     mockStreamEvents.mockResolvedValue(
-      createRun({
-        messages: [
-          {
-            text: ['请按退货流程操作。'],
-            reasoning: ['先检索知识库。'],
-          },
-        ],
-        toolCalls: [
-          {
-            name: 'search_knowledge',
-            input: { query: '退货流程' },
-            status: 'finished',
-            output: toolOutput,
-          },
-        ],
-      }),
+      createRun([
+        messageDelta({
+          type: 'reasoning-delta',
+          reasoning: '先检索知识库。',
+        }),
+        toolStarted('call-1', 'search_knowledge', { query: '退货流程' }),
+        toolFinished('call-1', toolOutput),
+        messageDelta({ type: 'text-delta', text: '请按退货流程操作。' }),
+      ]),
     );
 
-    const service = new AgentChatAgentService(
-      toolService as unknown as AgentChatToolService,
-      toolLoggingMiddleware as unknown as AgentChatToolLoggingMiddlewareService,
-    );
-    const events = await collectEvents(service);
+    const events = await collectEvents(createService());
 
     expect(mockStreamEvents).toHaveBeenCalledWith(
       { messages: [] },
@@ -139,59 +141,79 @@ describe('AgentChatAgentService', () => {
         },
       },
     );
-    expect(events).toEqual(
-      expect.arrayContaining([
-        { type: 'reasoning_delta', delta: '先检索知识库。' },
-        {
-          type: 'tool_start',
-          name: 'search_knowledge',
-          arguments: { query: '退货流程' },
-        },
-        {
-          type: 'tool_end',
-          name: 'search_knowledge',
-          arguments: { query: '退货流程' },
-          result: toolOutput,
-        },
-        { type: 'text_delta', delta: '请按退货流程操作。' },
-        {
-          type: 'done',
-          answer: '请按退货流程操作。',
-          toolCalls: [
-            {
-              name: 'search_knowledge',
-              arguments: { query: '退货流程' },
-              result: toolOutput,
-            },
-          ],
-        },
+    expect(events).toEqual([
+      { type: 'reasoning_delta', delta: '先检索知识库。' },
+      {
+        type: 'tool_start',
+        name: 'search_knowledge',
+        arguments: { query: '退货流程' },
+      },
+      {
+        type: 'tool_end',
+        name: 'search_knowledge',
+        arguments: { query: '退货流程' },
+        result: toolOutput,
+      },
+      { type: 'text_delta', delta: '请按退货流程操作。' },
+      {
+        type: 'done',
+        answer: '请按退货流程操作。',
+        toolCalls: [
+          {
+            name: 'search_knowledge',
+            arguments: { query: '退货流程' },
+            result: toolOutput,
+          },
+        ],
+      },
+    ]);
+  });
+
+  it('normalizes ToolMessage and serialized ToolMessage outputs', async () => {
+    const toolMessage = new ToolMessage({
+      content: '实时工具结果',
+      tool_call_id: 'call-1',
+    });
+    const serializedToolMessage = {
+      lc: 1,
+      type: 'constructor',
+      id: ['langchain_core', 'messages', 'ToolMessage'],
+      kwargs: { content: '序列化工具结果', tool_call_id: 'call-2' },
+    };
+    mockStreamEvents.mockResolvedValue(
+      createRun([
+        toolStarted('call-1', 'calculate', { expression: '1+1' }),
+        toolStarted('call-2', 'get_document', { id: 'document-1' }),
+        toolFinished('call-2', serializedToolMessage),
+        toolFinished('call-1', toolMessage),
       ]),
     );
-    expect(events).not.toContainEqual({
-      type: 'text_delta',
-      delta: toolOutput,
+
+    const events = await collectEvents(createService());
+
+    expect(events).toContainEqual({
+      type: 'tool_end',
+      name: 'calculate',
+      arguments: { expression: '1+1' },
+      result: '实时工具结果',
+    });
+    expect(events).toContainEqual({
+      type: 'tool_end',
+      name: 'get_document',
+      arguments: { id: 'document-1' },
+      result: '序列化工具结果',
     });
   });
 
-  it('records failed tool calls as tool_end results', async () => {
+  it('records tool errors using the matching tool call', async () => {
     mockStreamEvents.mockResolvedValue(
-      createRun({
-        toolCalls: [
-          {
-            name: 'calculate',
-            input: { expression: '1/0' },
-            status: 'error',
-            error: 'division by zero',
-          },
-        ],
-      }),
+      createRun([
+        toolStarted('call-1', 'calculate', { expression: '1/0' }),
+        toolError('call-1', 'division by zero'),
+      ]),
     );
 
-    const service = new AgentChatAgentService(
-      toolService as unknown as AgentChatToolService,
-      toolLoggingMiddleware as unknown as AgentChatToolLoggingMiddlewareService,
-    );
-    const events = await collectEvents(service);
+    const events = await collectEvents(createService());
 
     expect(events).toContainEqual({
       type: 'tool_end',
@@ -200,47 +222,110 @@ describe('AgentChatAgentService', () => {
       result: 'division by zero',
     });
   });
+
+  it('reports a successful tool event with missing output explicitly', async () => {
+    mockStreamEvents.mockResolvedValue(
+      createRun([
+        toolStarted('call-1', 'search_knowledge', { query: '退款' }),
+        toolFinished('call-1', undefined),
+      ]),
+    );
+
+    const events = await collectEvents(createService());
+
+    expect(events).toContainEqual({
+      type: 'tool_end',
+      name: 'search_knowledge',
+      arguments: { query: '退款' },
+      result: '工具执行完成，但未返回可展示结果',
+    });
+  });
+
+  it('awaits run.output before emitting done', async () => {
+    const output = Promise.resolve({ messages: [] });
+    const outputThen = jest.fn(output.then.bind(output));
+    mockStreamEvents.mockResolvedValue(
+      createRun([], { then: outputThen } as unknown as PromiseLike<unknown>),
+    );
+
+    const events = await collectEvents(createService());
+
+    expect(outputThen).toHaveBeenCalledTimes(1);
+    expect(events).toEqual([{ type: 'done', answer: '', toolCalls: [] }]);
+  });
+
+  it('propagates a rejected final run output', async () => {
+    mockStreamEvents.mockResolvedValue(
+      createRun([], Promise.reject(new Error('agent failed'))),
+    );
+
+    await expect(collectEvents(createService())).rejects.toThrow(
+      'agent failed',
+    );
+  });
+
+  function createService() {
+    return new AgentChatAgentService(
+      toolService as unknown as AgentChatToolService,
+      toolLoggingMiddleware as unknown as AgentChatToolLoggingMiddlewareService,
+    );
+  }
 });
 
-function createRun({
-  messages = [],
-  toolCalls = [],
-}: {
-  messages?: Array<{ text: string[]; reasoning: string[] }>;
-  toolCalls?: Array<{
-    name: string;
-    input: unknown;
-    status: 'finished' | 'error';
-    output?: unknown;
-    error?: string;
-  }>;
-}) {
+function createRun(
+  events: unknown[],
+  output: PromiseLike<unknown> = Promise.resolve({ messages: [] }),
+) {
   return {
-    messages: toAsyncIterable(
-      messages.map((message) => ({
-        text: toAsyncIterable(message.text),
-        reasoning: toAsyncIterable(message.reasoning),
-      })),
-    ),
-    toolCalls: toAsyncIterable(
-      toolCalls.map((call) => ({
-        name: call.name,
-        input: call.input,
-        status: Promise.resolve(call.status),
-        output:
-          call.status === 'error'
-            ? Promise.reject(new Error(call.error))
-            : Promise.resolve(call.output),
-        error: Promise.resolve(call.error),
-      })),
-    ),
+    output,
+    async *[Symbol.asyncIterator]() {
+      yield* events;
+    },
   };
 }
 
-function toAsyncIterable<T>(values: T[]): AsyncIterable<T> {
-  return (async function* () {
-    yield* values;
-  })();
+function messageDelta(delta: Record<string, unknown>) {
+  return protocolEvent('messages', {
+    event: 'content-block-delta',
+    index: 0,
+    delta,
+  });
+}
+
+function toolStarted(id: string, name: string, input: unknown) {
+  return protocolEvent('tools', {
+    event: 'tool-started',
+    tool_call_id: id,
+    tool_name: name,
+    input,
+  });
+}
+
+function toolFinished(id: string, output: unknown) {
+  return protocolEvent('tools', {
+    event: 'tool-finished',
+    tool_call_id: id,
+    output,
+  });
+}
+
+function toolError(id: string, message: string) {
+  return protocolEvent('tools', {
+    event: 'tool-error',
+    tool_call_id: id,
+    message,
+  });
+}
+
+function protocolEvent(method: 'messages' | 'tools', data: object) {
+  return {
+    method,
+    params: {
+      namespace: [],
+      timestamp: '2026-10-02T00:00:00.000Z',
+      data,
+    },
+  };
 }
 
 async function collectEvents(service: AgentChatAgentService) {

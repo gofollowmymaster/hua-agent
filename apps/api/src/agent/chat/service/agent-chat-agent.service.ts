@@ -8,7 +8,6 @@ import {
   registerHarnessProfile,
 } from 'deepagents';
 import { NodeConfigService } from '@src/config/node-config.service';
-import { AsyncEventQueue } from '../common/async-event-queue';
 import { AgentChatToolLoggingMiddlewareService } from './agent-chat-tool-logging-middleware.service';
 import { AgentChatToolService } from './agent-chat-tool.service';
 import type {
@@ -16,10 +15,6 @@ import type {
   AgentChatExecutionContext,
   AgentChatToolCallRecord,
 } from '../type/agent-chat-contract.type';
-import type {
-  AgentMessageStream,
-  AgentToolCallStream,
-} from '../type/agent-chat-runtime.type';
 
 const EXCLUDED_BUILTIN_TOOLS = [
   'ls',
@@ -33,6 +28,24 @@ const EXCLUDED_BUILTIN_TOOLS = [
 ];
 
 const MAX_TOOL_CALLS_PER_RUN = 5;
+const MISSING_TOOL_OUTPUT_MESSAGE = '工具执行完成，但未返回可展示结果';
+
+type MessageProtocolData = {
+  event: string;
+  delta?:
+    | { type: 'reasoning-delta'; reasoning: string }
+    | { type: 'text-delta'; text: string };
+};
+
+type ToolProtocolData =
+  | {
+      event: 'tool-started';
+      tool_call_id: string;
+      tool_name: string;
+      input?: unknown;
+    }
+  | { event: 'tool-finished'; tool_call_id: string; output?: unknown }
+  | { event: 'tool-error'; tool_call_id: string; message: string };
 
 /** 封装 deepagents 运行时创建、模型配置和有序流事件适配。 */
 @Injectable()
@@ -68,7 +81,7 @@ export class AgentChatAgentService {
     });
   }
 
-  /** 按顺序消费 deepagents 消息和工具事件，输出协议无关的 Agent 事件。 */
+  /** 按 v3 原始事件到达顺序输出协议无关的 Agent 事件。 */
   async *stream(
     messages: BaseMessage[],
     context: AgentChatExecutionContext,
@@ -79,22 +92,69 @@ export class AgentChatAgentService {
       { messages },
       { version: 'v3', context },
     );
-    const events = new AsyncEventQueue<AgentChatAgentEvent>();
+    const activeToolCalls = new Map<
+      string,
+      Omit<AgentChatToolCallRecord, 'result'>
+    >();
 
-    void Promise.all([
-      this.consumeMessageStreams(run.messages, events),
-      this.consumeToolCalls(run.toolCalls, toolCalls, events),
-    ])
-      .then(() => events.close())
-      .catch((error) => events.fail(error));
+    for await (const event of run) {
+      if (event.method === 'messages') {
+        const data = event.params.data as MessageProtocolData;
+        if (data.event !== 'content-block-delta' || !data.delta) continue;
 
-    for await (const event of events) {
-      if (event.type === 'text_delta') {
-        answer += event.delta;
+        if (data.delta.type === 'reasoning-delta') {
+          if (data.delta.reasoning) {
+            yield {
+              type: 'reasoning_delta',
+              delta: data.delta.reasoning,
+            };
+          }
+          continue;
+        }
+        if (data.delta.type === 'text-delta' && data.delta.text) {
+          answer += data.delta.text;
+          yield { type: 'text_delta', delta: data.delta.text };
+        }
+        continue;
       }
-      yield event;
+
+      if (event.method !== 'tools') continue;
+      const data = event.params.data as ToolProtocolData;
+      if (data.event === 'tool-started') {
+        const toolCall = {
+          name: data.tool_name,
+          arguments: this.normalizeInput(data.input),
+        };
+        activeToolCalls.set(data.tool_call_id, toolCall);
+        yield { type: 'tool_start', ...toolCall };
+        continue;
+      }
+
+      if (data.event === 'tool-finished') {
+        const toolCall = this.finishToolCall(
+          data.tool_call_id,
+          data.output === undefined
+            ? MISSING_TOOL_OUTPUT_MESSAGE
+            : this.normalizeResult(data.output),
+          activeToolCalls,
+        );
+        toolCalls.push(toolCall);
+        yield { type: 'tool_end', ...toolCall };
+        continue;
+      }
+
+      if (data.event === 'tool-error') {
+        const toolCall = this.finishToolCall(
+          data.tool_call_id,
+          data.message,
+          activeToolCalls,
+        );
+        toolCalls.push(toolCall);
+        yield { type: 'tool_end', ...toolCall };
+      }
     }
 
+    await run.output;
     yield {
       type: 'done',
       answer,
@@ -102,79 +162,18 @@ export class AgentChatAgentService {
     };
   }
 
-  /** 将模型文本和 reasoning 投影映射为界面可消费的流事件。 */
-  private async consumeMessageStreams(
-    messages: AsyncIterable<AgentMessageStream>,
-    events: AsyncEventQueue<AgentChatAgentEvent>,
-  ) {
-    for await (const message of messages) {
-      await Promise.all([
-        this.forwardDeltas(message.reasoning, 'reasoning_delta', events),
-        this.forwardDeltas(message.text, 'text_delta', events),
-      ]);
-    }
-  }
-
-  /** 将工具调用投影映射为开始和完成事件，并保留原始结果。 */
-  private async consumeToolCalls(
-    calls: AsyncIterable<AgentToolCallStream>,
-    toolCalls: AgentChatToolCallRecord[],
-    events: AsyncEventQueue<AgentChatAgentEvent>,
-  ) {
-    for await (const call of calls) {
-      const argumentsValue = this.normalizeInput(call.input);
-      events.push({
-        type: 'tool_start',
-        name: call.name,
-        arguments: argumentsValue,
-      });
-
-      const [status, outputResult, error] = await Promise.all([
-        call.status,
-        call.output.then(
-          (value) => ({ value }),
-          (outputError) => ({ outputError }),
-        ),
-        call.error,
-      ]);
-      const output =
-        'outputError' in outputResult
-          ? outputResult.outputError
-          : outputResult.value;
-      const result =
-        status === 'error'
-          ? (error ?? this.normalizeResult(output))
-          : this.normalizeResult(output);
-      const toolCall = {
-        name: call.name,
-        arguments: argumentsValue,
-        result,
-      };
-      toolCalls.push(toolCall);
-      events.push({ type: 'tool_end', ...toolCall });
-    }
-  }
-
-  /** 转发单个模型文本投影中的非空增量。 */
-  private async forwardDeltas(
-    deltas: AsyncIterable<string>,
-    type: 'reasoning_delta' | 'text_delta',
-    events: AsyncEventQueue<AgentChatAgentEvent>,
-  ) {
-    let emitted = '';
-    for await (const delta of deltas) {
-      if (!delta || delta === emitted) continue;
-
-      if (delta.startsWith(emitted)) {
-        const suffix = delta.slice(emitted.length);
-        if (suffix) events.push({ type, delta: suffix });
-        emitted = delta;
-        continue;
-      }
-
-      events.push({ type, delta });
-      emitted += delta;
-    }
+  /** 通过工具调用 ID 关联开始事件，并生成可持久化的结束记录。 */
+  private finishToolCall(
+    toolCallId: string,
+    result: string,
+    activeToolCalls: Map<string, Omit<AgentChatToolCallRecord, 'result'>>,
+  ): AgentChatToolCallRecord {
+    const toolCall = activeToolCalls.get(toolCallId) ?? {
+      name: 'unknown_tool',
+      arguments: {},
+    };
+    activeToolCalls.delete(toolCallId);
+    return { ...toolCall, result };
   }
 
   /** 隐藏 deepagents 内置文件系统和任务工具，只保留业务工具。 */
