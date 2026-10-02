@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ChatOpenAI } from '@langchain/openai';
 import { ToolMessage, type BaseMessage } from '@langchain/core/messages';
+import { toolCallLimitMiddleware } from 'langchain';
 import {
   createDeepAgent,
   createHarnessProfile,
@@ -31,6 +32,8 @@ const EXCLUDED_BUILTIN_TOOLS = [
   'task',
 ];
 
+const MAX_TOOL_CALLS_PER_RUN = 5;
+
 /** 封装 deepagents 运行时创建、模型配置和有序流事件适配。 */
 @Injectable()
 export class AgentChatAgentService {
@@ -55,7 +58,13 @@ export class AgentChatAgentService {
       model: this.model,
       tools: this.toolService.getTools(),
       systemPrompt: this.buildSystemPrompt(),
-      middleware: [this.toolLoggingMiddleware.create()],
+      middleware: [
+        toolCallLimitMiddleware({
+          runLimit: MAX_TOOL_CALLS_PER_RUN,
+          exitBehavior: 'continue',
+        }),
+        this.toolLoggingMiddleware.create(),
+      ],
     });
   }
 
@@ -152,8 +161,19 @@ export class AgentChatAgentService {
     type: 'reasoning_delta' | 'text_delta',
     events: AsyncEventQueue<AgentChatAgentEvent>,
   ) {
+    let emitted = '';
     for await (const delta of deltas) {
-      if (delta) events.push({ type, delta });
+      if (!delta || delta === emitted) continue;
+
+      if (delta.startsWith(emitted)) {
+        const suffix = delta.slice(emitted.length);
+        if (suffix) events.push({ type, delta: suffix });
+        emitted = delta;
+        continue;
+      }
+
+      events.push({ type, delta });
+      emitted += delta;
     }
   }
 
@@ -172,7 +192,7 @@ export class AgentChatAgentService {
   private buildSystemPrompt() {
     return `你是业务 Agent 助手，可以调用工具获取业务知识库内容、文档详情、切片、当前时间和计算结果。
 规则：
-1. 业务问题优先调用 search_knowledge，必要时调用 get_document / get_document_chunks 查看详情。
+1. 业务问题优先调用 search_knowledge，必要时调用 get_document  查看详情。
 2. 只基于工具返回的资料回答，不编造业务事实。
 3. 引用资料时给出文档名或路径。
 4. 用户询问时间时调用 get_current_time，需要计算时调用 calculate。

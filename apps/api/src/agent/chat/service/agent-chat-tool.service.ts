@@ -42,7 +42,7 @@ export class AgentChatToolService {
           category,
           topK: topK ?? 8,
         });
-        return JSON.stringify(
+        const res = JSON.stringify(
           hits.map((hit) => ({
             id: hit.id,
             category: hit.category,
@@ -54,6 +54,8 @@ export class AgentChatToolService {
             content: hit.content.slice(0, 1200),
           })),
         );
+        console.log('[ res ] >', res.slice(0, 100));
+        return res;
       },
       {
         name: 'search_knowledge',

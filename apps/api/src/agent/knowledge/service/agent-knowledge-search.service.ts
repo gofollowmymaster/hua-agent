@@ -46,8 +46,6 @@ export class AgentKnowledgeSearchService {
       this.searchFullText(normalizedQuery, options, candidateLimit),
       this.searchVector(normalizedQuery, options, candidateLimit),
     ]);
-    console.log('[ fullTextHits ] >', fullTextHits);
-    console.log('[ vectorHits ] >', vectorHits);
     return this.mergeByRrf([fullTextHits, vectorHits], topK);
   }
 
@@ -132,6 +130,7 @@ export class AgentKnowledgeSearchService {
       ORDER BY c.embedding <=> ${JSON.stringify(vector)}::vector
       LIMIT ${limit}
     `;
+
     return rows.map((row) => this.toHit(row));
   }
 
