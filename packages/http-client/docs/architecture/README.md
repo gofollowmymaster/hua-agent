@@ -8,7 +8,7 @@
 - 目录：`packages/http-client`。
 - 入口：`packages/http-client/src/index.ts`。
 - 运行时依赖：axios。
-- 当前消费者：`apps/rag-admin`、`apps/global-admin`。
+- 当前消费者：`apps/rag-admin`。
 - 当前通过 package exports 直接暴露 TypeScript 源码，不生成独立 `dist`。
 
 ## 运行模型

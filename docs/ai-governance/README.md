@@ -1,6 +1,6 @@
 # AI 治理方案
 
-`docs/ai-governance/` 是本 monorepo 的 AI 治理说明书，回答“AI 助手如何选择上下文、判断风险、选择流程、验证交付”。它不承载各子项目完整架构或实现规范；架构事实放在各子项目的 `docs/architecture/`（前端 app 为 `standard/architecture/`；多个前端 app 共用的架构约定在 `docs/standard/frontend/`），实现规范放在各子项目的 `docs/standard/`（前端 app 为 `standard/development/`）。
+`docs/ai-governance/` 是本 monorepo 的 AI 治理说明书，回答“AI 助手如何选择上下文、判断风险、选择流程、验证交付”。它不承载各子项目完整架构或实现规范；架构事实放在各子项目的 `docs/architecture/`（RAG Admin 为 `standard/architecture/`，前端共享约定在 `docs/standard/frontend/`），实现规范放在各子项目的 `docs/standard/`（RAG Admin 为 `standard/development/`）。
 
 ## AI 工作原则
 
@@ -16,9 +16,8 @@
 | 范围 | 场景 | 必读入口 |
 | --- | --- | --- |
 | `workspace` | 根脚本、pnpm workspace、依赖放置、部署/构建边界 | `AGENTS.md`、`docs/ai-governance/README.md` |
-| `api` | NestJS 后端、Prisma、Redis、BullMQ、飞书、多租户 | `apps/api/docs/architecture/README.md`、`apps/api/docs/standard/README.md` |
+| `api` | NestJS 后端、Prisma、Redis、飞书告警与表格鉴权、多租户 | `apps/api/docs/architecture/README.md`、`apps/api/docs/standard/README.md` |
 | `rag-admin` | Vue/Vite 前端、页面、路由、store、API client、样式 | `apps/rag-admin/standard/architecture/README.md`、`apps/rag-admin/standard/development/README.md`、`docs/standard/frontend/architecture/README.md`、`docs/standard/design/README.md` |
-| `global-admin` | 无租户总控台、GLOBAL 登录、租户目录、静态输出 | `apps/global-admin/standard/architecture/README.md`、`apps/global-admin/standard/development/README.md`、`docs/standard/frontend/architecture/README.md`、`docs/standard/design/README.md` |
 | `shared` | 共享类型、无副作用工具、跨包导出 | `packages/shared/docs/architecture/README.md`、`packages/shared/docs/standard/README.md` |
 | `frontend-packages` | Vue 公共组件/hooks、HTTP client、前端公共导出 | 对应 package 的 `docs/architecture/README.md`、`docs/standard/README.md`、受影响前端文档 |
 | `cross-app` | 前后端接口契约、登录链路、静态资源发布、shared 消费 | `workspace` 入口 + 受影响子项目入口 |
@@ -58,7 +57,6 @@
 
 - API 鉴权、租户、Redis key、飞书表格或飞书回调：读 `apps/api/docs/architecture/auth-and-tenant.md`、`apps/api/docs/architecture/feishu-integration.md` 和 `testing-and-verification.md`。
 - RAG Admin 登录、API client、路由、构建输出：读 `apps/rag-admin/standard/architecture/custom/auth-and-api-client.md`、`apps/rag-admin/standard/architecture/custom/build-and-runtime.md`、`apps/rag-admin/standard/development/README.md` 和 `docs/standard/design/README.md`。
-- Global Admin 登录、无租户 API、middleware 排除和构建输出：读 `apps/global-admin/standard/architecture/`、`apps/api/docs/architecture/auth-and-tenant.md` 和验证规范。
 - shared 导出或跨端类型：读 `packages/shared/docs/architecture/package-boundary.md`、`packages/shared/docs/standard/package-design.md`。
 - 前端 UI/hooks 或 HTTP client 公共导出：读对应 package 的架构与规范入口以及所有消费 app。
 - 根脚本、依赖、部署/构建边界：读 `AGENTS.md` 和受影响子项目入口。
@@ -66,7 +64,7 @@
 ## 与其他文档的分工
 
 - `AGENTS.md`：短、快、稳定。承载必须遵守的命令、环境、代码风格和文档入口。
-- `apps/*/docs/architecture/`、`packages/*` 文档：子项目和共享包架构事实（前端 app 为 `apps/*/standard/architecture/`）；`docs/standard/frontend/`：多个前端管理后台 app 共用的架构约定。
+- `apps/*/docs/architecture/`、`packages/*` 文档：子项目和共享包架构事实（RAG Admin 为 `apps/rag-admin/standard/architecture/`）；`docs/standard/frontend/`：RAG Admin 与前端共享包的架构约定。
 - `apps/*/docs/standard/`、`packages/shared/docs/standard/`：子项目开发规范（前端 app 为 `apps/*/standard/development/`）。
 - `docs/standard/design/`：整体产品设计规范。
 - `docs/ai-governance/`：AI 工作原则、任务分级、风险边界、OpenSpec 判断、上下文读取策略、验证和交付。

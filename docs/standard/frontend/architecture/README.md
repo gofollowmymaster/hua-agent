@@ -1,6 +1,6 @@
 # 前端管理后台通用架构约定
 
-`docs/standard/frontend/architecture/` 按类别存放多个前端管理后台 app（`apps/rag-admin`、`apps/global-admin`）共用的 Vue/Vite 架构约定与事实，后续可按请求/路由/构建等类别在本目录新增文档。各 app 特有事实保留在各自 `apps/*/standard/architecture/custom/`，共享页面开发规范见 `docs/standard/frontend/development/`，各 app 特有规范保留在各自 `apps/*/standard/development/`。
+`docs/standard/frontend/architecture/` 按类别存放 RAG Admin 与前端共享包使用的 Vue/Vite 架构约定。RAG Admin 特有事实保留在 `apps/rag-admin/standard/architecture/custom/`，共享页面开发规范见 `docs/standard/frontend/development/`。
 
 ## 技术栈与入口
 

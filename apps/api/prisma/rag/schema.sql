@@ -1,5 +1,22 @@
 CREATE EXTENSION IF NOT EXISTS vector;
 
+CREATE TABLE IF NOT EXISTS rag_admin_users (
+  id SERIAL PRIMARY KEY,
+  tenant_code TEXT NOT NULL,
+  supplier_code TEXT NOT NULL,
+  username TEXT NOT NULL,
+  display_name TEXT NOT NULL,
+  password_hash TEXT NOT NULL,
+  is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+  is_system_admin BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (tenant_code, username)
+);
+
+CREATE INDEX IF NOT EXISTS idx_rag_admin_users_tenant_code
+  ON rag_admin_users (tenant_code);
+
 -- 启用 zhparser 中文分词扩展
 CREATE EXTENSION IF NOT EXISTS zhparser;
 
@@ -203,32 +220,3 @@ CREATE INDEX IF NOT EXISTS idx_aplus_rag_messages_tenant_session_created
 
 CREATE INDEX IF NOT EXISTS idx_aplus_rag_messages_external_message
   ON aplus_rag_messages (tenant_code, external_message_id);
-
-CREATE TABLE IF NOT EXISTS scheduled_tasks (
-  id BIGSERIAL PRIMARY KEY,
-  task_key TEXT NOT NULL UNIQUE,
-  module TEXT NOT NULL,
-  description TEXT NOT NULL,
-  cron TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'enabled',
-  last_run_time TIMESTAMPTZ,
-  last_run_result TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX IF NOT EXISTS idx_scheduled_tasks_status
-  ON scheduled_tasks (status);
-
-CREATE TABLE IF NOT EXISTS scheduled_task_logs (
-  id BIGSERIAL PRIMARY KEY,
-  task_id BIGINT NOT NULL REFERENCES scheduled_tasks(id) ON DELETE CASCADE,
-  execute_time TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  result TEXT NOT NULL,
-  message TEXT,
-  cost_ms INTEGER,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX IF NOT EXISTS idx_scheduled_task_logs_task_execute
-  ON scheduled_task_logs (task_id, execute_time);

@@ -1,6 +1,6 @@
 # RAG Admin 项目架构与路由状态
 
-本文记录 `apps/rag-admin` 的特有架构事实；两个前端 app 共用的架构约定（启动链路、目录职责、路由/store 规则、数据流）见 `docs/standard/frontend/architecture/README.md`。
+本文记录 `apps/rag-admin` 的特有架构事实；workspace 只发布这一套管理后台。前端架构约定（启动链路、目录职责、路由/store 规则、数据流）见 `docs/standard/frontend/architecture/README.md`。
 
 ## 启动链路
 
@@ -15,21 +15,25 @@
 - `knowledge/document-manager/index.vue`：RAG 文档管理。
 - `knowledge/session-records/index.vue`：会话与消息记录查看。
 - `knowledge/assistant-demo/index.vue`：助手演示页面。
-- `business-agent/knowledge/index.vue`：业务知识库管理。
-- `business-agent/demo/index.vue`：多工具 Agent 聊天演示。
-- `business-agent/skills|sessions|config/index.vue`：业务 Agent 骨架占位页面。
+- `business-agent/knowledge/index.vue`：业务知识库管理，对应 `/business-agent/knowledge`。
+- `business-agent/skills/index.vue`：Skill 管理，对应 `/business-agent/skills`。
+- `business-agent/sessions/index.vue`：会话管理，对应 `/business-agent/sessions`。
+- `business-agent/config/index.vue`：配置中心，对应 `/business-agent/config`。
+- `business-agent/demo/index.vue`：多工具 Agent 聊天演示，对应 `/business-agent/demo`。
 
 模块公共展示组件位于对应页面目录的 `components/`，业务弹窗、抽屉和页面区块位于 `sections/`；跨页面复用的展示组件位于 `src/components/`，例如文档预览弹窗。
 
 ## 路由组织
 
+- `/login` 是唯一公开路由；未登录访问后台页面会保留原目标并跳转登录页。
 - `/knowledge/*` 承载知识问答，`/business-agent/*` 承载业务 Agent。
 - 旧 `/documents`、`/sessions`、`/assistant` 保留 redirect。
+- 未知路径统一重定向到知识问答默认页 `/knowledge/documents`。
 
 ## 状态与请求
 
 - 用户 store 位于 `src/stores/modules/user/index.ts`。
-- 登录 SDK、token 持久化（pinia-plugin-persistedstate + `localStorage['authToken']`）与租户认证配置和 user store 一起位于 `src/stores/modules/user/`。
+- 本地登录 API、token 持久化（pinia-plugin-persistedstate + `localStorage['authToken']`）与租户解析和 user store 分别位于 `src/api/auth/` 与 `src/stores/modules/user/`。
 - 后端请求通过 `src/api/common/http.ts` 的 axios 实例封装，业务 API 方法按“模块目录 + 菜单文件”维护在 `src/api/<module>/<menu>.ts`。
 
 ## UI 与预览能力

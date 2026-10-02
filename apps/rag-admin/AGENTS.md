@@ -11,7 +11,7 @@
 - **状态管理**: Pinia
 - **请求**: axios + `@ai-sdk/vue` / `ai`
 - **UI**: `@aplus-frontend/ui`、`@aplus-frontend/antdv`
-- **登录**: `@aplus-frontend/aplus-auth-sdk`
+- **登录**: API 本地账号密码登录 + JWT
 - **文件预览**: `@open-file-viewer/*`、`pdfjs-dist`
 
 ## 必读文档
@@ -106,7 +106,7 @@ pnpm admin:stylelint:check
 - `src/layouts/`：布局组件。
 - `src/router/`：路由实例、路由表和路由守卫。
 - `src/stores/`：Pinia store。
-- `src/stores/modules/user/`：用户 store、登录中心、pinia-plugin-persistedstate 持久化和租户认证配置。
+- `src/stores/modules/user/`：用户 store、pinia-plugin-persistedstate 持久化和租户解析配置。
 - `src/styles/`：全局样式。
 - `src/views/`：页面级组件。
 - `src/views/<page>/index.vue`：页面统一入口目录结构，页面私有逻辑放同级 `hooks/`、`components/`、`sections/`。

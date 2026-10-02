@@ -13,6 +13,7 @@ function readString(payload: Record<string, unknown>, keys: string[]) {
   for (const key of keys) {
     const value = payload[key];
     if (typeof value === 'string' && value) return value;
+    if (typeof value === 'number') return String(value);
   }
   return undefined;
 }
@@ -51,22 +52,5 @@ export function resolveUserInfo(token?: string): LoginUser {
     supplierName: readString(payload, ['supplierName', 'supplier_name']),
     tenantCode: readString(payload, ['tenantCode', 'tenant_code']),
     tenantName: readString(payload, ['tenantName', 'tenant_name'])
-  };
-}
-
-/** 将登录 SDK 返回的用户信息规范化为统一字段。 */
-export function normalizeSdkUserInfo(userInfo: unknown): LoginUser {
-  if (!userInfo || typeof userInfo !== 'object') return {};
-
-  const data = userInfo as Record<string, unknown>;
-  return {
-    userId: readString(data, ['userCode', 'unionId', 'id']),
-    userName: readString(data, ['userName', 'realName', 'name']),
-    email: readString(data, ['email']),
-    avatar: readString(data, ['avatar']),
-    supplierCode: readString(data, ['supplierCode', 'supplier_code']),
-    supplierName: readString(data, ['supplierName', 'supplier_name']),
-    tenantCode: readString(data, ['tenantCode']),
-    tenantName: readString(data, ['tenantName'])
   };
 }

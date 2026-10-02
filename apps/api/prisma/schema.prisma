@@ -1,39 +1,5 @@
-generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-3.0.x"]
-}
-
 datasource db {
   provider          = "mysql"
   url               = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
-}
- 
-
-
-
-model AlertMessageUser {
-  id         Int      @id @default(autoincrement())
-  message    AlertMessage @relation(fields: [messageId], references: [fMessageId])
-  messageId  String
-  fUserId     String
-  readTime   DateTime?
-  reactionTime   DateTime?
-  createTime DateTime @default(now())
-}
-
-model AlertMessage {
-  fMessageId  String   @id
-  userAlerted     AlertMessageUser[]
-  content    String   @db.Text 
-  createTime DateTime @default(now())
-}
-
-
-
-
-
-enum MIdStatusEnum {
-  Enable
-  Disable
 }

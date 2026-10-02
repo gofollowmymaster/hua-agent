@@ -1,8 +1,8 @@
 # 前端管理后台公共架构与规范
 
-`docs/standard/frontend/` 存放多个前端管理后台 app（`apps/rag-admin`、`apps/global-admin`）共用的架构约定与开发规范。各 app 特有架构事实保留在各自 `apps/*/standard/architecture/custom/`，特有规范可放在各自 `apps/*/standard/development/` 补充。
+`docs/standard/frontend/` 存放 RAG Admin 及前端共享包使用的架构约定与开发规范。RAG Admin 特有架构事实保留在 `apps/rag-admin/standard/architecture/custom/`，特有规范放在 `apps/rag-admin/standard/development/`。
 
-两个前端 app 通过软连接引用本目录文档（如 `apps/*/standard/development/*.md`），共享文档更新后各 app 自动生效；不需要公用的内容请保留在各 app 目录内。
+RAG Admin 通过软连接引用本目录文档（如 `apps/rag-admin/standard/development/*.md`），共享文档更新后自动生效；app 特有内容保留在自身目录内。
 
 ## 阅读顺序
 

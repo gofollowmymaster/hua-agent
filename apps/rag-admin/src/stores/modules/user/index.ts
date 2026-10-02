@@ -1,12 +1,10 @@
 import { defineStore } from 'pinia';
+import { login, type LoginParams } from '@/api/auth/auth';
 import {
-  ensureLogin as loginWithAuthCenter,
-  getCurrentUserInfo,
-  logout as redirectLogout,
-  tenantAuthConfig
-} from './auth';
-import { resolveTenantDisplayName } from './tenant-auth.config';
-import { normalizeSdkUserInfo, resolveUserInfo, type LoginUser } from './jwt';
+  resolveTenantAuthConfig,
+  resolveTenantDisplayName
+} from './tenant-auth.config';
+import { resolveUserInfo, type LoginUser } from './jwt';
 
 export type { LoginUser } from './jwt';
 
@@ -14,17 +12,13 @@ interface UserState {
   token?: string;
   userInfo: LoginUser;
   loginReady: boolean;
-  loginLoading: boolean;
-  loginError: string;
 }
 
 export const useUserStore = defineStore('user', {
   state: (): UserState => ({
     token: undefined,
     userInfo: {},
-    loginReady: false,
-    loginLoading: false,
-    loginError: ''
+    loginReady: false
   }),
   getters: {
     displayName(state) {
@@ -39,11 +33,15 @@ export const useUserStore = defineStore('user', {
       return Boolean(state.token);
     },
     supplierCode(state) {
-      return state.userInfo.supplierCode || tenantAuthConfig.supplierCode;
+      return (
+        state.userInfo.supplierCode ||
+        resolveTenantAuthConfig(window.location.hostname).supplierCode
+      );
     },
     tenantDisplayName(state) {
       const supplierCode =
-        state.userInfo.supplierCode || tenantAuthConfig.supplierCode;
+        state.userInfo.supplierCode ||
+        resolveTenantAuthConfig(window.location.hostname).supplierCode;
       return (
         state.userInfo.tenantName ||
         state.userInfo.supplierName ||
@@ -53,9 +51,6 @@ export const useUserStore = defineStore('user', {
     }
   },
   actions: {
-    setLoginError(message: string) {
-      this.loginError = message;
-    },
     setToken(token?: string) {
       this.token = token;
       this.userInfo = resolveUserInfo(token);
@@ -70,26 +65,15 @@ export const useUserStore = defineStore('user', {
       this.userInfo = merged;
     },
     async ensureLogin() {
-      if (this.loginReady && this.token) return this.token;
-
-      this.loginLoading = true;
-      this.loginError = '';
-      try {
-        const token = await loginWithAuthCenter();
-        console.log('[ token ] >', token);
-        if (token) {
-          this.setToken(token);
-          const userInfo = await getCurrentUserInfo();
-          this.setUserInfo(normalizeSdkUserInfo(userInfo));
-        }
-        return token;
-      } finally {
-        this.loginLoading = false;
-      }
+      return this.token;
+    },
+    async login(params: LoginParams) {
+      const { token } = await login(params);
+      this.setToken(token);
+      return token;
     },
     logout() {
       this.setToken(undefined);
-      redirectLogout();
     }
   },
   persist: {

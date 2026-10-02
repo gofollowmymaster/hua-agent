@@ -7,20 +7,18 @@
 ## 阅读顺序
 
 1. `code-style.md`：TypeScript/NestJS 代码风格、异常、日志和装饰器写法。
-2. `module-design.md`：模块、Controller、Service、DTO、adapter、table、schedule、processor 的放置和分层规则。
+2. `module-design.md`：模块、Controller、Service、DTO、adapter、table 的放置和分层规则。
 3. `configuration.md`：后端环境变量、租户配置、NodeConfigService 和敏感信息维护规则。
 4. `redis.md`：Redis key、缓存、限流、幂等和批量删除规范。
-5. `background-jobs.md`：定时任务、BullMQ 队列处理器和后台任务规范。
 
 ## 任务类型到必读文档
 
 | API 任务类型 | 必读规范 | 补充上下文 |
 | --- | --- | --- |
 | 新增或修改接口、业务行为 | `module-design.md`、`code-style.md` | `apps/api/docs/architecture/directory-structure.md`、`apps/api/docs/architecture/auth-and-tenant.md` |
-| 新增模块、Service、DTO、adapter、table、schedule | `module-design.md`、`code-style.md` | `apps/api/docs/architecture/directory-structure.md` |
+| 新增模块、Service、DTO、adapter、table | `module-design.md`、`code-style.md` | `apps/api/docs/architecture/directory-structure.md` |
 | 修改配置、环境变量、租户配置 | `configuration.md`、`module-design.md` | `apps/api/docs/architecture/project-architecture.md`、`apps/api/docs/architecture/auth-and-tenant.md` |
 | 修改 Redis key、缓存、限流、幂等、批量删除 | `redis.md`、`module-design.md` | `apps/api/docs/architecture/auth-and-tenant.md` |
-| 修改定时任务、队列 processor、后台任务 | `background-jobs.md`、`module-design.md` | `apps/api/docs/architecture/project-architecture.md` |
 | 涉及飞书或外部系统集成 | `module-design.md`、`configuration.md` | `apps/api/docs/architecture/feishu-integration.md` |
 | 涉及 Prisma schema、租户、鉴权 | `module-design.md`、`configuration.md` | `apps/api/docs/architecture/auth-and-tenant.md` |
 

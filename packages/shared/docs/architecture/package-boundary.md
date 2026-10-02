@@ -14,7 +14,7 @@
 - Vue 组件、composable、store。
 - Prisma client、Prisma model 访问逻辑、数据库连接。
 - 浏览器专属或 Node 专属运行时代码。
-- 飞书、Redis、BullMQ、axios 实例等基础设施封装。
+- 飞书、Redis、队列客户端、axios 实例等基础设施封装。
 
 前端专属公共组件和 hooks 放入 `packages/ui-kit`，可注入认证策略的前端请求封装放入 `packages/http-client`，不得放入本 shared 包。
 

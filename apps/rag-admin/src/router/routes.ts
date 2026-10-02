@@ -14,6 +14,15 @@ export interface AdminMenuGroup {
 
 export const routes: RouteRecordRaw[] = [
   {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/views/login/index.vue'),
+    meta: {
+      title: '登录',
+      public: true
+    }
+  },
+  {
     path: '/',
     component: AdminLayout,
     redirect: '/knowledge/documents',
@@ -24,7 +33,7 @@ export const routes: RouteRecordRaw[] = [
         component: RouterView,
         redirect: '/knowledge/documents',
         meta: {
-          menuTitle: '知识问答',
+          menuTitle: '知识问答'
         },
         children: [
           {
@@ -36,8 +45,8 @@ export const routes: RouteRecordRaw[] = [
               title: '文档管理',
               menuTitle: '文档管理',
               subtitle:
-                '查看、维护或删除已索引文档，也可触发 raw 目录重新入库。',
-            },
+                '查看、维护或删除已索引文档，也可触发 raw 目录重新入库。'
+            }
           },
           {
             path: 'sessions',
@@ -47,8 +56,8 @@ export const routes: RouteRecordRaw[] = [
             meta: {
               title: '消息对话记录',
               menuTitle: '消息对话记录',
-              subtitle: '按会话查看用户提问与助手回答。',
-            },
+              subtitle: '按会话查看用户提问与助手回答。'
+            }
           },
           {
             path: 'assistant',
@@ -58,10 +67,10 @@ export const routes: RouteRecordRaw[] = [
             meta: {
               title: '问答助手',
               menuTitle: '问答助手',
-              subtitle: '基于当前 RAG 文档索引的 AGUI 协议演示会话。',
-            },
-          },
-        ],
+              subtitle: '基于当前 RAG 文档索引的 AGUI 协议演示会话。'
+            }
+          }
+        ]
       },
       {
         path: 'business-agent',
@@ -69,7 +78,7 @@ export const routes: RouteRecordRaw[] = [
         component: RouterView,
         redirect: '/business-agent/knowledge',
         meta: {
-          menuTitle: '业务Agent',
+          menuTitle: '业务Agent'
         },
         children: [
           {
@@ -81,8 +90,8 @@ export const routes: RouteRecordRaw[] = [
               title: '业务知识库管理',
               menuTitle: '业务知识库管理',
               subtitle:
-                '查看、维护已入库的业务 Agent 文档，并可触发 docs 目录重新入库。',
-            },
+                '查看、维护已入库的业务 Agent 文档，并可触发 docs 目录重新入库。'
+            }
           },
           {
             path: 'skills',
@@ -91,8 +100,8 @@ export const routes: RouteRecordRaw[] = [
             meta: {
               title: 'Skill 管理',
               menuTitle: 'Skill 管理',
-              subtitle: '业务 Agent 模块骨架。',
-            },
+              subtitle: '业务 Agent 模块骨架。'
+            }
           },
           {
             path: 'sessions',
@@ -102,8 +111,8 @@ export const routes: RouteRecordRaw[] = [
             meta: {
               title: '会话管理',
               menuTitle: '会话管理',
-              subtitle: '业务 Agent 模块骨架。',
-            },
+              subtitle: '业务 Agent 模块骨架。'
+            }
           },
           {
             path: 'config',
@@ -112,8 +121,8 @@ export const routes: RouteRecordRaw[] = [
             meta: {
               title: '配置中心',
               menuTitle: '配置中心',
-              subtitle: '业务 Agent 模块骨架。',
-            },
+              subtitle: '业务 Agent 模块骨架。'
+            }
           },
           {
             path: 'demo',
@@ -122,32 +131,32 @@ export const routes: RouteRecordRaw[] = [
             meta: {
               title: '演示 Demo',
               menuTitle: '演示 Demo',
-              subtitle: '体验业务 Agent 多工具对话与历史会话。',
-            },
-          },
-        ],
-      },
-    ],
+              subtitle: '体验业务 Agent 多工具对话与历史会话。'
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     path: '/documents',
-    redirect: '/knowledge/documents',
+    redirect: '/knowledge/documents'
   },
   {
     path: '/sessions',
-    redirect: '/knowledge/sessions',
+    redirect: '/knowledge/sessions'
   },
   {
     path: '/assistant',
-    redirect: '/knowledge/assistant',
+    redirect: '/knowledge/assistant'
   },
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/knowledge/documents',
-  },
+    redirect: '/login'
+  }
 ];
 
-const adminRoute = routes[0];
+const adminRoute = routes.find((route) => route.path === '/');
 
 function createAdminMenus(route: RouteRecordRaw): AdminMenuGroup[] {
   return (route.children ?? []).flatMap((group) => {
@@ -170,4 +179,6 @@ function createAdminMenus(route: RouteRecordRaw): AdminMenuGroup[] {
   });
 }
 
-export const adminMenus: AdminMenuGroup[] = createAdminMenus(adminRoute);
+export const adminMenus: AdminMenuGroup[] = adminRoute
+  ? createAdminMenus(adminRoute)
+  : [];

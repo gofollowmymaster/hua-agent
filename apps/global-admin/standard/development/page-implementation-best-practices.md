@@ -1,1 +1,0 @@
-../../../../docs/standard/frontend/development/page-implementation-best-practices.md

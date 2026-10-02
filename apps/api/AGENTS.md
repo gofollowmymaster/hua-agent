@@ -22,8 +22,7 @@ AI 收到任务后，**按任务类型读取对应文档**，不可跳过。多�
 | Prisma Schema 变更 | 本文件 Prisma 段 + `../../docs/ai-governance/testing-and-verification.md` | 改后运行 `pnpm pg` |
 | 新增/修改模块 | `docs/architecture/directory-structure.md` + `docs/standard/module-design.md` | 目录边界、模块协作方式 |
 | Redis key / 缓存 / 限流 / 幂等 | `docs/standard/redis.md` | key 枚举定义、禁止手动拼接、TTL |
-| 定时任务 / BullMQ 队列 | `docs/standard/background-jobs.md` | 必须继承 BaseSchedule/BaseProcessor |
-| 鉴权 / 租户 / Guard | `docs/architecture/auth-and-tenant.md` | TenantContext、四类 Guard |
+| 鉴权 / 租户 / Guard | `docs/architecture/auth-and-tenant.md` | TenantContext、三类 Guard |
 | 飞书集成 / 表格 / 卡片 / 回调 | `docs/architecture/feishu-integration.md` | ClientFactory、分层方式 |
 | 配置变更 / 环境变量 | `docs/standard/configuration.md` | NodeConfigService，禁止 process.env |
 | 公共能力抽取 | `docs/standard/code-style.md` + `docs/standard/module-design.md` | 跨模块复用才进 common |
@@ -36,11 +35,9 @@ AI 收到任务后，**按任务类型读取对应文档**，不可跳过。多�
 ## 技术栈
 
 - **框架**: NestJS + TypeScript
-- **ORM**: Prisma (MySQL)
-- **RAG 数据库**: Prisma + pgvector
-- **缓存/队列**: Redis + BullMQ
-- **定时任务**: `@nestjs/schedule`
-- **外部集成**: 飞书、企业微信、OpenAI/LangChain
+- **ORM**: Prisma + PostgreSQL/pgvector；MySQL schema 仅保留迁移链
+- **缓存**: Redis
+- **外部集成**: 飞书告警与表格鉴权、OpenAI/LangChain
 - **代码检查**: ESLint + Prettier（配置位于 `apps/api/eslint.config.js`、`apps/api/.prettierrc`）
 
 ---
@@ -106,8 +103,8 @@ pnpm env:prod
 - `src/app.module.ts`：根模块和全局中间件装配。
 - `src/common/`：跨模块基础设施、守卫、异常、拦截器、中间件、全局服务、飞书 helper/table 等。
 - `src/config/`：全局配置、数据库/Redis 配置、租户配置和 `NodeConfigService`。
-- `src/ai/`：AI、Aily、RAG、日志操作相关能力。
-- `src/doc/`、`src/alert/`、`src/devops/`、`src/manage/`、`src/robot/`：各业务域模块。
+- `src/ai/`：知识问答、RAG Admin 管理接口、文档入库与检索。
+- `src/agent/`：业务Agent知识库与多工具 Chat。
 - `prisma/`：API app 的 Prisma schema 和迁移元信息。
 - `public/`：静态资源目录，包含 RAG Admin 生产构建产物。
 
@@ -123,7 +120,7 @@ pnpm env:prod
 
 - ✅ 只负责：路由定义、Guard 声明、DTO 参数接收、调用 Service、返回结果
 - ❌ 禁止：写业务逻辑、直接操作数据库/Redis、直接调用飞书 API、做复杂条件判断
-- 装饰器示例：`@AuthGuard()`, `@SecretAuthGuard()`, `@SignAuthGuard()`
+- Guard 示例：`AuthGuard`、`SecretAuthGuard`、`CompositeAuthOrSecretGuard`
 
 ### Service 规则
 
@@ -214,19 +211,6 @@ pnpm env:prod
 - Pattern 批量操作基于 SCAN：`hasByPattern` / `getByPattern` / `delByPattern`
 - `delByPattern` 长度 < 20 会抛错，pattern 必须足够具体
 
-### 定时任务 / 队列
-
-> 前置必读：`docs/standard/background-jobs.md`
-
-核心要点（不可仅依赖此摘要）：
-- **必须**继承 `BaseSchedule`（定时任务）或 `BaseProcessor`（队列处理），不得绕过
-- `BaseSchedule` 子类必须定义：`cron`（表达式）、`jobName`（唯一且稳定表意）、`isOpen`（开关）、`handle(context, force)`
-- 定时任务放 `common/schedule/` 并在对应 module 的 providers 注册
-- `jobName` 不得随意更改（影响防重复注册）
-- `BaseProcessor`：`@Processor(queueName)` + 子类实现 `handle(data)`
-- 队列入队 payload **必须**含 `tenantCode`（符合 `ProcessorBody` 接口）
-- 基类提供统一异常捕获和飞书告警，子类只关注业务逻辑
-
 ### 鉴权 / 租户
 
 > 前置必读：`docs/architecture/auth-and-tenant.md`
@@ -234,19 +218,16 @@ pnpm env:prod
 核心要点（不可仅依赖此摘要）：
 - `TenantMiddleware` 解析用户与租户，通过 `TenantContext`（AsyncLocalStorage）保存
 - 需要当前用户/租户信息时注入 `TenantContext`，不要自行解析 header
-- 四类 Guard：`AuthGuard`（Bearer JWT）、`SecretAuthGuard`（固定密钥）、`SignAuthGuard`（签名认证）、`CompositeAuthOrSecretGuard`（JWT 或固定密钥）
+- 三类 Guard：`AuthGuard`（Bearer JWT）、`SecretAuthGuard`（固定密钥）、`CompositeAuthOrSecretGuard`（JWT 或固定密钥）
 - 租户配置通过 `NodeConfigService` 读取，禁止直接 import 租户配置文件
-- 后台任务/定时任务/processor/webhook 中**不能假设有请求上下文**，需要显式传入租户
 
 ### 飞书集成
 
 > 前置必读：`docs/architecture/feishu-integration.md`
 
 核心要点（不可仅依赖此摘要）：
-- 飞书客户端通过 `ClientFactory` 创建，枚举定义在 `FeishuApp`
-- Helper 通过 `FeishuHelperModule.forRoot(client)` 注册
-- 飞书表格访问分层：`FeishuTableHelper`（基础 API） → table adapter（业务语义）
-- 事件/回调入口在 `src/alert/event/` 和 `src/doc/event/`
+- 告警客户端通过 `ClientFactory` 创建，当前只保留 `FeishuApp.AlertClient`
+- 飞书表格访问通过保留的 helper 与 `ClientSecretTable` 分层封装
 - **不直接散写飞书 API 调用**，先判断是否已有 helper 或 adapter 可用
 
 ---
@@ -258,14 +239,13 @@ pnpm env:prod
 1. **禁止直接 `throw new Error()`** — 必须使用 `src/common/exception/` 中已有异常类型或 `NotReportException`
 2. **禁止在 Service/Controller 中写 `process.env`** — 必须通过 `NodeConfigService`
 3. **禁止手动拼接 Redis key** — 必须通过 `buildCacheKey` / `buildCacheKeyWithTemplates`
-4. **禁止绕过 BaseSchedule/BaseProcessor** — 新增定时任务/队列处理器必须继承基类
-5. **禁止在多 Service 中复制粘贴 HTTP 调用/签名/分页/重试/字段映射逻辑** — 提取到 helper/adapter
-6. **禁止为假想复用提前抽象** — 至少两个模块真实复用后才进 `src/common/`
-7. **禁止引入第二套同职责技术方案** — 如已有 redis 客户端不再引入 ioredis 直连
-8. **禁止 Redis key 不含租户占位符** — 多租户场景的 key 必须含 `{tenant}`
-9. **禁止缓存不设 TTL** — 除非有明确的不失效设计理由并加注释
-10. **禁止 Controller 中写业务逻辑** — Controller 只做路由和参数透传
-11. **禁止在非 DTO 文件中声明多个 `class` 或在类文件内声明类型** — 非 DTO 类一文件一个，类型必须拆到独立类型文件
+4. **禁止在多 Service 中复制粘贴 HTTP 调用/签名/分页/重试/字段映射逻辑** — 提取到 helper/adapter
+5. **禁止为假想复用提前抽象** — 至少两个模块真实复用后才进 `src/common/`
+6. **禁止引入第二套同职责技术方案** — 如已有 redis 客户端不再引入 ioredis 直连
+7. **禁止 Redis key 不含租户占位符** — 多租户场景的 key 必须含 `{tenant}`
+8. **禁止缓存不设 TTL** — 除非有明确的不失效设计理由并加注释
+9. **禁止 Controller 中写业务逻辑** — Controller 只做路由和参数透传
+10. **禁止在非 DTO 文件中声明多个 `class` 或在类文件内声明类型** — 非 DTO 类一文件一个，类型必须拆到独立类型文件
 
 ---
 
@@ -273,7 +253,7 @@ pnpm env:prod
 
 - 普通 API 变更：优先运行相关 Jest 测试；必要时运行 `pnpm test` 或 `pnpm build:dev`
 - Prisma schema 变更：运行 `pnpm pg`；需要迁移时按环境执行迁移命令
-- Redis、租户、队列、飞书、鉴权变更：按 `../../docs/ai-governance/testing-and-verification.md` 的专项检查执行
+- Redis、租户、飞书、鉴权变更：按 `../../docs/ai-governance/testing-and-verification.md` 的专项检查执行
 - 只改文档时不需要跑业务测试，但要做路径和引用静态校验
 
 ---
@@ -287,8 +267,7 @@ pnpm env:prod
 | `project-architecture.md` | 整体架构、启动链路、中间件链、请求生命周期 | 理解系统全貌 |
 | `directory-structure.md` | src 整体目录结构说明 | 新增模块/文件 |
 | `auth-and-tenant.md` | 鉴权、Guard、租户上下文、Redis key 隔离 | 鉴权/多租户变更 |
-| `global-admin.md` | Global Admin 聚合模块与业务子模块边界 | 总控台后端变更 |
-| `feishu-integration.md` | 飞书分层：client/helper/table/card/event | 飞书相关变更 |
+| `feishu-integration.md` | 保留的告警客户端和表格鉴权边界 | 飞书相关变更 |
 
 ### API 开发规范 (`docs/standard/`)
 | 文档 | 说明 | 何时读 |
@@ -298,7 +277,6 @@ pnpm env:prod
 | `module-design.md` | 模块/子模块目录设计、table/adapter/helper 放置规则 | 新增模块/外部集成 |
 | `configuration.md` | 环境变量、NodeConfigService、租户配置 | 配置/环境变量变更 |
 | `redis.md` | Redis key 规范、缓存、限流、幂等 | Redis 相关变更 |
-| `background-jobs.md` | BaseSchedule/BaseProcessor、队列规范 | 定时任务/队列变更 |
 
 ### AI 治理文档 (`../../docs/ai-governance/`)
 | 文档 | 说明 | 何时读 |

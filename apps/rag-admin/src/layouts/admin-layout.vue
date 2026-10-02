@@ -47,12 +47,7 @@
       </LayoutHeader>
 
       <LayoutContent class="main">
-        <Spin :spinning="userStore.loginLoading">
-          <div v-if="userStore.loginError" class="state error-state">
-            {{ userStore.loginError }}
-          </div>
-          <RouterView v-else />
-        </Spin>
+        <RouterView />
         <LayoutDrawer />
       </LayoutContent>
     </Layout>
@@ -80,7 +75,6 @@
     LayoutHeader,
     LayoutSider,
     Menu,
-    Spin,
     type ItemType,
     type MenuProps
   } from '@aplus-frontend/antdv';
@@ -163,14 +157,19 @@
 
   function readSiderCollapsedPreference() {
     try {
-      return window.localStorage.getItem(SIDER_COLLAPSED_STORAGE_KEY) === 'true';
+      return (
+        window.localStorage.getItem(SIDER_COLLAPSED_STORAGE_KEY) === 'true'
+      );
     } catch {
       return false;
     }
   }
 
   const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
-    if (key === 'logout') userStore.logout();
+    if (key === 'logout') {
+      userStore.logout();
+      void router.replace({ name: 'login' });
+    }
   };
 
   watch(
@@ -301,25 +300,6 @@
     padding: 12px;
     overflow: hidden;
     background: @fill-hover-color;
-  }
-
-  .main :deep(.ant-spin-nested-loading),
-  .main :deep(.ant-spin-container) {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    min-height: 0;
-  }
-
-  .state {
-    display: grid;
-    min-height: 160px;
-    place-items: center;
-    color: @text-secondary-color;
-  }
-
-  .error-state {
-    color: @red-color;
   }
 
   @media (max-width: 900px) {

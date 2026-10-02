@@ -1,19 +1,29 @@
 import type { App } from 'vue';
 import { createRouter, createWebHashHistory } from 'vue-router';
 import { useUserStore } from '@/stores/modules/user';
-import { prepareRagAdminRoute } from './route-auth';
 import { routes } from './routes';
 
 export const router = createRouter({
   history: createWebHashHistory(),
   routes,
-  strict: true,
+  strict: true
 });
 
-router.beforeEach(async (to) => {
+router.beforeEach((to) => {
   const userStore = useUserStore();
-  const allowed = await prepareRagAdminRoute(userStore);
-  if (!allowed) return false;
+
+  if (to.meta.public) {
+    if (!userStore.isLoggedIn) return true;
+    const redirect =
+      typeof to.query.redirect === 'string' ? to.query.redirect : '';
+    return redirect.startsWith('/') && redirect !== '/login'
+      ? redirect
+      : '/knowledge/documents';
+  }
+
+  if (!userStore.isLoggedIn) {
+    return { name: 'login', query: { redirect: to.fullPath } };
+  }
 
   const title = typeof to.meta.title === 'string' ? to.meta.title : '';
   const brandTitle = `${userStore.tenantDisplayName} 管理后台`;

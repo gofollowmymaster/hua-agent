@@ -1,25 +1,12 @@
-import { FeishuAppConfig, WecomRagBotConfig } from '../interface';
+import { FeishuAppConfig } from '../interface';
 import aplus from './aplus';
 import boat from './boat';
 import yurex from './yurex';
 
 export type TenantConfig = {
-  FeishuWikiSpaceIds: string[];
   hostTag: string;
-  WikiBlackListCheckoutGroupId: string;
-  WikiBlackListCheckoutUserId: string;
-  robots: {
-    WikiClient: FeishuAppConfig;
-    AuthClient?: FeishuAppConfig;
-    //机器人Aplus智能体相关
-    AilyAplusClient?: FeishuAppConfig;
-  };
-
-  //Aplus智能体表格相关
+  robots: Record<string, FeishuAppConfig>;
   feishuTables: Record<string, string>;
-  wecomBot?: {
-    vcHelperClient?: WecomRagBotConfig;
-  };
 };
 export type TenantRobots = keyof TenantConfig['robots'];
 export type TenantConfigKey = keyof TenantConfig;

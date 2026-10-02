@@ -9,7 +9,6 @@
 - `workspace`：根脚本、pnpm workspace、依赖、部署、构建边界。
 - `api`：`apps/api` 后端能力。
 - `rag-admin`：`apps/rag-admin` 前端能力。
-- `global-admin`：`apps/global-admin` 无租户总控台能力。
 - `shared`：`packages/shared` 共享包。
 - `cross-app`：前后端接口契约、登录链路、静态资源发布、shared 消费。
 - `docs-only`：只修改文档。
@@ -36,7 +35,6 @@
 - workspace 任务：检查根 `package.json`、`pnpm-workspace.yaml`、受影响 app 的 `package.json` 和相关部署配置。
 - API 任务：查找 controller、service、DTO、table adapter、helper、配置、测试和相关规范。
 - RAG Admin 任务：查找 router、view、layout、store、API client、auth、样式和 Vite 配置，并读 `docs/standard/design/README.md`。
-- Global Admin 任务：除前端结构外，同时检查 GlobalAdminGuard、TenantMiddleware 排除和无租户 Service 边界。
 - shared 任务：查找 `packages/shared` 导出和所有 workspace 消费者。
 - cross-app 任务：同时查后端 DTO/Controller/Service 和前端 API client/页面调用方。
 
@@ -47,8 +45,7 @@
 所有项目命令必须遵循 `AGENTS.md` 的环境加载规则：
 
 - API 后端优先使用根目录已有兼容脚本，例如 `pnpm build:dev`、`pnpm start:dev`、`pnpm migrate:dev`。直接在 `apps/api` 内执行依赖环境变量的底层命令时，才使用 API app 的 `pnpm env:dev -- ...`、`pnpm env:test -- ...` 或 `pnpm env:prod -- ...`。
-- RAG Admin 前端命令使用 `pnpm rag-admin:*` 或 `pnpm --filter @aplus-sql/rag-admin ...`，不要套 API 的 dotenv 加载器。
-- Global Admin 前端命令使用 `pnpm global-admin:*` 或 `pnpm --filter @aplus-sql/global-admin ...`，不要套 API 的 dotenv 加载器。
+- RAG Admin 前端命令使用 `pnpm admin:*` 或 `pnpm --filter @aplus-sql/rag-admin ...`，不要套 API 的 dotenv 加载器。
 - shared 命令按实际 package 脚本执行；当前没有脚本时不要虚构。
 
 格式化和 lint 命令会修改文件，执行前应确认这是当前任务的一部分。

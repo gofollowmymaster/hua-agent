@@ -3,207 +3,72 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import { createApp, nextTick } from 'vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const mocks = vi.hoisted(() => ({
-  ensureLogin: vi.fn(),
-  getCurrentUserInfo: vi.fn(),
-  logout: vi.fn()
-}));
+const mocks = vi.hoisted(() => ({ login: vi.fn() }));
 
-vi.mock('./auth', () => ({
-  ensureLogin: mocks.ensureLogin,
-  getCurrentUserInfo: mocks.getCurrentUserInfo,
-  logout: mocks.logout,
-  tenantAuthConfig: { supplierCode: 'D' }
-}));
+vi.mock('@/api/auth/auth', () => ({ login: mocks.login }));
 
 import { useUserStore } from './index';
 
-interface MemoryStorage {
-  getItem: (key: string) => string | null;
-  setItem: (key: string, value: string) => void;
-}
-
-function createMemoryStorage(): MemoryStorage {
-  const data = new Map<string, string>();
+function createMemoryStorage() {
+  const values = new Map<string, string>();
   return {
-    getItem: (key) => data.get(key) ?? null,
-    setItem: (key, value) => {
-      data.set(key, value);
-    }
+    getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, value: string) => values.set(key, value),
+    removeItem: (key: string) => values.delete(key)
   };
 }
 
-function encodeBase64(value: string) {
-  return Buffer.from(value, 'utf8')
-    .toString('base64')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/g, '');
-}
-
 function createJwt(payload: Record<string, unknown>) {
-  const header = encodeBase64(JSON.stringify({ alg: 'none' }));
-  const body = encodeBase64(JSON.stringify(payload));
-  return `${header}.${body}.signature`;
+  const encode = (value: unknown) =>
+    Buffer.from(JSON.stringify(value), 'utf8')
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/g, '');
+  return `${encode({ alg: 'none' })}.${encode(payload)}.signature`;
 }
 
 describe('useUserStore', () => {
-  let storage: MemoryStorage;
-
   beforeEach(() => {
-    vi.clearAllMocks();
-    storage = createMemoryStorage();
+    mocks.login.mockReset();
     vi.stubGlobal('window', {
       atob: (value: string) => Buffer.from(value, 'base64').toString('binary'),
-      localStorage: storage,
-      document: { cookie: '' }
+      localStorage: createMemoryStorage(),
+      location: { hostname: 'admin.yurexcc.com' }
     });
-
     const pinia = createPinia();
     pinia.use(piniaPluginPersistedstate);
     createApp({}).use(pinia);
     setActivePinia(pinia);
   });
 
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
+  afterEach(() => vi.unstubAllGlobals());
 
-  it('parses tenant info from the JWT payload', () => {
-    const store = useUserStore();
-
-    store.setToken(
-      createJwt({
-        tenantName: '小往',
-        supplierCode: 'C',
-        tenantCode: 'boat'
-      })
-    );
-
-    expect(store.userInfo).toMatchObject({
-      tenantName: '小往',
-      supplierCode: 'C',
-      tenantCode: 'boat'
-    });
-    expect(store.supplierCode).toBe('C');
-    expect(store.tenantDisplayName).toBe('小往');
-  });
-
-  it('supports snake_case JWT claims', () => {
-    const store = useUserStore();
-
-    store.setToken(
-      createJwt({
-        tenant_name: 'Aplus',
-        supplier_code: 'A'
-      })
-    );
-
-    expect(store.userInfo).toMatchObject({
-      tenantName: 'Aplus',
-      supplierCode: 'A'
-    });
-    expect(store.tenantDisplayName).toBe('Aplus');
-  });
-
-  it('uses supplierName when tenantName is missing', () => {
-    const store = useUserStore();
-
-    store.setToken(
-      createJwt({
-        supplierName: 'Yurex',
-        supplierCode: 'D'
-      })
-    );
-
-    expect(store.tenantDisplayName).toBe('Yurex');
-  });
-
-  it('falls back to the resolved host tenant when token has no tenant info', () => {
-    const store = useUserStore();
-
-    expect(store.supplierCode).toBe('D');
-    expect(store.tenantDisplayName).toBe('Yurex');
-  });
-
-  it('keeps token tenant info when SDK user info omits it', () => {
+  it('stores the local login token and parses numeric user IDs', async () => {
     const token = createJwt({
-      tenantName: 'Aplus',
-      supplierCode: 'A'
+      userId: 7,
+      username: 'Alice',
+      supplierCode: 'D',
+      tenantCode: 'yurex'
     });
-    const store = useUserStore();
-    store.setToken(token);
-
-    store.setUserInfo({ userName: 'Alice' });
-
-    expect(store.userInfo.tenantName).toBe('Aplus');
-    expect(store.tenantDisplayName).toBe('Aplus');
-    expect(store.userInfo.userName).toBe('Alice');
-  });
-
-  it('persists token and userInfo under authToken', async () => {
-    const token = createJwt({
-      tenantName: 'Aplus',
-      supplierCode: 'A',
-      userName: 'Alice'
-    });
+    mocks.login.mockResolvedValue({ token });
     const store = useUserStore();
 
-    expect(store.$persist).toBeTypeOf('function');
-    store.setToken(token);
+    await store.login({ username: 'alice', password: 'password123' });
     await nextTick();
 
-    expect(JSON.parse(storage.getItem('authToken')!)).toMatchObject({
-      token,
-      userInfo: {
-        tenantName: 'Aplus',
-        supplierCode: 'A',
-        userName: 'Alice'
-      }
-    });
-  });
-
-  it('restores loginReady and user info from persisted authToken', () => {
-    const token = createJwt({
-      tenantName: 'Aplus',
-      supplierCode: 'A'
-    });
-    storage.setItem('authToken', JSON.stringify({ token }));
-
-    const store = useUserStore();
-
     expect(store.token).toBe(token);
-    expect(store.loginReady).toBe(true);
-    expect(store.userInfo.tenantName).toBe('Aplus');
+    expect(store.userInfo).toMatchObject({ userId: '7', userName: 'Alice' });
+    expect(store.isLoggedIn).toBe(true);
   });
 
-  it('clears persisted token on logout', async () => {
+  it('clears local state on logout', () => {
     const store = useUserStore();
-    store.setToken(createJwt({ tenantName: 'Aplus', supplierCode: 'A' }));
+    store.setToken(createJwt({ username: 'Alice' }));
 
     store.logout();
-    await nextTick();
 
-    expect(JSON.parse(storage.getItem('authToken')!)).not.toHaveProperty(
-      'token'
-    );
-    expect(mocks.logout).toHaveBeenCalledOnce();
-  });
-
-  it('merges SDK user info without clearing token claims', async () => {
-    const token = createJwt({
-      tenantName: 'Aplus',
-      supplierCode: 'A'
-    });
-    mocks.ensureLogin.mockResolvedValue(token);
-    mocks.getCurrentUserInfo.mockResolvedValue({ userName: 'Alice' });
-    const store = useUserStore();
-
-    await store.ensureLogin();
-
-    expect(store.token).toBe(token);
-    expect(store.userInfo.tenantName).toBe('Aplus');
-    expect(store.userInfo.userName).toBe('Alice');
-    expect(store.loginReady).toBe(true);
+    expect(store.token).toBeUndefined();
+    expect(store.loginReady).toBe(false);
   });
 });

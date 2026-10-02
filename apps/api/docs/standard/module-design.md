@@ -59,7 +59,7 @@ src/<module>/<submodule>/
     └── service/
 ```
 
-- 控制器文件与子模块目录同名，例如 `src/doc/wiki/wiki.controller.ts`。
+- 控制器文件与子模块目录同名，例如 `src/agent/chat/agent-chat.controller.ts`。
 - 子模块是父模块内的目录拆分，不新增 `<submodule>.module.ts`；controller、service、provider 由父模块统一注册。
 - 子模块内额外私有 service 可放在子模块根目录或 `common/service/`；子模块间复用仍通过父模块内的 Service 注入，不跨目录调用内部实现细节。
 
@@ -70,7 +70,6 @@ src/<module>/<submodule>/
 - Service：承载业务编排、流程控制、权限后的业务判断、事务边界和调用其他服务。
 - Table/Adapter：封装飞书表格、外部系统或第三方 API 的访问细节。
 - Helper：基础能力封装，尤其是飞书 OpenAPI 级能力。
-- Schedule/Processor：定时任务或后台处理逻辑，不要塞进普通 Controller。
 - Type：业务内部类型，避免滥用 `any` 或把局部类型放到全局。
 
 ## Controller 与路由
@@ -90,7 +89,7 @@ src/<module>/<submodule>/
 - 外部系统适配、字段转换、飞书表格访问不直接混在核心业务流程中。
 - 对需要幂等的回调或任务，优先使用 `RedisService.idempotent`。
 - 需要租户、用户、request 信息时注入 `TenantContext`。
-- 需要数据库时注入 `PrismaService`。
+- 需要数据库时注入 `RagPrismaService`。
 - 需要缓存、限流、幂等时注入 `RedisService`。
 - 需要日志时注入 `LoggerService` 或使用项目已有 logger 方式。
 
@@ -100,7 +99,7 @@ src/<module>/<submodule>/
 - 模块内部类型放模块内 `type/` 或 `common/type/`。
 - 飞书 OpenAPI 类型放 `src/common/feishu/type/`。
 - 跨模块稳定类型才考虑放到 `src/type`。
-- 新增类型文件以其主要导出类型命名，并保持与类文件分离；不要在 Controller、Service、DTO、adapter、table、schedule 或 processor 文件中内联业务类型。
+- 新增类型文件以其主要导出类型命名，并保持与类文件分离；不要在 Controller、Service、DTO、adapter 或 table 文件中内联业务类型。
 
 ## table/adapter/helper 放置规则
 
@@ -120,14 +119,6 @@ src/<module>/<submodule>/
 
 不要在多个 Service 中复制粘贴 HTTP 调用、签名、分页、重试、字段映射等细节。
 
-## schedule/processor 放置规则
-
-- 定时任务放业务模块内的 `common/schedule` 或既有 schedule 目录。
-- 后台处理器放业务模块内的 `common/processor` 或既有 processor 目录。
-- 定时任务和处理器应只负责触发和调度，复杂业务逻辑下沉到 Service。
-- 新增任务应通过对应模块 providers 注册，任务逻辑应保持可测试。
-- 定时任务与队列处理器的执行、租户上下文、异常告警和队列 payload 约定见 `background-jobs.md`。
-
 ## 新文件放置决策
 
 - 新 HTTP 接口：优先在对应业务模块下新增 controller、service、dto。
@@ -135,7 +126,6 @@ src/<module>/<submodule>/
 - 新飞书表格访问：优先新增或复用 table adapter，不要在 Service 里直接拼表格请求。
 - 新租户配置：按 `configuration.md` 判断归属并维护类型。
 - 新缓存 key：先扩展 `RedisKeys`，再通过 `RedisService.buildCacheKey*` 构造；具体规则见 `redis.md`。
-- 新定时任务或队列处理器：放业务模块的 `common/schedule`、`common/processor` 或已有目录，复用 `background-jobs.md` 中的统一基类。
 
 ## 模块落地检查
 

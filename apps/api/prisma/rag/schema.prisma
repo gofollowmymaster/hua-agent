@@ -9,6 +9,23 @@ datasource db {
   url      = env("RAG_DATABASE_URL")
 }
 
+model RagAdminUser {
+  id            Int      @id @default(autoincrement())
+  tenantCode    String   @map("tenant_code") @db.Text
+  supplierCode  String   @map("supplier_code") @db.Text
+  username      String   @db.Text
+  displayName   String   @map("display_name") @db.Text
+  passwordHash  String   @map("password_hash") @db.Text
+  isEnabled     Boolean  @default(true) @map("is_enabled")
+  isSystemAdmin Boolean  @default(false) @map("is_system_admin")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([tenantCode, username])
+  @@index([tenantCode], map: "idx_rag_admin_users_tenant_code")
+  @@map("rag_admin_users")
+}
+
 model AplusDocument {
   id         BigInt       @id @default(autoincrement())
   tenantCode String       @map("tenant_code") @db.Text
@@ -175,35 +192,4 @@ model AplusRagMessage {
   @@index([tenantCode, sessionId, createdAt], map: "idx_aplus_rag_messages_tenant_session_created")
   @@index([tenantCode, externalMessageId], map: "idx_aplus_rag_messages_external_message")
   @@map("aplus_rag_messages")
-}
-
-model ScheduledTask {
-  id            BigInt             @id @default(autoincrement())
-  taskKey       String             @unique @map("task_key") @db.Text
-  module        String             @db.Text
-  description   String             @db.Text
-  cron          String             @db.Text
-  status        String             @default("enabled") @db.Text
-  lastRunTime   DateTime?          @map("last_run_time") @db.Timestamptz(6)
-  lastRunResult String?            @map("last_run_result") @db.Text
-  createdAt     DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt     DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
-  logs          ScheduledTaskLog[]
-
-  @@index([status], map: "idx_scheduled_tasks_status")
-  @@map("scheduled_tasks")
-}
-
-model ScheduledTaskLog {
-  id          BigInt        @id @default(autoincrement())
-  taskId      BigInt        @map("task_id")
-  executeTime DateTime      @map("execute_time") @db.Timestamptz(6)
-  result      String        @db.Text
-  message     String?       @db.Text
-  costMs      Int?          @map("cost_ms")
-  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
-  task        ScheduledTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
-
-  @@index([taskId, executeTime], map: "idx_scheduled_task_logs_task_execute")
-  @@map("scheduled_task_logs")
 }

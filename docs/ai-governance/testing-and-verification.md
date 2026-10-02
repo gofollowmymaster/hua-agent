@@ -32,7 +32,7 @@
 
 - 根 `package.json`、`pnpm-workspace.yaml` 和受影响 app 的 `package.json` 是否一致。
 - API 命令是否正确使用环境加载器。
-- 两个前端 app 的命令是否使用各自前端脚本，不混用 API dotenv。
+- RAG Admin 命令是否使用自身前端脚本，不混用 API dotenv。
 - 跨包引用是否符合 `AGENTS.md`。
 - 根据受影响子项目追加 API、RAG Admin 或 shared 验证。
 
@@ -50,14 +50,10 @@
 
 优先验证：
 
-- `pnpm rag-admin:build`。
-- 涉及 dev server、proxy、登录跳转或运行时交互时，必要时运行 `pnpm rag-admin:dev` 并做人工或浏览器验证。
+- `pnpm --filter @aplus-sql/rag-admin test` 和 `pnpm admin:build`。
+- 涉及 dev server、proxy、登录跳转或运行时交互时，必要时运行 `pnpm admin:dev` 并做人工或浏览器验证。
 
 若构建无法运行，需要说明原因，例如依赖未安装、网络受限或环境变量缺失。
-
-## Global Admin 前端变更
-
-优先验证 `pnpm global-admin:test`、`pnpm global-admin:build`、lint/stylelint/format check。涉及登录、proxy、详情 query 或静态输出时启动 dev server 做浏览器验证，并同步验证 GlobalAdminGuard 和 TenantMiddleware 排除范围。
 
 ## Shared 包变更
 
@@ -66,7 +62,7 @@
 - 是否符合 `packages/shared/docs/standard/package-design.md` 的导出和依赖边界。
 - 是否搜索并更新所有消费者。
 - API 消费者受影响时运行相关 API 验证。
-- 任一前端消费者受影响时运行对应 app 的生产构建；共享前端包变更默认同时运行 `pnpm admin:build` 和 `pnpm global-admin:build`。
+- 前端消费者受影响时运行 `pnpm admin:build`。
 
 ## Cross-app 变更
 
@@ -110,18 +106,6 @@
 - 批量删除是否有足够具体的 pattern、长度保护和范围保护。
 - 后台任务是否显式处理租户，而不是依赖请求上下文。
 
-## 定时任务与队列处理变更
-
-涉及定时任务、BullMQ 队列处理器、后台任务时，先读 `apps/api/docs/standard/background-jobs.md`，并检查：
-
-- 定时任务是否继承 `BaseSchedule`，并配置稳定 `jobName`、明确 `cron` 和合适 `isOpen`。
-- 定时任务是否通过 `initContext()` 或默认 `tenantContextDatas` 明确租户上下文。
-- 手动触发路径是否确认 `force`、Guard、租户来源和异常处理。
-- 队列处理器是否继承 `BaseProcessor`，并只实现 `handle(data)`。
-- 入队 payload 是否包含 `tenantCode`，符合 `ProcessorBody`。
-- `BullModule.registerQueue` 是否配置队列名、重试、退避和完成保留策略。
-- 异常是否能触发基类告警，关键失败是否没有被吞掉。
-
 ## 飞书集成变更
 
 涉及飞书 API、表格、卡片、事件、回调时检查：
@@ -138,8 +122,6 @@
 
 - API Guard 是否符合 `apps/api/docs/architecture/auth-and-tenant.md` 中的鉴权使用现状。
 - 前端 token 读取、保存和请求头注入是否集中在各 app 的用户 store 与 `src/api`。
-- Global Admin API 是否使用 GlobalAdminGuard、排除 TenantMiddleware 且不读取默认 TenantContext。
-- 后台任务是否显式处理租户，而不是依赖请求上下文。
 - Redis key 是否租户隔离，批量删除是否有范围保护。
 - 租户化配置是否通过 `NodeConfigService` 读取。
 - 是否避免跨租户读取数据、污染缓存或错误发送飞书消息。

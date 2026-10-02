@@ -14,9 +14,7 @@ export type { RagChatRequest } from './types/rag.type';
 /**
  * RAG 问答 Facade
  *
- * 保持与原有 RagService 完全相同的公共接口，
- * 同步和流式问答委托给 RagQueryService，AGUI 请求与事件在此完成协议适配。
- * 所有外部调用方（RagController、WecomRagBotService）无需修改。
+ * 问答工作流委托给 RagQueryService，AGUI 请求与事件在此完成协议适配。
  */
 @Injectable()
 export class RagService {

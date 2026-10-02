@@ -8,7 +8,7 @@
 
 - 至少有一个明确跨包消费者，或即将同时被 API 与 RAG Admin 使用。
 - 类型或工具语义稳定，不频繁跟随单个页面或单个 Service 内部实现变化。
-- 不依赖 NestJS、Vue、Prisma、Redis、BullMQ、axios 实例或浏览器/Node 专属运行时。
+- 不依赖 NestJS、Vue、Prisma、Redis、队列客户端、axios 实例或浏览器/Node 专属运行时。
 
 ## 导出规则
 

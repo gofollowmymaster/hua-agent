@@ -19,4 +19,4 @@ pnpm ui-kit:lint:check
 pnpm ui-kit:stylelint:check
 ```
 
-同时运行所有受影响消费 app 的类型检查和生产构建；当前至少运行 `pnpm admin:build` 和 `pnpm global-admin:build`。涉及运行时交互时启动消费 app 做页面 smoke test。
+同时运行所有受影响消费 app 的类型检查和生产构建；当前运行 `pnpm admin:build`。涉及运行时交互时启动消费 app 做页面 smoke test。

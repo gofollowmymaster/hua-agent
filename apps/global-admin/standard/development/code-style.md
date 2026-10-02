@@ -1,1 +1,0 @@
-../../../../docs/standard/frontend/development/code-style.md

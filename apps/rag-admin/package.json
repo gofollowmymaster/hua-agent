@@ -22,7 +22,6 @@
     "@ai-sdk/vue": "3.0.148",
     "@ant-design/icons-vue": "7.0.1",
     "@aplus-frontend/antdv": "2.2.0",
-    "@aplus-frontend/aplus-auth-sdk": "2.1.4",
     "@aplus-frontend/ui": "7.26.8",
     "@aplus-sql/http-client": "workspace:*",
     "@aplus-sql/ui-kit": "workspace:*",

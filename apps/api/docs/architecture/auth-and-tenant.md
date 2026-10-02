@@ -1,167 +1,38 @@
 # 权限与多租户
 
-本文说明项目中的鉴权、多租户上下文、租户配置、Redis key 和租户化飞书配置模型，可作为理解接口权限、服务商差异、Redis key、飞书表格访问的架构上下文。
-
-## 核心模型
-
-项目通过 `TenantMiddleware` 在每个请求开始阶段解析用户与租户，并通过 `TenantContext` 保存到 `AsyncLocalStorage`。
-
-Global Admin 是明确的例外：`/global-admin` API 及 `/public/global-admin` 静态路径在 middleware 注册层被排除，不创建 TenantContext，也不回退默认租户。
-
-业务代码通过注入 `TenantContext` 获取：
-
-- `tenant`：当前租户码。
-- `user`：当前用户上下文。
-- `userId`：当前用户 ID。
-- `request`：当前 Express request。
+所有 API 路由都经过 `TenantMiddleware`。中间件解析租户后使用 `TenantContext` 的 `AsyncLocalStorage` 保存当前租户、用户和 request；业务代码应注入 `TenantContext`，不要重复解析 header。
 
 ## 租户来源
 
-`TenantMiddleware` 按以下来源解析租户：
+`TenantMiddleware` 按以下顺序解析租户：
 
-1. `supplier` header：直接作为服务商编码来源。
-2. `Authorization: Bearer <jwt>`：decode JWT，读取用户上下文中的 `supplierCode`。
-3. 非 Bearer `Authorization`：作为固定 token，通过 `ClientSecretTable` 查询服务商。
-4. 未解析到租户时，使用 `NodeConfigService.get('defaultTenant')`。
+1. `supplier` header。
+2. Bearer JWT 中的 `supplierCode`。
+3. 非 Bearer `Authorization` 固定 token，通过 `ClientSecretTable` 查询服务商。
+4. `NodeConfigService.get('defaultTenant')`。
 
-`getTenantCode` 会兼容 `tenantCodeMap` 的 key 和 value，当前租户值包括：
+非 dev 环境还会使用租户 `hostTag` 校验请求 host。当前租户为 `aplus`、`boat`、`yurex`。
 
-- `aplus`
-- `boat`
-- `yurex`
+## Guard
 
-## 域名与租户校验
+- `AuthGuard`：校验 Bearer JWT、登录时间和过期时间，并把 payload 写入 `request.user`。
+- `SystemAdminGuard`：校验 JWT 的 `isSystemAdmin` 标记，仅用于本地用户管理接口。
+- `SecretAuthGuard`：通过 `ClientSecretTable` 校验固定密钥、启用状态和请求路径权限。
+- `CompositeAuthOrSecretGuard`：Bearer 请求使用 `AuthGuard`，其他请求使用 `SecretAuthGuard`。
 
-非 dev 环境下，`TenantMiddleware` 会用租户配置中的 `hostTag` 校验请求 host 与 token 服务商是否匹配。
+知识问答聊天和管理端用户接口使用 `AuthGuard`；需要同时支持后台用户和系统调用的保留接口使用组合 Guard。项目不再提供签名 Guard 或无租户管理后台例外。
 
-如果请求头包含 `ignore-supplier-check: true`，会跳过该域名与服务商匹配检查。
+## 本地用户认证
 
-## TenantContext 使用场景
+- `POST /auth/login` 是公开的本地账号密码登录接口。RAG Admin 按页面 hostname 解析服务商码，并通过 `supplier` header 传递给 `TenantMiddleware`，以兼容开发代理。
+- 用户记录保存在 RAG PostgreSQL 的 `rag_admin_users`，按 `tenant_code + username` 唯一，密码仅保存 scrypt 加盐哈希。
+- 登录 JWT 继续携带 `userId`、`userCode`、`username`、`loginId`、`supplierCode`、`tenantCode`、`appCode`、`scope` 和 `loginTime`；新增 `isSystemAdmin` 仅用于用户管理边界。
+- 首次系统管理员通过 `RAG_ADMIN_BOOTSTRAP_*` 环境变量创建。除 `RAG_ADMIN_BOOTSTRAP_RESET_PASSWORD=true` 外，启动不会覆盖既有管理员密码。
+- `POST /auth/users/*` 同时使用 `AuthGuard` 和 `SystemAdminGuard`，查询与写入始终限制在当前租户。
 
-适用场景：
+## 租户隔离
 
-- 构造租户化 Redis key。
-- 读取租户级飞书机器人或表格配置。
-- 根据当前用户做业务判断。
-- 需要当前 request 进行日志或上下文关联。
-
-## Guard 类型
-
-项目当前提供四类可复用 Guard。
-
-### AuthGuard
-
-适用于用户态 Bearer JWT 接口。
-
-行为：
-
-- 只接受 `Authorization: Bearer <token>`。
-- 使用 `JwtService.verify` 校验 token。
-- 根据 `loginTime` 和 `jwtTokenExpired` 判断登录是否过期。
-- 校验通过后把 payload 写到 `request.user`。
-
-适合场景：需要登录用户身份的业务接口，如部分 wiki、Aily session、日志操作接口。
-
-### SecretAuthGuard
-
-适用于固定密钥调用的系统间接口。
-
-行为：
-
-- 直接读取 `authorization` header 作为 token。
-- 通过 `ClientSecretTable` 查询 app 信息。
-- 校验密钥是否启用。
-- 根据请求路径第一段校验 app 的使用范围。
-
-适合场景：内部系统、自动化任务、飞书/工具侧以固定密钥调用的接口。
-
-### SignAuthGuard
-
-适用于带签名的请求体认证。
-
-行为：
-
-- 从 body 中读取 `signature` 和 `appId`。
-- 通过 `ClientSecretTable` 查询 app secret。
-- 对剩余 body 字段按 key 排序后拼接，并追加 secret 生成 MD5。
-- 比对生成签名与传入签名。
-
-适合场景：Aily 等需要请求体签名校验的接口。
-
-### CompositeAuthOrSecretGuard
-
-适用于同时支持用户 JWT 和固定密钥的接口。
-
-行为：
-
-- `authorization` 以 `Bearer ` 开头时走 `AuthGuard`。
-- 否则走 `SecretAuthGuard`。
-
-适合场景：同一个接口既允许前端用户调用，也允许内部系统调用。
-
-### GlobalAdminGuard
-
-适用于无租户总控台接口。它位于 `src/global-admin/common/guard/`，先复用 AuthGuard 完成 JWT 验签和过期校验，再要求 payload 的 appCode 等于 `globalAdminAppCode`（默认 `GLOBAL`）。该 Guard 不使用 TenantContext，也不接受客户端 header 作为授权依据。这里的 `common` 仅表示 Global Admin 模块内部公共层，专用 Guard 不注册到全局通用 `GuardModule`。
-
-## 鉴权使用现状
-
-- 用户登录态接口通常使用 `AuthGuard`。
-- 内部系统固定密钥接口通常使用 `SecretAuthGuard`。
-- 第三方或 Aily 风格签名接口通常使用 `SignAuthGuard`。
-- 同时兼容用户和系统调用的接口通常使用 `CompositeAuthOrSecretGuard`。
-- 无租户总控台接口使用 `GlobalAdminGuard`，并保持在 TenantMiddleware 排除范围内。
-- 公开 webhook/callback 会结合来源校验、challenge 处理、幂等和异常上报策略。
-
-Global Admin 的完整模块边界见 `global-admin.md`。
-
-## 租户配置
-
-租户配置位于 `src/config/tenant`，统一由 `src/config/tenant/index.ts` 聚合。
-
-每个租户包含：
-
-- `FeishuWikiSpaceIds`
-- `hostTag`
-- `WikiBlackListCheckoutGroupId`
-- `WikiBlackListCheckoutUserId`
-- `robots`
-- `feishuTables`
-
-现有读取入口：
-
-- 全局配置使用 `NodeConfigService.get` 或 `getOrThrow`。
-- 租户单项配置使用 `NodeConfigService.getTenantConfigItem`。
-- 机器人配置使用 `NodeConfigService.getRobotConfig`。
-- 表格配置使用 `NodeConfigService.getFeishuTableConfig`。
-
-配置归属、读取方式、类型维护和敏感信息处理规范见 `apps/api/docs/standard/configuration.md`。
-
-## Redis key 与租户
-
-Redis key 枚举位于 `src/common/const/redis-key.enum.ts`。
-
-租户化 key 构造入口包括：
-
-- `RedisService.buildCacheKey`
-- `RedisService.buildCacheKeyWithTemplates`
-
-这些方法会替换 key 模板中的 `{tenant}`。
-
-`RedisService.delByPattern` 对 pattern 长度有保护，避免误删过宽范围。
-
-Redis key、缓存、限流、幂等和批量删除的开发规范见 `apps/api/docs/standard/redis.md`。
-
-## 飞书表格与租户
-
-固定 token 鉴权和部分飞书表格访问会依赖当前租户上下文：
-
-- `TenantMiddleware` 可通过固定 token 查询服务商。
-- `SecretAuthGuard` 使用 `ClientSecretTable` 校验 token 和模块权限。
-- 飞书 table adapter 通过配置服务读取对应租户的 app token/table id。
-
-## 相关规范入口
-
-- 配置新增与读取规范：`apps/api/docs/standard/configuration.md`
-- Redis key、缓存、限流、幂等和批量删除规范：`apps/api/docs/standard/redis.md`
-- 模块分层、后台任务和 provider 注册规范：`apps/api/docs/standard/module-design.md`
-- 鉴权、租户、Redis、飞书变更的验证要求：`docs/ai-governance/testing-and-verification.md`
+- Prisma 查询必须携带当前 `tenantCode`，避免跨租户读取文档、分块、会话或消息。
+- Redis key 通过 `RedisService.buildCacheKey` 或 `buildCacheKeyWithTemplates` 构造，并在租户化场景使用 `{tenant}`。
+- 租户配置只通过 `NodeConfigService` 读取，不直接 import 单个租户文件。
+- 固定 token 与飞书表格访问继续依赖 `ClientSecretTable` 和当前租户配置。

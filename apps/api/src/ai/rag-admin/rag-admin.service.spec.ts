@@ -402,15 +402,14 @@ describe('RagAdminService', () => {
 
       const result = await service.getDocumentPreviewFile(1);
 
-      const expectedPath = await fs.realpath(
-        path.join(root, 'raw', 'aplus', 'a.md'),
-      );
       expect(result).toMatchObject({
-        absolutePath: expectedPath,
         fileName: 'a.md',
         fileType: 'md',
         fileSize: 6,
       });
+      await expect(fs.readFile(result.absolutePath, 'utf8')).resolves.toBe(
+        '# demo',
+      );
     } finally {
       process.chdir(originalCwd);
       await fs.rm(root, { recursive: true, force: true });

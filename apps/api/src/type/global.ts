@@ -49,6 +49,7 @@ export type UserContext = {
   scope?: 'WEB' | 'APP';
   tenantId?: number;
   username?: string;
+  isSystemAdmin?: boolean;
 };
 
 export type ProcessorBody = {

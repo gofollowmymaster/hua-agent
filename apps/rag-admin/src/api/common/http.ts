@@ -9,5 +9,6 @@ export const { http, post, get, del, getBlob } = createHttpClient({
   },
   onUnauthorized() {
     useUserStore().logout();
+    window.location.hash = '#/login';
   }
 });
