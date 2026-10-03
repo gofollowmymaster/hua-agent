@@ -13,6 +13,7 @@ jest.mock('@src/config/node-config.service', () => ({
 
 describe('AgentKnowledgeService', () => {
   let ragPrisma: {
+    $queryRaw: jest.Mock;
     agentDocument: {
       count: jest.Mock;
       findMany: jest.Mock;
@@ -31,6 +32,7 @@ describe('AgentKnowledgeService', () => {
 
   beforeEach(() => {
     ragPrisma = {
+      $queryRaw: jest.fn(),
       agentDocument: {
         count: jest.fn().mockResolvedValue(1),
         findMany: jest.fn().mockResolvedValue([
@@ -132,6 +134,61 @@ describe('AgentKnowledgeService', () => {
       id: '1',
       tenantCode: 'yurex',
       actualChunkCount: 2,
+    });
+  });
+
+  it('matches document content with zhparser full-text search', async () => {
+    ragPrisma.$queryRaw
+      .mockResolvedValueOnce([{ count: BigInt(1) }])
+      .mockResolvedValueOnce([{ id: BigInt(1) }]);
+
+    const result = await service.pageDocuments({
+      keyword: '报销流程',
+      category: 'yurex',
+      status: 'ready',
+      page: 1,
+      pageSize: 10,
+    });
+
+    expect(ragPrisma.$queryRaw).toHaveBeenCalledTimes(2);
+    const countQuery = ragPrisma.$queryRaw.mock.calls[0][0];
+    expect(countQuery.strings.join(' ')).toContain(
+      "to_tsvector('zhparser', c.content)",
+    );
+    expect(countQuery.values).toEqual(
+      expect.arrayContaining(['报销流程', 'yurex', 'ready']),
+    );
+    expect(ragPrisma.agentDocument.findMany).toHaveBeenCalledWith({
+      where: { id: { in: [BigInt(1)] } },
+      include: {
+        _count: { select: { chunks: true } },
+      },
+    });
+    expect(result).toMatchObject({
+      total: 1,
+      page: 1,
+      pageSize: 10,
+      list: [{ id: '1', tenantCode: 'yurex' }],
+    });
+  });
+
+  it('does not load documents when keyword search has no matches', async () => {
+    ragPrisma.$queryRaw
+      .mockResolvedValueOnce([{ count: BigInt(0) }])
+      .mockResolvedValueOnce([]);
+
+    const result = await service.pageDocuments({
+      keyword: '不存在的内容',
+      page: 2,
+      pageSize: 10,
+    });
+
+    expect(ragPrisma.agentDocument.findMany).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      list: [],
+      total: 0,
+      page: 2,
+      pageSize: 10,
     });
   });
 

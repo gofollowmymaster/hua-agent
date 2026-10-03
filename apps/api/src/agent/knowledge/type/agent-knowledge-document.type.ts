@@ -30,3 +30,11 @@ export interface AgentKnowledgeIngestSummary {
     reason?: string;
   }>;
 }
+
+export interface AgentKnowledgeDocumentIdRow {
+  id: bigint;
+}
+
+export interface AgentKnowledgeDocumentCountRow {
+  count: bigint | number;
+}

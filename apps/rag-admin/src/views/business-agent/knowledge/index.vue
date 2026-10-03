@@ -85,11 +85,19 @@ const columns: AgGridColumnType<AgentKnowledgeDocumentItem>[] = [
     valueType: 'text',
     hideInTable: true,
     fieldProps: {
-      placeholder: '文件名 / 路径 / 面包屑',
+      placeholder: '文件名 / 路径 / 面包屑 / 正文',
       field: {
         allowClear: true
       }
     }
+  },
+  {
+    title: 'ID',
+    key: 'id',
+    dataIndex: 'id',
+    valueType: 'text',
+    width: 100,
+    hideInSearch: true
   },
   {
     title: '分类',

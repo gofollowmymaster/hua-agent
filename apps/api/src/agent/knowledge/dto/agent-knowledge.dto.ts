@@ -63,7 +63,9 @@ export class AgentKnowledgeSearchDto {
 
 /** 定义业务 Agent 知识库文档分页查询条件。 */
 export class AgentKnowledgeDocumentPageDto {
-  @ApiPropertyOptional({ description: '文件名、路径或面包屑关键词' })
+  @ApiPropertyOptional({
+    description: '文件名、路径、面包屑或正文全文关键词',
+  })
   @IsOptional()
   @IsString()
   keyword?: string;

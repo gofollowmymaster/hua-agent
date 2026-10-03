@@ -22,7 +22,7 @@ export class AgentChatToolService {
     this.tools = [
       this.buildSearchKnowledgeTool(),
       this.buildGetDocumentTool(),
-      this.buildGetDocumentChunksTool(),
+      // this.buildGetDocumentChunksTool(),
       this.buildGetCurrentTimeTool(),
       this.buildCalculateTool(),
     ];
@@ -44,7 +44,7 @@ export class AgentChatToolService {
         });
         const res = JSON.stringify(
           hits.map((hit) => ({
-            id: hit.id,
+            documentId: hit.documentId,
             category: hit.category,
             fileName: hit.fileName,
             sourcePath: hit.sourcePath,

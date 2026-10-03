@@ -14,6 +14,10 @@ import type {
   AgentKnowledgeIngestDto,
   AgentKnowledgeSearchDto,
 } from './dto/agent-knowledge.dto';
+import type {
+  AgentKnowledgeDocumentCountRow,
+  AgentKnowledgeDocumentIdRow,
+} from './type/agent-knowledge-document.type';
 
 /** 编排业务 Agent 知识库的租户级入库、检索和文档管理。 */
 @Injectable()
@@ -48,6 +52,16 @@ export class AgentKnowledgeService {
     const tenantCode = this.currentTenant();
     const page = params.page ?? 1;
     const pageSize = params.pageSize ?? 20;
+    const keyword = params.keyword?.trim();
+    if (keyword) {
+      return this.pageDocumentsByKeyword(
+        params,
+        tenantCode,
+        page,
+        pageSize,
+        keyword,
+      );
+    }
     const where = this.buildDocumentWhere(params, tenantCode);
 
     const [total, documents] = await Promise.all([
@@ -64,31 +78,7 @@ export class AgentKnowledgeService {
     ]);
 
     return {
-      list: documents.map((document) => ({
-        id: this.serializeBigInt(document.id),
-        tenantCode: document.tenantCode,
-        category: document.category,
-        sourcePath: document.sourcePath,
-        fileName: document.fileName,
-        fileType: document.fileType,
-        fileHash: document.fileHash,
-        fileSize: this.serializeBigInt(document.fileSize),
-        chunkCount: document.chunkCount,
-        actualChunkCount: document._count.chunks,
-        status: document.status,
-        error: document.error,
-        metadata: document.metadata,
-        remoteUrl: document.remoteUrl,
-        docId: document.docId,
-        wikiNodeId: document.wikiNodeId,
-        lastModifiedAt: document.lastModifiedAt,
-        breadcrumb: document.breadcrumb,
-        sourceType: document.sourceType,
-        currentVersion: document.currentVersion,
-        createdAt: document.createdAt,
-        updatedAt: document.updatedAt,
-        ingestedAt: document.ingestedAt,
-      })),
+      list: documents.map((document) => this.serializeDocument(document)),
       total,
       page,
       pageSize,
@@ -227,15 +217,94 @@ export class AgentKnowledgeService {
     const where: Prisma.AgentDocumentWhereInput = { tenantCode };
     if (params.category) where.category = params.category;
     if (params.status) where.status = params.status;
-    if (params.keyword?.trim()) {
-      const keyword = params.keyword.trim();
-      where.OR = [
-        { fileName: { contains: keyword } },
-        { sourcePath: { contains: keyword } },
-        { breadcrumb: { contains: keyword } },
-      ];
-    }
     return where;
+  }
+
+  /** 使用元数据包含匹配与 zhparser 切片全文匹配分页查询文档。 */
+  private async pageDocumentsByKeyword(
+    params: AgentKnowledgeDocumentPageDto,
+    tenantCode: string,
+    page: number,
+    pageSize: number,
+    keyword: string,
+  ) {
+    const matchingDocuments = Prisma.sql`
+      WITH keyword_terms AS (
+        SELECT DISTINCT term.lexeme
+        FROM ts_debug('zhparser', ${keyword}) debug
+        CROSS JOIN LATERAL unnest(debug.lexemes) AS term(lexeme)
+        WHERE term.lexeme <> ''
+      ),
+      keyword_query AS (
+        SELECT string_agg(quote_literal(lexeme), ' | ')::tsquery AS query
+        FROM keyword_terms
+      ),
+      matching_documents AS (
+        SELECT d.id, d.updated_at
+        FROM agent_documents d
+        CROSS JOIN keyword_query
+        WHERE d.tenant_code = ${tenantCode}
+          AND (${params.category ?? null}::text IS NULL OR d.category = ${params.category ?? null})
+          AND (${params.status ?? null}::text IS NULL OR d.status = ${params.status ?? null})
+          AND (
+            strpos(d.file_name, ${keyword}) > 0
+            OR strpos(d.source_path, ${keyword}) > 0
+            OR strpos(COALESCE(d.breadcrumb, ''), ${keyword}) > 0
+            OR (
+              keyword_query.query IS NOT NULL
+              AND EXISTS (
+                SELECT 1
+                FROM agent_chunks c
+                WHERE c.tenant_code = ${tenantCode}
+                  AND c.document_id = d.id
+                  AND to_tsvector('zhparser', c.content) @@ keyword_query.query
+              )
+            )
+          )
+      )
+    `;
+    const [countRows, idRows] = await Promise.all([
+      this.ragPrisma.$queryRaw<AgentKnowledgeDocumentCountRow[]>(
+        Prisma.sql`${matchingDocuments}
+          SELECT COUNT(*) AS count
+          FROM matching_documents
+        `,
+      ),
+      this.ragPrisma.$queryRaw<AgentKnowledgeDocumentIdRow[]>(
+        Prisma.sql`${matchingDocuments}
+          SELECT id
+          FROM matching_documents
+          ORDER BY updated_at DESC, id DESC
+          LIMIT ${pageSize}
+          OFFSET ${(page - 1) * pageSize}
+        `,
+      ),
+    ]);
+    const total = Number(countRows[0]?.count ?? 0);
+    const ids = idRows.map((row) => row.id);
+    if (ids.length === 0) {
+      return { list: [], total, page, pageSize };
+    }
+
+    const documents = await this.ragPrisma.agentDocument.findMany({
+      where: { id: { in: ids } },
+      include: {
+        _count: { select: { chunks: true } },
+      },
+    });
+    const order = new Map(ids.map((id, index) => [id.toString(), index]));
+    documents.sort(
+      (left, right) =>
+        (order.get(left.id.toString()) ?? 0) -
+        (order.get(right.id.toString()) ?? 0),
+    );
+
+    return {
+      list: documents.map((document) => this.serializeDocument(document)),
+      total,
+      page,
+      pageSize,
+    };
   }
 
   /** 将 JSON 不支持的 bigint 转换为可序列化字符串。 */
