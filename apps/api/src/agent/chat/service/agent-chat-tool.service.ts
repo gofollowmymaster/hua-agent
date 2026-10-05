@@ -6,6 +6,7 @@ import { NodeConfigService } from '@src/config/node-config.service';
 import { calculateExpression } from '../agent-chat-calculator';
 import { AgentKnowledgeSearchService } from '../../knowledge/service/agent-knowledge-search.service';
 import { AgentKnowledgeService } from '../../knowledge/agent-knowledge.service';
+import { DsOrderToolService } from '../../ds-order/ds-order-tool.service';
 import type { AgentChatTool } from '../type/agent-chat-runtime.type';
 
 /** 提供业务 Agent 可调用的知识库工具和通用工具。 */
@@ -18,6 +19,7 @@ export class AgentChatToolService {
     private readonly knowledgeSearchService: AgentKnowledgeSearchService,
     private readonly knowledgeService: AgentKnowledgeService,
     private readonly tenantContext: TenantContext,
+    private readonly dsOrderToolService: DsOrderToolService,
   ) {
     this.tools = [
       this.buildSearchKnowledgeTool(),
@@ -25,6 +27,7 @@ export class AgentChatToolService {
       // this.buildGetDocumentChunksTool(),
       this.buildGetCurrentTimeTool(),
       this.buildCalculateTool(),
+      ...this.dsOrderToolService.getTools(),
     ];
   }
 

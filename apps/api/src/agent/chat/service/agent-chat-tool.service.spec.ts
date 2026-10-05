@@ -13,9 +13,9 @@ describe('AgentChatToolService', () => {
   let knowledgeSearchService: { search: jest.Mock };
   let knowledgeService: {
     getDocument: jest.Mock;
-    pageDocumentChunks: jest.Mock;
   };
   let tenantContext: { tenant?: string };
+  let dsOrderToolService: { getTools: jest.Mock };
   let service: AgentChatToolService;
 
   beforeEach(() => {
@@ -46,23 +46,26 @@ describe('AgentChatToolService', () => {
         remoteUrl: null,
         updatedAt: '2026-01-01',
       }),
-      pageDocumentChunks: jest.fn().mockResolvedValue({
-        total: 1,
-        list: [
-          {
-            id: '1',
-            chunkIndex: 0,
-            content: '切片内容',
-            metadata: {},
-          },
-        ],
-      }),
     };
     tenantContext = { tenant: 'yurex' };
+    dsOrderToolService = {
+      getTools: jest
+        .fn()
+        .mockReturnValue(
+          [
+            'list_ds_orders',
+            'get_ds_order',
+            'list_ds_order_logs',
+            'audit_ds_order',
+            'cancel_ds_order',
+          ].map((name) => ({ name })),
+        ),
+    };
     service = new AgentChatToolService(
       knowledgeSearchService as any,
       knowledgeService as any,
       tenantContext as any,
+      dsOrderToolService as any,
     );
   });
 
@@ -98,39 +101,31 @@ describe('AgentChatToolService', () => {
     expect(result).toContain('2026');
   });
 
-  it('returns document detail and chunks', async () => {
+  it('returns document detail', async () => {
     const documentTool = service
       .getTools()
       .find((item) => item.name === 'get_document');
-    const chunksTool = service
-      .getTools()
-      .find((item) => item.name === 'get_document_chunks');
 
     const document = await documentTool!.invoke({ documentId: '1' });
-    const chunks = await chunksTool!.invoke({
-      documentId: '1',
-      page: 2,
-      pageSize: 5,
-    });
 
     expect(JSON.parse(document)).toMatchObject({
       id: '1',
       fileName: 'guide.md',
     });
-    expect(knowledgeService.pageDocumentChunks).toHaveBeenCalledWith(1, {
-      page: 2,
-      pageSize: 5,
-    });
-    expect(JSON.parse(chunks)).toMatchObject({ total: 1 });
   });
 
   it('exposes only business tools', () => {
     expect(service.getTools().map((item) => item.name)).toEqual([
       'search_knowledge',
       'get_document',
-      'get_document_chunks',
       'get_current_time',
       'calculate',
+      'list_ds_orders',
+      'get_ds_order',
+      'list_ds_order_logs',
+      'audit_ds_order',
+      'cancel_ds_order',
     ]);
+    expect(dsOrderToolService.getTools).toHaveBeenCalledTimes(1);
   });
 });
