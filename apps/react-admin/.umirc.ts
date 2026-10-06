@@ -1,4 +1,5 @@
 import { defineConfig } from '@umijs/max';
+import routes from './config/routes';
 
 const apiTarget =
   process.env.UMI_APP_API_PROXY_TARGET || 'http://localhost:3000';
@@ -20,58 +21,7 @@ export default defineConfig({
   define: {
     'process.env.UMI_APP_API_BASE_URL': apiBaseUrl,
   },
-  routes: [
-    { path: '/login', component: '@/pages/login' },
-    {
-      path: '/',
-      component: '@/layouts/admin-layout',
-      wrappers: ['@/wrappers/auth'],
-      routes: [
-        { path: '/', redirect: '/knowledge/documents' },
-        { path: '/knowledge', redirect: '/knowledge/documents' },
-        {
-          path: '/knowledge/documents',
-          component: '@/pages/knowledge/documents',
-        },
-        {
-          path: '/knowledge/sessions',
-          component: '@/pages/knowledge/sessions',
-        },
-        {
-          path: '/knowledge/assistant',
-          component: '@/pages/knowledge/assistant',
-        },
-        {
-          path: '/business-agent',
-          redirect: '/business-agent/knowledge',
-        },
-        {
-          path: '/business-agent/knowledge',
-          component: '@/pages/business-agent/knowledge',
-        },
-        {
-          path: '/business-agent/skills',
-          component: '@/pages/business-agent/skills',
-        },
-        {
-          path: '/business-agent/sessions',
-          component: '@/pages/business-agent/sessions',
-        },
-        {
-          path: '/business-agent/config',
-          component: '@/pages/business-agent/config',
-        },
-        {
-          path: '/business-agent/demo',
-          component: '@/pages/business-agent/demo',
-        },
-        { path: '/documents', redirect: '/knowledge/documents' },
-        { path: '/sessions', redirect: '/knowledge/sessions' },
-        { path: '/assistant', redirect: '/knowledge/assistant' },
-      ],
-    },
-    { path: '*', redirect: '/login' },
-  ],
+  routes,
   proxy: {
     [apiProxyPath]: {
       target: apiTarget,

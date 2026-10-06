@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, Descriptions, Empty, List, Pagination, Spin } from 'antd';
+import { Alert, Descriptions, Empty, Listy, Pagination, Spin } from 'antd';
 import dayjs from 'dayjs';
 import {
   getDocument,
@@ -80,29 +80,38 @@ export function DocumentChunks({ id, source }: DocumentChunksProps) {
           </Descriptions.Item>
         </Descriptions>
       )}
-      <List
-        style={{ marginTop: 16 }}
-        dataSource={chunks}
-        locale={{ emptyText: <Empty description="暂无切片" /> }}
-        renderItem={(chunk) => (
-          <List.Item>
-            <List.Item.Meta
-              title={`切片 ${chunk.chunkIndex + 1} · ${dayjs(chunk.createdAt).format('YYYY-MM-DD HH:mm')}`}
-              description={
-                <pre
-                  style={{
-                    margin: 0,
-                    whiteSpace: 'pre-wrap',
-                    overflowWrap: 'anywhere',
-                  }}
-                >
-                  {chunk.content}
-                </pre>
-              }
-            />
-          </List.Item>
-        )}
-      />
+      {chunks.length > 0 ? (
+        <Listy
+          items={chunks}
+          rowKey={(chunk) => chunk.id}
+          styles={{
+            root: { marginTop: 16 },
+            item: {
+              padding: '8px 0',
+              borderBlockEnd: '1px solid var(--app-color-divider)',
+            },
+          }}
+          itemRender={(chunk) => (
+            <div>
+              <strong>
+                切片 {chunk.chunkIndex + 1} ·{' '}
+                {dayjs(chunk.createdAt).format('YYYY-MM-DD HH:mm')}
+              </strong>
+              <pre
+                style={{
+                  margin: '4px 0 0',
+                  whiteSpace: 'pre-wrap',
+                  overflowWrap: 'anywhere',
+                }}
+              >
+                {chunk.content}
+              </pre>
+            </div>
+          )}
+        />
+      ) : (
+        !loading && <Empty description="暂无切片" />
+      )}
       {total > 10 && (
         <Pagination
           current={page}

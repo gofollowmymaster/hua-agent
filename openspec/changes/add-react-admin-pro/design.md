@@ -65,6 +65,10 @@ ProTable 默认使用组件库 `small` 密度，单元格使用 `6px 8px` 内边
 
 全应用使用 12px 正文基准，并显式将小号字号下限保持在 12px，避免 Tag、分页和辅助文案被算法缩小到 10px。登录页与工作台共用该规则；页面标题、弹窗标题和品牌名称继续使用组件库派生的大号与标题字号保留信息层级，控件高度和页面间距不随字号变化。
 
+### 11. Ant Design Pro 工程质量规则
+
+参考 Ant Design Pro 上游的 AI 开发约定，但保留本项目的 pnpm、React 18、ESLint/Prettier、共享 HTTP client 和现有认证边界。Ant Design 核心组件变更前使用与 antd 版本一致的 CLI 查询 API，提交前运行专项 lint；Umi 插件通过 workspace override 与应用共用 ProComponents 3.1，避免旧版组件树。路由声明与构建配置分离，Playwright 按业务流程拆分并共享 mock 支持代码，所有 TS/TSX 文件保持在 400 行以内。
+
 ## Risks / Trade-offs
 
 - [两套前端业务类型可能漂移] -> API 文件按 Vue 当前边界镜像，并用 adapter/页面测试锁定路径和字段。

@@ -50,3 +50,10 @@
 - [x] 7.1 将 antd 锁定到 6.6.5、ProComponents 锁定到 3.1.15-5，并声明 Node 22.12+ 构建基线
 - [x] 7.2 迁移 antd 6 与 ProComponents 3.1 变更的组件属性和主题 token，保持现有视觉与行为
 - [x] 7.3 运行依赖树、React Admin、跨 app 构建和完整视觉回归验证
+
+## 8. Ant Design Pro 工程质量优化
+
+- [x] 8.1 重写 React Admin AGENTS，增加 antd CLI、质量命令、路由配置分层和 workspace 依赖 override
+- [x] 8.2 将 Drawer、Alert 和 List 的 antd 6 弃用接口迁移到 size、closable 和 Listy，并将专项 lint 清零
+- [x] 8.3 拆分 Playwright 测试与共享 mock/support，确保所有 TS/TSX 文件不超过 400 行且行为不变
+- [x] 8.4 运行依赖树、静态检查、单元/E2E、React/Vue/HTTP client 与根构建验证

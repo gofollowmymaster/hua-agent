@@ -60,7 +60,7 @@
 
 优先验证：
 
-- `pnpm react-admin:lint:check`、`pnpm react-admin:test` 和 `pnpm react-admin:build`。
+- `pnpm react-admin:check`、`pnpm react-admin:antd:lint` 和 `pnpm react-admin:build`。
 - 涉及登录、query 抽屉、流式聊天或预览时，运行 `pnpm react-admin:e2e` 或提供等价浏览器验证。
 - 涉及共享 HTTP client 或静态发布时，同时验证对应 package、Vue Admin 和根 workspace 构建。
 

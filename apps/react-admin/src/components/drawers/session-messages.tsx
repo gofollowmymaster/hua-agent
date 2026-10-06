@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, Empty, List, Spin } from 'antd';
+import { Alert, Empty, Listy, Spin } from 'antd';
 import dayjs from 'dayjs';
 import {
   listSessionMessages,
@@ -26,29 +26,35 @@ export function SessionMessages({ id }: { id: string }) {
   if (error) return <Alert type="error" showIcon title={error} />;
   return (
     <Spin spinning={loading}>
-      <List
-        dataSource={messages}
-        locale={{ emptyText: <Empty description="暂无消息" /> }}
-        renderItem={(item) => (
-          <List.Item>
-            <List.Item.Meta
-              title={
-                <span>
-                  <SemanticTag
-                    tone={item.role === 'assistant' ? 'info' : 'success'}
-                  >
-                    {item.role === 'assistant' ? '助手' : '用户'}
-                  </SemanticTag>
-                  {dayjs(item.createdAt).format('YYYY-MM-DD HH:mm')}
-                </span>
-              }
-              description={
-                <div style={{ whiteSpace: 'pre-wrap' }}>{item.content}</div>
-              }
-            />
-          </List.Item>
-        )}
-      />
+      {messages.length > 0 ? (
+        <Listy
+          items={messages}
+          rowKey={(item) => item.id}
+          styles={{
+            item: {
+              padding: '8px 0',
+              borderBlockEnd: '1px solid var(--app-color-divider)',
+            },
+          }}
+          itemRender={(item) => (
+            <div>
+              <div>
+                <SemanticTag
+                  tone={item.role === 'assistant' ? 'info' : 'success'}
+                >
+                  {item.role === 'assistant' ? '助手' : '用户'}
+                </SemanticTag>
+                {dayjs(item.createdAt).format('YYYY-MM-DD HH:mm')}
+              </div>
+              <div style={{ marginTop: 4, whiteSpace: 'pre-wrap' }}>
+                {item.content}
+              </div>
+            </div>
+          )}
+        />
+      ) : (
+        !loading && <Empty description="暂无消息" />
+      )}
     </Spin>
   );
 }

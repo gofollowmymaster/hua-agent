@@ -7,7 +7,7 @@ import {
   Card,
   Empty,
   Input,
-  List,
+  Listy,
   Space,
   Spin,
   Tag,
@@ -172,30 +172,39 @@ export function ChatDemo({
             />
           }
         >
-          <List
-            loading={historyLoading}
-            dataSource={sessions}
-            locale={{ emptyText: <Empty description="暂无历史会话" /> }}
-            renderItem={(item) => (
-              <List.Item
-                className={
-                  String(item.id) === selectedId
-                    ? 'chat-history-item active'
-                    : 'chat-history-item'
-                }
-                onClick={() => selectSession(item)}
-              >
-                <List.Item.Meta
-                  title={
-                    item.latestMessage?.content.slice(0, 20) ||
-                    item.conversationId ||
-                    '未命名会话'
-                  }
-                  description={`${item.messageCount} 条 · ${adapter.formatTime(item.lastActiveAt)}`}
-                />
-              </List.Item>
+          <Spin spinning={historyLoading}>
+            {sessions.length > 0 ? (
+              <Listy
+                items={sessions}
+                rowKey={(item) => item.id}
+                styles={{ item: { padding: 0 } }}
+                itemRender={(item) => (
+                  <button
+                    type="button"
+                    aria-pressed={String(item.id) === selectedId}
+                    className={
+                      String(item.id) === selectedId
+                        ? 'chat-history-item active'
+                        : 'chat-history-item'
+                    }
+                    onClick={() => selectSession(item)}
+                  >
+                    <span className="chat-history-item-title">
+                      {item.latestMessage?.content.slice(0, 20) ||
+                        item.conversationId ||
+                        '未命名会话'}
+                    </span>
+                    <span className="muted">
+                      {item.messageCount} 条 ·{' '}
+                      {adapter.formatTime(item.lastActiveAt)}
+                    </span>
+                  </button>
+                )}
+              />
+            ) : (
+              !historyLoading && <Empty description="暂无历史会话" />
             )}
-          />
+          </Spin>
         </Card>
         <Card className="chat-main" styles={{ body: { padding: 0 } }}>
           <div ref={messagePane} className="chat-messages" role="log">
@@ -219,9 +228,8 @@ export function ChatDemo({
             <Alert
               type="error"
               showIcon
-              closable
+              closable={{ onClose: runtime.clearError }}
               title={runtime.error.message}
-              onClose={runtime.clearError}
             />
           )}
           <div className="chat-composer">

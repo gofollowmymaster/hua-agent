@@ -16,7 +16,7 @@ export function GlobalDrawer() {
     <Drawer
       open={valid && Boolean(query.drawerCode)}
       title={query.drawer ? titles[query.drawer] : ''}
-      width="min(760px, calc(100vw - 24px))"
+      size="min(760px, calc(100vw - 24px))"
       onClose={query.close}
       destroyOnHidden
     >

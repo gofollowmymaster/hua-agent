@@ -15,6 +15,8 @@ catalog:
   vue-eslint-parser: 10.4.1
 
 overrides:
+  "@umijs/plugins>@ant-design/pro-components": 3.1.15-5
+  "@umijs/max>antd": 6.6.5
   stylelint-config-html: 1.1.0
   stylelint-config-recommended: 14.0.1
 

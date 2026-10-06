@@ -28,10 +28,23 @@
 }
 
 .chat-history-item {
+  display: block;
+  width: 100%;
   padding: 8px !important;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  background: transparent;
+  border: 0;
   border-inline-start: 3px solid transparent;
   border-radius: 6px;
   cursor: pointer;
+}
+
+.chat-history-item-title {
+  display: block;
+  margin-bottom: 2px;
+  font-weight: 500;
 }
 
 .chat-history-item:hover {

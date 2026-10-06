@@ -40,7 +40,11 @@ pnpm admin:stylelint:check # 转发到 RAG Admin Stylelint（只检查）
 pnpm react-admin:dev        # React Admin 开发服务（5175）
 pnpm react-admin:build      # React Admin 生产构建
 pnpm react-admin:test       # React Admin Vitest
+pnpm react-admin:typecheck  # React Admin TypeScript 只检查
 pnpm react-admin:lint:check # React Admin ESLint（只检查）
+pnpm react-admin:antd:info Button # 查询当前 antd 组件 API
+pnpm react-admin:antd:lint  # React Admin Ant Design 专项检查
+pnpm react-admin:check      # React Admin 静态检查与单测汇总
 pnpm python-api:dev         # FastAPI 开发服务（8000）
 pnpm python-api:start       # FastAPI 生产启动（默认 prod）
 pnpm python-api:test        # FastAPI pytest

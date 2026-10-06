@@ -12,11 +12,14 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
-    "lint": "eslint --cache --cache-location node_modules/.cache/.eslintcache --max-warnings 0 \"src/**/*.{ts,tsx}\" --fix",
-    "lint:check": "eslint --cache --cache-location node_modules/.cache/.eslintcache --max-warnings 0 \"src/**/*.{ts,tsx}\"",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"e2e/**/*.{ts,tsx}\" .umirc.ts eslint.config.js playwright.config.ts prettier.config.cjs tsconfig.json package.json",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"e2e/**/*.{ts,tsx}\" .umirc.ts eslint.config.js playwright.config.ts prettier.config.cjs tsconfig.json package.json",
-    "typecheck": "tsc --noEmit"
+    "lint": "eslint --cache --cache-location node_modules/.cache/.eslintcache --max-warnings 0 .umirc.ts playwright.config.ts \"config/**/*.ts\" \"src/**/*.{ts,tsx}\" \"e2e/**/*.ts\" --fix",
+    "lint:check": "eslint --cache --cache-location node_modules/.cache/.eslintcache --max-warnings 0 .umirc.ts playwright.config.ts \"config/**/*.ts\" \"src/**/*.{ts,tsx}\" \"e2e/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"e2e/**/*.{ts,tsx}\" \"config/**/*.ts\" .umirc.ts eslint.config.js playwright.config.ts prettier.config.cjs tsconfig.json package.json",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"e2e/**/*.{ts,tsx}\" \"config/**/*.ts\" .umirc.ts eslint.config.js playwright.config.ts prettier.config.cjs tsconfig.json package.json",
+    "typecheck": "tsc --noEmit",
+    "antd:info": "antd info",
+    "antd:lint": "antd lint ./src",
+    "check": "pnpm typecheck && pnpm lint:check && pnpm format:check && pnpm antd:lint && pnpm test"
   },
   "dependencies": {
     "@ai-sdk/react": "4.0.130",
@@ -35,6 +38,7 @@
     "remark-gfm": "4.0.1"
   },
   "devDependencies": {
+    "@ant-design/cli": "6.6.5",
     "@eslint/js": "catalog:",
     "@playwright/test": "^1.55.1",
     "@testing-library/jest-dom": "^6.8.0",

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { App, List, Modal, Space, Upload, type UploadFile } from 'antd';
+import { App, Listy, Modal, Space, Upload, type UploadFile } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import {
   uploadDocuments,
@@ -100,22 +100,42 @@ export function DocumentUploadModal({
             </SemanticTag>
             <SemanticTag tone="error">失败 {result.failedFiles}</SemanticTag>
           </Space>
-          <List
-            style={{ marginTop: 12, maxHeight: 280, overflow: 'auto' }}
-            bordered
-            dataSource={result.files}
-            renderItem={(item) => (
-              <List.Item>
-                <List.Item.Meta
-                  title={item.fileName}
-                  description={
-                    item.status === 'indexed'
+          <Listy
+            items={result.files}
+            rowKey={(item) => item.fileName}
+            styles={{
+              root: {
+                maxHeight: 280,
+                marginTop: 12,
+                overflow: 'auto',
+                border: '1px solid var(--app-color-border)',
+                borderRadius: 6,
+              },
+              item: {
+                padding: '8px 12px',
+                borderBlockEnd: '1px solid var(--app-color-divider)',
+              },
+            }}
+            itemRender={(item) => (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  gap: 8,
+                }}
+              >
+                <div>
+                  <h4 style={{ margin: 0 }}>{item.fileName}</h4>
+                  <div className="muted">
+                    {item.status === 'indexed'
                       ? `${item.chunks || 0} 个切片${item.sourcePath ? ` · ${item.sourcePath}` : ''}`
                       : item.duplicateOf
                         ? `与 ${item.duplicateOf.fileName} 内容重复`
-                        : item.reason || '处理失败'
-                  }
-                />
+                        : item.reason || '处理失败'}
+                  </div>
+                </div>
                 <SemanticTag
                   tone={
                     item.status === 'indexed'
@@ -131,7 +151,7 @@ export function DocumentUploadModal({
                       ? '重复'
                       : '失败'}
                 </SemanticTag>
-              </List.Item>
+              </div>
             )}
           />
         </div>
