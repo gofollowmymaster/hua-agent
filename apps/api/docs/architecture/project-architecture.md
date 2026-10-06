@@ -11,7 +11,7 @@
 - `AuthModule`：本地 `/auth/login` 与系统管理员用户管理接口。
 - `GlobalServiceModule`：Redis、日志、RAG Prisma 和 `TenantContext`。
 - `ConfigModule`、全局 `JwtModule`、`GuardModule`、`GlobalExceptionHandlerModule`。
-- `ServeStaticModule`：发布 `public/rag-admin` 构建产物。
+- `ServeStaticModule`：通过 `/public` 静态根路径发布 Vue RAG Admin 与 React Admin 构建产物。
 - `DevtoolsModule`：保留现有 Nest devtools 配置。
 
 `LoggerMiddleware` 和 `TenantMiddleware` 按顺序应用到全部路由。项目没有无租户业务例外，也不注册定时任务、队列或其他历史业务模块。
@@ -31,4 +31,4 @@
 
 ## 静态发布
 
-RAG Admin 生产构建输出到 `apps/api/public/rag-admin`，由 API 的 `/public` 静态根路径发布。workspace 不再包含或发布其他管理后台。
+Vue RAG Admin 生产构建输出到 `apps/api/public/rag-admin`，React Admin 输出到 `apps/api/public/react-admin`，均由 API 的 `/public` 静态根路径发布。两套后台并行存在且互不覆盖。

@@ -106,7 +106,7 @@ pnpm env:prod
 - `src/ai/`：知识问答、RAG Admin 管理接口、文档入库与检索。
 - `src/agent/`：业务Agent知识库与多工具 Chat。
 - `prisma/`：API app 的 Prisma schema 和迁移元信息。
-- `public/`：静态资源目录，包含 RAG Admin 生产构建产物。
+- `public/`：静态资源目录，包含 Vue RAG Admin 与 React Admin 生产构建产物。
 
 新增公共能力前先确认真实跨模块复用需求；不要在未搜索现有 Service、DTO、helper、adapter、table、Redis key 和异常类型前新增平行结构。
 

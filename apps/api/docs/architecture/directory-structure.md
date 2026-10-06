@@ -9,6 +9,7 @@
 - `prisma/`：MySQL 历史迁移链与 datasource-only schema。
 - `scripts/`：RAG 数据库初始化和业务Agent知识入库脚本。
 - `public/rag-admin/`：RAG Admin 生产构建产物。
+- `public/react-admin/`：React Ant Design Pro 管理后台生产构建产物。
 
 ## src 结构
 

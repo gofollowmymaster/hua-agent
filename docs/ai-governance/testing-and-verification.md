@@ -33,6 +33,7 @@
 - 根 `package.json`、`pnpm-workspace.yaml` 和受影响 app 的 `package.json` 是否一致。
 - API 命令是否正确使用环境加载器。
 - RAG Admin 命令是否使用自身前端脚本，不混用 API dotenv。
+- React Admin 命令是否使用 `react-admin:*` 和 `UMI_APP_*` 配置，不覆盖 Vue Admin 静态目录。
 - 跨包引用是否符合 `AGENTS.md`。
 - 根据受影响子项目追加 API、RAG Admin 或 shared 验证。
 
@@ -54,6 +55,14 @@
 - 涉及 dev server、proxy、登录跳转或运行时交互时，必要时运行 `pnpm admin:dev` 并做人工或浏览器验证。
 
 若构建无法运行，需要说明原因，例如依赖未安装、网络受限或环境变量缺失。
+
+## React Admin 前端变更
+
+优先验证：
+
+- `pnpm react-admin:lint:check`、`pnpm react-admin:test` 和 `pnpm react-admin:build`。
+- 涉及登录、query 抽屉、流式聊天或预览时，运行 `pnpm react-admin:e2e` 或提供等价浏览器验证。
+- 涉及共享 HTTP client 或静态发布时，同时验证对应 package、Vue Admin 和根 workspace 构建。
 
 ## Shared 包变更
 

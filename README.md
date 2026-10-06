@@ -30,15 +30,20 @@
 
 ```text
 apps/api        NestJS API service
+apps/python-api FastAPI parity service (Python 3.12, port 8000)
 apps/rag-admin  RAG admin console
+apps/react-admin React Ant Design Pro admin console
 packages/shared Shared package boundary
 ```
 
 Root scripts remain compatible and forward to workspace packages.
 
+The NestJS and FastAPI services are long-lived alternatives. They share PostgreSQL and Redis but a
+single request must be routed to only one backend.
+
 ## Environment Files
 
-API environment files live in `apps/api/.env*`. RAG admin environment files live in `apps/rag-admin/.env*` and only expose `VITE_` variables to browser code.
+API environment files live in `apps/api/.env*`. Vue RAG Admin only exposes `VITE_` variables, while React Admin uses browser-safe `UMI_APP_` variables from `apps/react-admin/.env*`.
 
 ## Installation
 
@@ -55,10 +60,11 @@ $ pnpm install --frozen-lockfile
 $ pnpm build
 ```
 
-`pnpm build` runs the dev build for the API and RAG Admin. Build artifacts are written to:
+`pnpm build` runs the dev build for the API and both admin apps. Build artifacts are written to:
 
 - `apps/api/dist` for the API
 - `apps/api/public/rag-admin` for RAG Admin
+- `apps/api/public/react-admin` for React Admin
 
 ## Running the app
 

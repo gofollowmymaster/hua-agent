@@ -1,9 +1,16 @@
 # compiled output
 /dist
 /apps/*/dist
-/apps/*/src/.umi
+/apps/*/src/.umi*
+/apps/api/public/react-admin
 /node_modules
 **/node_modules
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+apps/python-api/dist
 .pnpm-store
 /build
 .trae
@@ -24,6 +31,7 @@ lerna-debug.log*
 # Tests
 /coverage
 /.nyc_output
+/apps/*/test-results
 
 # IDEs and editors
 /.idea
