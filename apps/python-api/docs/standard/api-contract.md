@@ -41,7 +41,7 @@
 
 ## SSE
 
-- 流式接口统一通过 `ui_stream.stream_response` 输出 UI Message SSE。
+- 流式接口统一通过 `core.stream.stream_response` 输出 UI Message SSE。
 - 事件数据必须可 JSON 序列化，不能携带 SDK 对象或异常对象。
 - reasoning、text 和 tool 生命周期必须按开始、增量、结束顺序输出。
 - 累计快照必须在边界处转换为增量，不能把累计全文重复发送给客户端。

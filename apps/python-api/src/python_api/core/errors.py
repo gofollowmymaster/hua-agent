@@ -86,7 +86,7 @@ def install_exception_handlers(app: FastAPI) -> None:
             content={
                 "code": 409,
                 "message": "Unique constraint violation",
-                "error": str(exception.orig),
+                "error": "Database constraint violation",
             },
         )
 
@@ -97,7 +97,7 @@ def install_exception_handlers(app: FastAPI) -> None:
             status_code=500,
             content={
                 "code": 500,
-                "message": str(exception) or "Internal Server Error",
+                "message": "Internal Server Error",
                 "path": _path(request),
             },
         )

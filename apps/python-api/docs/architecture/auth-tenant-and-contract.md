@@ -77,7 +77,7 @@ middleware 在响应结束后使用 token 重置上下文，避免上下文泄�
 
 ## UI Message SSE
 
-`ui_stream.stream_response` 将异步事件编码为：
+`core.stream.stream_response` 将异步事件编码为：
 
 ```text
 data: <compact-json>\n\n

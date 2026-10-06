@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator
 
+from fastapi import Request
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
-    async_sessionmaker,
     create_async_engine,
 )
 
-from python_api.core.config import Settings, get_settings
+from python_api.core.config import Settings
 
 
 def create_database_engine(settings: Settings) -> AsyncEngine:
@@ -24,17 +24,13 @@ def create_database_engine(settings: Settings) -> AsyncEngine:
     )
 
 
-engine = create_database_engine(get_settings())
-session_factory = async_sessionmaker(engine, expire_on_commit=False)
-
-
-async def get_db() -> AsyncIterator[AsyncSession]:
+async def get_db(request: Request) -> AsyncIterator[AsyncSession]:
     """Provides one transaction-capable SQLAlchemy session per request."""
-    async with session_factory() as session:
+    async with request.app.state.resources.session_factory() as session:
         yield session
 
 
-async def database_ready() -> bool:
+async def database_ready(engine: AsyncEngine) -> bool:
     """Checks database connectivity without modifying shared state."""
     from sqlalchemy import text
 

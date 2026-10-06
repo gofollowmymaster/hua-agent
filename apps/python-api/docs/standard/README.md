@@ -18,6 +18,7 @@
 4. `data-and-integration.md`：数据库、租户、Redis、异步、文件和外部服务。
 5. `testing-and-verification.md`：测试分层、验证矩阵和交付要求。
 6. `current-gaps.md`：当前实现与目标规范之间的已知差距。
+7. `fastapi-best-practices.md`：上游最佳实践的采用、调整与不适用矩阵。
 
 ## 任务阅读路由
 

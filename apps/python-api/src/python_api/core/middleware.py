@@ -11,7 +11,7 @@ from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from python_api.core.config import get_settings
+from python_api.core.config import Settings
 from python_api.core.context import RequestContext, reset_request_context, set_request_context
 
 logger = logging.getLogger("python_api.http")
@@ -21,11 +21,14 @@ TENANT_CODES = {"A": "aplus", "C": "boat", "D": "yurex"}
 class TenantMiddleware(BaseHTTPMiddleware):
     """Builds the same tenant context precedence used by NestJS middleware."""
 
+    def __init__(self, app: Any, settings: Settings) -> None:
+        super().__init__(app)
+        self.settings = settings
+
     async def dispatch(
         self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
         """Resolves tenant hints and scopes them to the current request context."""
-        settings = get_settings()
         user: dict[str, object] = {}
         supplier = request.headers.get("supplier")
         authorization = request.headers.get("authorization", "")
@@ -47,7 +50,9 @@ class TenantMiddleware(BaseHTTPMiddleware):
         supplier_code = str(user.get("supplierCode", ""))
         tenant = TENANT_CODES.get(
             supplier_code,
-            supplier_code if supplier_code in TENANT_CODES.values() else settings.default_tenant,
+            supplier_code
+            if supplier_code in TENANT_CODES.values()
+            else self.settings.default_tenant,
         )
         token = set_request_context(RequestContext(tenant_code=tenant, user=user, request=request))
         try:
@@ -105,6 +110,10 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 class RequestSizeLimitMiddleware(BaseHTTPMiddleware):
     """Rejects requests whose declared body exceeds the configured service limit."""
 
+    def __init__(self, app: Any, settings: Settings) -> None:
+        super().__init__(app)
+        self.settings = settings
+
     async def dispatch(
         self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
@@ -112,7 +121,9 @@ class RequestSizeLimitMiddleware(BaseHTTPMiddleware):
         content_length = request.headers.get("content-length")
         if content_length:
             try:
-                too_large = int(content_length) > get_settings().python_api_max_request_size_bytes
+                too_large = (
+                    int(content_length) > self.settings.python_api_max_request_size_bytes
+                )
             except ValueError:
                 too_large = False
             if too_large:
@@ -125,3 +136,4 @@ class RequestSizeLimitMiddleware(BaseHTTPMiddleware):
                     },
                 )
         return await call_next(request)
+

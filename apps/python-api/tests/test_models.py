@@ -1,16 +1,18 @@
 from sqlalchemy.orm import configure_mappers
 
-from python_api.core.model import (
+from python_api.core.model_base import Base
+from python_api.modules.agent.models import (
     AgentChatMessage,
     AgentChatSession,
     AgentChunk,
     AgentDocument,
+)
+from python_api.modules.auth.models import RagAdminUser
+from python_api.modules.rag.models import (
     AplusChunk,
     AplusDocument,
     AplusRagMessage,
     AplusRagSession,
-    Base,
-    RagAdminUser,
 )
 
 EXPECTED_TABLES = {

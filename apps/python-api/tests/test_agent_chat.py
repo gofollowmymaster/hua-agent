@@ -3,13 +3,11 @@ from typing import Any, cast
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from python_api.schemas.chat import ChatRequest
-from python_api.services.agent_chat import (
-    AgentChatService,
-    CumulativeDeltaNormalizer,
-    _current_time,
-)
-from python_api.services.memory import ResolvedSession
+from python_api.core.session import ResolvedSession
+from python_api.modules.agent.chat import AgentChatService
+from python_api.modules.agent.event_adapter import CumulativeDeltaNormalizer
+from python_api.modules.agent.schemas import ChatRequest
+from python_api.modules.agent.tools import current_time
 
 
 class FakeRuntime:
@@ -70,7 +68,7 @@ def test_cumulative_delta_normalization_keeps_channels_separate() -> None:
 
 
 def test_current_time_uses_bundled_shanghai_timezone() -> None:
-    value = _current_time()
+    value = current_time()
 
     assert "年" in value
     assert "月" in value

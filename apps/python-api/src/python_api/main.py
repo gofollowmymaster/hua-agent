@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from python_api.core.config import get_settings
-from python_api.core.database import engine
+from python_api.core.config import Settings, get_settings
 from python_api.core.errors import install_exception_handlers
 from python_api.core.middleware import (
     RequestLoggingMiddleware,
@@ -17,45 +16,51 @@ from python_api.core.middleware import (
     ResponseEnvelopeMiddleware,
     TenantMiddleware,
 )
-from python_api.core.redis.redis_service import redis_client
-from python_api.routes.agent_chat import router as agent_chat_router
-from python_api.routes.agent_knowledge import router as agent_knowledge_router
-from python_api.routes.auth import router as auth_router
-from python_api.routes.ds_order import router as ds_order_router
-from python_api.routes.health import router as health_router
-from python_api.routes.rag_admin import router as rag_admin_router
-from python_api.routes.rag_chat import router as rag_chat_router
-from python_api.services.auth import bootstrap_admin
+from python_api.core.resources import AppResources, create_app_resources
+from python_api.modules.agent.chat_router import router as agent_chat_router
+from python_api.modules.agent.knowledge_router import router as agent_knowledge_router
+from python_api.modules.auth.router import router as auth_router
+from python_api.modules.auth.service import bootstrap_admin
+from python_api.modules.ds_order.router import router as ds_order_router
+from python_api.modules.health.router import router as health_router
+from python_api.modules.rag.admin_router import router as rag_admin_router
+from python_api.modules.rag.chat_router import router as rag_chat_router
 
 
-@asynccontextmanager
-async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
-    """Initializes and closes process-wide integrations."""
-    await bootstrap_admin()
-    yield
-    await redis_client.aclose()
-    await engine.dispose()
-
-
-def create_app() -> FastAPI:
+def create_app(
+    settings: Settings | None = None,
+    resource_factory: Callable[[Settings], AppResources] = create_app_resources,
+) -> FastAPI:
     """Builds the production application with NestJS-compatible middleware."""
-    settings = get_settings()
+    resolved_settings = settings or get_settings()
+
+    @asynccontextmanager
+    async def lifespan(application: FastAPI) -> AsyncIterator[None]:
+        """Creates and closes resources owned by this application instance."""
+        resources = resource_factory(resolved_settings)
+        application.state.resources = resources
+        await bootstrap_admin(resolved_settings, resources.session_factory)
+        try:
+            yield
+        finally:
+            await resources.close()
+
     app = FastAPI(
         title="Aplus Frontend Python",
         description="FastAPI parity implementation for Aplus Frontend Node",
         version="1.0",
-        docs_url="/swagger" if settings.docs_enabled else None,
-        openapi_url="/swagger/json" if settings.docs_enabled else None,
+        docs_url="/swagger" if resolved_settings.docs_enabled else None,
+        openapi_url="/swagger/json" if resolved_settings.docs_enabled else None,
         lifespan=lifespan,
     )
     app.add_middleware(ResponseEnvelopeMiddleware)
-    app.add_middleware(TenantMiddleware)
+    app.add_middleware(TenantMiddleware, settings=resolved_settings)
     app.add_middleware(RequestLoggingMiddleware)
-    app.add_middleware(RequestSizeLimitMiddleware)
+    app.add_middleware(RequestSizeLimitMiddleware, settings=resolved_settings)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.cors_origin_list,
-        allow_credentials=settings.cors_allow_credentials,
+        allow_origins=resolved_settings.cors_origin_list,
+        allow_credentials=resolved_settings.cors_allow_credentials,
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allow_headers=["*"],
     )
@@ -67,8 +72,10 @@ def create_app() -> FastAPI:
     app.include_router(agent_chat_router)
     app.include_router(ds_order_router)
     app.include_router(rag_chat_router)
-    if settings.public_dir.exists():
-        app.mount("/public", StaticFiles(directory=settings.public_dir), name="public")
+    if resolved_settings.public_dir.exists():
+        app.mount(
+            "/public", StaticFiles(directory=resolved_settings.public_dir), name="public"
+        )
     return app
 
 

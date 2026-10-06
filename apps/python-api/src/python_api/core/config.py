@@ -15,6 +15,15 @@ from pydantic import (
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from python_api.core.config_sections import (
+    AIConfig,
+    AppConfig,
+    AuthConfig,
+    DatabaseConfig,
+    FilesConfig,
+    RedisConfig,
+)
+
 PYTHON_API_DIR = Path(__file__).resolve().parents[3]
 EnvironmentName = Literal["dev", "test", "prod"]
 
@@ -209,6 +218,89 @@ class Settings(BaseSettings):
     def node_env(self) -> str:
         """Provides the normalized environment to existing integration metadata."""
         return self.python_api_env
+
+    @property
+    def app(self) -> AppConfig:
+        """Returns the grouped application process configuration."""
+        return AppConfig(
+            self.python_api_env,
+            self.python_api_host,
+            self.python_api_port,
+            self.python_api_workers,
+            self.python_api_reload,
+            self.docs_enabled,
+            self.python_api_log_level,
+            self.cors_origin_list,
+            self.cors_allow_credentials,
+            self.python_api_max_request_size_bytes,
+        )
+
+    @property
+    def database(self) -> DatabaseConfig:
+        """Returns the grouped PostgreSQL configuration."""
+        return DatabaseConfig(
+            self.async_database_url,
+            self.database_pool_size,
+            self.database_max_overflow,
+            self.database_pool_timeout_seconds,
+            self.database_pool_recycle_seconds,
+            self.database_pool_pre_ping,
+        )
+
+    @property
+    def redis(self) -> RedisConfig:
+        """Returns the grouped Redis configuration."""
+        return RedisConfig(
+            self.redis_host,
+            self.redis_port,
+            self.redis_db,
+            self.redis_password,
+            self.redis_max_connections,
+            self.redis_connect_timeout_seconds,
+            self.redis_read_timeout_seconds,
+            self.redis_health_check_interval_seconds,
+        )
+
+    @property
+    def auth(self) -> AuthConfig:
+        """Returns the grouped authentication configuration."""
+        return AuthConfig(
+            self.jwt_secret,
+            self.jwt_token_expired_time,
+            self.default_tenant,
+            self.rag_admin_bootstrap_username,
+            self.rag_admin_bootstrap_password,
+            self.rag_admin_bootstrap_supplier_code,
+            self.rag_admin_bootstrap_display_name,
+            self.rag_admin_bootstrap_reset_password,
+        )
+
+    @property
+    def ai(self) -> AIConfig:
+        """Returns the grouped AI provider configuration."""
+        return AIConfig(
+            self.openai_api_key,
+            self.openai_base_url,
+            self.model_name,
+            self.embeddings_api_key,
+            self.embeddings_base_url,
+            self.embeddings_model_name,
+            self.embeddings_dimensions,
+            self.rerank_api_key,
+            self.rerank_url,
+            self.rerank_model,
+        )
+
+    @property
+    def files(self) -> FilesConfig:
+        """Returns the grouped file and document processing configuration."""
+        return FilesConfig(
+            self.workspace_root,
+            self.raw_dir,
+            self.agent_docs_dir,
+            self.python_api_max_upload_files,
+            self.python_api_max_upload_size_bytes,
+        )
 
     @property
     def docs_enabled(self) -> bool:

@@ -15,7 +15,7 @@
 
 ### HTTP 测试
 
-使用 FastAPI `TestClient` 或 httpx ASGI transport 验证：
+使用 `httpx.AsyncClient`、`ASGITransport` 与 `LifespanManager` 验证：
 
 - route、method 和参数校验。
 - 鉴权成功、未认证和无权限路径。

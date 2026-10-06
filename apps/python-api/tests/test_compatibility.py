@@ -3,9 +3,9 @@ import json
 import pytest
 
 from python_api.core.context import RequestContext, reset_request_context, set_request_context
-from python_api.core.redis.redis_service import RAG_SESSION_MEMORY, RedisService
-from python_api.core.security import hash_password, verify_password
-from python_api.ui_stream import UI_STREAM_HEADERS, encode_event
+from python_api.core.stream import UI_STREAM_HEADERS, encode_event
+from python_api.integrations.redis import RAG_SESSION_MEMORY, RedisService
+from python_api.modules.auth.dependencies import hash_password, verify_password
 
 
 @pytest.mark.asyncio

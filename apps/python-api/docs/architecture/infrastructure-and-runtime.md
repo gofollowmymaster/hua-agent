@@ -13,9 +13,9 @@
 
 ## PostgreSQL
 
-`core/database.py` 创建全局 async engine 和 `async_sessionmaker`，每个请求通过 `get_db` 获取独立 `AsyncSession`。连接池大小、溢出、等待时间、回收和 pre-ping 均由配置控制。
+`core/resources.py` 在 lifespan 中创建 async engine、`async_sessionmaker`、Redis 与飞书 adapter；每个请求通过 `app.state.resources` 获取资源，`get_db` 提供独立 `AsyncSession`。连接池大小、溢出、等待时间、回收和 pre-ping 均由配置控制。
 
-`core/model/` 按认证、RAG 和 Agent 业务域映射以下既有表：
+ORM 由 `modules/auth/models.py`、`modules/rag/models.py` 和 `modules/agent/models.py` 分域映射以下既有表：
 
 - `rag_admin_users`。
 - `aplus_documents`、`aplus_chunks`。
@@ -29,7 +29,7 @@
 
 ## Redis
 
-`core/redis/redis_service.py` 创建异步 Redis client，并集中维护 key 模板：
+`integrations/redis.py` 定义 Redis adapter 与兼容 key 模板，client 由 lifespan 创建：
 
 - `frontend-node:mtable:{appToken}:{tableId}`：飞书表格缓存基础 key。
 - `frontend-node:limiter:{key}`：限流计数。

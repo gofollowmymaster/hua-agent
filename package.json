@@ -55,6 +55,8 @@
     "python-api:dev": "cross-env PYTHON_API_ENV=dev uv run --project apps/python-api python -m python_api.run",
     "python-api:start": "cross-env PYTHON_API_ENV=prod uv run --project apps/python-api python -m python_api.run",
     "python-api:test": "cross-env PYTHON_API_ENV=test uv run --project apps/python-api pytest apps/python-api/tests",
+    "python-api:test:integration": "uv run --project apps/python-api python apps/python-api/scripts/run_integration_tests.py",
+    "python-api:test:all": "pnpm python-api:test && pnpm python-api:test:integration",
     "python-api:lint": "uv run --project apps/python-api ruff check apps/python-api",
     "python-api:typecheck": "uv run --project apps/python-api mypy --config-file apps/python-api/pyproject.toml apps/python-api/src",
     "python-api:build": "uv build --project apps/python-api",

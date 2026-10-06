@@ -20,21 +20,15 @@ Python API 是一个可独立启动和部署的 FastAPI 服务，默认监听 `8
 apps/python-api/
 ├── docs/                    # 架构和开发规范
 ├── src/python_api/
-│   ├── routes/              # HTTP 路由和依赖声明
-│   ├── schemas/             # Pydantic 请求契约与公共转换
-│   ├── services/            # 业务用例、检索、入库和会话编排
-│   ├── core/config.py       # 环境选择、配置校验和派生配置
-│   ├── core/context.py      # 请求级租户与用户上下文
-│   ├── core/database.py     # 异步数据库引擎和 session
-│   ├── core/errors.py       # 应用异常与全局异常处理
-│   ├── core/feishu/feishu.py # 飞书客户端、表格读取和告警
-│   ├── main.py              # FastAPI 工厂、中间件和路由装配
-│   ├── middleware.py        # 租户、日志、请求大小和响应包裹
-│   ├── core/model/          # 按业务域组织的 SQLAlchemy 映射
-│   ├── core/redis/redis_service.py # Redis 客户端和通用状态操作
-│   ├── run.py               # Uvicorn 启动入口
-│   ├── core/security.py     # 密码、JWT 和路由鉴权依赖
-│   └── ui_stream.py         # AI SDK UI Message SSE 编码
+│   ├── core/                # 配置、数据库、lifespan 资源、异常、中间件与流协议
+│   ├── integrations/        # Redis、飞书与 embedding adapter
+│   ├── modules/auth/        # 本地用户、JWT、固定 token 与 ORM
+│   ├── modules/rag/         # RAG 管理、对话、文档、解析、记忆与 ORM
+│   ├── modules/agent/       # Agent 知识、对话、runtime、tools、记忆与 ORM
+│   ├── modules/ds_order/    # 租户隔离 mock 服务与 fixture
+│   ├── modules/health/      # liveness 与 readiness
+│   ├── main.py              # FastAPI 工厂、中间件、lifespan 和路由装配
+│   └── run.py               # Uvicorn 启动入口
 ├── tests/                   # 单元、契约和配置测试
 ├── Dockerfile
 ├── pyproject.toml
@@ -45,11 +39,11 @@ apps/python-api/
 
 ```mermaid
 flowchart LR
-  Client[HTTP Client] --> Routes[routes]
-  Routes --> Schemas[schemas]
-  Routes --> Security[security dependencies]
-  Routes --> Services[services]
-  Services --> Models[SQLAlchemy models]
+  Client[HTTP Client] --> Modules[domain routers]
+  Modules --> Schemas[domain schemas]
+  Modules --> Security[auth dependencies]
+  Modules --> Services[domain services]
+  Services --> Models[domain SQLAlchemy models]
   Services --> Database[AsyncSession]
   Services --> Redis[RedisService]
   Services --> Providers[Model and Feishu adapters]
@@ -64,7 +58,7 @@ flowchart LR
 - schema 只负责输入约束、字段别名和公共 JSON 转换，不访问基础设施。
 - service 负责编排业务流程，可使用数据库、Redis、模型、文件和外部服务。
 - model 只映射既有表结构，不负责迁移。
-- `core/config.py`、`core/database.py`、`core/redis/redis_service.py`、`core/feishu/feishu.py` 等模块提供基础设施能力。
+- `core/` 不依赖业务领域；`integrations/` 可依赖 core，领域通过显式依赖使用 integration。
 
 ## 应用生命周期
 
@@ -77,7 +71,7 @@ flowchart LR
 5. 注册 health、auth、RAG、Agent 和 DS Order 路由。
 6. 当公共静态目录存在时挂载 `/public`。
 
-应用 lifespan 启动时可按配置创建初始管理员；关闭时依次关闭 Redis client 和 SQLAlchemy engine。
+应用 lifespan 创建 `AppResources` 并存入 `app.state`，按配置创建初始管理员；关闭时依次关闭 Redis client 和 SQLAlchemy engine。`create_app` 可替换 Settings 与 resource factory，便于隔离测试。
 
 ## 请求生命周期
 
