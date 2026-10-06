@@ -6,7 +6,7 @@
 
 ## What Changes
 
-- 新增 `apps/react-admin`，使用 Umi Max、React 18、Ant Design 5 和 ProComponents。
+- 新增 `apps/react-admin`，使用 Umi Max、React 18、Ant Design 6 和 ProComponents 3.1 beta。
 - 迁移当前 RAG Admin 的登录、布局、知识库、会话、两套聊天 Demo、文档预览和占位页面行为。
 - 新增独立开发、测试、构建命令，并将静态产物发布到 `/public/react-admin/`。
 - 保留现有 Vue RAG Admin，不修改后端 API、数据库或鉴权协议。

@@ -53,7 +53,7 @@ export default function DocumentsPage() {
     {
       title: '文件名',
       dataIndex: 'fileName',
-      hideInSearch: true,
+      search: false,
       width: 360,
       render: (_, item) => (
         <div>
@@ -65,9 +65,9 @@ export default function DocumentsPage() {
         </div>
       ),
     },
-    { title: '扩展名', dataIndex: 'fileType', hideInSearch: true, width: 90 },
-    { title: 'type', dataIndex: 'type', hideInSearch: true, width: 110 },
-    { title: 'tag', dataIndex: 'tag', hideInSearch: true, width: 140 },
+    { title: '扩展名', dataIndex: 'fileType', search: false, width: 90 },
+    { title: 'type', dataIndex: 'type', search: false, width: 110 },
+    { title: 'tag', dataIndex: 'tag', search: false, width: 140 },
     {
       title: '状态',
       dataIndex: 'status',
@@ -86,21 +86,21 @@ export default function DocumentsPage() {
     {
       title: '片段数',
       dataIndex: 'chunkCount',
-      hideInSearch: true,
+      search: false,
       width: 90,
       render: (_, item) => item.actualChunkCount ?? item.chunkCount ?? '-',
     },
     {
       title: '大小',
       dataIndex: 'fileSize',
-      hideInSearch: true,
+      search: false,
       width: 90,
       render: (_, item) => formatSize(item.fileSize),
     },
     {
       title: '更新时间',
       dataIndex: 'updatedAt',
-      hideInSearch: true,
+      search: false,
       width: 160,
       render: (_, item) => dayjs(item.updatedAt).format('YYYY-MM-DD HH:mm'),
     },

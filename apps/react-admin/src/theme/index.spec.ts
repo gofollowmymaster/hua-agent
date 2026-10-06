@@ -111,7 +111,7 @@ describe('react admin theme', () => {
     expect(compactProTableProps).toMatchObject({
       defaultSize: 'small',
       search: { style: { padding: 12 } },
-      cardProps: { bodyStyle: { padding: 12 } },
+      cardProps: { styles: { body: { padding: 12 } } },
       pagination: { size: 'small' },
     });
   });

@@ -537,15 +537,12 @@ test('login, browse, preview, upload and restore a drawer deep link', async ({
   expect(
     await getFontSize(previewDialog.locator('.ant-modal-title')),
   ).toBeGreaterThan(12);
-  await expect(previewDialog.locator('.ant-modal-content')).toHaveCSS(
-    'padding-top',
-    '12px',
+  const previewDialogContainer = previewDialog.locator(
+    ':scope > .ant-modal-container',
   );
-  await expect(previewDialog.locator('.ant-modal-content')).toHaveCSS(
-    'padding-left',
-    '16px',
-  );
-  await page.getByRole('button', { name: 'Close' }).click();
+  await expect(previewDialogContainer).toHaveCSS('padding-top', '12px');
+  await expect(previewDialogContainer).toHaveCSS('padding-left', '16px');
+  await previewDialog.getByRole('button', { name: '关闭' }).click();
 
   await page.getByRole('button', { name: /添加文档/ }).click();
   await page.locator('input[type="file"]').setInputFiles({
@@ -556,7 +553,7 @@ test('login, browse, preview, upload and restore a drawer deep link', async ({
   await page.getByRole('button', { name: '开始上传' }).click();
   await expect(page.getByText('处理 1 个文件')).toBeVisible();
   await expect(page.getByRole('heading', { name: '新增.txt' })).toBeVisible();
-  await page.getByRole('button', { name: /关\s*闭/ }).click();
+  await page.getByRole('button', { name: '关 闭', exact: true }).click();
 
   await page.getByText('切片实况', { exact: true }).click();
   await expect(page).toHaveURL(/drawer=document-chunks.*drawerCode=1/);
@@ -651,7 +648,7 @@ test('opens every menu route and keeps placeholder modules explicit', async ({
   await expect(statusTag).toHaveCSS('background-color', 'rgb(221, 247, 239)');
   await page.getByRole('button', { name: '2026年8月更新.md' }).click();
   await expect(page.getByRole('dialog')).toContainText('业务知识预览正文');
-  await page.getByRole('button', { name: 'Close' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: '关闭' }).click();
   if (testInfo.project.name === 'desktop') {
     await page.screenshot({
       path: testInfo.outputPath('business-knowledge-theme.png'),

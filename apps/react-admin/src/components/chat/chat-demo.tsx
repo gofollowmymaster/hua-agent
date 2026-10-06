@@ -197,7 +197,7 @@ export function ChatDemo({
             )}
           />
         </Card>
-        <Card className="chat-main" bodyStyle={{ padding: 0 }}>
+        <Card className="chat-main" styles={{ body: { padding: 0 } }}>
           <div ref={messagePane} className="chat-messages" role="log">
             <Spin spinning={messageLoading}>
               {runtime.messages.length === 0 ? (
@@ -220,7 +220,7 @@ export function ChatDemo({
               type="error"
               showIcon
               closable
-              message={runtime.error.message}
+              title={runtime.error.message}
               onClose={runtime.clearError}
             />
           )}

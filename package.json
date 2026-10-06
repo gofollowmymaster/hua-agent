@@ -5,6 +5,9 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "build": "pnpm --filter @aplus-sql/api --filter @aplus-sql/rag-admin --filter @aplus-sql/react-admin -r run build:dev",
     "build:dev": "pnpm --filter @aplus-sql/api build:dev",

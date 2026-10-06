@@ -42,17 +42,17 @@ export default function AgentSkillsPage() {
       hideInTable: true,
       fieldProps: { placeholder: '名称 / 描述 / 指令', allowClear: true },
     },
-    { title: '名称', dataIndex: 'name', hideInSearch: true, width: 180 },
+    { title: '名称', dataIndex: 'name', search: false, width: 180 },
     {
       title: '描述',
       dataIndex: 'description',
-      hideInSearch: true,
+      search: false,
       ellipsis: true,
     },
     {
       title: '状态',
       dataIndex: 'isEnabled',
-      hideInSearch: true,
+      search: false,
       width: 110,
       render: () => <SemanticTag tone="success">强制启用</SemanticTag>,
     },
@@ -90,24 +90,24 @@ export default function AgentSkillsPage() {
         </SemanticTag>
       ),
     },
-    { title: '名称', dataIndex: 'name', hideInSearch: true, width: 180 },
+    { title: '名称', dataIndex: 'name', search: false, width: 180 },
     {
       title: '描述',
       dataIndex: 'description',
-      hideInSearch: true,
+      search: false,
       ellipsis: true,
     },
     {
       title: '更新时间',
       dataIndex: 'updatedAt',
-      hideInSearch: true,
+      search: false,
       width: 160,
       render: (_, item) => dayjs(item.updatedAt).format('YYYY-MM-DD HH:mm'),
     },
     {
       title: '启用',
       dataIndex: 'enabledAction',
-      hideInSearch: true,
+      search: false,
       width: 80,
       render: (_, item) => (
         <Switch

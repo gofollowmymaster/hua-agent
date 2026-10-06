@@ -96,7 +96,7 @@ export function DocumentPreviewModal<T extends PreviewDocumentItem>({
         )}
         {error && (
           <div className="document-preview-state">
-            <Alert type="error" showIcon message={error} />
+            <Alert type="error" showIcon title={error} />
           </div>
         )}
         <div

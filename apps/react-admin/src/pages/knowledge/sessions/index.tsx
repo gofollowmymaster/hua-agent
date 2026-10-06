@@ -40,7 +40,7 @@ export default function SessionsPage() {
     {
       title: '会话',
       dataIndex: 'sessionKey',
-      hideInSearch: true,
+      search: false,
       width: 260,
       render: (_, item) => (
         <div>
@@ -52,7 +52,7 @@ export default function SessionsPage() {
     {
       title: '消息数',
       dataIndex: 'messageCount',
-      hideInSearch: true,
+      search: false,
       width: 90,
       render: (_, item) => (
         <SemanticTag tone="info">{item.messageCount || 0} 条</SemanticTag>
@@ -61,14 +61,14 @@ export default function SessionsPage() {
     {
       title: '最后消息',
       dataIndex: 'latestMessage',
-      hideInSearch: true,
+      search: false,
       ellipsis: true,
       render: (_, item) => item.latestMessage?.content || '暂无消息',
     },
     {
       title: '最后活跃',
       dataIndex: 'lastActiveAt',
-      hideInSearch: true,
+      search: false,
       width: 160,
       render: (_, item) => dayjs(item.lastActiveAt).format('YYYY-MM-DD HH:mm'),
     },

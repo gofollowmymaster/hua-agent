@@ -23,7 +23,7 @@ export function SessionMessages({ id }: { id: string }) {
       active = false;
     };
   }, [id]);
-  if (error) return <Alert type="error" showIcon message={error} />;
+  if (error) return <Alert type="error" showIcon title={error} />;
   return (
     <Spin spinning={loading}>
       <List

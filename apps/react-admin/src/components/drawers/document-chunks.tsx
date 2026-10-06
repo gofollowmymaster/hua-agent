@@ -60,7 +60,7 @@ export function DocumentChunks({ id, source }: DocumentChunksProps) {
     };
   }, [id, page, source]);
 
-  if (error) return <Alert type="error" showIcon message={error} />;
+  if (error) return <Alert type="error" showIcon title={error} />;
   return (
     <Spin spinning={loading}>
       {document && (

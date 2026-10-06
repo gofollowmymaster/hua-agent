@@ -7,7 +7,7 @@
 ## Stack
 
 - Umi Max 4 + React 18 + TypeScript
-- Ant Design 5 + `@ant-design/pro-components`
+- Ant Design 6.6.5 + `@ant-design/pro-components` 3.1.15-5 beta
 - Vitest + React Testing Library；关键流程使用 Playwright
 
 ## Boundaries

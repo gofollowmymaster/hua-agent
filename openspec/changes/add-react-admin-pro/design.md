@@ -23,7 +23,7 @@
 
 ### 1. Umi Max 与兼容版本组合
 
-采用 Umi Max 4.7.22、React 18.3.1、antd 5.29.3、ProComponents 2.8.10。ProComponents 当前 peer range 未声明支持 antd 6，因此不使用最新 antd 6。路由使用 hash history，`publicPath` 为 `/public/react-admin/`，构建输出到 `apps/api/public/react-admin`。
+采用 Umi Max 4.7.22、React 18.3.1、antd 6.6.5、ProComponents 3.1.15-5 beta。ProComponents 3.1 beta 要求 antd 6 和 Node.js 22.12.0 以上；workspace 通过根 `engines.node` 声明构建基线，但现有 Node 20 Docker 镜像仅运行预构建的后端与静态产物，不作为 React Admin 的受支持安装或构建环境。路由使用 hash history，`publicPath` 为 `/public/react-admin/`，构建输出到 `apps/api/public/react-admin`。
 
 ### 2. 应用内认证 model 与共享 HTTP client
 

@@ -191,7 +191,7 @@ export const compactProTableProps = {
     style: { padding: 12 },
   },
   cardProps: {
-    bodyStyle: { padding: 12 },
+    styles: { body: { padding: 12 } },
   },
   pagination: { size: 'small' },
 } as const;

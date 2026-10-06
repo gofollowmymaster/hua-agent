@@ -74,7 +74,7 @@ export default function AgentKnowledgePage() {
         allowClear: true,
       },
     },
-    { title: 'ID', dataIndex: 'id', hideInSearch: true, width: 100 },
+    { title: 'ID', dataIndex: 'id', search: false, width: 100 },
     {
       title: '分类',
       dataIndex: 'category',
@@ -87,7 +87,7 @@ export default function AgentKnowledgePage() {
     {
       title: '文件名',
       dataIndex: 'fileName',
-      hideInSearch: true,
+      search: false,
       width: 380,
       render: (_, item) => (
         <div>
@@ -118,21 +118,21 @@ export default function AgentKnowledgePage() {
     {
       title: '片段数',
       dataIndex: 'chunkCount',
-      hideInSearch: true,
+      search: false,
       width: 90,
       render: (_, item) => item.actualChunkCount ?? item.chunkCount ?? '-',
     },
     {
       title: '大小',
       dataIndex: 'fileSize',
-      hideInSearch: true,
+      search: false,
       width: 90,
       render: (_, item) => formatSize(item.fileSize),
     },
     {
       title: '更新时间',
       dataIndex: 'updatedAt',
-      hideInSearch: true,
+      search: false,
       width: 160,
       render: (_, item) => dayjs(item.updatedAt).format('YYYY-MM-DD HH:mm'),
     },
