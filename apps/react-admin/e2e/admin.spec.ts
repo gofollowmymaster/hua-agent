@@ -19,6 +19,24 @@ const documentItem = {
   updatedAt: '2026-10-05T00:00:00Z',
 };
 
+const agentKnowledgeItem = {
+  id: 41,
+  tenantCode: 'A',
+  category: '版本更新日志',
+  sourcePath: 'yurex/版本更新日志/2026年更新/2026年8月更新.md',
+  fileName: '2026年8月更新.md',
+  fileType: 'md',
+  fileHash: 'agent-document-hash',
+  fileSize: 2048,
+  chunkCount: 1,
+  actualChunkCount: 1,
+  status: 'ready',
+  metadata: {},
+  breadcrumb: '版本更新日志 > 2026年更新 > 2026年8月更新',
+  createdAt: '2026-10-05T00:00:00Z',
+  updatedAt: '2026-10-05T00:00:00Z',
+};
+
 async function login(page: Page) {
   await page.goto('/public/react-admin/#/login');
   await expect(page.getByPlaceholder('用户名')).toBeVisible();
@@ -215,6 +233,17 @@ test.beforeEach(async ({ page }) => {
       ]),
     }),
   );
+  await page.route(/\/agent\/knowledge\/documents(?:\?.*)?$/, (route) =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: json({
+        list: [agentKnowledgeItem],
+        total: 1,
+        page: 1,
+        pageSize: 20,
+      }),
+    }),
+  );
   await page.route('**/agent/chat/sessions/page', (route) =>
     route.fulfill({
       contentType: 'application/json',
@@ -301,6 +330,26 @@ test('login, browse, preview, upload and restore a drawer deep link', async ({
       )
       .toBe('true');
     await expectPageSpacing(page);
+    await page.locator('.ant-pro-sider .ant-menu-submenu').first().hover();
+    const submenuPopup = page.locator('.ant-menu-submenu-popup:visible');
+    await expect(submenuPopup).toBeVisible();
+    await expect(submenuPopup.locator('> .ant-menu')).toHaveCSS(
+      'background-color',
+      'rgb(29, 43, 39)',
+    );
+    const selectedMenuItem = submenuPopup
+      .locator('.ant-menu-item-selected')
+      .filter({ hasText: '文档管理' });
+    const regularMenuItem = submenuPopup
+      .locator('.ant-menu-item')
+      .filter({ hasText: '消息对话记录' });
+    await expect(selectedMenuItem).toHaveCSS('color', 'rgb(94, 234, 212)');
+    await expect(regularMenuItem).toHaveCSS('color', 'rgb(197, 208, 204)');
+    await regularMenuItem.hover();
+    await expect(regularMenuItem).toHaveCSS('color', 'rgb(255, 255, 255)');
+    await page.screenshot({
+      path: testInfo.outputPath('collapsed-menu-theme.png'),
+    });
   }
 
   await page.getByRole('button', { name: '手册.txt' }).click();
@@ -328,7 +377,7 @@ test('login, browse, preview, upload and restore a drawer deep link', async ({
 
 test('opens every menu route and keeps placeholder modules explicit', async ({
   page,
-}) => {
+}, testInfo) => {
   await login(page);
   const pages: Array<[string, string]> = [
     ['/knowledge/sessions', '消息对话记录'],
@@ -346,6 +395,24 @@ test('opens every menu route and keeps placeholder modules explicit', async ({
   await page.goto('/public/react-admin/#/business-agent/skills');
   await expect(page.getByText('模块建设中')).toBeVisible();
   await expect(page.locator('body')).not.toHaveCSS('overflow-x', 'scroll');
+
+  await page.goto('/public/react-admin/#/business-agent/knowledge');
+  const categoryTag = page.locator('.semantic-tag-info', {
+    hasText: '版本更新日志',
+  });
+  const statusTag = page.locator('.semantic-tag-success', {
+    hasText: 'ready',
+  });
+  await expect(categoryTag).toHaveCSS('color', 'rgb(29, 78, 216)');
+  await expect(categoryTag).toHaveCSS('background-color', 'rgb(239, 246, 255)');
+  await expect(statusTag).toHaveCSS('color', 'rgb(17, 94, 89)');
+  await expect(statusTag).toHaveCSS('background-color', 'rgb(221, 247, 239)');
+  if (testInfo.project.name === 'desktop') {
+    await page.screenshot({
+      path: testInfo.outputPath('knowledge-tags-theme.png'),
+      fullPage: true,
+    });
+  }
 });
 
 test('loads RAG and business Agent histories with ordered visible parts', async ({

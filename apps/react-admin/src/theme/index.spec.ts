@@ -65,6 +65,10 @@ describe('react admin theme', () => {
     [themePalette.navigationText, themePalette.navigation],
     [themePalette.navigationSelected, themePalette.navigation],
     [themePalette.info, themePalette.containerBackground],
+    [themePalette.infoText, themePalette.infoSurface],
+    [themePalette.primaryActive, themePalette.selectedBackground],
+    [themePalette.warningText, themePalette.warningSurface],
+    [themePalette.errorText, themePalette.errorSurface],
   ])('keeps critical text pair %s on %s at WCAG AA contrast', (text, bg) => {
     expect(contrastRatio(text, bg)).toBeGreaterThanOrEqual(4.5);
   });

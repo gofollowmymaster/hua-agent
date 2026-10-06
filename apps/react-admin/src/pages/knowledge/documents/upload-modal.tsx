@@ -94,9 +94,7 @@ export function DocumentUploadModal({
         <div style={{ marginTop: 20 }}>
           <Space wrap>
             <span>处理 {result.totalFiles} 个文件</span>
-            <SemanticTag tone="success">
-              成功 {result.indexedFiles}
-            </SemanticTag>
+            <SemanticTag tone="success">成功 {result.indexedFiles}</SemanticTag>
             <SemanticTag tone="warning">
               重复 {result.duplicateFiles}
             </SemanticTag>

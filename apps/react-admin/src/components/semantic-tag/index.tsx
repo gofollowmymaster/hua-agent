@@ -3,11 +3,7 @@ import { Tag } from 'antd';
 import './style.css';
 
 export type SemanticTagTone =
-  | 'neutral'
-  | 'info'
-  | 'success'
-  | 'warning'
-  | 'error';
+  'neutral' | 'info' | 'success' | 'warning' | 'error';
 
 export function SemanticTag({
   children,
@@ -16,7 +12,5 @@ export function SemanticTag({
   children: ReactNode;
   tone?: SemanticTagTone;
 }) {
-  return (
-    <Tag className={`semantic-tag semantic-tag-${tone}`}>{children}</Tag>
-  );
+  return <Tag className={`semantic-tag semantic-tag-${tone}`}>{children}</Tag>;
 }
