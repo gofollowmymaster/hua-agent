@@ -8,8 +8,8 @@ from python_api.config import (
     normalize_environment,
     selected_environment,
 )
+from python_api.core.database import create_database_engine
 from python_api.core.redis.redis_service import create_redis_client
-from python_api.database import create_database_engine
 
 CORE = """\
 RAG_DATABASE_URL=postgresql://user:password@localhost:5432/database

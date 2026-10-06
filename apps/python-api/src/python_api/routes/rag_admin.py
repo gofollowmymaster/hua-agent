@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, File, UploadFile
 from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from python_api.database import get_db
+from python_api.core.database import get_db
 from python_api.schemas.common import PageRequest
 from python_api.schemas.rag_admin import (
     DocumentMetadataRequest,

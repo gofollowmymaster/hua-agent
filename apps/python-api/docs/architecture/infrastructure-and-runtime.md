@@ -13,7 +13,7 @@
 
 ## PostgreSQL
 
-`database.py` 创建全局 async engine 和 `async_sessionmaker`，每个请求通过 `get_db` 获取独立 `AsyncSession`。连接池大小、溢出、等待时间、回收和 pre-ping 均由配置控制。
+`core/database.py` 创建全局 async engine 和 `async_sessionmaker`，每个请求通过 `get_db` 获取独立 `AsyncSession`。连接池大小、溢出、等待时间、回收和 pre-ping 均由配置控制。
 
 `models.py` 映射以下既有表：
 

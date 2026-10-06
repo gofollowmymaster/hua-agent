@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from python_api.database import get_db
+from python_api.core.database import get_db
 from python_api.schemas.chat import ChatRequest
 from python_api.security import require_bearer
 from python_api.services.rag_chat import RagChatService

@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from python_api.database import get_db
+from python_api.core.database import get_db
 from python_api.schemas.agent_knowledge import (
     AgentDocumentPageRequest,
     AgentKnowledgeIngestRequest,

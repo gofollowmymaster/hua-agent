@@ -171,7 +171,7 @@ class AuthService:
 
 async def bootstrap_admin() -> None:
     """Creates or resets the configured administrator with startup idempotence."""
-    from python_api.database import session_factory
+    from python_api.core.database import session_factory
 
     settings = get_settings()
     username = settings.rag_admin_bootstrap_username

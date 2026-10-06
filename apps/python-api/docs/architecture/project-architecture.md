@@ -25,9 +25,9 @@ apps/python-api/
 │   ├── services/            # 业务用例、检索、入库和会话编排
 │   ├── config.py            # 环境选择、配置校验和派生配置
 │   ├── core/context.py      # 请求级租户与用户上下文
-│   ├── database.py          # 异步数据库引擎和 session
+│   ├── core/database.py     # 异步数据库引擎和 session
 │   ├── core/errors.py       # 应用异常与全局异常处理
-│   ├── feishu.py            # 飞书客户端、表格读取和告警
+│   ├── core/feishu/feishu.py # 飞书客户端、表格读取和告警
 │   ├── main.py              # FastAPI 工厂、中间件和路由装配
 │   ├── middleware.py        # 租户、日志、请求大小和响应包裹
 │   ├── models.py            # 既有表的 SQLAlchemy 映射
@@ -64,7 +64,7 @@ flowchart LR
 - schema 只负责输入约束、字段别名和公共 JSON 转换，不访问基础设施。
 - service 负责编排业务流程，可使用数据库、Redis、模型、文件和外部服务。
 - model 只映射既有表结构，不负责迁移。
-- `config.py`、`database.py`、`core/redis/redis_service.py`、`feishu.py` 等模块提供基础设施能力。
+- `config.py`、`core/database.py`、`core/redis/redis_service.py`、`core/feishu/feishu.py` 等模块提供基础设施能力。
 
 ## 应用生命周期
 

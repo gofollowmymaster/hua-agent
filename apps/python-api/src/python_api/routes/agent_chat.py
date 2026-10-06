@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from python_api.database import get_db
+from python_api.core.database import get_db
 from python_api.schemas.chat import AgentSessionPageRequest, ChatRequest
 from python_api.security import require_composite_auth
 from python_api.services.agent_chat import AgentChatService

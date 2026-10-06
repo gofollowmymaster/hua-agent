@@ -3,7 +3,7 @@ from typing import Any
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from python_api.database import get_db
+from python_api.core.database import get_db
 from python_api.schemas.auth import (
     CreateUserRequest,
     LoginRequest,

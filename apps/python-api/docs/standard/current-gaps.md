@@ -40,7 +40,7 @@
 
 ## P2 全局客户端降低测试隔离能力
 
-证据：`database.py`、`core/redis/redis_service.py` 和 `feishu.py` 在模块级创建 engine、client 或 singleton；部分 service 构造时直接创建模型 client。
+证据：`core/database.py`、`core/redis/redis_service.py` 和 `core/feishu/feishu.py` 在模块级创建 engine、client 或 singleton；部分 service 构造时直接创建模型 client。
 
 风险：导入阶段依赖配置，测试替换和资源生命周期验证较难，多个测试之间可能共享状态。
 

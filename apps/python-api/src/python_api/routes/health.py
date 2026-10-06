@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
+from python_api.core.database import database_ready
 from python_api.core.redis.redis_service import redis_ready
-from python_api.database import database_ready
 
 router = APIRouter(prefix="/health", tags=["health"])
 
