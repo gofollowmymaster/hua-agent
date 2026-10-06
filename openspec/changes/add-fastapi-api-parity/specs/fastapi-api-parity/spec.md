@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: FastAPI 必须兼容现有 API 边界
-系统 MUST 在独立 FastAPI 进程中提供现有 NestJS 的 31 个 HTTP 接口，并保持方法、路径、请求转换、状态码、响应头、响应体和数据副作用兼容。
+系统 MUST 在独立 FastAPI 进程中提供现有 NestJS 的 36 个 HTTP 接口，并保持方法、路径、请求转换、状态码、响应头、响应体和数据副作用兼容。
 
 #### Scenario: 普通 JSON 请求
 - **WHEN** 同一合法请求分别发送到 NestJS 和 FastAPI

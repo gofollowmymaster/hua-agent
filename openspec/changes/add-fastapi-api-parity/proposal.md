@@ -7,7 +7,8 @@
 ## What Changes
 
 - 在 `apps/python-api` 增加 Python 3.12、FastAPI 和 uv 项目。
-- 复刻现有 31 个 API 的路由、鉴权、校验、响应、流式协议和数据副作用。
+- 复刻现有 36 个 API 的路由、鉴权、校验、响应、流式协议和数据副作用。
+- 同步 Business Agent 系统 Skill、用户 Skill 管理接口和运行时动态装载能力。
 - 迁移 RAG、业务 Agent、文档处理、飞书多维表格鉴权和告警能力。
 - 保持 Prisma 为数据库 schema 和迁移的唯一权威，两套后端共享现有表和 Redis key。
 - 增加独立 Docker 镜像、根命令、健康检查和双栈差异契约测试。
@@ -20,7 +21,7 @@
 
 ### Modified Capabilities
 
-无。
+- `business-agent-skills`：将系统 Skill、用户 Skill 管理和运行时装载扩展到 FastAPI。
 
 ## Impact
 

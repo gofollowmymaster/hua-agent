@@ -26,6 +26,11 @@ EXPECTED_ROUTES = {
     ("POST", "/agent/chat"),
     ("POST", "/agent/chat/sessions/page"),
     ("GET", "/agent/chat/sessions/{session_id}/messages"),
+    ("GET", "/agent/skills/system"),
+    ("POST", "/agent/skills/user/page"),
+    ("POST", "/agent/skills/user"),
+    ("POST", "/agent/skills/user/{skill_id}"),
+    ("DELETE", "/agent/skills/user/{skill_id}"),
     ("POST", "/oms/admin/dsOrder/page"),
     ("POST", "/oms/admin/dsOrder/info"),
     ("POST", "/oms/admin/dsOrder/logPage"),
@@ -36,7 +41,7 @@ EXPECTED_ROUTES = {
 
 
 def test_all_nestjs_contract_routes_are_exposed() -> None:
-    """Locks the 31-method NestJS compatibility surface."""
+    """Locks the 36-method NestJS compatibility surface."""
     paths = app.openapi()["paths"]
     actual = {
         (method.upper(), path)
@@ -45,4 +50,4 @@ def test_all_nestjs_contract_routes_are_exposed() -> None:
         if method in {"get", "post", "put", "patch", "delete"} and not path.startswith("/health/")
     }
     assert actual == EXPECTED_ROUTES
-    assert len(actual) == 31
+    assert len(actual) == 36

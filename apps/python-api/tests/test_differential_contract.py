@@ -8,6 +8,7 @@ from test_contract_manifest import EXPECTED_ROUTES
 
 NEST_API_URL = os.getenv("NEST_API_URL", "").rstrip("/")
 PYTHON_API_URL = os.getenv("PYTHON_API_URL", "").rstrip("/")
+DIFFERENTIAL_BEARER_TOKEN = os.getenv("DIFFERENTIAL_BEARER_TOKEN", "")
 
 
 def _concrete_path(path: str) -> str:
@@ -37,3 +38,17 @@ def test_unauthenticated_error_contract_matches_nestjs(method: str, path: str) -
     ).split(";", 1)[0]
     if "application/json" in nest.headers.get("content-type", ""):
         assert python.json() == nest.json()
+
+
+@pytest.mark.skipif(
+    not NEST_API_URL or not PYTHON_API_URL or not DIFFERENTIAL_BEARER_TOKEN,
+    reason="Set both API URLs and DIFFERENTIAL_BEARER_TOKEN for Skill catalog comparison",
+)
+def test_system_skill_catalog_matches_nestjs() -> None:
+    """Compares the complete system Skill payload and fixed ordering."""
+    headers = {"Authorization": f"Bearer {DIFFERENTIAL_BEARER_TOKEN}"}
+    nest = httpx.get(f"{NEST_API_URL}/agent/skills/system", headers=headers, timeout=10)
+    python = httpx.get(f"{PYTHON_API_URL}/agent/skills/system", headers=headers, timeout=10)
+
+    assert python.status_code == nest.status_code
+    assert python.json() == nest.json()

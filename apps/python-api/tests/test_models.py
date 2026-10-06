@@ -6,6 +6,7 @@ from python_api.modules.agent.models import (
     AgentChatSession,
     AgentChunk,
     AgentDocument,
+    AgentUserSkill,
 )
 from python_api.modules.auth.models import RagAdminUser
 from python_api.modules.rag.models import (
@@ -17,6 +18,7 @@ from python_api.modules.rag.models import (
 
 EXPECTED_TABLES = {
     "agent_chat_messages",
+    "agent_user_skills",
     "agent_chat_sessions",
     "agent_chunks",
     "agent_documents",
@@ -37,6 +39,7 @@ def test_model_package_registers_all_prisma_owned_tables() -> None:
         AgentChatSession.__tablename__,
         AgentChunk.__tablename__,
         AgentDocument.__tablename__,
+        AgentUserSkill.__tablename__,
         AplusChunk.__tablename__,
         AplusDocument.__tablename__,
         AplusRagMessage.__tablename__,

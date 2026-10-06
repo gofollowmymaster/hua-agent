@@ -13,9 +13,7 @@ from python_api.modules.agent.memory import AgentMemoryService
 from python_api.modules.agent.schemas import AgentSessionPageRequest, ChatRequest
 from python_api.modules.auth.dependencies import require_composite_auth
 
-router = APIRouter(
-    prefix="/agent/chat", tags=["业务 Agent Chat"], dependencies=[Depends(require_composite_auth)]
-)
+router = APIRouter(prefix="/agent/chat", tags=["业务 Agent Chat"])
 
 
 @router.post("")
@@ -23,14 +21,19 @@ async def chat(
     body: ChatRequest,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_app_settings),
+    identity: dict[str, Any] = Depends(require_composite_auth),
 ) -> StreamingResponse:
     """Streams one business Agent response using the AI SDK protocol."""
-    return stream_response(AgentChatService(db, settings=settings).stream(body))
+    raw_user_id = identity.get("userId")
+    user_id = raw_user_id if isinstance(raw_user_id, int) and not isinstance(raw_user_id, bool) else None
+    return stream_response(AgentChatService(db, settings=settings, user_id=user_id).stream(body))
 
 
 @router.post("/sessions/page")
 async def page_sessions(
-    body: AgentSessionPageRequest, db: AsyncSession = Depends(get_db)
+    body: AgentSessionPageRequest,
+    db: AsyncSession = Depends(get_db),
+    _identity: dict[str, Any] = Depends(require_composite_auth),
 ) -> dict[str, Any]:
     """Pages current-tenant Agent sessions."""
     return await AgentMemoryService(db).page_sessions(body)
@@ -38,7 +41,9 @@ async def page_sessions(
 
 @router.get("/sessions/{session_id}/messages")
 async def list_session_messages(
-    session_id: int, db: AsyncSession = Depends(get_db)
+    session_id: int,
+    db: AsyncSession = Depends(get_db),
+    _identity: dict[str, Any] = Depends(require_composite_auth),
 ) -> list[dict[str, Any]]:
     """Returns ordered messages for one tenant-owned Agent session."""
     return await AgentMemoryService(db).list_messages(session_id)

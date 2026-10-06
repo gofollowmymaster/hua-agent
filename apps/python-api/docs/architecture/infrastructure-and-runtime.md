@@ -22,6 +22,7 @@ ORM 由 `modules/auth/models.py`、`modules/rag/models.py` 和 `modules/agent/mo
 - `agent_documents`、`agent_chunks`。
 - `aplus_rag_sessions`、`aplus_rag_messages`。
 - `agent_chat_sessions`、`agent_chat_messages`。
+- `agent_user_skills`。
 
 本项目不创建数据库迁移。常规读写优先使用 SQLAlchemy ORM；需要 pgvector、zhparser、JSONB cast 或 PostgreSQL upsert 时使用参数化 `text()`。
 

@@ -10,12 +10,14 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.core.config import Settings
+from python_api.core.context import get_request_context
 from python_api.modules.agent.memory import AgentMemoryService
 from python_api.modules.agent.runtime import (
     FALLBACK_ANSWER,
     AgentChatRuntime,
 )
 from python_api.modules.agent.schemas import ChatRequest
+from python_api.modules.agent.skills import AgentSkillService
 
 
 class AgentChatService:
@@ -27,12 +29,17 @@ class AgentChatService:
         runtime_factory: Callable[[AsyncSession], AgentChatRuntime] | None = None,
         settings: Settings | None = None,
         memory: AgentMemoryService | None = None,
+        user_id: int | None = None,
+        skill_service: AgentSkillService | None = None,
     ) -> None:
         self.memory = memory or AgentMemoryService(db)
         self.runtime = (
             runtime_factory(db)
             if runtime_factory is not None
             else AgentChatRuntime(db, settings=settings)
+        )
+        self.skills = skill_service or AgentSkillService(
+            db, get_request_context().tenant_code, user_id
         )
 
     def stream(self, request: ChatRequest) -> AsyncIterator[dict[str, Any]]:
@@ -46,6 +53,7 @@ class AgentChatService:
             parts: list[dict[str, Any]] = []
             yield self._status(parts, "analyze_start", "开始分析问题")
             history = await self.memory.recent(session, 10)
+            skills = await self.skills.list_enabled_instructions()
             messages: list[BaseMessage] = [
                 HumanMessage(item["content"])
                 if item["role"] == "user"
@@ -60,7 +68,7 @@ class AgentChatService:
             generation_started = False
             has_text = False
 
-            async for event in self.runtime.stream(messages):
+            async for event in self.runtime.stream(messages, skills):
                 event_type = event["type"]
                 if event_type == "reasoning_delta":
                     if active_text:

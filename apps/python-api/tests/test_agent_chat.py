@@ -13,7 +13,7 @@ from python_api.modules.agent.tools import current_time
 class FakeRuntime:
     """Provides deterministic normalized events without a model call."""
 
-    async def stream(self, _messages: list[Any]):
+    async def stream(self, _messages: list[Any], _skills: list[Any]):
         yield {"type": "reasoning_delta", "delta": "分析"}
         yield {"type": "tool_start", "name": "search_knowledge", "arguments": {"query": "退款"}}
         yield {
@@ -56,6 +56,35 @@ class FakeMemory:
         self.appended.append(
             {"role": role, "content": content, "toolCalls": tool_calls, "parts": parts}
         )
+
+
+class ReloadingSkills:
+    """Returns a distinct instruction on every Agent run."""
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    async def list_enabled_instructions(self):
+        self.calls += 1
+        return [
+            {
+                "key": f"user:{self.calls}",
+                "type": "user",
+                "name": "动态规则",
+                "instruction": f"版本 {self.calls}",
+            }
+        ]
+
+
+class RecordingRuntime:
+    """Records the ordered Skill input passed to each runtime invocation."""
+
+    def __init__(self) -> None:
+        self.skills: list[list[Any]] = []
+
+    async def stream(self, _messages: list[Any], skills: list[Any]):
+        self.skills.append(skills)
+        yield {"type": "done", "answer": "完成", "toolCalls": []}
 
 
 def test_cumulative_delta_normalization_keeps_channels_separate() -> None:
@@ -130,3 +159,33 @@ async def test_agent_stream_and_persisted_parts_preserve_visible_order() -> None
         {"type": "text", "text": "答案"},
         {"type": "data-status", "data": {"stage": "done", "message": "生成完成"}},
     ]
+
+
+@pytest.mark.asyncio
+async def test_agent_reloads_skills_for_every_run_and_ignores_participant_id() -> None:
+    runtime = RecordingRuntime()
+    skills = ReloadingSkills()
+    memory = FakeMemory()
+    service = AgentChatService(
+        cast(AsyncSession, None),
+        lambda _db: cast(Any, runtime),
+        memory=cast(Any, memory),
+        user_id=7,
+        skill_service=cast(Any, skills),
+    )
+    request = ChatRequest.model_validate(
+        {
+            "id": "conversation-1",
+            "participantId": "999",
+            "messages": [
+                {"id": "message-1", "role": "user", "parts": [{"type": "text", "text": "执行"}]}
+            ],
+        }
+    )
+
+    for _ in range(2):
+        _ = [event async for event in service.stream(request)]
+
+    assert skills.calls == 2
+    assert runtime.skills[0][0]["instruction"] == "版本 1"
+    assert runtime.skills[1][0]["instruction"] == "版本 2"

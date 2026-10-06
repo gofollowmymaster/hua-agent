@@ -2,7 +2,7 @@
 
 ## Context
 
-NestJS API 当前提供 31 个 HTTP 入口，包含本地用户、多租户、飞书固定 token、RAG 文档与会话、pgvector/zhparser 检索、AI SDK UI Message 流和 Deep Agents 工具调用。Python 实现需要长期与 NestJS 交替承接请求，并直接读取彼此写入的数据库和缓存状态。
+NestJS API 当前提供 36 个 HTTP 入口，包含本地用户、多租户、飞书固定 token、RAG 文档与会话、Business Agent Skill、pgvector/zhparser 检索、AI SDK UI Message 流和 Deep Agents 工具调用。Python 实现需要长期与 NestJS 交替承接请求，并直接读取彼此写入的数据库和缓存状态。
 
 ## Goals / Non-Goals
 
@@ -45,12 +45,18 @@ FastAPI 默认监听 8000，并使用独立 Dockerfile。根命令只调度 Pyth
 
 FastAPI 不读取 `apps/api/.env*`。`PYTHON_API_ENV`（兼容回退 `NODE_ENV`）选择 `dev`、`test` 或 `prod`，并按基础、环境、本地覆盖、进程变量的顺序加载。PostgreSQL、Redis、JWT 启动即校验；模型、rerank、飞书仅在调用时校验。真实密钥不提交，也不复制到镜像层。
 
+### 7. Skill 清单双语言维护并按请求装载
+
+系统 Skill 在 TypeScript 与 Python 中分别以代码清单维护，并通过差异契约测试校验 key、内容和顺序。FastAPI 映射 Prisma 管理的 `agent_user_skills` 表，不引入 Alembic；管理接口只接受 Bearer JWT。每次 Agent 运行重新查询当前 JWT 用户启用的 Skill 并创建本次运行的 agent，固定密钥会话只装载系统 Skill，`participantId` 不参与用户 Skill 归属判断。
+
 ## Risks / Trade-offs
 
 - [Python 与 TypeScript AI 库事件存在差异] -> 使用内部事件模型和固定 provider mock 做流差异测试。
 - [共享表和缓存发生格式漂移] -> 增加跨服务读写与 Redis 原始值测试，Prisma 保持唯一迁移权威。
 - [飞书测试误发真实消息] -> 单测默认 mock SDK，真实 smoke test 必须显式开关并使用测试租户。
 - [长期双栈功能漂移] -> 新增 API 行为时要求同时更新契约样本和两侧实现。
+- [双语言系统 Skill 清单漂移] -> 差异测试比较完整字段与固定顺序。
+- [跨请求 agent 缓存污染用户提示词] -> 每次运行按可信身份加载 Skill 并创建独立 agent。
 
 ## Rollout
 

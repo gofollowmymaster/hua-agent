@@ -9,6 +9,7 @@
 | RAG Chat | `/ai/rag/chat` | Bearer JWT | `RagChatService`、`RagMemoryService` | 检索结果、Redis 记忆、会话消息 |
 | Agent 知识库 | `/agent/knowledge` | Bearer JWT | `AgentKnowledgeService` | Agent 文档、分块和向量 |
 | Agent Chat | `/agent/chat` | JWT 或固定 token | `AgentChatService`、`AgentMemoryService` | Agent 会话、消息、parts、工具调用 |
+| Agent Skill | `/agent/skills` | Bearer JWT | `AgentSkillService` | `agent_user_skills`、系统 Skill 代码清单 |
 | DS Order Mock | `/oms/admin/dsOrder` | JWT 或固定 token | `DsOrderService` | 进程内、按租户隔离的 fixture |
 | 健康检查 | `/health` | 无 | `database_ready`、`redis_ready` | 进程与依赖就绪状态 |
 
@@ -64,6 +65,12 @@ Agent runtime 使用 Deep Agents 创建模型代理，并注册以下工具：
 - `audit_ds_order`、`cancel_ds_order`。
 
 单次运行最多执行 5 次工具调用。runtime 将原始模型事件规范化为 reasoning、tool 和 text 事件；service 再转换为 UI Message SSE，并按可见顺序构建 `parts`。最终消息同时保存正文、工具调用摘要和有序 parts。
+
+每次 Agent 运行按“核心规则、系统 Skill、用户 Skill”重新构造提示词。系统 Skill 由 Python 代码清单按固定顺序提供；Bearer JWT 会话再按创建时间和 ID 装载当前租户用户启用的个人 Skill。固定 token 会话只装载系统 Skill，`participantId` 只参与会话记忆，不参与 Skill 所有者查询。
+
+## Agent Skill
+
+系统 Skill 只读且强制启用，Python 清单与 NestJS 清单通过差异契约测试保持一致。用户 Skill 映射 Prisma 管理的 `agent_user_skills` 表，所有查询、修改和删除同时限定 `tenant_code` 与 JWT `userId`。用户最多启用 20 个 Skill，启用指令总长度最多 30000 字；FastAPI 不创建 Skill 表或迁移。
 
 ```mermaid
 flowchart LR

@@ -19,6 +19,7 @@ from python_api.core.middleware import (
 from python_api.core.resources import AppResources, create_app_resources
 from python_api.modules.agent.chat_router import router as agent_chat_router
 from python_api.modules.agent.knowledge_router import router as agent_knowledge_router
+from python_api.modules.agent.skill_router import router as agent_skill_router
 from python_api.modules.auth.router import router as auth_router
 from python_api.modules.auth.service import bootstrap_admin
 from python_api.modules.ds_order.router import router as ds_order_router
@@ -70,6 +71,7 @@ def create_app(
     app.include_router(rag_admin_router)
     app.include_router(agent_knowledge_router)
     app.include_router(agent_chat_router)
+    app.include_router(agent_skill_router)
     app.include_router(ds_order_router)
     app.include_router(rag_chat_router)
     if resolved_settings.public_dir.exists():
