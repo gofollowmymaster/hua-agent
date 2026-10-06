@@ -9,15 +9,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from python_api.config import get_settings
-from python_api.database import engine
-from python_api.errors import install_exception_handlers
+from python_api.core.errors import install_exception_handlers
 from python_api.core.middleware import (
     RequestLoggingMiddleware,
     RequestSizeLimitMiddleware,
     ResponseEnvelopeMiddleware,
     TenantMiddleware,
 )
-from python_api.redis_service import redis_client
+from python_api.core.redis.redis_service import redis_client
+from python_api.database import engine
 from python_api.routes.agent_chat import router as agent_chat_router
 from python_api.routes.agent_knowledge import router as agent_knowledge_router
 from python_api.routes.auth import router as auth_router

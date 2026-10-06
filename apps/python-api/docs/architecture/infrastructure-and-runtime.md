@@ -29,7 +29,7 @@
 
 ## Redis
 
-`redis_service.py` 创建异步 Redis client，并集中维护 key 模板：
+`core/redis/redis_service.py` 创建异步 Redis client，并集中维护 key 模板：
 
 - `frontend-node:mtable:{appToken}:{tableId}`：飞书表格缓存基础 key。
 - `frontend-node:limiter:{key}`：限流计数。

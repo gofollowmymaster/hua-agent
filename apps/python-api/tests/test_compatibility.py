@@ -2,8 +2,8 @@ import json
 
 import pytest
 
-from python_api.context import RequestContext, reset_request_context, set_request_context
-from python_api.redis_service import RAG_SESSION_MEMORY, RedisService
+from python_api.core.context import RequestContext, reset_request_context, set_request_context
+from python_api.core.redis.redis_service import RAG_SESSION_MEMORY, RedisService
 from python_api.security import hash_password, verify_password
 from python_api.ui_stream import UI_STREAM_HEADERS, encode_event
 

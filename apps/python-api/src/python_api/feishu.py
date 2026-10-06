@@ -7,7 +7,7 @@ import time
 from typing import Any
 
 from python_api.config import get_settings
-from python_api.redis_service import FEISHU_MTABLE, redis_service
+from python_api.core.redis.redis_service import FEISHU_MTABLE, redis_service
 
 logger = logging.getLogger("python_api.feishu")
 CLIENT_SECRET_TABLE_ID = "tblM4JUNtLKnrewV"

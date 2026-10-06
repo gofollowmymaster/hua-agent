@@ -8,7 +8,7 @@ from sqlalchemy import exists, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.config import get_settings
-from python_api.context import get_request_context
+from python_api.core.context import get_request_context
 from python_api.models import AplusChunk, AplusDocument, AplusRagMessage, AplusRagSession
 from python_api.schemas.common import PageRequest, json_value
 from python_api.schemas.rag_admin import (

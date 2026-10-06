@@ -7,7 +7,7 @@ from typing import Any
 
 from fastapi import HTTPException
 
-from python_api.context import get_request_context
+from python_api.core.context import get_request_context
 from python_api.schemas.ds_order import (
     DsOrderAuditRequest,
     DsOrderCancelRequest,

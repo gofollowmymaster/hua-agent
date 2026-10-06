@@ -38,7 +38,7 @@ router 不得直接编写 SQL、访问 Redis、调用模型或实现复杂状态
 ## 基础设施模块
 
 - 配置只通过 `config.Settings` 和 `get_settings()` 读取；除环境选择入口外不得散写 `os.getenv`。
-- Redis key 模板集中定义在 `redis_service.py` 或后续专用常量模块。
+- Redis key 模板集中定义在 `core/redis/redis_service.py` 或后续专用常量模块。
 - 飞书、模型和其他外部 SDK 必须由小型 adapter 隔离，业务代码不依赖 SDK 原始响应的全部结构。
 - 模块级 client 需要在应用关闭时释放；若测试难以替换，应提供显式 factory 或 dependency override 入口。
 

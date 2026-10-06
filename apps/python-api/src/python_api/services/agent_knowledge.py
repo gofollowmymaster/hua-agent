@@ -13,7 +13,7 @@ from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.config import get_settings
-from python_api.context import get_request_context
+from python_api.core.context import get_request_context
 from python_api.embeddings import create_embeddings
 from python_api.models import AgentChunk, AgentDocument
 from python_api.schemas.agent_knowledge import AgentDocumentPageRequest, AgentKnowledgeSearchRequest

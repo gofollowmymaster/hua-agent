@@ -6,7 +6,7 @@ from typing import Any, TypeVar, cast
 from redis.asyncio import Redis
 
 from python_api.config import Settings, get_settings
-from python_api.context import get_request_context
+from python_api.core.context import get_request_context
 
 T = TypeVar("T")
 

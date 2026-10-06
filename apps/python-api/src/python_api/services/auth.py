@@ -7,8 +7,8 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.config import get_settings
-from python_api.context import get_request_context
-from python_api.errors import NotReportError
+from python_api.core.context import get_request_context
+from python_api.core.errors import NotReportError
 from python_api.models import RagAdminUser
 from python_api.schemas.auth import (
     CreateUserRequest,
