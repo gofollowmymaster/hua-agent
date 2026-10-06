@@ -8,13 +8,13 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import HTTPException
-from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.config import get_settings
 from python_api.context import get_request_context
+from python_api.embeddings import create_embeddings
 from python_api.models import AgentChunk, AgentDocument
 from python_api.schemas.agent_knowledge import AgentDocumentPageRequest, AgentKnowledgeSearchRequest
 from python_api.schemas.common import PageRequest, json_value
@@ -29,12 +29,7 @@ class AgentKnowledgeService:
         self.db = db
         self.tenant = get_request_context().tenant_code
         settings = get_settings()
-        self.embeddings = OpenAIEmbeddings(
-            openai_api_key=settings.require_embeddings_key(),
-            openai_api_base=settings.embeddings_base_url or settings.openai_base_url,
-            model=settings.embeddings_model_name,
-            dimensions=settings.embeddings_dimensions,
-        )
+        self.embeddings = create_embeddings(settings)
         self.splitter = RecursiveCharacterTextSplitter(
             chunk_size=settings.agent_chunk_size,
             chunk_overlap=settings.agent_chunk_overlap,

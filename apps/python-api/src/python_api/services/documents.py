@@ -8,13 +8,13 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import HTTPException, UploadFile
-from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.config import get_settings
 from python_api.context import get_request_context
+from python_api.embeddings import create_embeddings
 from python_api.models import AplusDocument
 
 SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".xlsx", ".ppt", ".pptx", ".txt", ".md"}
@@ -160,12 +160,7 @@ class DocumentIngestService:
             chunk_overlap=self.settings.rag_chunk_overlap,
             separators=["\n\n", "\n", "。", "！", "？", ".", "!", "?", " ", ""],
         )
-        self.embeddings = OpenAIEmbeddings(
-            openai_api_key=self.settings.require_embeddings_key(),
-            openai_api_base=self.settings.embeddings_base_url or self.settings.openai_base_url,
-            model=self.settings.embeddings_model_name,
-            dimensions=self.settings.embeddings_dimensions,
-        )
+        self.embeddings = create_embeddings(self.settings)
 
     async def ingest_rag(self, force: bool = False) -> dict[str, Any]:
         """Scans and indexes the current tenant raw directory."""

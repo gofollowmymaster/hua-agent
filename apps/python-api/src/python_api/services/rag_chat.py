@@ -8,11 +8,12 @@ from typing import Any
 
 from fastapi import HTTPException
 from langchain_core.messages import HumanMessage
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_openai import ChatOpenAI
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.config import get_settings
+from python_api.embeddings import create_embeddings
 from python_api.schemas.chat import ChatRequest
 from python_api.services.memory import RagMemoryService
 
@@ -37,12 +38,7 @@ class RagChatService:
             base_url=self.settings.openai_base_url,
             streaming=True,
         )
-        self.embeddings = OpenAIEmbeddings(
-            openai_api_key=self.settings.require_embeddings_key(),
-            openai_api_base=self.settings.embeddings_base_url or self.settings.openai_base_url,
-            model=self.settings.embeddings_model_name,
-            dimensions=self.settings.embeddings_dimensions,
-        )
+        self.embeddings = create_embeddings(self.settings)
 
     async def stream(self, request: ChatRequest) -> AsyncIterator[dict[str, Any]]:
         """Emits AI SDK events and persists the completed turn."""

@@ -33,6 +33,7 @@ def test_ui_stream_encoding_and_headers_are_ai_sdk_compatible() -> None:
     encoded = encode_event({"type": "text-delta", "id": "1", "delta": "你好"})
 
     assert encoded == b'data: {"type":"text-delta","id":"1","delta":"\xe4\xbd\xa0\xe5\xa5\xbd"}\n\n'
+    assert UI_STREAM_HEADERS["cache-control"] == "no-cache, no-transform"
     assert UI_STREAM_HEADERS["x-vercel-ai-ui-message-stream"] == "v1"
     assert UI_STREAM_HEADERS["x-accel-buffering"] == "no"
     assert json.loads(encoded.removeprefix(b"data: ").strip()) == {

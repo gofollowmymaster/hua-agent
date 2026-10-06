@@ -56,6 +56,11 @@ SYSTEM_PROMPT = """你是业务 Agent 助手，可以调用工具获取业务知
 9. 只能使用 SDK 提供的原生工具调用，不得用 XML、Markdown 或文本模拟工具调用。"""
 
 
+def _current_time() -> str:
+    """Formats the current time using the bundled Shanghai time zone data."""
+    return datetime.now(ZoneInfo("Asia/Shanghai")).strftime("%Y年%m月%d日 %A %H:%M:%S")
+
+
 class CumulativeDeltaNormalizer:
     """Converts cumulative provider snapshots into non-duplicated deltas."""
 
@@ -223,7 +228,7 @@ class AgentChatRuntime:
         @tool
         def get_current_time() -> str:
             """Get current Asia/Shanghai date and time."""
-            return datetime.now(ZoneInfo("Asia/Shanghai")).strftime("%Y年%m月%d日 %A %H:%M:%S")
+            return _current_time()
 
         @tool
         def calculate(expression: str) -> str:

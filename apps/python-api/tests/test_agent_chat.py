@@ -4,7 +4,11 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.schemas.chat import ChatRequest
-from python_api.services.agent_chat import AgentChatService, CumulativeDeltaNormalizer
+from python_api.services.agent_chat import (
+    AgentChatService,
+    CumulativeDeltaNormalizer,
+    _current_time,
+)
 from python_api.services.memory import ResolvedSession
 
 
@@ -63,6 +67,14 @@ def test_cumulative_delta_normalization_keeps_channels_separate() -> None:
     assert normalizer.normalize("reasoning", "先分析") == "分析"
     assert normalizer.normalize("reasoning", "先分析") == ""
     assert normalizer.normalize("text", "先") == "先"
+
+
+def test_current_time_uses_bundled_shanghai_timezone() -> None:
+    value = _current_time()
+
+    assert "年" in value
+    assert "月" in value
+    assert "日" in value
 
 
 @pytest.mark.asyncio

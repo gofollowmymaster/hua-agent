@@ -7,7 +7,7 @@ from typing import Any
 from fastapi.responses import StreamingResponse
 
 UI_STREAM_HEADERS = {
-    "cache-control": "no-cache",
+    "cache-control": "no-cache, no-transform",
     "connection": "keep-alive",
     "x-vercel-ai-ui-message-stream": "v1",
     "x-accel-buffering": "no",
