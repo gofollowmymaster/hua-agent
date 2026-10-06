@@ -2,7 +2,7 @@
 
 ## 配置加载
 
-`config.py` 使用 `PYTHON_API_ENV` 选择 `dev`、`test` 或 `prod`，并兼容 `development`、`production` 别名。配置文件按以下优先级加载，后者覆盖前者：
+`core/config.py` 使用 `PYTHON_API_ENV` 选择 `dev`、`test` 或 `prod`，并兼容 `development`、`production` 别名。配置文件按以下优先级加载，后者覆盖前者：
 
 1. `.env`
 2. `.env.{environment}`
@@ -15,7 +15,7 @@
 
 `core/database.py` 创建全局 async engine 和 `async_sessionmaker`，每个请求通过 `get_db` 获取独立 `AsyncSession`。连接池大小、溢出、等待时间、回收和 pre-ping 均由配置控制。
 
-`models.py` 映射以下既有表：
+`core/model/` 按认证、RAG 和 Agent 业务域映射以下既有表：
 
 - `rag_admin_users`。
 - `aplus_documents`、`aplus_chunks`。

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from python_api.config import (
+from python_api.core.config import (
     ConfigurationError,
     load_settings,
     normalize_environment,
@@ -181,7 +181,7 @@ def test_database_and_redis_factories_apply_runtime_settings(
 
 
 def test_python_environment_files_never_reference_nestjs_directory() -> None:
-    from python_api.config import PYTHON_API_DIR, environment_files
+    from python_api.core.config import PYTHON_API_DIR, environment_files
 
     files = environment_files("dev")
     assert all(path.parent == PYTHON_API_DIR for path in files)

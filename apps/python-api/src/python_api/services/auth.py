@@ -6,10 +6,11 @@ from typing import Any
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from python_api.config import get_settings
+from python_api.core.config import get_settings
 from python_api.core.context import get_request_context
 from python_api.core.errors import NotReportError
-from python_api.models import RagAdminUser
+from python_api.core.model import RagAdminUser
+from python_api.core.security import create_access_token, hash_password, verify_password
 from python_api.schemas.auth import (
     CreateUserRequest,
     LoginRequest,
@@ -18,7 +19,6 @@ from python_api.schemas.auth import (
     UpdateUserRequest,
 )
 from python_api.schemas.common import json_value
-from python_api.security import create_access_token, hash_password, verify_password
 
 TENANT_IDENTITIES = {
     "aplus": {"supplierCode": "A", "supplierName": "Aplus", "tenantName": "Aplus"},

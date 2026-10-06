@@ -6,13 +6,13 @@ from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.core.database import get_db
+from python_api.core.security import require_bearer
 from python_api.schemas.agent_knowledge import (
     AgentDocumentPageRequest,
     AgentKnowledgeIngestRequest,
     AgentKnowledgeSearchRequest,
 )
 from python_api.schemas.common import PageRequest
-from python_api.security import require_bearer
 from python_api.services.agent_knowledge import AgentKnowledgeService
 
 router = APIRouter(

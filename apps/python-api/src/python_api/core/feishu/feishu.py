@@ -6,7 +6,7 @@ import logging
 import time
 from typing import Any
 
-from python_api.config import get_settings
+from python_api.core.config import get_settings
 from python_api.core.redis.redis_service import FEISHU_MTABLE, redis_service
 
 logger = logging.getLogger("python_api.feishu")

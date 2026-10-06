@@ -12,8 +12,8 @@ from langchain_openai import ChatOpenAI
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from python_api.config import get_settings
-from python_api.embeddings import create_embeddings
+from python_api.core.config import get_settings
+from python_api.core.embeddings import create_embeddings
 from python_api.schemas.chat import ChatRequest
 from python_api.services.memory import RagMemoryService
 

@@ -12,10 +12,10 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from python_api.config import get_settings
+from python_api.core.config import get_settings
 from python_api.core.context import get_request_context
-from python_api.embeddings import create_embeddings
-from python_api.models import AgentChunk, AgentDocument
+from python_api.core.embeddings import create_embeddings
+from python_api.core.model import AgentChunk, AgentDocument
 from python_api.schemas.agent_knowledge import AgentDocumentPageRequest, AgentKnowledgeSearchRequest
 from python_api.schemas.common import PageRequest, json_value
 

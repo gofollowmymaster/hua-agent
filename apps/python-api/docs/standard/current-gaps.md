@@ -10,7 +10,7 @@
 
 ## P1 对外异常可能暴露内部细节
 
-证据：`core/errors.py` 的兜底异常和唯一约束处理、`security.py` 的部分认证失败路径会把 `str(exception)` 或 `str(error)` 放入客户端消息。
+证据：`core/errors.py` 的兜底异常和唯一约束处理、`core/security.py` 的部分认证失败路径会把 `str(exception)` 或 `str(error)` 放入客户端消息。
 
 风险：数据库、SDK、路径或内部实现信息可能进入 HTTP 响应。
 

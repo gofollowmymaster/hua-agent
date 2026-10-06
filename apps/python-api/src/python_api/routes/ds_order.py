@@ -2,6 +2,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends
 
+from python_api.core.security import require_composite_auth
 from python_api.schemas.ds_order import (
     DsOrderAuditRequest,
     DsOrderCancelRequest,
@@ -9,7 +10,6 @@ from python_api.schemas.ds_order import (
     DsOrderLogPageRequest,
     DsOrderPageRequest,
 )
-from python_api.security import require_composite_auth
 from python_api.services.ds_order import DsOrderService
 
 router = APIRouter(

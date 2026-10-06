@@ -58,7 +58,7 @@ ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
 "src/python_api/routes/*.py" = ["B008"]
-"src/python_api/security.py" = ["B008"]
+"src/python_api/core/security.py" = ["B008"]
 
 [tool.mypy]
 python_version = "3.12"

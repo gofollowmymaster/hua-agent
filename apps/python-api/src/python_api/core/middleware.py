@@ -11,7 +11,7 @@ from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from python_api.config import get_settings
+from python_api.core.config import get_settings
 from python_api.core.context import RequestContext, reset_request_context, set_request_context
 
 logger = logging.getLogger("python_api.http")

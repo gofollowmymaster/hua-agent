@@ -30,14 +30,14 @@ router 不得直接编写 SQL、访问 Redis、调用模型或实现复杂状态
 
 ## Model 与持久化边界
 
-- `models.py` 仅映射应用实际读写的既有表，不创建 schema 或迁移。
+- `core/model/` 仅映射应用实际读写的既有表，不创建 schema 或迁移。
 - model 字段名应与数据库列稳定对应；保留字或 JSON metadata 使用显式列名映射。
 - ORM 适合常规查询和关系；pgvector、zhparser、JSONB cast 和 upsert 可使用参数化原生 SQL。
 - 原生 SQL 较长或被多个方法复用时，应下沉到专用 query 模块或 repository，而不是继续扩张 service。
 
 ## 基础设施模块
 
-- 配置只通过 `config.Settings` 和 `get_settings()` 读取；除环境选择入口外不得散写 `os.getenv`。
+- 配置只通过 `core.config.Settings` 和 `get_settings()` 读取；除环境选择入口外不得散写 `os.getenv`。
 - Redis key 模板集中定义在 `core/redis/redis_service.py` 或后续专用常量模块。
 - 飞书、模型和其他外部 SDK 必须由小型 adapter 隔离，业务代码不依赖 SDK 原始响应的全部结构。
 - 模块级 client 需要在应用关闭时释放；若测试难以替换，应提供显式 factory 或 dependency override 入口。

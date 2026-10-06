@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from python_api.config import Settings, get_settings
+from python_api.core.config import Settings, get_settings
 
 
 def create_database_engine(settings: Settings) -> AsyncEngine:

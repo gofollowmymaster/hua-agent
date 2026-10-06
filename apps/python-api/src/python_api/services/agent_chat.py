@@ -22,7 +22,7 @@ from langchain_core.tools import BaseTool, tool
 from langchain_openai import ChatOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from python_api.config import get_settings
+from python_api.core.config import get_settings
 from python_api.schemas.agent_knowledge import AgentKnowledgeSearchRequest
 from python_api.schemas.chat import ChatRequest
 from python_api.schemas.common import PageRequest

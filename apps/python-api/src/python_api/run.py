@@ -1,6 +1,6 @@
 import uvicorn
 
-from python_api.config import get_settings
+from python_api.core.config import get_settings
 
 
 def main() -> None:

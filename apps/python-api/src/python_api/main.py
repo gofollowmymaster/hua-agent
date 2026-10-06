@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from python_api.config import get_settings
+from python_api.core.config import get_settings
 from python_api.core.database import engine
 from python_api.core.errors import install_exception_handlers
 from python_api.core.middleware import (

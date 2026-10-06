@@ -1,6 +1,6 @@
 from langchain_openai import OpenAIEmbeddings
 
-from python_api.config import Settings
+from python_api.core.config import Settings
 
 
 def create_embeddings(settings: Settings) -> OpenAIEmbeddings:

@@ -13,8 +13,8 @@ from sqlalchemy import func, or_, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.core.context import get_request_context
+from python_api.core.model import AgentChatMessage, AgentChatSession, AplusRagMessage
 from python_api.core.redis.redis_service import RAG_SESSION_MEMORY, redis_service
-from python_api.models import AgentChatMessage, AgentChatSession, AplusRagMessage
 from python_api.schemas.chat import AgentSessionPageRequest
 from python_api.schemas.common import json_value
 

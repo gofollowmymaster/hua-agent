@@ -5,7 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 
-from python_api.config import ConfigurationError
+from python_api.core.config import ConfigurationError
 
 
 class AppError(Exception):

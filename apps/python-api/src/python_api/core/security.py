@@ -11,7 +11,7 @@ from typing import Any
 import jwt
 from fastapi import Depends, HTTPException, Request
 
-from python_api.config import get_settings
+from python_api.core.config import get_settings
 from python_api.core.context import get_request_context
 from python_api.core.feishu.feishu import client_secret_table
 

@@ -1,7 +1,7 @@
 from pydantic import SecretStr
 
-from python_api.config import Settings
-from python_api.embeddings import create_embeddings
+from python_api.core.config import Settings
+from python_api.core.embeddings import create_embeddings
 
 
 def test_compatible_embeddings_send_raw_text() -> None:

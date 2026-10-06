@@ -115,5 +115,11 @@
     "tableid",
     "Wecom",
     "xiaol"
-  ]
+  ],
+   "python.defaultInterpreterPath": "${workspaceFolder}/apps/python-api/.venv/Scripts/python.exe",
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/apps/python-api/src"
+  ],
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.diagnosticMode": "workspace"
 }
