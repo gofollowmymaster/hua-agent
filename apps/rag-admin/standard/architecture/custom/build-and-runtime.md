@@ -7,6 +7,7 @@
 `apps/rag-admin/vite.config.ts` 当前配置：
 
 - Vue 插件：`@vitejs/plugin-vue`。
+- 浏览器兼容：通过 Vite `define` 将 `global` 映射为 `globalThis`，兼容 `@aplus-frontend/ui` 间接依赖中的 Node.js 全局变量引用。
 - Less 预处理：`@namespace` 取 `VITE_AUTH_PLATFORM`（默认 `rag-admin`）；`@primary-color`、`@text-primary-color` 等主题变量由 `src/config/theme-color-token.ts` 统一生成，两者都通过 Vite `modifyVars` 注入。
 - 路径别名：`@` 指向 `apps/rag-admin/src`。
 - `base`：`/public/rag-admin/`。

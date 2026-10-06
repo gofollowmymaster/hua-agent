@@ -186,7 +186,7 @@ export function ChatDemo({
               >
                 <List.Item.Meta
                   title={
-                    item.latestMessage?.content ||
+                    item.latestMessage?.content.slice(0, 20) ||
                     item.conversationId ||
                     '未命名会话'
                   }

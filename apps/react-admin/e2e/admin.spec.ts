@@ -21,10 +21,56 @@ const documentItem = {
 
 async function login(page: Page) {
   await page.goto('/public/react-admin/#/login');
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          document.documentElement.scrollWidth <=
+          document.documentElement.clientWidth,
+      ),
+    )
+    .toBe(true);
   await page.getByPlaceholder('用户名').fill('admin');
   await page.getByPlaceholder('密码').fill('password');
   await page.getByRole('button', { name: '登 录' }).click();
   await expect(page.getByRole('button', { name: '手册.txt' })).toBeVisible();
+}
+
+async function expectPageSpacing(page: Page) {
+  const spacing = await page
+    .locator('.admin-page-container')
+    .evaluate((root) => {
+      const header = root.querySelector<HTMLElement>(
+        '[class*="page-container-warp-page-header"]',
+      );
+      const content = root.querySelector<HTMLElement>(
+        '[class*="page-container-children-container"]',
+      );
+      if (!header || !content)
+        throw new Error('PageContainer layout not found');
+
+      const headerStyle = getComputedStyle(header);
+      const contentStyle = getComputedStyle(content);
+      return {
+        headerInlineStart: headerStyle.paddingInlineStart,
+        headerInlineEnd: headerStyle.paddingInlineEnd,
+        contentInlineStart: contentStyle.paddingInlineStart,
+        contentInlineEnd: contentStyle.paddingInlineEnd,
+        contentBlockEnd: contentStyle.paddingBlockEnd,
+        hasHorizontalOverflow:
+          document.documentElement.scrollWidth >
+          document.documentElement.clientWidth,
+      };
+    });
+
+  expect(spacing).toEqual({
+    headerInlineStart: '12px',
+    headerInlineEnd: '12px',
+    contentInlineStart: '12px',
+    contentInlineEnd: '12px',
+    contentBlockEnd: '12px',
+    hasHorizontalOverflow: false,
+  });
 }
 
 test.beforeEach(async ({ page }) => {
@@ -192,9 +238,22 @@ test.beforeEach(async ({ page }) => {
 
 test('login, browse, preview, upload and restore a drawer deep link', async ({
   page,
-}) => {
+}, testInfo) => {
   await login(page);
   await expect(page.getByRole('button', { name: '手册.txt' })).toBeVisible();
+  await expectPageSpacing(page);
+
+  if (testInfo.project.name === 'desktop') {
+    await page.locator('[class*="sider-collapsed-button"]').click();
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          window.localStorage.getItem('react-admin:sider-collapsed'),
+        ),
+      )
+      .toBe('true');
+    await expectPageSpacing(page);
+  }
 
   await page.getByRole('button', { name: '手册.txt' }).click();
   await expect(page.getByRole('dialog')).toContainText('手册.txt');

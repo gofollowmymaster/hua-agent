@@ -185,12 +185,16 @@ export default function AdminLayout() {
       layout="mix"
       fixedHeader
       fixSiderbar
-      contentStyle={{ padding: 12, minHeight: 'calc(100vh - 56px)' }}
+      contentStyle={{ padding: 0, minHeight: 'calc(100vh - 56px)' }}
     >
       <PageContainer
+        className="admin-page-container"
         title={meta.title}
         subTitle={meta.subtitle}
-        header={{ style: { paddingBlock: 12 } }}
+        token={{
+          paddingInlinePageContainerContent: 12,
+          paddingBlockPageContainerContent: 12,
+        }}
       >
         <Outlet />
       </PageContainer>

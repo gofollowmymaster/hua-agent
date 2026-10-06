@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { LoginFormPage, ProFormText } from '@ant-design/pro-components';
+import { LoginForm, ProFormText } from '@ant-design/pro-components';
 import { App, Card } from 'antd';
 import { history, useModel, useSearchParams } from '@umijs/max';
 import { resolveTenantAuthConfig } from '@/auth/tenant';
@@ -49,8 +49,8 @@ export default function LoginPage() {
         placeItems: 'center',
       }}
     >
-      <Card style={{ width: 'min(100%, 420px)' }}>
-        <LoginFormPage<LoginParams>
+      <Card style={{ width: 'min(100%, 480px)' }}>
+        <LoginForm<LoginParams>
           title={`${tenant.displayName} 管理后台`}
           subTitle="知识库与业务 Agent 管理"
           logo={
@@ -90,7 +90,7 @@ export default function LoginPage() {
             placeholder="密码"
             rules={[{ required: true, message: '请输入密码' }]}
           />
-        </LoginFormPage>
+        </LoginForm>
       </Card>
     </main>
   );

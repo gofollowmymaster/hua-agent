@@ -40,6 +40,9 @@ export class AgentChatController {
     pipeUIMessageStreamToResponse({
       response: res,
       stream,
+      headers: {
+        'Cache-Control': 'no-cache, no-transform',
+      },
     });
   }
 

@@ -11,6 +11,9 @@ export default defineConfig(({ mode }) => {
   return {
     base: '/public/rag-admin/',
     plugins: [vue()],
+    define: {
+      global: 'globalThis',
+    },
     css: {
       preprocessorOptions: {
         less: {
