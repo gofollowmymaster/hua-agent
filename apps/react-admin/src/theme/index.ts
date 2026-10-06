@@ -15,6 +15,7 @@ export const themePalette = {
   border: '#DCE5E2',
   divider: '#E8EFED',
   selectedBackground: '#DDF7EF',
+  selectedHoverBackground: '#C9EFE4',
   info: '#2563EB',
   infoText: '#1D4ED8',
   infoSurface: '#EFF6FF',
@@ -58,7 +59,15 @@ export const reactAdminTheme = {
   components: {
     Button: {
       primaryShadow: '0 2px 0 rgba(15, 118, 110, 0.12)',
+      dangerShadow: 'none',
       defaultBorderColor: themePalette.border,
+    },
+    Breadcrumb: {
+      itemColor: themePalette.textSecondary,
+      linkColor: themePalette.textSecondary,
+      lastItemColor: themePalette.textPrimary,
+      separatorColor: themePalette.textSecondary,
+      linkHoverColor: themePalette.primary,
     },
     Card: {
       headerBg: themePalette.containerBackground,
@@ -66,6 +75,14 @@ export const reactAdminTheme = {
     },
     Drawer: {
       colorBgElevated: themePalette.containerBackground,
+    },
+    Dropdown: {
+      colorText: themePalette.textPrimary,
+      colorPrimary: themePalette.primaryActive,
+      colorBgElevated: themePalette.containerBackground,
+      controlItemBgHover: themePalette.selectedHoverBackground,
+      controlItemBgActive: themePalette.selectedBackground,
+      controlItemBgActiveHover: themePalette.selectedHoverBackground,
     },
     Input: {
       activeBorderColor: themePalette.primary,
@@ -93,7 +110,7 @@ export const reactAdminTheme = {
       borderColor: themePalette.divider,
       rowHoverBg: themePalette.selectedBackground,
       rowSelectedBg: themePalette.selectedBackground,
-      rowSelectedHoverBg: '#C9EFE4',
+      rowSelectedHoverBg: themePalette.selectedHoverBackground,
     },
     Tag: {
       defaultBg: themePalette.neutralSurface,
@@ -159,6 +176,7 @@ export const themeCssVariables = {
   '--app-color-border': themePalette.border,
   '--app-color-divider': themePalette.divider,
   '--app-color-selected-bg': themePalette.selectedBackground,
+  '--app-color-selected-hover-bg': themePalette.selectedHoverBackground,
   '--app-color-info': themePalette.info,
   '--app-color-info-text': themePalette.infoText,
   '--app-color-info-surface': themePalette.infoSurface,

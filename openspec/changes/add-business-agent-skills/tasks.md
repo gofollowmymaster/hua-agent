@@ -26,4 +26,4 @@
 ## 5. 验证与文档
 
 - [x] 5.1 更新路由说明、React 规格和 NestJS/FastAPI 能力差异文档
-- [ ] 5.2 运行 Prisma generate、聚焦测试、lint、双前端 build 和 diff 检查
+- [x] 5.2 运行 Prisma generate、聚焦测试、lint、双前端 build 和 diff 检查

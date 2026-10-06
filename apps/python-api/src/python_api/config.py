@@ -6,12 +6,18 @@ from pathlib import Path
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+API_ENV_DIR = Path(__file__).resolve().parents[3] / "api"
+
 
 class Settings(BaseSettings):
     """Centralizes environment parsing shared with the NestJS deployment."""
 
     model_config = SettingsConfigDict(
-        env_file=(".env.dev.local", ".env.dev", ".env"),
+        env_file=(
+            API_ENV_DIR / ".env",
+            API_ENV_DIR / ".env.dev",
+            API_ENV_DIR / ".env.dev.local",
+        ),
         env_file_encoding="utf-8",
         extra="ignore",
         case_sensitive=False,

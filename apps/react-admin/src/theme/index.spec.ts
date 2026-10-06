@@ -37,6 +37,23 @@ describe('react admin theme', () => {
       },
       header: { colorBgHeader: '#17211F' },
     });
+    expect(reactAdminTheme.components).toMatchObject({
+      Button: { dangerShadow: 'none' },
+      Breadcrumb: {
+        itemColor: '#66736F',
+        lastItemColor: '#1F2926',
+        separatorColor: '#66736F',
+        linkHoverColor: '#0F766E',
+      },
+      Dropdown: {
+        colorText: '#1F2926',
+        colorPrimary: '#115E59',
+        colorBgElevated: '#FFFFFF',
+        controlItemBgHover: '#C9EFE4',
+        controlItemBgActive: '#DDF7EF',
+        controlItemBgActiveHover: '#C9EFE4',
+      },
+    });
   });
 
   it('uses one theme for every supported tenant', () => {

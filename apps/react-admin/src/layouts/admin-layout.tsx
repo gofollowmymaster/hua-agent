@@ -132,8 +132,13 @@ export default function AdminLayout() {
   return (
     <ProLayout
       className="admin-layout"
-      navTheme="realDark"
       token={proLayoutTheme}
+      stylish={{
+        header: () => ({
+          borderBlockEnd: 0,
+          boxShadow: 'none',
+        }),
+      }}
       title={brand}
       logo={<div className="admin-brand-mark">{auth.supplierCode}</div>}
       route={{ routes: menuRoutes }}

@@ -53,6 +53,10 @@ Vitest 与 React Testing Library 验证纯逻辑和组件交互；Playwright 通
 
 React Admin 在 `src/theme/` 集中维护 Ant Design token、ProLayout token、业务 CSS 变量与聊天状态色映射。A/C/D 租户共用石墨中性色和青绿色强调，仅保留名称与字母标识差异；页面不得引入脱离主题预设的临时颜色。主题 CSS 变量同时安装到文档根节点，保证挂载到 `body` 的菜单、弹窗等 portal 浮层仍可使用主题颜色。页面结构、12px 页面边距和业务交互不随主题变化。
 
+### 9. ProLayout 暗色区域与浅色内容隔离
+
+顶栏和侧栏只通过 ProLayout token 使用石墨深色，不启用会向内容区后代注入暗色算法的 `realDark` 导航主题。Dropdown 与 Breadcrumb 显式使用浅色内容区 token，Header 清除默认分割边框和阴影；危险按钮单独关闭阴影，主按钮阴影保持不变。这样折叠菜单 portal 继续维持深色，同时表格工具浮层、面包屑和危险操作在浅色内容区保持可读。
+
 ## Risks / Trade-offs
 
 - [两套前端业务类型可能漂移] -> API 文件按 Vue 当前边界镜像，并用 adapter/页面测试锁定路径和字段。

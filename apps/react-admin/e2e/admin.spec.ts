@@ -335,6 +335,42 @@ test('login, browse, preview, upload and restore a drawer deep link', async ({
   await login(page);
   await expect(page.getByRole('button', { name: '手册.txt' })).toBeVisible();
   await expectPageSpacing(page);
+  await expect(page.getByRole('button', { name: /强制重建索引/ })).toHaveCSS(
+    'box-shadow',
+    'none',
+  );
+  await expect(page.locator('.ant-pro-layout-header')).toHaveCSS(
+    'border-bottom-width',
+    '0px',
+  );
+  await expect(page.locator('.ant-pro-layout-header')).toHaveCSS(
+    'box-shadow',
+    'none',
+  );
+
+  await page.locator('[aria-label="column-height"]').click();
+  const densityMenu = page.locator(
+    '.ant-dropdown:not(.ant-dropdown-hidden):visible',
+  );
+  await expect(densityMenu).toBeVisible();
+  const regularDensityItem = densityMenu
+    .locator('.ant-dropdown-menu-item')
+    .filter({ hasText: '宽松' });
+  const selectedDensityItem = densityMenu
+    .locator('.ant-dropdown-menu-item-selected')
+    .filter({ hasText: '中等' });
+  await expect(regularDensityItem).toHaveCSS('color', 'rgb(31, 41, 38)');
+  await expect(selectedDensityItem).toHaveCSS(
+    'background-color',
+    'rgb(221, 247, 239)',
+  );
+  await expect(selectedDensityItem).toHaveCSS('color', 'rgb(17, 94, 89)');
+  await regularDensityItem.hover();
+  await expect(regularDensityItem).toHaveCSS(
+    'background-color',
+    'rgb(201, 239, 228)',
+  );
+  await page.keyboard.press('Escape');
   if (testInfo.project.name === 'desktop') {
     await page.screenshot({
       path: testInfo.outputPath('document-management-theme.png'),
@@ -423,6 +459,18 @@ test('opens every menu route and keeps placeholder modules explicit', async ({
   await expect(page.locator('body')).not.toHaveCSS('overflow-x', 'scroll');
 
   await page.goto('/public/react-admin/#/business-agent/knowledge');
+  const breadcrumb = page.locator('.ant-breadcrumb');
+  await expect(breadcrumb.locator('li').first()).toHaveCSS(
+    'color',
+    'rgb(102, 115, 111)',
+  );
+  await expect(
+    breadcrumb.locator('.ant-breadcrumb-separator').first(),
+  ).toHaveCSS('color', 'rgb(102, 115, 111)');
+  await expect(breadcrumb.locator('li').last()).toHaveCSS(
+    'color',
+    'rgb(31, 41, 38)',
+  );
   const categoryTag = page.locator('.semantic-tag-info', {
     hasText: '版本更新日志',
   });
@@ -435,7 +483,7 @@ test('opens every menu route and keeps placeholder modules explicit', async ({
   await expect(statusTag).toHaveCSS('background-color', 'rgb(221, 247, 239)');
   if (testInfo.project.name === 'desktop') {
     await page.screenshot({
-      path: testInfo.outputPath('knowledge-tags-theme.png'),
+      path: testInfo.outputPath('business-knowledge-theme.png'),
       fullPage: true,
     });
   }
