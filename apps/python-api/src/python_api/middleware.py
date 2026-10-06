@@ -8,6 +8,7 @@ from typing import Any, cast
 
 import jwt
 from fastapi import Request, Response
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from python_api.config import get_settings
@@ -96,3 +97,27 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             (time.perf_counter() - started) * 1000,
         )
         return response
+
+
+class RequestSizeLimitMiddleware(BaseHTTPMiddleware):
+    """Rejects requests whose declared body exceeds the configured service limit."""
+
+    async def dispatch(
+        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
+        content_length = request.headers.get("content-length")
+        if content_length:
+            try:
+                too_large = int(content_length) > get_settings().python_api_max_request_size_bytes
+            except ValueError:
+                too_large = False
+            if too_large:
+                return JSONResponse(
+                    status_code=413,
+                    content={
+                        "code": 413,
+                        "message": "Request body too large",
+                        "path": request.url.path,
+                    },
+                )
+        return await call_next(request)

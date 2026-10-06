@@ -5,7 +5,7 @@ from typing import Any, TypeVar, cast
 
 from redis.asyncio import Redis
 
-from python_api.config import get_settings
+from python_api.config import Settings, get_settings
 from python_api.context import get_request_context
 
 T = TypeVar("T")
@@ -86,7 +86,23 @@ class RedisService:
         return deleted
 
 
-redis_client = Redis.from_url(get_settings().redis_url, decode_responses=True)
+def create_redis_client(settings: Settings) -> Redis:
+    """Creates a Redis client from canonical connection and timeout settings."""
+    password = settings.redis_password.get_secret_value() if settings.redis_password else None
+    return Redis(
+        host=settings.redis_host,
+        port=settings.redis_port,
+        db=settings.redis_db,
+        password=password,
+        decode_responses=True,
+        max_connections=settings.redis_max_connections,
+        socket_connect_timeout=settings.redis_connect_timeout_seconds,
+        socket_timeout=settings.redis_read_timeout_seconds,
+        health_check_interval=settings.redis_health_check_interval_seconds,
+    )
+
+
+redis_client = create_redis_client(get_settings())
 redis_service = RedisService(redis_client)
 
 

@@ -1,36 +1,39 @@
 # AGENTS.md
 
-## Scope
+## 适用范围
 
-These rules apply to `apps/python-api/**`. The app is a Python 3.12 FastAPI parity
-implementation of `apps/api`; both services remain deployable and share the Prisma-owned
-PostgreSQL schema and `frontend-node:*` Redis keys.
+本规则适用于 `apps/python-api/**`。该应用是基于 Python 3.12 和 FastAPI 实现的
+`apps/api` 对等服务；两个服务均可独立部署，并共享由 Prisma 管理的 PostgreSQL
+schema 和 `frontend-node:*` Redis key。
 
-## Commands
+## 常用命令
 
-Run from the repository root:
+在仓库根目录运行：
 
 ```bash
 pnpm python-api:sync
 pnpm python-api:dev
+pnpm python-api:start
 pnpm python-api:test
 pnpm python-api:lint
 pnpm python-api:typecheck
 pnpm python-api:build
 ```
 
-## Boundaries
+## 边界约束
 
-- Prisma schema and SQL migrations in `apps/api` are the only database authority. Do not add Alembic.
-- Preserve route, authentication, tenant, response, error, file, and AI SDK stream contracts.
-- Every database read/write must include the current tenant unless the table is explicitly global.
-- Redis keys, TTL values, JSON encoding, and idempotency states must stay compatible with NestJS.
-- Normalize LangChain, LangGraph, and Deep Agents events before producing UI Message SSE events.
-- Do not log credentials, request bodies, knowledge contents, raw tool arguments, or full tool results.
-- Feishu integration tests use mocks by default; live smoke tests require `FEISHU_SMOKE_TEST_ENABLED=true`.
+- `apps/api` 中的 Prisma schema 和 SQL migration 是数据库结构的唯一权威来源，不得引入 Alembic。
+- 保持路由、鉴权、租户、响应、错误、文件和 AI SDK 流式协议兼容。
+- 除非数据表被明确标记为全局表，否则每次数据库读写都必须包含当前租户条件。
+- Redis key、TTL、JSON 编码和幂等状态必须与 NestJS 保持兼容。
+- 生成 UI Message SSE 事件前，必须先规范化 LangChain、LangGraph 和 Deep Agents 事件。
+- 不得记录凭据、请求体、知识库内容、原始工具参数或完整工具结果。
+- 飞书集成测试默认使用 mock；实时冒烟测试必须显式设置 `FEISHU_SMOKE_TEST_ENABLED=true`。
+- 运行时只加载本 app 的 `.env`、`.env.{env}`、`.env.{env}.local`，不得读取 `apps/api/.env*`。
+- 核心 PostgreSQL、Redis、JWT 配置必须启动即校验；模型、rerank 和飞书凭据只在功能调用时校验。
 
-## Documentation
+## 文档入口
 
-- Architecture: `apps/python-api/docs/architecture/README.md`
-- Development and verification: `apps/python-api/docs/standard/README.md`
-- Cross-app governance: `docs/ai-governance/README.md`
+- 架构说明：`apps/python-api/docs/architecture/README.md`
+- 开发与验证规范：`apps/python-api/docs/standard/README.md`
+- 跨应用治理：`docs/ai-governance/README.md`

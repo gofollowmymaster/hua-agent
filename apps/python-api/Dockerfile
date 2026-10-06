@@ -6,6 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
+    PYTHON_API_ENV=prod \
     WORKSPACE_ROOT=/workspace \
     PATH=/app/.venv/bin:$PATH
 

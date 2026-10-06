@@ -60,6 +60,8 @@ apps/*/.env.test.local
 apps/*/.env.prod.local
 apps/*/.env.production.local
 apps/*/.env.local
+apps/python-api/.env
+apps/python-api/.env.*.local
 
 # temp directory
 .temp

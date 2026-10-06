@@ -43,3 +43,13 @@ FastAPI MUST 输出现有客户端可消费的 UI Message data stream，并保�
 #### Scenario: 独立启动
 - **WHEN** 使用 FastAPI 镜像和现有外部服务配置启动容器
 - **THEN** 服务 MUST 在 8000 端口就绪且不要求 NestJS 进程存在
+
+#### Scenario: 独立选择运行环境
+- **WHEN** 使用 `PYTHON_API_ENV` 启动 FastAPI
+- **THEN** 服务 MUST 只加载 Python app 对应环境文件和进程变量
+- **AND** 服务 MUST NOT 读取或依赖 `apps/api/.env*`
+
+#### Scenario: 核心与可选配置校验
+- **WHEN** PostgreSQL、Redis 或 JWT 核心配置缺失
+- **THEN** FastAPI MUST 在启动阶段失败并只报告配置项名称
+- **AND** 缺少模型、rerank 或飞书凭据 MUST NOT 阻止基础服务启动

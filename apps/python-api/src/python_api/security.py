@@ -45,20 +45,22 @@ async def verify_password(password: str, stored_hash: str) -> bool:
 
 def create_access_token(payload: dict[str, Any]) -> str:
     """Signs claims with the same secret and algorithm as NestJS JwtService."""
-    return jwt.encode(payload, get_settings().jwt_secret, algorithm="HS256")
+    return jwt.encode(
+        payload, get_settings().jwt_secret.get_secret_value(), algorithm="HS256"
+    )
 
 
 async def require_bearer(request: Request) -> dict[str, Any]:
     """Validates Bearer JWT and the project-specific loginTime window."""
     settings = get_settings()
-    if not settings.jwt_secret:
-        raise HTTPException(500, "JWT_SECRET 未配置")
     authorization = request.headers.get("authorization", "")
     token = authorization.removeprefix("Bearer ") if authorization.startswith("Bearer ") else ""
     if len(token) < 10:
         raise HTTPException(401, f"缺少必要的token信息:{token or 'undefined'}")
     try:
-        payload = jwt.decode(token, settings.jwt_secret, algorithms=["HS256"])
+        payload = jwt.decode(
+            token, settings.jwt_secret.get_secret_value(), algorithms=["HS256"]
+        )
         login_time = float(payload.get("loginTime", 0))
         if login_time < time.time() - settings.jwt_token_expired_time * 86_400:
             raise ValueError("登录已过期")

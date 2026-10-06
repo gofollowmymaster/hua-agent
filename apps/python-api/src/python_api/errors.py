@@ -5,6 +5,8 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 
+from python_api.config import ConfigurationError
+
 
 class AppError(Exception):
     """Represents project errors whose HTTP status must not be rewritten."""
@@ -60,6 +62,15 @@ def install_exception_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=exception.code,
             content={"code": exception.code, "message": exception.message, "path": _path(request)},
+        )
+
+    @app.exception_handler(ConfigurationError)
+    async def configuration_handler(
+        request: Request, exception: ConfigurationError
+    ) -> JSONResponse:
+        return JSONResponse(
+            status_code=503,
+            content={"code": 503, "message": str(exception), "path": _path(request)},
         )
 
     @app.exception_handler(IntegrityError)

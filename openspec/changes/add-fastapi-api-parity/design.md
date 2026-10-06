@@ -41,6 +41,10 @@ LangChain、LangGraph 和 Deep Agents 的原生事件先转换为稳定的内部
 
 FastAPI 默认监听 8000，并使用独立 Dockerfile。根命令只调度 Python 项目，不改变现有 Node Dockerfile。`/public` 复用现有静态产物；readiness 仅检查 PostgreSQL、Redis 和必要配置。
 
+### 6. Python 配置独立且按环境分层
+
+FastAPI 不读取 `apps/api/.env*`。`PYTHON_API_ENV`（兼容回退 `NODE_ENV`）选择 `dev`、`test` 或 `prod`，并按基础、环境、本地覆盖、进程变量的顺序加载。PostgreSQL、Redis、JWT 启动即校验；模型、rerank、飞书仅在调用时校验。真实密钥不提交，也不复制到镜像层。
+
 ## Risks / Trade-offs
 
 - [Python 与 TypeScript AI 库事件存在差异] -> 使用内部事件模型和固定 provider mock 做流差异测试。

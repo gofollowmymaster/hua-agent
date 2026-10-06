@@ -9,9 +9,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from python_api.config import get_settings
+from python_api.database import engine
 from python_api.errors import install_exception_handlers
 from python_api.middleware import (
     RequestLoggingMiddleware,
+    RequestSizeLimitMiddleware,
     ResponseEnvelopeMiddleware,
     TenantMiddleware,
 )
@@ -32,27 +34,28 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     await bootstrap_admin()
     yield
     await redis_client.aclose()
+    await engine.dispose()
 
 
 def create_app() -> FastAPI:
     """Builds the production application with NestJS-compatible middleware."""
     settings = get_settings()
-    production = settings.node_env in {"production", "prod"}
     app = FastAPI(
         title="Aplus Frontend Python",
         description="FastAPI parity implementation for Aplus Frontend Node",
         version="1.0",
-        docs_url=None if production else "/swagger",
-        openapi_url=None if production else "/swagger/json",
+        docs_url="/swagger" if settings.docs_enabled else None,
+        openapi_url="/swagger/json" if settings.docs_enabled else None,
         lifespan=lifespan,
     )
     app.add_middleware(ResponseEnvelopeMiddleware)
     app.add_middleware(TenantMiddleware)
     app.add_middleware(RequestLoggingMiddleware)
+    app.add_middleware(RequestSizeLimitMiddleware)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
+        allow_origins=settings.cors_origin_list,
+        allow_credentials=settings.cors_allow_credentials,
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allow_headers=["*"],
     )
@@ -70,7 +73,7 @@ def create_app() -> FastAPI:
 
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=getattr(logging, get_settings().python_api_log_level),
     format="%(asctime)s %(levelname)s %(name)s %(message)s",
 )
 app = create_app()

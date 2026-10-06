@@ -10,7 +10,6 @@ from typing import Any
 from fastapi import HTTPException, UploadFile
 from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from pydantic import SecretStr
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,8 +18,6 @@ from python_api.context import get_request_context
 from python_api.models import AplusDocument
 
 SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".xlsx", ".ppt", ".pptx", ".txt", ".md"}
-MAX_UPLOAD_FILES = 20
-MAX_UPLOAD_SIZE = 50 * 1024 * 1024
 
 
 @dataclass(slots=True)
@@ -164,9 +161,7 @@ class DocumentIngestService:
             separators=["\n\n", "\n", "。", "！", "？", ".", "!", "?", " ", ""],
         )
         self.embeddings = OpenAIEmbeddings(
-            openai_api_key=SecretStr(
-                self.settings.embeddings_api_key or self.settings.openai_api_key
-            ),
+            openai_api_key=self.settings.require_embeddings_key(),
             openai_api_base=self.settings.embeddings_base_url or self.settings.openai_base_url,
             model=self.settings.embeddings_model_name,
             dimensions=self.settings.embeddings_dimensions,
@@ -181,7 +176,7 @@ class DocumentIngestService:
         """Validates, stores, deduplicates and indexes a multipart batch."""
         if not files:
             raise HTTPException(400, "files are required")
-        if len(files) > MAX_UPLOAD_FILES:
+        if len(files) > self.settings.python_api_max_upload_files:
             raise HTTPException(400, "Too many files")
         tenant = get_request_context().tenant_code
         root = self.loader.raw_root(tenant)
@@ -208,8 +203,8 @@ class DocumentIngestService:
                     }
                 )
                 continue
-            data = await upload.read(MAX_UPLOAD_SIZE + 1)
-            if len(data) > MAX_UPLOAD_SIZE:
+            data = await upload.read(self.settings.python_api_max_upload_size_bytes + 1)
+            if len(data) > self.settings.python_api_max_upload_size_bytes:
                 raise HTTPException(400, "File too large")
             digest = hashlib.sha256(data).hexdigest()
             if digest in hashes:

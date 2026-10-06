@@ -20,7 +20,6 @@ from langchain.agents.middleware import ToolCallLimitMiddleware
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langchain_core.tools import BaseTool, tool
 from langchain_openai import ChatOpenAI
-from pydantic import SecretStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.config import get_settings
@@ -143,7 +142,7 @@ class AgentChatRuntime:
         model = ChatOpenAI(
             model=settings.model_name,
             temperature=0.5,
-            api_key=SecretStr(settings.openai_api_key),
+            api_key=settings.require_openai_key(),
             base_url=settings.openai_base_url,
         )
         self._agent = create_deep_agent(

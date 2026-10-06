@@ -26,10 +26,11 @@ class FeishuClient:
             import lark_oapi as lark
 
             settings = get_settings()
+            app_id, app_secret = settings.require_feishu_app()
             self._client = (
                 lark.Client.builder()
-                .app_id(settings.feishu_alert_app_appid)
-                .app_secret(settings.feishu_alert_app_appsecret)
+                .app_id(app_id)
+                .app_secret(app_secret)
                 .log_level(lark.LogLevel.WARNING)
                 .build()
             )
@@ -42,7 +43,7 @@ class ClientSecretTable:
     async def get(self, record_id: str) -> dict[str, Any]:
         """Gets one Bitable record and caches the SDK data shape for 24 hours."""
         settings = get_settings()
-        app_token = settings.feishu_aplus_node_admin_app_token
+        app_token = settings.require_feishu_app_token()
         key = (
             FEISHU_MTABLE.replace("{appToken}", app_token).replace(
                 "{tableId}", CLIENT_SECRET_TABLE_ID
@@ -83,7 +84,11 @@ class FeishuAlertService:
     async def send_exception(self, error: Exception, context: str = "") -> None:
         """Sends at most one retained alert card per 400 milliseconds."""
         settings = get_settings()
-        if not settings.server_alert_groupid or not settings.feishu_alert_app_appid:
+        if (
+            not settings.server_alert_groupid
+            or not settings.feishu_alert_app_appid
+            or not settings.feishu_alert_app_appsecret
+        ):
             return
         now = time.monotonic()
         if now - self._last_sent < 0.4:

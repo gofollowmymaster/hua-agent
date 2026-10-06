@@ -9,7 +9,6 @@ from typing import Any
 from fastapi import HTTPException
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from pydantic import SecretStr
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -27,21 +26,19 @@ class RagChatService:
         self.memory = RagMemoryService(db)
         self.model = ChatOpenAI(
             model=self.settings.model_name,
-            api_key=SecretStr(self.settings.openai_api_key),
+            api_key=self.settings.require_openai_key(),
             base_url=self.settings.openai_base_url,
             streaming=True,
             model_kwargs={"reasoning_effort": self.settings.rag_reasoning_effort},
         )
         self.fallback_model = ChatOpenAI(
             model=self.settings.model_name,
-            api_key=SecretStr(self.settings.openai_api_key),
+            api_key=self.settings.require_openai_key(),
             base_url=self.settings.openai_base_url,
             streaming=True,
         )
         self.embeddings = OpenAIEmbeddings(
-            openai_api_key=SecretStr(
-                self.settings.embeddings_api_key or self.settings.openai_api_key
-            ),
+            openai_api_key=self.settings.require_embeddings_key(),
             openai_api_base=self.settings.embeddings_base_url or self.settings.openai_base_url,
             model=self.settings.embeddings_model_name,
             dimensions=self.settings.embeddings_dimensions,

@@ -11,6 +11,7 @@ def main() -> None:
         host=settings.python_api_host,
         port=settings.python_api_port,
         workers=settings.python_api_workers,
+        reload=settings.python_api_reload,
         proxy_headers=True,
     )
 

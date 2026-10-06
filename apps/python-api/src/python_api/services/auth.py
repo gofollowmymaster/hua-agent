@@ -171,9 +171,11 @@ async def bootstrap_admin() -> None:
     from python_api.database import session_factory
 
     settings = get_settings()
-    username, password = (
-        settings.rag_admin_bootstrap_username,
-        settings.rag_admin_bootstrap_password,
+    username = settings.rag_admin_bootstrap_username
+    password = (
+        settings.rag_admin_bootstrap_password.get_secret_value()
+        if settings.rag_admin_bootstrap_password
+        else ""
     )
     if not username and not password:
         return

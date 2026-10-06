@@ -52,8 +52,9 @@
     "react-admin:format": "pnpm --filter @aplus-sql/react-admin format",
     "react-admin:format:check": "pnpm --filter @aplus-sql/react-admin format:check",
     "python-api:sync": "python -m uv sync --project apps/python-api --python 3.12",
-    "python-api:dev": "python -m uv run --project apps/python-api uvicorn python_api.main:app --app-dir apps/python-api/src --host 0.0.0.0 --port 8000 --reload",
-    "python-api:test": "python -m uv run --project apps/python-api pytest apps/python-api/tests",
+    "python-api:dev": "cross-env PYTHON_API_ENV=dev python -m uv run --project apps/python-api python -m python_api.run",
+    "python-api:start": "cross-env PYTHON_API_ENV=prod python -m uv run --project apps/python-api python -m python_api.run",
+    "python-api:test": "cross-env PYTHON_API_ENV=test python -m uv run --project apps/python-api pytest apps/python-api/tests",
     "python-api:lint": "python -m uv run --project apps/python-api ruff check apps/python-api",
     "python-api:typecheck": "python -m uv run --project apps/python-api mypy --config-file apps/python-api/pyproject.toml apps/python-api/src",
     "python-api:build": "python -m uv build --project apps/python-api",
@@ -80,6 +81,7 @@
   "devDependencies": {
     "@commitlint/cli": "^19.7.1",
     "@commitlint/config-conventional": "^19.7.1",
+    "cross-env": "^7.0.3",
     "dotenv-cli": "^7.4.2",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.5"

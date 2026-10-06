@@ -18,6 +18,7 @@ async def ready() -> dict[str, object]:
     database, redis = await database_ready(), await redis_ready()
     return {
         "status": "ok" if database and redis else "not_ready",
+        "configuration": True,
         "database": database,
         "redis": redis,
     }

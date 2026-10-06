@@ -10,7 +10,6 @@ from typing import Any
 from fastapi import HTTPException
 from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from pydantic import SecretStr
 from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -31,7 +30,7 @@ class AgentKnowledgeService:
         self.tenant = get_request_context().tenant_code
         settings = get_settings()
         self.embeddings = OpenAIEmbeddings(
-            openai_api_key=SecretStr(settings.embeddings_api_key or settings.openai_api_key),
+            openai_api_key=settings.require_embeddings_key(),
             openai_api_base=settings.embeddings_base_url or settings.openai_base_url,
             model=settings.embeddings_model_name,
             dimensions=settings.embeddings_dimensions,

@@ -42,6 +42,7 @@ pnpm react-admin:build      # React Admin 生产构建
 pnpm react-admin:test       # React Admin Vitest
 pnpm react-admin:lint:check # React Admin ESLint（只检查）
 pnpm python-api:dev         # FastAPI 开发服务（8000）
+pnpm python-api:start       # FastAPI 生产启动（默认 prod）
 pnpm python-api:test        # FastAPI pytest
 pnpm python-api:lint        # FastAPI Ruff 只检查
 pnpm python-api:typecheck   # FastAPI mypy
