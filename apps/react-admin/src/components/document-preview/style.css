@@ -14,7 +14,23 @@
   min-height: 0;
 }
 
+.document-preview-state {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  inset: 0;
+  padding: 24px;
+  background: var(--app-color-neutral-surface);
+  place-items: center;
+}
+
 .document-preview-host .ofv-root,
 .document-preview-host .ofv-host {
   height: 100%;
+}
+
+.document-preview-host .ofv-viewport,
+.document-preview-host .ofv-pdf {
+  min-height: 0;
+  overflow: auto;
 }

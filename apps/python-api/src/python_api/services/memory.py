@@ -131,6 +131,7 @@ class RagMemoryService:
         await self.db.commit()
 
     async def _upsert(self, session: ResolvedSession) -> int:
+        """Creates or refreshes the durable RAG session and returns its identifier."""
         result = await self.db.execute(
             text(
                 """INSERT INTO aplus_rag_sessions (tenant_code,channel,session_key,user_id,conversation_id,conversation_type,metadata,last_active_at,updated_at) VALUES (:tenant,:channel,:key,:user_id,:conversation_id,:conversation_type,CAST(:metadata AS jsonb),CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) ON CONFLICT (tenant_code,channel,session_key) DO UPDATE SET user_id=EXCLUDED.user_id,conversation_id=EXCLUDED.conversation_id,conversation_type=EXCLUDED.conversation_type,metadata=EXCLUDED.metadata,last_active_at=CURRENT_TIMESTAMP,updated_at=CURRENT_TIMESTAMP RETURNING id"""
@@ -149,6 +150,7 @@ class RagMemoryService:
 
     @staticmethod
     def _key(session: ResolvedSession) -> str:
+        """Builds the shared tenant-scoped Redis memory key for a RAG session."""
         encoded = base64.urlsafe_b64encode(session.session_key.encode()).decode().rstrip("=")
         return (
             RAG_SESSION_MEMORY.replace("{tenant}", session.tenant_code)
@@ -354,6 +356,7 @@ class AgentMemoryService:
         ]
 
     async def _upsert(self, session: ResolvedSession) -> int:
+        """Creates or refreshes the durable Agent session and returns its identifier."""
         result = await self.db.execute(
             text(
                 """INSERT INTO agent_chat_sessions (tenant_code,channel,session_key,user_id,conversation_id,conversation_type,metadata,last_active_at,updated_at) VALUES (:tenant,:channel,:key,:user_id,:conversation_id,:conversation_type,CAST(:metadata AS jsonb),CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) ON CONFLICT (tenant_code,channel,session_key) DO UPDATE SET user_id=EXCLUDED.user_id,conversation_id=EXCLUDED.conversation_id,conversation_type=EXCLUDED.conversation_type,metadata=EXCLUDED.metadata,last_active_at=CURRENT_TIMESTAMP,updated_at=CURRENT_TIMESTAMP RETURNING id"""

@@ -123,6 +123,7 @@ class AuthService:
         await self.db.commit()
 
     async def _find_user(self, user_id: int) -> RagAdminUser:
+        """Loads one tenant-owned user or raises the compatible not-found error."""
         user = await self.db.scalar(
             select(RagAdminUser).where(
                 RagAdminUser.id == user_id,
@@ -134,6 +135,7 @@ class AuthService:
         return user
 
     def _create_token(self, user: RagAdminUser) -> str:
+        """Builds the JWT claims expected by existing API and frontend consumers."""
         identity = TENANT_IDENTITIES[user.tenant_code]
         return create_access_token(
             {
@@ -153,6 +155,7 @@ class AuthService:
         )
 
     def _summary(self, user: RagAdminUser) -> dict[str, Any]:
+        """Serializes a user without exposing password material."""
         return json_value(
             {
                 "id": user.id,

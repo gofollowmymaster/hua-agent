@@ -1,4 +1,4 @@
-import { render, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { DocumentPreviewModal } from '.';
 
@@ -52,5 +52,31 @@ describe('DocumentPreviewModal', () => {
 
     view.unmount();
     expect(viewerMocks.destroy).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows viewer errors above the preview host', async () => {
+    viewerMocks.createViewer.mockImplementation((options) => {
+      options.onError?.(new Error('render failed'), options.file);
+      return { destroy: viewerMocks.destroy };
+    });
+    const loadFile = vi
+      .fn()
+      .mockResolvedValue(new Blob(['# preview'], { type: 'text/markdown' }));
+
+    render(
+      <DocumentPreviewModal
+        open
+        item={{ id: 1, fileName: 'preview.md', fileType: 'md' }}
+        onClose={vi.fn()}
+        loadFile={loadFile}
+      />,
+    );
+
+    expect(
+      await screen.findByText('文件预览失败，可以尝试下载原文件后查看。'),
+    ).toBeInTheDocument();
+    expect(document.querySelector('.document-preview-host')).toHaveAttribute(
+      'hidden',
+    );
   });
 });

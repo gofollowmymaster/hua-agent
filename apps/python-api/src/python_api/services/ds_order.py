@@ -116,10 +116,12 @@ class DsOrderService:
         return self._mutation(order)
 
     def _state(self) -> dict[str, Any]:
+        """Returns the isolated in-memory order state for the current tenant."""
         tenant = get_request_context().tenant_code
         return self._states.setdefault(tenant, self._fixture(tenant))
 
     def _find(self, number: str) -> dict[str, Any]:
+        """Finds an order by number within the current tenant state."""
         order = next(
             (item for item in self._state()["orders"] if item["dsOrderNo"] == number), None
         )
@@ -128,6 +130,7 @@ class DsOrderService:
         return order
 
     def _matches(self, order: dict[str, Any], request: DsOrderPageRequest) -> bool:
+        """Applies the supported order list filters to one fixture record."""
         mapping = [
             (request.id_list, "id"),
             (request.ds_order_no_list, "dsOrderNo"),
@@ -172,6 +175,7 @@ class DsOrderService:
         return True
 
     def _append_log(self, number: str, business_type: str, content: str) -> None:
+        """Appends an audit entry using the current authenticated operator metadata."""
         user = get_request_context().user
         self._state()["logs"].setdefault(number, []).append(
             {
@@ -186,6 +190,7 @@ class DsOrderService:
 
     @staticmethod
     def _mutation(order: dict[str, Any]) -> dict[str, Any]:
+        """Returns only fields exposed by audit and cancellation mutations."""
         return {
             key: order.get(key)
             for key in ("dsOrderNo", "status", "tipType", "tipMsg")
@@ -194,6 +199,7 @@ class DsOrderService:
 
     @staticmethod
     def _page_item(order: dict[str, Any]) -> dict[str, Any]:
+        """Projects an internal fixture order into the list response contract."""
         keys = [
             "id",
             "dsOrderNo",
@@ -238,6 +244,7 @@ class DsOrderService:
 
     @staticmethod
     def _fixture(tenant: str) -> dict[str, Any]:
+        """Builds deterministic tenant-local order and log fixtures."""
         statuses = [
             "PENDING_AUDIT",
             "PROCESSING",

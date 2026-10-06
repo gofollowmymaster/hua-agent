@@ -55,6 +55,7 @@ class ClientSecretTable:
             return json.loads(cached)
 
         def execute() -> dict[str, Any]:
+            """Runs the blocking Bitable lookup in a worker thread."""
             from lark_oapi.api.bitable.v1 import GetAppTableRecordRequest
 
             request = (
@@ -115,6 +116,7 @@ class FeishuAlertService:
         )
 
         def execute() -> None:
+            """Runs the blocking Feishu message request in a worker thread."""
             from lark_oapi.api.im.v1 import CreateMessageRequest, CreateMessageRequestBody
 
             request = (

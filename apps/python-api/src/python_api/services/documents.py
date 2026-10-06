@@ -138,6 +138,7 @@ class DocumentLoader:
 
     @staticmethod
     def _normalize_pdf(value: str) -> str:
+        """Normalizes extracted PDF whitespace while preserving paragraph breaks."""
         value = value.replace("\r\n", "\n")
         value = re.sub(
             r"\b(?:[A-Za-z][ \t]+)+[A-Za-z]\b",
@@ -276,6 +277,7 @@ class DocumentIngestService:
     async def _ingest_files(
         self, files: list[RawDocument], tenant: str, force: bool
     ) -> dict[str, Any]:
+        """Ingests files independently and reports indexed, skipped, and failed totals."""
         summary: dict[str, Any] = {
             "scannedFiles": len(files),
             "indexedFiles": 0,
@@ -350,6 +352,7 @@ class DocumentIngestService:
         return summary
 
     def _build_chunks(self, file: RawDocument, tenant: str) -> list[dict[str, Any]]:
+        """Loads and splits a raw document while attaching searchable metadata."""
         chunks = []
         for segment in self.loader.load(file):
             for split in self.splitter.split_text(segment["text"]):
@@ -371,6 +374,7 @@ class DocumentIngestService:
         return chunks
 
     async def _embed(self, texts: list[str]) -> list[list[float]]:
+        """Embeds document text in bounded batches accepted by the provider."""
         result: list[list[float]] = []
         size = min(max(self.settings.rag_embedding_batch_size, 1), 10)
         for index in range(0, len(texts), size):
@@ -384,6 +388,7 @@ class DocumentIngestService:
         chunks: list[dict[str, Any]],
         vectors: list[list[float]],
     ) -> int:
+        """Replaces a tenant document and all chunks in one committed transaction."""
         result = await self.db.execute(
             text("""INSERT INTO aplus_documents (tenant_code, source_path, file_name, file_type, "type", tag, file_hash, file_size, status, updated_at)
                     VALUES (:tenant, :source, :name, :file_type, :document_type, '', :file_hash, :file_size, 'processing', CURRENT_TIMESTAMP)
@@ -429,6 +434,7 @@ class DocumentIngestService:
 
     @staticmethod
     def _unique_target(root: Path, file_name: str) -> Path:
+        """Finds a collision-free upload path without overwriting existing files."""
         stem, suffix = Path(file_name).stem, Path(file_name).suffix
         for index in range(10_000):
             target = root / (file_name if index == 0 else f"{stem} ({index}){suffix}")

@@ -24,6 +24,7 @@ def stream_response(events: AsyncIterator[dict[str, Any]]) -> StreamingResponse:
     """Wraps normalized events with the exact AI SDK stream headers and terminator."""
 
     async def body() -> AsyncIterator[bytes]:
+        """Yields encoded events immediately and closes the protocol with DONE."""
         async for event in events:
             yield encode_event(event)
         yield b"data: [DONE]\n\n"

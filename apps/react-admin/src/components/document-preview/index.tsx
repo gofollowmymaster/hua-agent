@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, Modal, Spin } from 'antd';
 import {
   createViewer,
@@ -9,6 +9,7 @@ import {
 } from '@open-file-viewer/core';
 import '@open-file-viewer/core/style.css';
 import './style.css';
+import { toPreviewFile } from './file';
 
 export interface PreviewDocumentItem {
   id: string | number;
@@ -29,23 +30,22 @@ export function DocumentPreviewModal<T extends PreviewDocumentItem>({
   onClose,
   loadFile,
 }: DocumentPreviewModalProps<T>) {
-  const hostRef = useRef<HTMLDivElement>(null);
+  const [host, setHost] = useState<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!open || !item || !hostRef.current) return undefined;
+    if (!open || !item || !host) return undefined;
     let disposed = false;
     let viewer: ReturnType<typeof createViewer> | undefined;
-    const host = hostRef.current;
     setLoading(true);
     setError('');
     void loadFile(item)
       .then((blob) => {
-        if (disposed || !hostRef.current) return;
-        const file = new File([blob], item.fileName, { type: blob.type });
+        if (disposed) return;
+        const file = toPreviewFile(blob, item);
         viewer = createViewer({
-          container: hostRef.current,
+          container: host,
           file,
           fileName: item.fileName,
           height: '100%',
@@ -77,7 +77,7 @@ export function DocumentPreviewModal<T extends PreviewDocumentItem>({
       viewer?.destroy();
       host.replaceChildren();
     };
-  }, [item, loadFile, open]);
+  }, [host, item, loadFile, open]);
 
   return (
     <Modal
@@ -89,9 +89,21 @@ export function DocumentPreviewModal<T extends PreviewDocumentItem>({
       destroyOnHidden
     >
       <div className="document-preview-viewport">
-        {loading && <Spin size="large" />}
-        {error && <Alert type="error" showIcon message={error} />}
-        <div ref={hostRef} className="document-preview-host" />
+        {loading && (
+          <div className="document-preview-state">
+            <Spin size="large" />
+          </div>
+        )}
+        {error && (
+          <div className="document-preview-state">
+            <Alert type="error" showIcon message={error} />
+          </div>
+        )}
+        <div
+          ref={setHost}
+          className="document-preview-host"
+          hidden={Boolean(error)}
+        />
       </div>
     </Modal>
   );

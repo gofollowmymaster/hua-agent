@@ -24,6 +24,7 @@ class TenantMiddleware(BaseHTTPMiddleware):
     async def dispatch(
         self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
+        """Resolves tenant hints and scopes them to the current request context."""
         settings = get_settings()
         user: dict[str, object] = {}
         supplier = request.headers.get("supplier")
@@ -61,6 +62,7 @@ class ResponseEnvelopeMiddleware(BaseHTTPMiddleware):
     async def dispatch(
         self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
+        """Wraps eligible JSON bodies while bypassing files, streams, and OpenAPI."""
         response = await call_next(request)
         if (
             response.status_code < 300
@@ -87,6 +89,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(
         self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
+        """Records request completion metadata without logging payloads or credentials."""
         started = time.perf_counter()
         response = await call_next(request)
         logger.info(
@@ -105,6 +108,7 @@ class RequestSizeLimitMiddleware(BaseHTTPMiddleware):
     async def dispatch(
         self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
+        """Rejects declared oversized bodies before downstream request processing."""
         content_length = request.headers.get("content-length")
         if content_length:
             try:

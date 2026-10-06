@@ -270,6 +270,7 @@ class RagAdminService:
         ]
 
     async def _document_page(self, filters: list[Any], request: PageRequest) -> dict[str, Any]:
+        """Pages filtered documents and attaches each actual chunk count."""
         total = await self.db.scalar(
             select(func.count()).select_from(AplusDocument).where(*filters)
         )
@@ -298,6 +299,7 @@ class RagAdminService:
         }
 
     async def _owned_document(self, document_id: int) -> AplusDocument:
+        """Loads one RAG document only when it belongs to the current tenant."""
         document = await self.db.scalar(
             select(AplusDocument).where(
                 AplusDocument.id == document_id, AplusDocument.tenant_code == self.tenant
@@ -308,6 +310,7 @@ class RagAdminService:
         return document
 
     def _serialize_document(self, document: AplusDocument, actual_count: int) -> dict[str, Any]:
+        """Maps a RAG document and measured chunk count to the API contract."""
         return json_value(
             {
                 "id": str(document.id),
@@ -331,6 +334,7 @@ class RagAdminService:
 
     @staticmethod
     def _inside(path: Path, parent: Path) -> bool:
+        """Checks whether a resolved preview path remains under its allowed root."""
         try:
             path.relative_to(parent)
             return True

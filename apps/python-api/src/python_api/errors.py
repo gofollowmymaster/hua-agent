@@ -26,6 +26,7 @@ class NotReportError(AppError):
 
 
 def _path(request: Request) -> str:
+    """Builds the request path used in compatible error payloads."""
     query = request.url.query
     return request.url.path + (f"?{query}" if query else "")
 
@@ -37,6 +38,7 @@ def install_exception_handlers(app: FastAPI) -> None:
     async def validation_handler(
         request: Request, exception: RequestValidationError
     ) -> JSONResponse:
+        """Converts Pydantic validation failures into the shared business envelope."""
         messages = []
         for error in exception.errors():
             location = ".".join(str(part) for part in error["loc"] if part != "body")
@@ -48,6 +50,7 @@ def install_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(HTTPException)
     async def http_handler(request: Request, exception: HTTPException) -> JSONResponse:
+        """Preserves FastAPI HTTP error codes inside the compatible JSON payload."""
         return JSONResponse(
             status_code=200,
             content={
@@ -59,6 +62,7 @@ def install_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(AppError)
     async def app_handler(request: Request, exception: AppError) -> JSONResponse:
+        """Returns project errors without rewriting their status or message."""
         return JSONResponse(
             status_code=exception.code,
             content={"code": exception.code, "message": exception.message, "path": _path(request)},
@@ -68,6 +72,7 @@ def install_exception_handlers(app: FastAPI) -> None:
     async def configuration_handler(
         request: Request, exception: ConfigurationError
     ) -> JSONResponse:
+        """Reports unavailable runtime configuration without exposing secret values."""
         return JSONResponse(
             status_code=503,
             content={"code": 503, "message": str(exception), "path": _path(request)},
@@ -75,6 +80,7 @@ def install_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(IntegrityError)
     async def integrity_handler(request: Request, exception: IntegrityError) -> JSONResponse:
+        """Maps database uniqueness failures to a stable conflict response."""
         return JSONResponse(
             status_code=409,
             content={
@@ -86,6 +92,7 @@ def install_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(Exception)
     async def fallback_handler(request: Request, exception: Exception) -> JSONResponse:
+        """Converts otherwise unhandled failures into the generic error envelope."""
         return JSONResponse(
             status_code=500,
             content={

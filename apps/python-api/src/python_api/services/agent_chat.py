@@ -134,6 +134,7 @@ class AgentChatRuntime:
         yield {"type": "done", "answer": answer, "toolCalls": tool_calls}
 
     def _get_agent(self) -> Any:
+        """Lazily builds the tenant-aware Deep Agents runtime and tool limit middleware."""
         if self._agent is not None:
             return self._agent
         settings = get_settings()
@@ -160,6 +161,7 @@ class AgentChatRuntime:
         return self._agent
 
     def _build_tools(self) -> list[BaseTool]:
+        """Builds the bounded knowledge, order, time, and calculation tool set."""
         knowledge = self.knowledge
         orders = self.orders
 
@@ -293,6 +295,7 @@ class AgentChatRuntime:
 
     @staticmethod
     def _message_parts(chunk: Any) -> list[tuple[str, str]]:
+        """Extracts reasoning and answer text from supported provider chunk shapes."""
         blocks = getattr(chunk, "content_blocks", None)
         if isinstance(blocks, list):
             result = []
@@ -310,6 +313,7 @@ class AgentChatRuntime:
 
     @staticmethod
     def _tool_name(event: dict[str, Any]) -> str:
+        """Recovers a stable tool name from event fields or metadata."""
         name = str(event.get("name") or "").strip()
         if name:
             return name
@@ -319,6 +323,7 @@ class AgentChatRuntime:
 
     @staticmethod
     def _normalize_input(value: Any) -> dict[str, Any]:
+        """Narrows wrapped or JSON tool input into a plain argument mapping."""
         if isinstance(value, str):
             try:
                 return AgentChatRuntime._normalize_input(json.loads(value))
@@ -333,6 +338,7 @@ class AgentChatRuntime:
 
     @staticmethod
     def _normalize_result(value: Any) -> str:
+        """Converts provider tool output into displayable text with an empty fallback."""
         if value is None:
             return MISSING_TOOL_OUTPUT
         content = getattr(value, "content", value)
@@ -347,6 +353,7 @@ class AgentChatRuntime:
 
     @staticmethod
     def _json(value: Any) -> str:
+        """Serializes dynamic tool values without losing Chinese text."""
         return json.dumps(value, ensure_ascii=False, separators=(",", ":"), default=str)
 
 
@@ -367,6 +374,7 @@ class AgentChatService:
         conversation_id = request.id.strip() if request.id and request.id.strip() else str(uuid4())
 
         async def events() -> AsyncIterator[dict[str, Any]]:
+            """Translates runtime events into ordered UI events and persists the turn."""
             session = self.memory.resolve(conversation_id, request.participant_id, question_id)
             parts: list[dict[str, Any]] = []
             yield self._status(parts, "analyze_start", "开始分析问题")
@@ -462,6 +470,7 @@ class AgentChatService:
 
     @staticmethod
     def _latest_question(request: ChatRequest) -> tuple[str | None, str]:
+        """Extracts the latest non-empty user text or raises a stable input error."""
         if not request.messages:
             raise HTTPException(400, "messages is required")
         message = next((item for item in reversed(request.messages) if item.role == "user"), None)
@@ -480,12 +489,14 @@ class AgentChatService:
     def _status(
         parts: list[dict[str, Any]], stage: str, message: str, **extra: Any
     ) -> dict[str, Any]:
+        """Appends and returns one visible status event for ordered persistence."""
         data = {"stage": stage, "message": message, **extra}
         parts.append({"type": "data-status", "data": data})
         return {"type": "data-status", "data": data}
 
     @staticmethod
     def _append_text_part(parts: list[dict[str, Any]], part_type: str, value: str) -> None:
+        """Merges only adjacent text of the same type in persisted message parts."""
         if parts and parts[-1].get("type") == part_type:
             parts[-1]["text"] += value
         else:
@@ -493,6 +504,7 @@ class AgentChatService:
 
     @staticmethod
     def _tool_summary(tool_call: dict[str, Any]) -> str:
+        """Builds a concise user-visible summary without discarding the full result."""
         name = tool_call["name"]
         try:
             value = json.loads(tool_call["result"])
@@ -534,6 +546,7 @@ def _calculate(expression: str) -> int | float:
         raise ValueError("表达式过长")
 
     def evaluate(node: ast.AST) -> float:
+        """Evaluates the allowlisted arithmetic AST and rejects every other node."""
         if isinstance(node, ast.Expression):
             return evaluate(node.body)
         if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):

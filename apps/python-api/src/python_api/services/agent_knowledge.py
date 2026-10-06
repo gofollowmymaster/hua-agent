@@ -252,6 +252,7 @@ class AgentKnowledgeService:
         return summary
 
     async def _fulltext(self, query: str, category: str | None, limit: int) -> list[dict[str, Any]]:
+        """Retrieves tenant-scoped Agent chunks ranked by zhparser relevance."""
         sql = text("""WITH keyword_terms AS (SELECT DISTINCT term.lexeme FROM ts_debug('zhparser', :query) debug CROSS JOIN LATERAL unnest(debug.lexemes) AS term(lexeme) WHERE term.lexeme <> ''), keyword_query AS (SELECT string_agg(quote_literal(lexeme), ' | ')::tsquery AS query FROM keyword_terms)
             SELECT c.id,c.tenant_code,c.document_id,c.chunk_index,c.content,c.metadata,d.category,d.file_name,d.source_path,d.remote_url,d.doc_id,d.wiki_node_id,d.last_modified_at,d.breadcrumb,d.source_type,d.current_version,ts_rank_cd(to_tsvector('zhparser', c.content), keyword_query.query) AS score
             FROM agent_chunks c JOIN agent_documents d ON d.id=c.document_id CROSS JOIN keyword_query WHERE c.tenant_code=:tenant AND d.tenant_code=:tenant AND (CAST(:category AS text) IS NULL OR d.category=:category) AND keyword_query.query IS NOT NULL AND to_tsvector('zhparser', c.content) @@ keyword_query.query ORDER BY score DESC,c.id ASC LIMIT :limit""")
@@ -268,6 +269,7 @@ class AgentKnowledgeService:
         return [self._hit(row) for row in rows]
 
     async def _vector(self, query: str, category: str | None, limit: int) -> list[dict[str, Any]]:
+        """Retrieves tenant-scoped Agent chunks nearest to the query embedding."""
         vector = json.dumps(await self.embeddings.aembed_query(query))
         sql = text(
             """SELECT c.id,c.tenant_code,c.document_id,c.chunk_index,c.content,c.metadata,d.category,d.file_name,d.source_path,d.remote_url,d.doc_id,d.wiki_node_id,d.last_modified_at,d.breadcrumb,d.source_type,d.current_version,1-(c.embedding <=> CAST(:vector AS vector)) AS score FROM agent_chunks c JOIN agent_documents d ON d.id=c.document_id WHERE c.tenant_code=:tenant AND d.tenant_code=:tenant AND (CAST(:category AS text) IS NULL OR d.category=:category) ORDER BY c.embedding <=> CAST(:vector AS vector) LIMIT :limit"""
@@ -285,6 +287,7 @@ class AgentKnowledgeService:
         return [self._hit(row) for row in rows]
 
     async def _page_by_keyword(self, request: AgentDocumentPageRequest) -> dict[str, Any]:
+        """Pages documents matching metadata or zhparser-indexed chunk content."""
         keyword = (request.keyword or "").strip()
         sql = text(
             """WITH keyword_terms AS (SELECT DISTINCT term.lexeme FROM ts_debug('zhparser', :keyword) debug CROSS JOIN LATERAL unnest(debug.lexemes) AS term(lexeme) WHERE term.lexeme<>''), keyword_query AS (SELECT string_agg(quote_literal(lexeme), ' | ')::tsquery AS query FROM keyword_terms), matches AS (SELECT d.id,d.updated_at FROM agent_documents d CROSS JOIN keyword_query WHERE d.tenant_code=:tenant AND (CAST(:category AS text) IS NULL OR d.category=:category) AND (CAST(:status AS text) IS NULL OR d.status=:status) AND (strpos(d.file_name,:keyword)>0 OR strpos(d.source_path,:keyword)>0 OR strpos(COALESCE(d.breadcrumb,''),:keyword)>0 OR (keyword_query.query IS NOT NULL AND EXISTS (SELECT 1 FROM agent_chunks c WHERE c.tenant_code=:tenant AND c.document_id=d.id AND to_tsvector('zhparser',c.content) @@ keyword_query.query)))) SELECT id, count(*) OVER() AS total FROM matches ORDER BY updated_at DESC,id DESC LIMIT :limit OFFSET :offset"""
@@ -330,7 +333,10 @@ class AgentKnowledgeService:
         chunks: list[dict[str, Any]],
         vectors: list[list[float]],
     ) -> int:
+        """Atomically replaces one Agent document, its chunks, and vector data."""
+
         def value(key: str) -> str:
+            """Reads a trimmed optional frontmatter value."""
             return metadata.get(key, "").strip()
 
         file_size = (await asyncio.to_thread(path.stat)).st_size
@@ -384,6 +390,7 @@ class AgentKnowledgeService:
         return document_id
 
     async def _owned_document(self, document_id: int) -> AgentDocument:
+        """Loads one Agent document only when it belongs to the current tenant."""
         document = await self.db.scalar(
             select(AgentDocument).where(
                 AgentDocument.id == document_id, AgentDocument.tenant_code == self.tenant
@@ -394,6 +401,7 @@ class AgentKnowledgeService:
         return document
 
     async def _serialize_document(self, document: AgentDocument) -> dict[str, Any]:
+        """Serializes an Agent document with its actual persisted chunk count."""
         count = await self.db.scalar(
             select(func.count())
             .select_from(AgentChunk)
@@ -429,6 +437,7 @@ class AgentKnowledgeService:
 
     @staticmethod
     def _frontmatter(raw: str) -> tuple[dict[str, str], str]:
+        """Separates simple YAML-like frontmatter from Markdown body text."""
         lines = raw.removeprefix("\ufeff").splitlines()
         if not lines or lines[0].strip() != "---":
             return {}, raw.strip()
@@ -444,6 +453,7 @@ class AgentKnowledgeService:
         return metadata, "\n".join(lines[end + 1 :]).strip()
 
     def _docs_root(self) -> Path:
+        """Resolves the configured Agent document root against the workspace."""
         configured = Path(get_settings().agent_docs_dir)
         if configured.is_absolute():
             return configured.resolve()
@@ -451,6 +461,7 @@ class AgentKnowledgeService:
 
     @staticmethod
     def _hit(row: Any) -> dict[str, Any]:
+        """Maps a retrieval row to the stable Agent knowledge hit contract."""
         return {
             "id": str(row["id"]),
             "documentId": str(row["document_id"]),

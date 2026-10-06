@@ -143,6 +143,7 @@ class RagChatService:
         await self.memory.append(session, "assistant", answer)
 
     async def _retrieve(self, query: str, tenant: str, top_k: int) -> list[dict[str, Any]]:
+        """Fuses tenant-scoped full-text and vector candidates using reciprocal rank."""
         candidate_limit = min(top_k * 2, 100)
         keyword_rows = (
             (
@@ -185,6 +186,7 @@ class RagChatService:
 
     @staticmethod
     def _question(request: ChatRequest) -> tuple[str | None, str]:
+        """Returns the latest non-empty user question and its message identifier."""
         for message in reversed(request.messages):
             if message.role == "user":
                 value = "".join(
@@ -198,6 +200,7 @@ class RagChatService:
 
     @staticmethod
     def _is_direct(question: str) -> bool:
+        """Detects greetings that can bypass knowledge retrieval."""
         return bool(
             re.fullmatch(
                 r"[\s,.!?，。！？]*(你好|您好|hi|hello|谢谢|thanks)[\s,.!?，。！？]*",
@@ -208,6 +211,7 @@ class RagChatService:
 
     @staticmethod
     def _prompt(question: str, history: list[dict[str, Any]], chunks: list[dict[str, Any]]) -> str:
+        """Builds either a direct-chat or evidence-grounded generation prompt."""
         memory = "\n".join(f"{item['role']}: {item['content']}" for item in history[-10:]) or "无"
         if not chunks:
             return f"你是企业知识助手。简洁、准确地回答用户。\n对话历史：\n{memory}\n用户问题：{question}"
@@ -219,6 +223,7 @@ class RagChatService:
 
     @staticmethod
     def _reasoning(chunk: Any) -> str:
+        """Extracts provider-specific reasoning text from a model chunk."""
         value = getattr(chunk, "additional_kwargs", {}).get("reasoning_content") or getattr(
             chunk, "additional_kwargs", {}
         ).get("reasoning")
@@ -226,6 +231,7 @@ class RagChatService:
 
     @staticmethod
     def _content(content: Any) -> str:
+        """Normalizes string or block-list model content into plain text."""
         if isinstance(content, str):
             return content
         if isinstance(content, list):

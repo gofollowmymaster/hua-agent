@@ -244,6 +244,12 @@ test.beforeEach(async ({ page }) => {
       }),
     }),
   );
+  await page.route('**/agent/knowledge/documents/41/preview', (route) =>
+    route.fulfill({
+      contentType: 'text/markdown',
+      body: '# 2026 年 8 月更新\n\n业务知识预览正文',
+    }),
+  );
   await page.route('**/agent/chat/sessions/page', (route) =>
     route.fulfill({
       contentType: 'application/json',
@@ -481,6 +487,9 @@ test('opens every menu route and keeps placeholder modules explicit', async ({
   await expect(categoryTag).toHaveCSS('background-color', 'rgb(239, 246, 255)');
   await expect(statusTag).toHaveCSS('color', 'rgb(17, 94, 89)');
   await expect(statusTag).toHaveCSS('background-color', 'rgb(221, 247, 239)');
+  await page.getByRole('button', { name: '2026年8月更新.md' }).click();
+  await expect(page.getByRole('dialog')).toContainText('业务知识预览正文');
+  await page.getByRole('button', { name: 'Close' }).click();
   if (testInfo.project.name === 'desktop') {
     await page.screenshot({
       path: testInfo.outputPath('business-knowledge-theme.png'),
