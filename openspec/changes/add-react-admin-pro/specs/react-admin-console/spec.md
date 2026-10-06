@@ -32,7 +32,8 @@ React Admin SHALL 提供与当前 Vue RAG Admin 相同的知识问答和业务 A
 #### Scenario: 打开管理后台
 - **WHEN** 已登录用户进入 React Admin
 - **THEN** 系统展示知识问答与业务 Agent 的全部现有菜单
-- **THEN** Skill 管理、业务会话管理和配置中心保持占位状态
+- **THEN** Skill 管理提供系统 Skill 与用户 Skill 双 Tab
+- **THEN** 业务会话管理和配置中心保持占位状态
 
 ### Requirement: 知识问答运营能力
 React Admin SHALL 提供现有文档查询、上传、预览、元数据维护、切片查看、删除、索引重建、会话查询和消息查看能力，并保持当前校验、确认和错误反馈语义。

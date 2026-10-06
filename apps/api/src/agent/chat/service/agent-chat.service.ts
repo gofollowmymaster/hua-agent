@@ -3,6 +3,7 @@ import { AIMessage, BaseMessage, HumanMessage } from '@langchain/core/messages';
 import { createUIMessageStream } from 'ai';
 import { randomUUID } from 'node:crypto';
 import { LoggerService } from '@src/common/service/logger/logger.service';
+import { TenantContext } from '@src/common/service/context/tenant.context';
 import { AgentChatAgentService } from './agent-chat-agent.service';
 import { AgentChatMemoryService } from './agent-chat-memory.service';
 import type {
@@ -20,6 +21,7 @@ export class AgentChatService {
     private readonly logger: LoggerService,
     private readonly memoryService: AgentChatMemoryService,
     private readonly agentService: AgentChatAgentService,
+    private readonly tenantContext: TenantContext,
   ) {
     this.logger.setContext(AgentChatService.name);
   }
@@ -124,6 +126,7 @@ export class AgentChatService {
 
         for await (const event of this.agentService.stream(messages, {
           tenantCode: session.tenantCode,
+          userId: this.tenantContext.userId,
           channel: session.channel,
           conversationId: session.conversationId,
           sessionKey: session.sessionKey,

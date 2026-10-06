@@ -14,6 +14,7 @@ describe('AgentChatService', () => {
     appendAssistantMessage: jest.Mock;
   };
   let agentService: { stream: jest.Mock };
+  let tenantContext: { userId?: number };
   let service: AgentChatService;
   let executeHandler: (params: { writer: unknown }) => Promise<void>;
 
@@ -48,10 +49,12 @@ describe('AgentChatService', () => {
         };
       }),
     };
+    tenantContext = { userId: 7 };
     service = new AgentChatService(
       logger as any,
       memoryService as any,
       agentService as any,
+      tenantContext as any,
     );
 
     (createUIMessageStream as jest.Mock).mockImplementation(
@@ -114,6 +117,7 @@ describe('AgentChatService', () => {
       expect.arrayContaining([expect.objectContaining({})]),
       {
         tenantCode: 'yurex',
+        userId: 7,
         channel: 'agent-web',
         conversationId: 'conversation',
         sessionKey: 'session',

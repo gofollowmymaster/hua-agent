@@ -16,7 +16,7 @@
 - `knowledge/session-records/index.vue`：会话与消息记录查看。
 - `knowledge/assistant-demo/index.vue`：助手演示页面。
 - `business-agent/knowledge/index.vue`：业务知识库管理，对应 `/business-agent/knowledge`。
-- `business-agent/skills/index.vue`：Skill 管理，对应 `/business-agent/skills`。
+- `business-agent/skills/index.vue`：Skill 管理，对应 `/business-agent/skills`，在同一页面以双 Tab 展示只读系统 Skill 和当前用户私有 Skill。
 - `business-agent/sessions/index.vue`：会话管理，对应 `/business-agent/sessions`。
 - `business-agent/config/index.vue`：配置中心，对应 `/business-agent/config`。
 - `business-agent/demo/index.vue`：多工具 Agent 聊天演示，对应 `/business-agent/demo`。

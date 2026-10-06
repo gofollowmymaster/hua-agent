@@ -100,7 +100,7 @@ export const routes: RouteRecordRaw[] = [
             meta: {
               title: 'Skill 管理',
               menuTitle: 'Skill 管理',
-              subtitle: '业务 Agent 模块骨架。'
+              subtitle: '查看系统 Skill，并维护当前用户自动装载的个人 Skill。'
             }
           },
           {

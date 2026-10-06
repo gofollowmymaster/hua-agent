@@ -3,6 +3,7 @@ import { toolCallLimitMiddleware } from 'langchain';
 import { AgentChatAgentService } from './agent-chat-agent.service';
 import { AgentChatToolLoggingMiddlewareService } from './agent-chat-tool-logging-middleware.service';
 import { AgentChatToolService } from './agent-chat-tool.service';
+import { AgentSkillService } from '../../skill/agent-skill.service';
 import {
   createDeepAgent,
   createHarnessProfile,
@@ -41,6 +42,7 @@ jest.mock('@src/config/node-config.service', () => ({
 describe('AgentChatAgentService', () => {
   let toolService: { getTools: jest.Mock };
   let toolLoggingMiddleware: { create: jest.Mock };
+  let skillService: { listEnabledInstructions: jest.Mock };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -49,6 +51,16 @@ describe('AgentChatAgentService', () => {
       create: jest
         .fn()
         .mockReturnValue({ name: 'AgentChatToolLoggingMiddleware' }),
+    };
+    skillService = {
+      listEnabledInstructions: jest.fn().mockResolvedValue([
+        {
+          key: 'business-knowledge',
+          type: 'system',
+          name: '业务知识检索',
+          instruction: '优先检索业务知识库。',
+        },
+      ]),
     };
     (toolCallLimitMiddleware as jest.Mock).mockReturnValue({
       name: 'ToolCallLimitMiddleware',
@@ -61,8 +73,9 @@ describe('AgentChatAgentService', () => {
     );
   });
 
-  it('creates deep agent with business tools and hidden built-in tools', () => {
-    createService();
+  it('creates deep agent with dynamic skills and hidden built-in tools', async () => {
+    mockStreamEvents.mockResolvedValue(createRun([]));
+    await collectEvents(createService());
 
     expect(registerHarnessProfile).toHaveBeenCalledWith(
       'openai',
@@ -94,6 +107,15 @@ describe('AgentChatAgentService', () => {
         ],
         systemPrompt: expect.stringContaining('业务 Agent 助手'),
       }),
+    );
+    expect(createDeepAgent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        systemPrompt: expect.stringContaining('优先检索业务知识库。'),
+      }),
+    );
+    expect(skillService.listEnabledInstructions).toHaveBeenCalledWith(
+      'yurex',
+      7,
     );
     expect(createDeepAgent).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -135,6 +157,7 @@ describe('AgentChatAgentService', () => {
         version: 'v3',
         context: {
           tenantCode: 'yurex',
+          userId: 7,
           channel: 'agent-web',
           conversationId: 'conversation-1',
           sessionKey: 'conversation:conversation-1:user:u1',
@@ -268,6 +291,7 @@ describe('AgentChatAgentService', () => {
     return new AgentChatAgentService(
       toolService as unknown as AgentChatToolService,
       toolLoggingMiddleware as unknown as AgentChatToolLoggingMiddlewareService,
+      skillService as unknown as AgentSkillService,
     );
   }
 });
@@ -332,6 +356,7 @@ async function collectEvents(service: AgentChatAgentService) {
   const events = [];
   for await (const event of service.stream([], {
     tenantCode: 'yurex',
+    userId: 7,
     channel: 'agent-web',
     conversationId: 'conversation-1',
     sessionKey: 'conversation:conversation-1:user:u1',

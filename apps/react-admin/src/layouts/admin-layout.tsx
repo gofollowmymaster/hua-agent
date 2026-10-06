@@ -94,7 +94,7 @@ const pageMeta: Record<string, { title: string; subtitle: string }> = {
   },
   '/business-agent/skills': {
     title: 'Skill 管理',
-    subtitle: '业务 Agent 模块骨架。',
+    subtitle: '查看系统 Skill，并维护当前用户自动装载的个人 Skill。',
   },
   '/business-agent/sessions': {
     title: '会话管理',

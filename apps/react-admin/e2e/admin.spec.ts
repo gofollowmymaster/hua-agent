@@ -300,6 +300,28 @@ test.beforeEach(async ({ page }) => {
       ]),
     }),
   );
+  await page.route(/\/agent\/skills\/system(?:\?.*)?$/, (route) =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: json([
+        {
+          key: 'business-knowledge',
+          type: 'system',
+          name: '业务知识检索',
+          description: '检索业务知识库。',
+          instruction: '优先调用 search_knowledge。',
+          isEnabled: true,
+          readonly: true,
+        },
+      ]),
+    }),
+  );
+  await page.route('**/agent/skills/user/page', (route) =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: json({ list: [], total: 0, page: 1, pageSize: 20 }),
+    }),
+  );
 });
 
 test('login, browse, preview, upload and restore a drawer deep link', async ({
@@ -393,7 +415,11 @@ test('opens every menu route and keeps placeholder modules explicit', async ({
     await expect(page.locator('main').getByText(title).first()).toBeVisible();
   }
   await page.goto('/public/react-admin/#/business-agent/skills');
-  await expect(page.getByText('模块建设中')).toBeVisible();
+  await expect(page.getByRole('tab', { name: '系统 Skill' })).toBeVisible();
+  await page.getByRole('tab', { name: '用户 Skill' }).click();
+  await page.getByRole('button', { name: /新建 Skill/ }).click();
+  await expect(page.getByText('新建用户 Skill')).toBeVisible();
+  await page.getByRole('button', { name: '取 消' }).click();
   await expect(page.locator('body')).not.toHaveCSS('overflow-x', 'scroll');
 
   await page.goto('/public/react-admin/#/business-agent/knowledge');

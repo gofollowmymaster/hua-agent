@@ -29,3 +29,9 @@ backend.
 Framework-native AI events never leave the service. They are normalized to reasoning, tool start,
 tool result, text, and completion events, then encoded as AI SDK UI Message SSE with `[DONE]`.
 Visible event order is also stored in the assistant message `parts` column.
+
+## Skill Boundary
+
+Business Agent Skill management and dynamic Skill loading are currently NestJS-only. FastAPI does
+not expose `/agent/skills/*`, does not map `agent_user_skills`, and keeps its existing fixed Agent
+prompt. This is an intentional compatibility exception until Skill parity is scheduled separately.

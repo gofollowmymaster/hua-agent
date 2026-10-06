@@ -13,6 +13,8 @@ import { GuardModule } from '@src/common/guard/guard.module';
 import { DsOrderController } from './ds-order/ds-order.controller';
 import { DsOrderMockService } from './ds-order/ds-order-mock.service';
 import { DsOrderToolService } from './ds-order/ds-order-tool.service';
+import { AgentSkillController } from './skill/agent-skill.controller';
+import { AgentSkillService } from './skill/agent-skill.service';
 
 /** 业务 Agent 独立业务域入口，后续承载知识库、skill、会话、配置与演示能力。 */
 @Module({
@@ -21,6 +23,7 @@ import { DsOrderToolService } from './ds-order/ds-order-tool.service';
     AgentKnowledgeController,
     AgentChatController,
     DsOrderController,
+    AgentSkillController,
   ],
   providers: [
     AgentKnowledgeService,
@@ -33,6 +36,7 @@ import { DsOrderToolService } from './ds-order/ds-order-tool.service';
     AgentChatService,
     DsOrderMockService,
     DsOrderToolService,
+    AgentSkillService,
   ],
   exports: [AgentKnowledgeIngestService],
 })

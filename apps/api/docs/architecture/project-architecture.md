@@ -7,7 +7,7 @@
 `AppModule` 只装配以下能力：
 
 - `AiModule`：`/ai/rag/chat` 与 `/ai/rag/admin/*`。
-- `AgentModule`：`/agent/knowledge/*` 与 `/agent/chat/*`。
+- `AgentModule`：`/agent/knowledge/*`、`/agent/chat/*` 与 `/agent/skills/*`。
 - `AuthModule`：本地 `/auth/login` 与系统管理员用户管理接口。
 - `GlobalServiceModule`：Redis、日志、RAG Prisma 和 `TenantContext`。
 - `ConfigModule`、全局 `JwtModule`、`GuardModule`、`GlobalExceptionHandlerModule`。
@@ -22,7 +22,8 @@
 
 ## 数据与配置
 
-- `prisma/rag/schema.prisma` 是运行时数据模型，包含本地 RAG Admin 用户、知识问答文档/分块/会话/消息和业务Agent对应模型。
+- `prisma/rag/schema.prisma` 是运行时数据模型，包含本地 RAG Admin 用户、知识问答文档/分块/会话/消息、业务Agent对应模型和用户私有 Skill。
+- 系统 Skill 由代码清单发布并强制装载；用户 Skill 按租户和登录用户隔离，NestJS Agent 每次运行时动态组合启用指令。
 - `prisma/schema.prisma` 仅保留 MySQL datasource，用于维护历史迁移链；运行时不生成或注入 MySQL Prisma client。
 - `src/config/index.ts` 聚合环境变量和 `aplus`、`boat`、`yurex` 三套租户配置。
 - `NodeConfigService` 是业务代码读取全局和租户配置的统一入口。

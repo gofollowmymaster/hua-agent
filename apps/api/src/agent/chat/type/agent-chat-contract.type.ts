@@ -23,6 +23,7 @@ export interface AgentChatResolvedSession extends AgentChatSessionInput {
 
 export interface AgentChatExecutionContext {
   tenantCode: string;
+  userId?: number;
   channel: string;
   conversationId?: string;
   sessionKey: string;
