@@ -10,6 +10,7 @@ import dayjs from 'dayjs';
 import { pageSessions, type RagSessionItem } from '@/api/knowledge/sessions';
 import { SemanticTag } from '@/components/semantic-tag';
 import { useDrawerQuery } from '@/layouts/drawer-query';
+import { compactProTableProps } from '@/theme';
 
 export default function SessionsPage() {
   const actionRef = useRef<ActionType>();
@@ -87,11 +88,11 @@ export default function SessionsPage() {
   ];
   return (
     <ProTable<RagSessionItem>
+      {...compactProTableProps}
       actionRef={actionRef}
       rowKey="id"
       columns={columns}
       scroll={{ x: 1040 }}
-      search={{ labelWidth: 'auto' }}
       request={async (params) => {
         const result = await pageSessions(params);
         return { data: result.list, total: result.total, success: true };

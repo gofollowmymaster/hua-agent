@@ -11,7 +11,7 @@ import {
   type ActionType,
   type ProColumns,
 } from '@ant-design/pro-components';
-import { App, Button, Modal, Typography } from 'antd';
+import { App, Button, Typography } from 'antd';
 import dayjs from 'dayjs';
 import {
   deleteDocument,
@@ -23,6 +23,7 @@ import {
 import { DocumentPreviewModal } from '@/components/document-preview';
 import { SemanticTag } from '@/components/semantic-tag';
 import { useDrawerQuery } from '@/layouts/drawer-query';
+import { compactProTableProps } from '@/theme';
 import { DocumentMetadataModal } from './metadata-modal';
 import { DocumentUploadModal } from './upload-modal';
 
@@ -35,7 +36,7 @@ function formatSize(value: string | number) {
 
 export default function DocumentsPage() {
   const actionRef = useRef<ActionType>();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const drawer = useDrawerQuery();
   const [uploadOpen, setUploadOpen] = useState(false);
   const [metadataItem, setMetadataItem] = useState<RagDocumentItem>();
@@ -141,7 +142,7 @@ export default function DocumentsPage() {
 
   function confirmDelete(item: RagDocumentItem) {
     const count = item.actualChunkCount ?? item.chunkCount ?? 0;
-    Modal.confirm({
+    modal.confirm({
       title: '确认删除文档？',
       content: `将删除“${item.fileName}”及其 ${count} 个关联切片。raw 原文件会保留，后续扫描或强制重建可能重新入库。`,
       okText: '删除',
@@ -157,11 +158,11 @@ export default function DocumentsPage() {
   return (
     <>
       <ProTable<RagDocumentItem>
+        {...compactProTableProps}
         actionRef={actionRef}
         rowKey="id"
         columns={columns}
         scroll={{ x: 1280 }}
-        search={{ labelWidth: 'auto' }}
         request={async (params) => {
           const result = await pageDocuments(params);
           return { data: result.list, total: result.total, success: true };
@@ -186,7 +187,7 @@ export default function DocumentsPage() {
             danger
             loading={ingesting}
             onClick={() =>
-              Modal.confirm({
+              modal.confirm({
                 title: '确认强制重建索引？',
                 content:
                   '请确认文档已准备好。本次操作将重建全部文档索引，耗时较长，请耐心等待。',

@@ -10,7 +10,7 @@ import {
   type ActionType,
   type ProColumns,
 } from '@ant-design/pro-components';
-import { App, Button, Modal, Switch, Tabs, Typography } from 'antd';
+import { App, Button, Switch, Tabs, Typography } from 'antd';
 import dayjs from 'dayjs';
 import {
   deleteUserSkill,
@@ -21,13 +21,14 @@ import {
   type UserSkillItem,
 } from '@/api/business-agent/skills';
 import { SemanticTag } from '@/components/semantic-tag';
+import { compactProTableProps } from '@/theme';
 import { SkillDetailModal } from './skill-detail-modal';
 import { SkillFormModal } from './skill-form-modal';
 
 export default function AgentSkillsPage() {
   const systemActionRef = useRef<ActionType>();
   const userActionRef = useRef<ActionType>();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const [detailItem, setDetailItem] = useState<
     SystemSkillItem | UserSkillItem
   >();
@@ -142,7 +143,7 @@ export default function AgentSkillsPage() {
           key="delete"
           type="danger"
           onClick={() =>
-            Modal.confirm({
+            modal.confirm({
               title: '确认删除用户 Skill？',
               content: `删除“${item.name}”后无法恢复。`,
               okText: '删除',
@@ -172,11 +173,11 @@ export default function AgentSkillsPage() {
             label: '系统 Skill',
             children: (
               <ProTable<SystemSkillItem>
+                {...compactProTableProps}
                 actionRef={systemActionRef}
                 rowKey="key"
                 columns={systemColumns}
                 pagination={false}
-                search={{ labelWidth: 'auto' }}
                 request={async (params) => {
                   const data = await listSystemSkills(
                     typeof params.keyword === 'string'
@@ -193,10 +194,10 @@ export default function AgentSkillsPage() {
             label: '用户 Skill',
             children: (
               <ProTable<UserSkillItem>
+                {...compactProTableProps}
                 actionRef={userActionRef}
                 rowKey="id"
                 columns={userColumns}
-                search={{ labelWidth: 'auto' }}
                 request={async (params) => {
                   const result = await pageUserSkills(params);
                   return {

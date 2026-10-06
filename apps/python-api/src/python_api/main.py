@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from python_api.config import get_settings
 from python_api.database import engine
 from python_api.errors import install_exception_handlers
-from python_api.middleware import (
+from python_api.core.middleware import (
     RequestLoggingMiddleware,
     RequestSizeLimitMiddleware,
     ResponseEnvelopeMiddleware,

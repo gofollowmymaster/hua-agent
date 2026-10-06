@@ -71,8 +71,8 @@ body {
 
 .admin-brand-mark {
   display: grid;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   color: var(--app-color-container);
   font-weight: 800;
   background: var(--app-color-primary);
@@ -107,7 +107,7 @@ body {
 
 .module-placeholder {
   display: grid;
-  min-height: 360px;
+  min-height: 280px;
   background: var(--app-color-container);
   border: 1px solid var(--app-color-divider);
   border-radius: 6px;

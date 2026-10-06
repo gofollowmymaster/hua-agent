@@ -10,7 +10,7 @@ import {
   type ActionType,
   type ProColumns,
 } from '@ant-design/pro-components';
-import { App, Button, Modal, Typography } from 'antd';
+import { App, Button, Typography } from 'antd';
 import dayjs from 'dayjs';
 import {
   deleteAgentKnowledgeDocument,
@@ -22,6 +22,7 @@ import {
 import { DocumentPreviewModal } from '@/components/document-preview';
 import { SemanticTag } from '@/components/semantic-tag';
 import { useDrawerQuery } from '@/layouts/drawer-query';
+import { compactProTableProps } from '@/theme';
 
 function formatSize(value: string | number) {
   const size = Number(value || 0);
@@ -33,7 +34,7 @@ function formatSize(value: string | number) {
 export default function AgentKnowledgePage() {
   const actionRef = useRef<ActionType>();
   const drawer = useDrawerQuery();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const [previewItem, setPreviewItem] = useState<AgentKnowledgeDocumentItem>();
   const [ingesting, setIngesting] = useState(false);
 
@@ -50,7 +51,7 @@ export default function AgentKnowledgePage() {
 
   function remove(item: AgentKnowledgeDocumentItem) {
     const count = item.actualChunkCount ?? item.chunkCount ?? 0;
-    Modal.confirm({
+    modal.confirm({
       title: '确认删除文档？',
       content: `将删除“${item.fileName}”及其 ${count} 个关联切片。docs 原文件会保留，后续入库可能重新索引。`,
       okText: '删除',
@@ -160,11 +161,11 @@ export default function AgentKnowledgePage() {
   return (
     <>
       <ProTable<AgentKnowledgeDocumentItem>
+        {...compactProTableProps}
         actionRef={actionRef}
         rowKey="id"
         columns={columns}
         scroll={{ x: 1280 }}
-        search={{ labelWidth: 'auto' }}
         request={async (params) => {
           const result = await pageAgentKnowledgeDocuments(params);
           return { data: result.list, total: result.total, success: true };
@@ -190,7 +191,7 @@ export default function AgentKnowledgePage() {
             danger
             disabled={ingesting}
             onClick={() =>
-              Modal.confirm({
+              modal.confirm({
                 title: '确认强制重建索引？',
                 content:
                   '本次操作将重新解析 docs 目录并重建全部文档切片，耗时较长，请确认文档已就绪。',

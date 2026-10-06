@@ -53,6 +53,8 @@ export const reactAdminTheme = {
     colorBgLayout: themePalette.pageBackground,
     colorBgContainer: themePalette.containerBackground,
     colorBgElevated: themePalette.containerBackground,
+    fontSize: 12,
+    fontSizeSM: 12,
     borderRadius: 6,
     boxShadowSecondary: '0 8px 24px rgba(23, 33, 31, 0.08)',
   },
@@ -88,6 +90,9 @@ export const reactAdminTheme = {
       activeBorderColor: themePalette.primary,
       hoverBorderColor: themePalette.primaryHover,
       activeShadow: '0 0 0 2px rgba(15, 118, 110, 0.12)',
+      inputFontSize: 12,
+      inputFontSizeLG: 12,
+      inputFontSizeSM: 12,
     },
     Modal: {
       contentBg: themePalette.containerBackground,
@@ -119,6 +124,78 @@ export const reactAdminTheme = {
   },
 } satisfies ThemeConfig;
 
+export const reactAdminWorkspaceTheme = {
+  token: {
+    controlHeight: 30,
+    controlHeightLG: 40,
+    padding: 12,
+    paddingSM: 8,
+    paddingMD: 12,
+    paddingLG: 16,
+    paddingContentHorizontalLG: 16,
+    margin: 12,
+    marginSM: 8,
+    marginMD: 12,
+    marginLG: 16,
+  },
+  components: {
+    Card: {
+      headerHeight: 44,
+      headerHeightSM: 40,
+      bodyPadding: 16,
+      bodyPaddingSM: 12,
+      headerPadding: 16,
+      headerPaddingSM: 12,
+      tabsMarginBottom: 0,
+    },
+    Drawer: {
+      footerPaddingBlock: 8,
+      footerPaddingInline: 16,
+    },
+    Form: {
+      itemMarginBottom: 12,
+      inlineItemMarginBottom: 0,
+    },
+    Menu: {
+      itemHeight: 36,
+      collapsedWidth: 64,
+      itemMarginBlock: 2,
+      itemMarginInline: 8,
+      itemPaddingInline: 12,
+      iconMarginInlineEnd: 8,
+    },
+    Pagination: {
+      itemSize: 30,
+      itemSizeSM: 24,
+    },
+    Table: {
+      cellPaddingBlock: 12,
+      cellPaddingInline: 16,
+      cellPaddingBlockMD: 8,
+      cellPaddingInlineMD: 12,
+      cellPaddingBlockSM: 6,
+      cellPaddingInlineSM: 8,
+    },
+    Tabs: {
+      horizontalMargin: '0 0 12px 0',
+      horizontalItemGutter: 24,
+      horizontalItemPadding: '8px 0',
+    },
+  },
+} satisfies ThemeConfig;
+
+export const compactProTableProps = {
+  defaultSize: 'small',
+  search: {
+    labelWidth: 'auto',
+    style: { padding: 12 },
+  },
+  cardProps: {
+    bodyStyle: { padding: 12 },
+  },
+  pagination: { size: 'small' },
+} as const;
+
 export const proLayoutTheme = {
   bgLayout: themePalette.pageBackground,
   sider: {
@@ -140,6 +217,7 @@ export const proLayoutTheme = {
     colorTextSubMenuSelected: themePalette.navigationSelected,
   },
   header: {
+    heightLayoutHeader: 48,
     colorBgHeader: themePalette.navigation,
     colorBgScrollHeader: themePalette.navigation,
     colorHeaderTitle: '#FFFFFF',

@@ -11,9 +11,9 @@ import {
   ThunderboltOutlined,
 } from '@ant-design/icons';
 import { PageContainer, ProLayout } from '@ant-design/pro-components';
-import { Dropdown, Space } from 'antd';
+import { App, ConfigProvider, Dropdown, Space } from 'antd';
 import { history, Link, Outlet, useLocation, useModel } from '@umijs/max';
-import { proLayoutTheme } from '@/theme';
+import { proLayoutTheme, reactAdminWorkspaceTheme } from '@/theme';
 import { GlobalDrawer } from './global-drawer';
 
 const COLLAPSED_KEY = 'react-admin:sider-collapsed';
@@ -130,69 +130,75 @@ export default function AdminLayout() {
   }, [auth.tenantDisplayName, meta.title]);
 
   return (
-    <ProLayout
-      className="admin-layout"
-      token={proLayoutTheme}
-      stylish={{
-        header: () => ({
-          borderBlockEnd: 0,
-          boxShadow: 'none',
-        }),
-      }}
-      title={brand}
-      logo={<div className="admin-brand-mark">{auth.supplierCode}</div>}
-      route={{ routes: menuRoutes }}
-      location={{ pathname: location.pathname }}
-      collapsed={collapsed}
-      onCollapse={(next) => {
-        setCollapsed(next);
-        window.localStorage.setItem(COLLAPSED_KEY, String(next));
-      }}
-      menuItemRender={(item, dom) =>
-        item.path ? <Link to={item.path}>{dom}</Link> : dom
-      }
-      avatarProps={{
-        title: auth.displayName,
-        src: auth.userInfo.avatar,
-        render: (_props, dom) => (
-          <Dropdown
-            menu={{
-              items: [
-                {
-                  key: 'logout',
-                  icon: <LogoutOutlined />,
-                  label: '退出登录',
-                },
-              ],
-              onClick: ({ key }) => {
-                if (key === 'logout') {
-                  auth.logout();
-                  history.replace('/login');
-                }
-              },
+    <ConfigProvider theme={reactAdminWorkspaceTheme}>
+      <App component={false}>
+        <ProLayout
+          className="admin-layout"
+          token={proLayoutTheme}
+          siderWidth={200}
+          stylish={{
+            header: () => ({
+              borderBlockEnd: 0,
+              boxShadow: 'none',
+            }),
+          }}
+          title={brand}
+          logo={<div className="admin-brand-mark">{auth.supplierCode}</div>}
+          route={{ routes: menuRoutes }}
+          location={{ pathname: location.pathname }}
+          collapsed={collapsed}
+          onCollapse={(next) => {
+            setCollapsed(next);
+            window.localStorage.setItem(COLLAPSED_KEY, String(next));
+          }}
+          menuItemRender={(item, dom) =>
+            item.path ? <Link to={item.path}>{dom}</Link> : dom
+          }
+          avatarProps={{
+            title: auth.displayName,
+            src: auth.userInfo.avatar,
+            render: (_props, dom) => (
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: 'logout',
+                      icon: <LogoutOutlined />,
+                      label: '退出登录',
+                    },
+                  ],
+                  onClick: ({ key }) => {
+                    if (key === 'logout') {
+                      auth.logout();
+                      history.replace('/login');
+                    }
+                  },
+                }}
+              >
+                <Space>{dom}</Space>
+              </Dropdown>
+            ),
+          }}
+          layout="mix"
+          fixedHeader
+          fixSiderbar
+          contentStyle={{ padding: 0, minHeight: 'calc(100vh - 48px)' }}
+        >
+          <PageContainer
+            className="admin-page-container"
+            title={meta.title}
+            subTitle={meta.subtitle}
+            header={{ style: { paddingBlock: 8 } }}
+            token={{
+              paddingInlinePageContainerContent: 12,
+              paddingBlockPageContainerContent: 12,
             }}
           >
-            <Space>{dom}</Space>
-          </Dropdown>
-        ),
-      }}
-      layout="mix"
-      fixedHeader
-      fixSiderbar
-      contentStyle={{ padding: 0, minHeight: 'calc(100vh - 56px)' }}
-    >
-      <PageContainer
-        className="admin-page-container"
-        title={meta.title}
-        subTitle={meta.subtitle}
-        token={{
-          paddingInlinePageContainerContent: 12,
-          paddingBlockPageContainerContent: 12,
-        }}
-      >
-        <Outlet />
-      </PageContainer>
-      <GlobalDrawer />
-    </ProLayout>
+            <Outlet />
+          </PageContainer>
+          <GlobalDrawer />
+        </ProLayout>
+      </App>
+    </ConfigProvider>
   );
 }

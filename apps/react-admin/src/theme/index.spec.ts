@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { resolveTenantAuthConfig } from '@/auth/tenant';
-import { proLayoutTheme, reactAdminTheme, themePalette } from './index';
+import {
+  compactProTableProps,
+  proLayoutTheme,
+  reactAdminTheme,
+  reactAdminWorkspaceTheme,
+  themePalette,
+} from './index';
 
 function relativeLuminance(hex: string) {
   const [red, green, blue] = [1, 3, 5]
@@ -27,6 +33,8 @@ describe('react admin theme', () => {
       colorPrimaryActive: '#115E59',
       colorBgLayout: '#F3F7F5',
       colorText: '#1F2926',
+      fontSize: 12,
+      fontSizeSM: 12,
       borderRadius: 6,
     });
     expect(proLayoutTheme).toMatchObject({
@@ -53,6 +61,11 @@ describe('react admin theme', () => {
         controlItemBgActive: '#DDF7EF',
         controlItemBgActiveHover: '#C9EFE4',
       },
+      Input: {
+        inputFontSize: 12,
+        inputFontSizeLG: 12,
+        inputFontSizeSM: 12,
+      },
     });
   });
 
@@ -73,6 +86,34 @@ describe('react admin theme', () => {
       themePalette.primary,
       themePalette.primary,
     ]);
+  });
+
+  it('defines a medium-density workspace without shrinking large controls', () => {
+    expect(reactAdminWorkspaceTheme).toMatchObject({
+      token: {
+        controlHeight: 30,
+        controlHeightLG: 40,
+        paddingLG: 16,
+      },
+      components: {
+        Card: { headerHeight: 44, bodyPadding: 16 },
+        Drawer: { footerPaddingInline: 16 },
+        Form: { itemMarginBottom: 12 },
+        Menu: { itemHeight: 36, collapsedWidth: 64 },
+        Pagination: { itemSize: 30 },
+        Table: { cellPaddingBlockMD: 8, cellPaddingInlineMD: 12 },
+        Tabs: { horizontalItemPadding: '8px 0' },
+      },
+    });
+    expect(proLayoutTheme.header?.heightLayoutHeader).toBe(48);
+    expect(reactAdminWorkspaceTheme.token).not.toHaveProperty('fontSize');
+    expect(reactAdminWorkspaceTheme.token).not.toHaveProperty('fontSizeSM');
+    expect(compactProTableProps).toMatchObject({
+      defaultSize: 'small',
+      search: { style: { padding: 12 } },
+      cardProps: { bodyStyle: { padding: 12 } },
+      pagination: { size: 'small' },
+    });
   });
 
   it.each([

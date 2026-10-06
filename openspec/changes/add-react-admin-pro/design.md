@@ -57,6 +57,14 @@ React Admin 在 `src/theme/` 集中维护 Ant Design token、ProLayout token、�
 
 顶栏和侧栏只通过 ProLayout token 使用石墨深色，不启用会向内容区后代注入暗色算法的 `realDark` 导航主题。Dropdown 与 Breadcrumb 显式使用浅色内容区 token，Header 清除默认分割边框和阴影；危险按钮单独关闭阴影，主按钮阴影保持不变。这样折叠菜单 portal 继续维持深色，同时表格工具浮层、面包屑和危险操作在浅色内容区保持可读。
 
+### 10. 登录后工作台中度紧凑
+
+登录后的 ProLayout 内使用独立 ConfigProvider 密度配置，将默认控件收紧到 30px、Header 收紧到 48px、展开侧栏收紧到 200px，并通过 Card、Form、Menu、Table、Tabs、Pagination、Modal 和 Drawer 官方 token 统一容器与控件间距。登录页保留原大号表单尺寸；聊天等自定义布局只在自身 CSS 中收紧网格和留白，不启用全局 compactAlgorithm，也不缩小文档预览画布。
+
+ProTable 默认使用组件库 `small` 密度，单元格使用 `6px 8px` 内边距，搜索区与表格 Card 使用 12px 内边距，分页使用小号尺寸。密度菜单继续保留，用户可在当前页面临时切换为中等或宽松；重新进入页面时恢复小号默认值。
+
+全应用使用 12px 正文基准，并显式将小号字号下限保持在 12px，避免 Tag、分页和辅助文案被算法缩小到 10px。登录页与工作台共用该规则；页面标题、弹窗标题和品牌名称继续使用组件库派生的大号与标题字号保留信息层级，控件高度和页面间距不随字号变化。
+
 ## Risks / Trade-offs
 
 - [两套前端业务类型可能漂移] -> API 文件按 Vue 当前边界镜像，并用 adapter/页面测试锁定路径和字段。

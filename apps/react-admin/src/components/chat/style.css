@@ -1,17 +1,17 @@
 .chat-demo-page {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 190px);
-  min-height: 520px;
-  gap: 12px;
+  height: calc(100vh - 166px);
+  min-height: 480px;
+  gap: 8px;
 }
 
 .chat-demo-workspace {
   display: grid;
-  grid-template-columns: 300px minmax(0, 1fr);
+  grid-template-columns: 280px minmax(0, 1fr);
   flex: 1;
   min-height: 0;
-  gap: 12px;
+  gap: 8px;
 }
 
 .chat-history,
@@ -22,13 +22,13 @@
 }
 
 .chat-history .ant-card-body {
-  height: calc(100% - 56px);
+  height: calc(100% - 44px);
   padding: 8px;
   overflow: auto;
 }
 
 .chat-history-item {
-  padding: 10px !important;
+  padding: 8px !important;
   border-inline-start: 3px solid transparent;
   border-radius: 6px;
   cursor: pointer;
@@ -52,15 +52,15 @@
 .chat-messages {
   flex: 1;
   min-height: 0;
-  padding: 16px;
+  padding: 12px;
   overflow: auto;
 }
 
 .chat-message {
   display: grid;
   grid-template-columns: 64px minmax(0, 1fr);
-  margin-bottom: 16px;
-  gap: 12px;
+  margin-bottom: 12px;
+  gap: 8px;
 }
 
 .chat-message.user > div {
@@ -71,8 +71,8 @@
 .chat-reasoning,
 .chat-status {
   max-width: 840px;
-  margin-bottom: 8px;
-  padding: 10px 12px;
+  margin-bottom: 6px;
+  padding: 8px 10px;
   border: 1px solid var(--app-color-border);
   border-radius: 6px;
   background: var(--app-color-container);
@@ -163,7 +163,7 @@
 }
 
 .chat-composer {
-  padding: 14px;
+  padding: 10px;
   border-top: 1px solid var(--app-color-divider);
   background: var(--app-color-container);
 }
@@ -172,8 +172,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 10px;
-  gap: 12px;
+  margin-top: 8px;
+  gap: 8px;
 }
 
 @media (max-width: 900px) {
@@ -186,10 +186,10 @@
   }
 
   .chat-history {
-    min-height: 260px;
+    min-height: 240px;
   }
 
   .chat-main {
-    min-height: 480px;
+    min-height: 440px;
   }
 }

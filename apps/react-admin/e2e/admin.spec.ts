@@ -1,7 +1,20 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 function json(body: unknown) {
   return JSON.stringify({ code: 200, message: 'ok', body });
+}
+
+async function getInputControlHeight(locator: Locator) {
+  return locator.evaluate((element) => {
+    const control = element.closest('.ant-input-affix-wrapper') || element;
+    return Math.round(control.getBoundingClientRect().height);
+  });
+}
+
+async function getFontSize(locator: Locator) {
+  return locator.evaluate((element) =>
+    Math.round(Number.parseFloat(getComputedStyle(element).fontSize)),
+  );
 }
 
 const documentItem = {
@@ -39,7 +52,11 @@ const agentKnowledgeItem = {
 
 async function login(page: Page) {
   await page.goto('/public/react-admin/#/login');
-  await expect(page.getByPlaceholder('用户名')).toBeVisible();
+  const usernameInput = page.getByPlaceholder('用户名');
+  await expect(usernameInput).toBeVisible();
+  await expect(usernameInput).toHaveClass(/ant-input-lg/);
+  await expect(usernameInput).toHaveCSS('font-size', '12px');
+  expect(await getInputControlHeight(usernameInput)).toBe(40);
   const loginTheme = await page
     .locator('.react-admin-theme')
     .evaluate((root) => {
@@ -76,6 +93,14 @@ async function login(page: Page) {
   await expect(page.locator('.ant-layout-sider').first()).toHaveCSS(
     'background-color',
     'rgb(23, 33, 31)',
+  );
+  await expect(page.locator('.ant-pro-layout-header')).toHaveCSS(
+    'height',
+    '48px',
+  );
+  await expect(page.locator('.ant-pro-sider .ant-menu-item').first()).toHaveCSS(
+    'font-size',
+    '12px',
   );
 }
 
@@ -341,10 +366,11 @@ test('login, browse, preview, upload and restore a drawer deep link', async ({
   await login(page);
   await expect(page.getByRole('button', { name: '手册.txt' })).toBeVisible();
   await expectPageSpacing(page);
-  await expect(page.getByRole('button', { name: /强制重建索引/ })).toHaveCSS(
-    'box-shadow',
-    'none',
-  );
+  const rebuildButton = page.getByRole('button', {
+    name: /强制重建索引/,
+  });
+  await expect(rebuildButton).toHaveCSS('height', '30px');
+  await expect(rebuildButton).toHaveCSS('box-shadow', 'none');
   await expect(page.locator('.ant-pro-layout-header')).toHaveCSS(
     'border-bottom-width',
     '0px',
@@ -352,6 +378,52 @@ test('login, browse, preview, upload and restore a drawer deep link', async ({
   await expect(page.locator('.ant-pro-layout-header')).toHaveCSS(
     'box-shadow',
     'none',
+  );
+  expect(
+    await getInputControlHeight(page.getByPlaceholder('文件名 / 路径')),
+  ).toBe(30);
+  await expect(page.locator('.ant-pro-query-filter')).toHaveCSS(
+    'padding-top',
+    '12px',
+  );
+  await expect(page.locator('.ant-pro-query-filter')).toHaveCSS(
+    'padding-left',
+    '12px',
+  );
+  await expect(page.locator('.ant-table-thead th').first()).toHaveCSS(
+    'padding-top',
+    '6px',
+  );
+  await expect(page.locator('.ant-table-thead th').first()).toHaveCSS(
+    'padding-left',
+    '8px',
+  );
+  await expect(page.locator('.ant-table-tbody td').first()).toHaveCSS(
+    'font-size',
+    '12px',
+  );
+  await expect(page.locator('.semantic-tag-success').first()).toHaveCSS(
+    'font-size',
+    '12px',
+  );
+  await expect(page.locator('.ant-pagination')).toHaveCSS('font-size', '12px');
+  await expect(page.locator('.ant-breadcrumb')).toHaveCSS('font-size', '12px');
+  expect(
+    await getFontSize(page.locator('.ant-page-header-heading-title')),
+  ).toBeGreaterThan(12);
+  const compactHeaderHeight = await page
+    .locator('.ant-table-thead tr')
+    .first()
+    .evaluate((element) => Math.round(element.getBoundingClientRect().height));
+  expect(compactHeaderHeight).toBeGreaterThanOrEqual(31);
+  expect(compactHeaderHeight).toBeLessThanOrEqual(33);
+  const tableToolbar = page.locator('.ant-pro-table-list-toolbar');
+  await expect(tableToolbar.locator('..')).toHaveCSS('padding-left', '12px');
+  await expect(
+    tableToolbar.locator('.ant-pro-table-list-toolbar-container'),
+  ).toHaveCSS('padding-top', '12px');
+  await expect(page.locator('.ant-pagination')).toHaveClass(
+    /ant-pagination-mini/,
   );
 
   await page.locator('[aria-label="column-height"]').click();
@@ -362,22 +434,65 @@ test('login, browse, preview, upload and restore a drawer deep link', async ({
   const regularDensityItem = densityMenu
     .locator('.ant-dropdown-menu-item')
     .filter({ hasText: '宽松' });
-  const selectedDensityItem = densityMenu
+  const compactDensityItem = densityMenu
     .locator('.ant-dropdown-menu-item-selected')
-    .filter({ hasText: '中等' });
+    .filter({ hasText: '紧凑' });
   await expect(regularDensityItem).toHaveCSS('color', 'rgb(31, 41, 38)');
-  await expect(selectedDensityItem).toHaveCSS(
+  await expect(compactDensityItem).toHaveCSS(
     'background-color',
     'rgb(221, 247, 239)',
   );
-  await expect(selectedDensityItem).toHaveCSS('color', 'rgb(17, 94, 89)');
+  await expect(compactDensityItem).toHaveCSS('color', 'rgb(17, 94, 89)');
   await regularDensityItem.hover();
   await expect(regularDensityItem).toHaveCSS(
     'background-color',
     'rgb(201, 239, 228)',
   );
-  await page.keyboard.press('Escape');
+  await regularDensityItem.click();
+  await expect(page.locator('.ant-table-thead th').first()).toHaveCSS(
+    'padding-top',
+    '12px',
+  );
+  await expect(page.locator('.ant-table-thead th').first()).toHaveCSS(
+    'padding-left',
+    '16px',
+  );
+  await page.locator('[aria-label="column-height"]').click();
+  await page
+    .locator('.ant-dropdown:not(.ant-dropdown-hidden):visible')
+    .locator('.ant-dropdown-menu-item')
+    .filter({ hasText: '中等' })
+    .click();
+  await expect(page.locator('.ant-table-thead th').first()).toHaveCSS(
+    'padding-top',
+    '8px',
+  );
+  await expect(page.locator('.ant-table-thead th').first()).toHaveCSS(
+    'padding-left',
+    '12px',
+  );
+  await page.locator('[aria-label="column-height"]').click();
+  await page
+    .locator('.ant-dropdown:not(.ant-dropdown-hidden):visible')
+    .locator('.ant-dropdown-menu-item')
+    .filter({ hasText: '紧凑' })
+    .click();
+  await expect(page.locator('.ant-table-thead th').first()).toHaveCSS(
+    'padding-top',
+    '6px',
+  );
+  await expect(page.locator('.ant-table-thead th').first()).toHaveCSS(
+    'padding-left',
+    '8px',
+  );
   if (testInfo.project.name === 'desktop') {
+    await expect(page.locator('.ant-layout-sider').first()).toHaveCSS(
+      'width',
+      '200px',
+    );
+    await expect(
+      page.locator('.ant-pro-sider .ant-menu-submenu-title').first(),
+    ).toHaveCSS('height', '36px');
     await page.screenshot({
       path: testInfo.outputPath('document-management-theme.png'),
       fullPage: true,
@@ -417,7 +532,19 @@ test('login, browse, preview, upload and restore a drawer deep link', async ({
   }
 
   await page.getByRole('button', { name: '手册.txt' }).click();
-  await expect(page.getByRole('dialog')).toContainText('手册.txt');
+  const previewDialog = page.getByRole('dialog');
+  await expect(previewDialog).toContainText('手册.txt');
+  expect(
+    await getFontSize(previewDialog.locator('.ant-modal-title')),
+  ).toBeGreaterThan(12);
+  await expect(previewDialog.locator('.ant-modal-content')).toHaveCSS(
+    'padding-top',
+    '12px',
+  );
+  await expect(previewDialog.locator('.ant-modal-content')).toHaveCSS(
+    'padding-left',
+    '16px',
+  );
   await page.getByRole('button', { name: 'Close' }).click();
 
   await page.getByRole('button', { name: /添加文档/ }).click();
@@ -434,6 +561,22 @@ test('login, browse, preview, upload and restore a drawer deep link', async ({
   await page.getByText('切片实况', { exact: true }).click();
   await expect(page).toHaveURL(/drawer=document-chunks.*drawerCode=1/);
   await expect(page.getByText('第一段切片内容')).toBeVisible();
+  expect(await getFontSize(page.locator('.ant-drawer-title'))).toBeGreaterThan(
+    12,
+  );
+  await expect(page.locator('.ant-drawer-body')).toHaveCSS(
+    'padding-top',
+    '16px',
+  );
+  await expect(page.locator('.ant-drawer-body')).toHaveCSS(
+    'padding-left',
+    '16px',
+  );
+  if (testInfo.project.name === 'desktop') {
+    await page.screenshot({
+      path: testInfo.outputPath('document-drawer-compact.png'),
+    });
+  }
   await page.reload();
   await expect(page.getByText('第一段切片内容')).toBeVisible();
   await expect(page.locator('body')).not.toHaveCSS('overflow-x', 'scroll');
@@ -456,11 +599,29 @@ test('opens every menu route and keeps placeholder modules explicit', async ({
     await page.goto(`/public/react-admin/#${path}`);
     await expect(page.locator('main').getByText(title).first()).toBeVisible();
   }
+  if (testInfo.project.name === 'desktop') {
+    await page.goto('/public/react-admin/#/knowledge/sessions');
+    await page.screenshot({
+      path: testInfo.outputPath('session-management-compact.png'),
+      fullPage: true,
+    });
+  }
   await page.goto('/public/react-admin/#/business-agent/skills');
   await expect(page.getByRole('tab', { name: '系统 Skill' })).toBeVisible();
   await page.getByRole('tab', { name: '用户 Skill' }).click();
+  if (testInfo.project.name === 'desktop') {
+    await page.screenshot({
+      path: testInfo.outputPath('skill-management-compact.png'),
+      fullPage: true,
+    });
+  }
   await page.getByRole('button', { name: /新建 Skill/ }).click();
   await expect(page.getByText('新建用户 Skill')).toBeVisible();
+  if (testInfo.project.name === 'desktop') {
+    await page.screenshot({
+      path: testInfo.outputPath('skill-modal-compact.png'),
+    });
+  }
   await page.getByRole('button', { name: '取 消' }).click();
   await expect(page.locator('body')).not.toHaveCSS('overflow-x', 'scroll');
 
@@ -484,6 +645,7 @@ test('opens every menu route and keeps placeholder modules explicit', async ({
     hasText: 'ready',
   });
   await expect(categoryTag).toHaveCSS('color', 'rgb(29, 78, 216)');
+  await expect(categoryTag).toHaveCSS('font-size', '12px');
   await expect(categoryTag).toHaveCSS('background-color', 'rgb(239, 246, 255)');
   await expect(statusTag).toHaveCSS('color', 'rgb(17, 94, 89)');
   await expect(statusTag).toHaveCSS('background-color', 'rgb(221, 247, 239)');
@@ -509,6 +671,19 @@ test('loads RAG and business Agent histories with ordered visible parts', async 
 
   await page.goto('/public/react-admin/#/business-agent/demo');
   await page.getByText('查询库存').click();
+  await expect(page.locator('.chat-text').first()).toHaveCSS(
+    'font-size',
+    '12px',
+  );
+  await expect(page.locator('.chat-demo-workspace')).toHaveCSS('gap', '8px');
+  await expect(page.locator('.chat-messages')).toHaveCSS('padding-top', '12px');
+  await expect(page.locator('.chat-composer')).toHaveCSS('padding-top', '10px');
+  if (testInfo.project.name === 'desktop') {
+    await expect(page.locator('.chat-demo-workspace')).toHaveCSS(
+      'grid-template-columns',
+      /280px/,
+    );
+  }
   const agentMessage = page.locator('.chat-message.assistant');
   await expect(agentMessage).toContainText('先查库存');
   await expect(agentMessage).toContainText('库存查询完成');
