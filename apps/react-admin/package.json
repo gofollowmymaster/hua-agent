@@ -7,7 +7,7 @@
     "build": "max build",
     "build:dev": "max build",
     "build:test": "cross-env UMI_ENV=test max build",
-    "dev": "cross-env PORT=5175 HOST=0.0.0.0 max dev",
+    "dev": "dotenv -e .env.development -- cross-env PORT=5175 HOST=0.0.0.0 max dev",
     "preview": "max preview --port 4175",
     "test": "vitest run",
     "test:watch": "vitest",

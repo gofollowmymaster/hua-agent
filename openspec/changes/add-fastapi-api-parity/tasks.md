@@ -31,7 +31,7 @@
 
 - [x] 5.1 增加根命令、独立 Dockerfile 和生产启动配置
 - [x] 5.2 增加 Python app AGENTS、架构、开发和验证文档并更新 workspace 索引
-- [ ] 5.3 将 Python 配置独立为 dev/test/prod 分层文件并接入核心与可选配置校验
+- [x] 5.3 将 Python 配置独立为 dev/test/prod 分层文件并接入核心与可选配置校验
 
 ## 6. 验证
 

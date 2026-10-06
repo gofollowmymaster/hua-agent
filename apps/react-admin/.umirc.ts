@@ -5,6 +5,7 @@ const apiTarget =
 const apiBaseUrl =
   process.env.UMI_APP_API_BASE_URL ||
   (process.env.NODE_ENV === 'development' ? '/api' : '');
+const apiProxyPath = apiBaseUrl || '/api';
 
 export default defineConfig({
   antd: {},
@@ -72,10 +73,10 @@ export default defineConfig({
     { path: '*', redirect: '/login' },
   ],
   proxy: {
-    '/api': {
+    [apiProxyPath]: {
       target: apiTarget,
       changeOrigin: true,
-      pathRewrite: { '^/api': '' },
+      ...(apiProxyPath === '/api' ? { pathRewrite: { '^/api': '' } } : {}),
     },
   },
 });

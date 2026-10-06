@@ -1,37 +1,30 @@
-# Python API Architecture
+# Python API 架构说明
 
-`apps/python-api` is an independently deployed FastAPI implementation of the NestJS boundary in
-`apps/api`. It listens on port 8000 by default; NestJS remains on port 3000. A request is handled by
-exactly one backend, while both backends can alternate across requests.
+`apps/python-api/docs/architecture/` 记录 `apps/python-api` 当前实现的架构事实，包括应用启动、请求处理、领域模块、数据存储和外部依赖。本目录不规定编码写法，开发约束见 `../standard/README.md`。
 
-## Layers
+本文档目录中的 `src/` 默认指 `apps/python-api/src/`，`python_api/` 默认指 `apps/python-api/src/python_api/`。
 
-- `routes/`: HTTP methods, paths, dependencies, and response type selection.
-- `schemas/`: Pydantic request conversion and validation.
-- `services/`: use-case orchestration, persistence, document processing, RAG, and Agent behavior.
-- `models.py` and `database.py`: async SQLAlchemy mappings and sessions over Prisma-owned tables.
-- `feishu.py` and `redis_service.py`: external integrations using shared configuration and formats.
-- `middleware.py`, `security.py`, and `ui_stream.py`: boundary compatibility for tenants, auth,
-  envelopes, errors, and AI SDK v6 SSE.
+## 阅读顺序
 
-Prisma remains the only schema and migration authority. SQLAlchemy models are compatibility
-mappings, while pgvector and zhparser operations use parameterized native SQL.
+1. `project-architecture.md`：理解技术栈、目录结构、依赖方向、生命周期和请求链路。
+2. `module-and-data-flow.md`：理解七个业务模块及文档入库、检索、对话和工具调用流程。
+3. `auth-tenant-and-contract.md`：理解租户、鉴权、HTTP 响应、文件响应和流式协议。
+4. `infrastructure-and-runtime.md`：理解数据库、Redis、模型、飞书、文件系统、配置和部署运行。
 
-## Shared State
+## 任务阅读路由
 
-JWT claims and Node-compatible scrypt hashes are accepted across both stacks. Request tenant state
-is held in `contextvars`. PostgreSQL queries carry `tenant_code`, and Redis keys preserve the
-`frontend-node:*` templates and TTLs. Agent and RAG session rows can therefore be read by either
-backend.
+| 任务 | 必读文档 |
+| --- | --- |
+| 修改启动、middleware、异常处理或应用生命周期 | `project-architecture.md`、`auth-tenant-and-contract.md` |
+| 新增或修改业务接口 | `module-and-data-flow.md`、`auth-tenant-and-contract.md` |
+| 修改 RAG、Agent、文档入库或会话持久化 | `module-and-data-flow.md`、`infrastructure-and-runtime.md` |
+| 修改数据库、Redis、飞书、模型或文件目录 | `infrastructure-and-runtime.md`、`auth-tenant-and-contract.md` |
+| 修改配置、健康检查、Docker 或启动命令 | `infrastructure-and-runtime.md`、`project-architecture.md` |
 
-## Streaming
+## 架构边界
 
-Framework-native AI events never leave the service. They are normalized to reasoning, tool start,
-tool result, text, and completion events, then encoded as AI SDK UI Message SSE with `[DONE]`.
-Visible event order is also stored in the assistant message `parts` column.
-
-## Skill Boundary
-
-Business Agent Skill management and dynamic Skill loading are currently NestJS-only. FastAPI does
-not expose `/agent/skills/*`, does not map `agent_user_skills`, and keeps its existing fixed Agent
-prompt. This is an intentional compatibility exception until Skill parity is scheduled separately.
+- Python 包保持 `src/python_api/` 布局，模块统一使用 `python_api.*` 绝对导入。
+- 应用读取既有 PostgreSQL schema，不在本项目中创建或执行数据库迁移。
+- 数据库结构、外部目录和远程服务仅按 Python API 所需契约记录，不展开其内部实现。
+- `routes/`、`schemas/`、`services/` 是主要业务分层，基础设施能力位于包根模块。
+- 所有持久化业务数据都必须显式遵守租户隔离要求。

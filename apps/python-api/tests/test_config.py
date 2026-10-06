@@ -2,7 +2,12 @@ from pathlib import Path
 
 import pytest
 
-from python_api.config import ConfigurationError, load_settings, normalize_environment
+from python_api.config import (
+    ConfigurationError,
+    load_settings,
+    normalize_environment,
+    selected_environment,
+)
 from python_api.database import create_database_engine
 from python_api.redis_service import create_redis_client
 
@@ -41,6 +46,17 @@ def test_environment_aliases_are_normalized() -> None:
     assert normalize_environment("development") == "dev"
     assert normalize_environment("production") == "prod"
     assert normalize_environment("test") == "test"
+
+
+def test_python_environment_selector_precedes_node_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("NODE_ENV", "production")
+    monkeypatch.setenv("PYTHON_API_ENV", "test")
+    assert selected_environment() == "test"
+
+    monkeypatch.delenv("PYTHON_API_ENV")
+    assert selected_environment() == "prod"
 
 
 def test_environment_files_and_process_values_follow_precedence(
