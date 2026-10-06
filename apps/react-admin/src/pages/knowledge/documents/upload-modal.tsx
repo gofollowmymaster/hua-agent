@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { App, List, Modal, Space, Tag, Upload, type UploadFile } from 'antd';
+import { App, List, Modal, Space, Upload, type UploadFile } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import {
   uploadDocuments,
@@ -10,6 +10,7 @@ import {
   MAX_UPLOAD_FILES,
   validateUploadFiles,
 } from './upload-validation';
+import { SemanticTag } from '@/components/semantic-tag';
 
 interface UploadModalProps {
   open: boolean;
@@ -93,9 +94,13 @@ export function DocumentUploadModal({
         <div style={{ marginTop: 20 }}>
           <Space wrap>
             <span>处理 {result.totalFiles} 个文件</span>
-            <Tag color="success">成功 {result.indexedFiles}</Tag>
-            <Tag color="warning">重复 {result.duplicateFiles}</Tag>
-            <Tag color="error">失败 {result.failedFiles}</Tag>
+            <SemanticTag tone="success">
+              成功 {result.indexedFiles}
+            </SemanticTag>
+            <SemanticTag tone="warning">
+              重复 {result.duplicateFiles}
+            </SemanticTag>
+            <SemanticTag tone="error">失败 {result.failedFiles}</SemanticTag>
           </Space>
           <List
             style={{ marginTop: 12, maxHeight: 280, overflow: 'auto' }}
@@ -113,8 +118,8 @@ export function DocumentUploadModal({
                         : item.reason || '处理失败'
                   }
                 />
-                <Tag
-                  color={
+                <SemanticTag
+                  tone={
                     item.status === 'indexed'
                       ? 'success'
                       : item.status === 'duplicate'
@@ -127,7 +132,7 @@ export function DocumentUploadModal({
                     : item.status === 'duplicate'
                       ? '重复'
                       : '失败'}
-                </Tag>
+                </SemanticTag>
               </List.Item>
             )}
           />

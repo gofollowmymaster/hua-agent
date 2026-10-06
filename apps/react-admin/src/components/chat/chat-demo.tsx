@@ -16,6 +16,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { UIMessage } from 'ai';
 import type { PreviewDocumentItem } from '@/components/document-preview';
+import { resolveChatStatusTone } from '@/theme/chat-status';
 import type { ChatDemoAdapter, ChatSessionItem } from './types';
 import './style.css';
 
@@ -319,9 +320,14 @@ function MessageView({
           }
           if (part.type === 'data-status') {
             const data = part.data as Record<string, unknown>;
+            const tone = resolveChatStatusTone(data.stage);
             return (
-              <div key={index} className="chat-status">
-                <Tag color="processing">{adapter.formatStatus(data)}</Tag>
+              <div
+                key={index}
+                className={`chat-status chat-status-${tone}`}
+                data-stage={String(data.stage || '')}
+              >
+                <Tag>{adapter.formatStatus(data)}</Tag>
                 {data.stage === 'tool_result' && data.arguments != null && (
                   <pre>{JSON.stringify(data.arguments, null, 2)}</pre>
                 )}

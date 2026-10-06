@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Alert, Empty, List, Spin, Tag } from 'antd';
+import { Alert, Empty, List, Spin } from 'antd';
 import dayjs from 'dayjs';
 import {
   listSessionMessages,
   type RagMessageItem,
 } from '@/api/knowledge/sessions';
+import { SemanticTag } from '@/components/semantic-tag';
 
 export function SessionMessages({ id }: { id: string }) {
   const [messages, setMessages] = useState<RagMessageItem[]>([]);
@@ -33,9 +34,11 @@ export function SessionMessages({ id }: { id: string }) {
             <List.Item.Meta
               title={
                 <span>
-                  <Tag color={item.role === 'assistant' ? 'blue' : 'green'}>
+                  <SemanticTag
+                    tone={item.role === 'assistant' ? 'info' : 'success'}
+                  >
                     {item.role === 'assistant' ? '助手' : '用户'}
-                  </Tag>
+                  </SemanticTag>
                   {dayjs(item.createdAt).format('YYYY-MM-DD HH:mm')}
                 </span>
               }

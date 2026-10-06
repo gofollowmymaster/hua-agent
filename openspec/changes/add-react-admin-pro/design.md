@@ -49,6 +49,10 @@ React app 使用 Umi model 管理认证状态，并由纯 TypeScript storage 模
 
 Vitest 与 React Testing Library 验证纯逻辑和组件交互；Playwright 通过 mock API 覆盖关键页面流程和响应式布局。构建验证同时覆盖新 React app、现有 Vue app、HTTP client 和根 workspace。
 
+### 8. 集中的石墨青绿主题
+
+React Admin 在 `src/theme/` 集中维护 Ant Design token、ProLayout token、业务 CSS 变量与聊天状态色映射。A/C/D 租户共用石墨中性色和青绿色强调，仅保留名称与字母标识差异；页面不得引入脱离主题预设的临时颜色。页面结构、12px 页面边距和业务交互不随主题变化。
+
 ## Risks / Trade-offs
 
 - [两套前端业务类型可能漂移] -> API 文件按 Vue 当前边界镜像，并用 adapter/页面测试锁定路径和字段。

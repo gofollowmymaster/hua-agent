@@ -1,0 +1,29 @@
+.semantic-tag {
+  color: var(--app-color-text-secondary);
+  background: var(--app-color-neutral-surface);
+  border-color: var(--app-color-border);
+}
+
+.semantic-tag-info {
+  color: var(--app-color-info-text);
+  background: var(--app-color-info-surface);
+  border-color: var(--app-color-info-border);
+}
+
+.semantic-tag-success {
+  color: var(--app-color-primary-active);
+  background: var(--app-color-selected-bg);
+  border-color: var(--app-color-success);
+}
+
+.semantic-tag-warning {
+  color: var(--app-color-warning-text);
+  background: var(--app-color-warning-surface);
+  border-color: var(--app-color-warning);
+}
+
+.semantic-tag-error {
+  color: var(--app-color-error-text);
+  background: var(--app-color-error-surface);
+  border-color: var(--app-color-error);
+}

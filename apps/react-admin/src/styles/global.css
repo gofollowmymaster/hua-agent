@@ -6,14 +6,18 @@ body,
 }
 
 body {
-  color: #1f2329;
-  background: #f5f7fa;
   font-family:
     Inter,
     -apple-system,
     BlinkMacSystemFont,
     'Segoe UI',
     sans-serif;
+}
+
+.react-admin-theme {
+  min-height: 100vh;
+  color: var(--app-color-text);
+  background: var(--app-color-page-bg);
 }
 
 * {
@@ -26,9 +30,86 @@ body {
 }
 
 .muted {
-  color: #646a73;
+  color: var(--app-color-text-secondary);
 }
 
 .error-text {
-  color: #ff4d4f;
+  color: var(--app-color-error);
+}
+
+.admin-layout .ant-pro-layout-bg-list {
+  display: none;
+}
+
+.react-admin-body .ant-menu-submenu-popup {
+  background: transparent !important;
+}
+
+.react-admin-body .ant-menu-submenu-popup > .ant-menu {
+  color: var(--app-color-nav-text);
+  background: var(--app-color-nav-secondary) !important;
+  border: 1px solid rgb(220 229 226 / 14%);
+}
+
+.react-admin-body .ant-menu-submenu-popup .ant-menu-item,
+.react-admin-body .ant-menu-submenu-popup .ant-menu-item a {
+  color: var(--app-color-nav-text);
+}
+
+.react-admin-body
+  .ant-menu-submenu-popup
+  .ant-menu-item:not(.ant-menu-item-selected):hover {
+  color: var(--app-color-container);
+  background: var(--app-color-nav-hover-bg);
+}
+
+.react-admin-body .ant-menu-submenu-popup .ant-menu-item-selected,
+.react-admin-body .ant-menu-submenu-popup .ant-menu-item-selected a {
+  color: var(--app-color-nav-selected);
+  background: var(--app-color-nav-selected-bg);
+}
+
+.admin-brand-mark {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  color: var(--app-color-container);
+  font-weight: 800;
+  background: var(--app-color-primary);
+  border-radius: 6px;
+  place-items: center;
+}
+
+.login-page {
+  display: grid;
+  min-height: 100vh;
+  padding: 24px;
+  background: var(--app-color-page-bg);
+  place-items: center;
+}
+
+.login-card {
+  width: min(100%, 440px);
+  border-color: var(--app-color-border);
+  box-shadow: var(--app-shadow-card);
+}
+
+.login-brand-mark {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  color: var(--app-color-container);
+  font-weight: 800;
+  background: var(--app-color-primary);
+  border-radius: 6px;
+  place-items: center;
+}
+
+.module-placeholder {
+  display: grid;
+  min-height: 360px;
+  background: var(--app-color-container);
+  border: 1px solid var(--app-color-divider);
+  border-radius: 6px;
+  place-items: center;
 }

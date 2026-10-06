@@ -74,3 +74,16 @@ React Admin SHALL 支持当前后台已支持的图片、PDF、Office 和文本�
 - **WHEN** 用户关闭预览弹窗或组件卸载
 - **THEN** 系统销毁文件 viewer 并释放所创建的临时 URL
 
+### Requirement: 一致且可访问的视觉主题
+React Admin SHALL 对所有租户使用集中的石墨中性色与青绿色强调主题，并 SHALL 保持关键文字、控件和状态信息达到 WCAG AA 对比度。
+
+#### Scenario: 切换租户入口
+- **WHEN** 用户通过 A、C 或 D 租户 hostname 打开 React Admin
+- **THEN** 系统保留对应租户名称和字母标识
+- **THEN** 登录页、管理布局和业务页面使用同一套主题 token
+
+#### Scenario: 展示业务 Agent 流式状态
+- **WHEN** 业务 Agent 依次展示 reasoning、工具调用、工具结果、生成状态和错误状态
+- **THEN** 系统使用中性、琥珀、青绿、信息蓝和错误红语义样式
+- **THEN** 状态样式不改变事件的原始展示顺序
+

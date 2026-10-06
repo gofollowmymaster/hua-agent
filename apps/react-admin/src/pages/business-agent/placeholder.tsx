@@ -2,14 +2,7 @@ import { Empty } from 'antd';
 
 export function ModulePlaceholder() {
   return (
-    <div
-      style={{
-        display: 'grid',
-        minHeight: 360,
-        background: '#fff',
-        placeItems: 'center',
-      }}
-    >
+    <div className="module-placeholder">
       <Empty description="模块建设中" />
     </div>
   );

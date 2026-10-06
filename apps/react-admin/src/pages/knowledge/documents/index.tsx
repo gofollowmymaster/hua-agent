@@ -11,7 +11,7 @@ import {
   type ActionType,
   type ProColumns,
 } from '@ant-design/pro-components';
-import { App, Button, Modal, Tag, Typography } from 'antd';
+import { App, Button, Modal, Typography } from 'antd';
 import dayjs from 'dayjs';
 import {
   deleteDocument,
@@ -21,6 +21,7 @@ import {
   type RagDocumentItem,
 } from '@/api/knowledge/documents';
 import { DocumentPreviewModal } from '@/components/document-preview';
+import { SemanticTag } from '@/components/semantic-tag';
 import { useDrawerQuery } from '@/layouts/drawer-query';
 import { DocumentMetadataModal } from './metadata-modal';
 import { DocumentUploadModal } from './upload-modal';
@@ -76,9 +77,9 @@ export default function DocumentsPage() {
         failed: { text: 'failed', status: 'Error' },
       },
       render: (_, item) => (
-        <Tag color={item.status === 'failed' ? 'error' : 'success'}>
+        <SemanticTag tone={item.status === 'failed' ? 'error' : 'success'}>
           {item.status || '-'}
-        </Tag>
+        </SemanticTag>
       ),
     },
     {

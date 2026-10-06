@@ -5,9 +5,10 @@ import {
   type ActionType,
   type ProColumns,
 } from '@ant-design/pro-components';
-import { Tag, Typography } from 'antd';
+import { Typography } from 'antd';
 import dayjs from 'dayjs';
 import { pageSessions, type RagSessionItem } from '@/api/knowledge/sessions';
+import { SemanticTag } from '@/components/semantic-tag';
 import { useDrawerQuery } from '@/layouts/drawer-query';
 
 export default function SessionsPage() {
@@ -19,7 +20,9 @@ export default function SessionsPage() {
       dataIndex: 'channel',
       width: 110,
       fieldProps: { placeholder: 'http / wecom', allowClear: true },
-      render: (_, item) => <Tag color="blue">{item.channel || '-'}</Tag>,
+      render: (_, item) => (
+        <SemanticTag tone="info">{item.channel || '-'}</SemanticTag>
+      ),
     },
     {
       title: '用户',
@@ -50,7 +53,9 @@ export default function SessionsPage() {
       dataIndex: 'messageCount',
       hideInSearch: true,
       width: 90,
-      render: (_, item) => <Tag color="blue">{item.messageCount || 0} 条</Tag>,
+      render: (_, item) => (
+        <SemanticTag tone="info">{item.messageCount || 0} 条</SemanticTag>
+      ),
     },
     {
       title: '最后消息',

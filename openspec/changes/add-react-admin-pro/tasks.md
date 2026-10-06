@@ -33,3 +33,9 @@
 - [x] 5.1 增加 Playwright mock API 冒烟测试，验证登录、菜单、列表、抽屉、上传、预览和两套聊天的桌面/窄屏流程
 - [x] 5.2 更新 workspace README、AI 治理和 API 静态资源文档，验证不再存在“唯一后台”的过期描述
 - [x] 5.3 运行 React lint、format check、test、build，以及 Vue Admin、HTTP client 和根 workspace 构建并记录结果
+
+## 6. 石墨青绿主题
+
+- [x] 6.1 建立 React Admin 集中主题模块，统一 Ant Design、ProLayout 与业务 CSS 语义颜色
+- [x] 6.2 重构登录、布局、表格容器、预览、占位页和聊天视觉，保持现有结构、12px 页面边距和交互
+- [x] 6.3 增加主题 token、租户共用主题、聊天状态色和 Playwright 视觉断言，并完成质量验证与截图检查

@@ -40,34 +40,12 @@ export default function LoginPage() {
   }
 
   return (
-    <main
-      style={{
-        display: 'grid',
-        minHeight: '100vh',
-        padding: 24,
-        background: '#f5f7fa',
-        placeItems: 'center',
-      }}
-    >
-      <Card style={{ width: 'min(100%, 480px)' }}>
+    <main className="login-page">
+      <Card className="login-card">
         <LoginForm<LoginParams>
           title={`${tenant.displayName} 管理后台`}
           subTitle="知识库与业务 Agent 管理"
-          logo={
-            <div
-              style={{
-                display: 'grid',
-                width: 44,
-                height: 44,
-                borderRadius: 8,
-                background: '#1677ff',
-                color: '#fff',
-                placeItems: 'center',
-              }}
-            >
-              {tenant.supplierCode}
-            </div>
-          }
+          logo={<div className="login-brand-mark">{tenant.supplierCode}</div>}
           onFinish={submit}
         >
           <ProFormText

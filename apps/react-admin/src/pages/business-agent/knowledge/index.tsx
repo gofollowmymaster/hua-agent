@@ -10,7 +10,7 @@ import {
   type ActionType,
   type ProColumns,
 } from '@ant-design/pro-components';
-import { App, Button, Modal, Tag, Typography } from 'antd';
+import { App, Button, Modal, Typography } from 'antd';
 import dayjs from 'dayjs';
 import {
   deleteAgentKnowledgeDocument,
@@ -20,6 +20,7 @@ import {
   type AgentKnowledgeDocumentItem,
 } from '@/api/business-agent/knowledge';
 import { DocumentPreviewModal } from '@/components/document-preview';
+import { SemanticTag } from '@/components/semantic-tag';
 import { useDrawerQuery } from '@/layouts/drawer-query';
 
 function formatSize(value: string | number) {
@@ -78,7 +79,9 @@ export default function AgentKnowledgePage() {
       dataIndex: 'category',
       width: 120,
       fieldProps: { placeholder: '如 业务流程', allowClear: true },
-      render: (_, item) => <Tag color="blue">{item.category || '-'}</Tag>,
+      render: (_, item) => (
+        <SemanticTag tone="info">{item.category || '-'}</SemanticTag>
+      ),
     },
     {
       title: '文件名',
@@ -106,9 +109,9 @@ export default function AgentKnowledgePage() {
         failed: { text: 'failed', status: 'Error' },
       },
       render: (_, item) => (
-        <Tag color={item.status === 'failed' ? 'error' : 'success'}>
+        <SemanticTag tone={item.status === 'failed' ? 'error' : 'success'}>
           {item.status || '-'}
-        </Tag>
+        </SemanticTag>
       ),
     },
     {

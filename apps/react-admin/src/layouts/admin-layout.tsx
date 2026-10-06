@@ -13,6 +13,7 @@ import {
 import { PageContainer, ProLayout } from '@ant-design/pro-components';
 import { Dropdown, Space } from 'antd';
 import { history, Link, Outlet, useLocation, useModel } from '@umijs/max';
+import { proLayoutTheme } from '@/theme';
 import { GlobalDrawer } from './global-drawer';
 
 const COLLAPSED_KEY = 'react-admin:sider-collapsed';
@@ -130,23 +131,11 @@ export default function AdminLayout() {
 
   return (
     <ProLayout
+      className="admin-layout"
+      navTheme="realDark"
+      token={proLayoutTheme}
       title={brand}
-      logo={
-        <div
-          style={{
-            display: 'grid',
-            width: 32,
-            height: 32,
-            borderRadius: 6,
-            background: '#fff',
-            color: '#1677ff',
-            fontWeight: 800,
-            placeItems: 'center',
-          }}
-        >
-          {auth.supplierCode}
-        </div>
-      }
+      logo={<div className="admin-brand-mark">{auth.supplierCode}</div>}
       route={{ routes: menuRoutes }}
       location={{ pathname: location.pathname }}
       collapsed={collapsed}

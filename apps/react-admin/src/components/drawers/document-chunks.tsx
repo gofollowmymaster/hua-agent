@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, Descriptions, Empty, List, Pagination, Spin, Tag } from 'antd';
+import { Alert, Descriptions, Empty, List, Pagination, Spin } from 'antd';
 import dayjs from 'dayjs';
 import {
   getDocument,
@@ -13,6 +13,7 @@ import {
   type AgentKnowledgeChunkItem,
   type AgentKnowledgeDocumentItem,
 } from '@/api/business-agent/knowledge';
+import { SemanticTag } from '@/components/semantic-tag';
 
 interface DocumentChunksProps {
   id: string;
@@ -71,9 +72,11 @@ export function DocumentChunks({ id, source }: DocumentChunksProps) {
             {document.sourcePath}
           </Descriptions.Item>
           <Descriptions.Item label="状态">
-            <Tag color={document.status === 'failed' ? 'error' : 'success'}>
+            <SemanticTag
+              tone={document.status === 'failed' ? 'error' : 'success'}
+            >
               {document.status}
-            </Tag>
+            </SemanticTag>
           </Descriptions.Item>
         </Descriptions>
       )}
