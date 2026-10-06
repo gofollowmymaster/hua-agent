@@ -42,6 +42,15 @@
     "admin:format:check": "pnpm --filter @aplus-sql/rag-admin format:check",
     "admin:stylelint": "pnpm --filter @aplus-sql/rag-admin stylelint",
     "admin:stylelint:check": "pnpm --filter @aplus-sql/rag-admin stylelint:check",
+    "react-admin:dev": "pnpm --filter @aplus-sql/react-admin dev",
+    "react-admin:build": "pnpm --filter @aplus-sql/react-admin build",
+    "react-admin:preview": "pnpm --filter @aplus-sql/react-admin preview",
+    "react-admin:test": "pnpm --filter @aplus-sql/react-admin test",
+    "react-admin:e2e": "pnpm --filter @aplus-sql/react-admin e2e",
+    "react-admin:lint": "pnpm --filter @aplus-sql/react-admin lint",
+    "react-admin:lint:check": "pnpm --filter @aplus-sql/react-admin lint:check",
+    "react-admin:format": "pnpm --filter @aplus-sql/react-admin format",
+    "react-admin:format:check": "pnpm --filter @aplus-sql/react-admin format:check",
     "ui-kit:build": "pnpm --filter @aplus-sql/ui-kit build",
     "ui-kit:test": "pnpm --filter @aplus-sql/ui-kit test",
     "ui-kit:lint:check": "pnpm --filter @aplus-sql/ui-kit lint:check",
@@ -53,6 +62,7 @@
   "lint-staged": {
     "apps/api/**/*.ts": "pnpm --filter @aplus-sql/api exec eslint --max-warnings 0",
     "apps/rag-admin/src/**/*.{ts,vue}": "pnpm --filter @aplus-sql/rag-admin exec eslint --max-warnings 0",
+    "apps/react-admin/src/**/*.{ts,tsx}": "pnpm --filter @aplus-sql/react-admin exec eslint --max-warnings 0",
     "packages/ui-kit/**/*.{ts,vue}": "pnpm --filter @aplus-sql/ui-kit exec eslint --max-warnings 0",
     "packages/http-client/**/*.ts": "pnpm --filter @aplus-sql/http-client exec eslint --max-warnings 0"
   },

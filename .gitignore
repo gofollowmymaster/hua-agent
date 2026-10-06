@@ -1,6 +1,7 @@
 # compiled output
 /dist
 /apps/*/dist
+/apps/*/src/.umi
 /node_modules
 **/node_modules
 .pnpm-store

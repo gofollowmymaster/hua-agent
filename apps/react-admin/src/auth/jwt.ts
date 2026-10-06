@@ -1,0 +1,52 @@
+export interface LoginUser {
+  userId?: string;
+  userName?: string;
+  email?: string;
+  avatar?: string;
+  supplierCode?: string;
+  supplierName?: string;
+  tenantCode?: string;
+  tenantName?: string;
+}
+
+function readString(payload: Record<string, unknown>, keys: string[]) {
+  for (const key of keys) {
+    const value = payload[key];
+    if (typeof value === 'string' && value) return value;
+    if (typeof value === 'number') return String(value);
+  }
+  return undefined;
+}
+
+export function parseJwtPayload(token: string): Record<string, unknown> {
+  const [, payload] = token.split('.');
+  if (!payload) return {};
+  try {
+    const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const decoded = window.atob(normalized);
+    const json = decodeURIComponent(
+      decoded
+        .split('')
+        .map((char) => `%${char.charCodeAt(0).toString(16).padStart(2, '0')}`)
+        .join(''),
+    );
+    return JSON.parse(json) as Record<string, unknown>;
+  } catch {
+    return {};
+  }
+}
+
+export function resolveUserInfo(token?: string): LoginUser {
+  if (!token) return {};
+  const payload = parseJwtPayload(token);
+  return {
+    userId: readString(payload, ['userId', 'user_id', 'sub', 'id']),
+    userName: readString(payload, ['userName', 'username', 'name', 'nickname']),
+    email: readString(payload, ['email', 'mail']),
+    avatar: readString(payload, ['avatar', 'avatarUrl']),
+    supplierCode: readString(payload, ['supplierCode', 'supplier_code']),
+    supplierName: readString(payload, ['supplierName', 'supplier_name']),
+    tenantCode: readString(payload, ['tenantCode', 'tenant_code']),
+    tenantName: readString(payload, ['tenantName', 'tenant_name']),
+  };
+}
