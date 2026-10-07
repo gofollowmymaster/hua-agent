@@ -12,25 +12,21 @@ from deepagents import (
 )
 from langchain.agents.middleware import ToolCallLimitMiddleware
 from langchain_core.messages import BaseMessage
-from langchain_core.tools import BaseTool, tool
+from langchain_core.tools import BaseTool
 from langchain_openai import ChatOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.core.config import Settings, get_settings
-from python_api.core.schemas import PageRequest
 from python_api.modules.agent.chat.event_adapter import CumulativeDeltaNormalizer
-from python_api.modules.agent.chat.tools import calculate_expression, current_time
-from python_api.modules.agent.knowledge.schemas import AgentKnowledgeSearchRequest
+from python_api.modules.agent.chat.tools import (
+    build_ds_order_tools,
+    build_knowledge_tools,
+    build_utility_tools,
+    current_time,
+)
 from python_api.modules.agent.knowledge.service import AgentKnowledgeService
 from python_api.modules.agent.skills.schemas import SkillInstruction
-from python_api.modules.ds_order.schemas import (
-    DsOrderAuditRequest,
-    DsOrderCancelRequest,
-    DsOrderInfoRequest,
-    DsOrderLogPageRequest,
-    DsOrderPageRequest,
-)
-from python_api.modules.ds_order.service import DsOrderService
+from python_api.modules.business.ds_order.service import DsOrderService
 
 EXCLUDED_BUILTIN_TOOLS = frozenset(
     {"write_todos", "ls", "read_file", "write_file", "edit_file", "glob", "grep", "execute", "task"}
@@ -65,6 +61,7 @@ class AgentChatRuntime:
         self.time_provider = time_provider
         self.knowledge = AgentKnowledgeService(db, self.settings)
         self.orders = orders or DsOrderService()
+
     async def stream(
         self, messages: list[BaseMessage], skills: list[SkillInstruction]
     ) -> AsyncIterator[dict[str, Any]]:
@@ -154,136 +151,10 @@ class AgentChatRuntime:
 
     def _build_tools(self) -> list[BaseTool]:
         """Builds the bounded knowledge, order, time, and calculation tool set."""
-        knowledge = self.knowledge
-        orders = self.orders
-        time_provider = self.time_provider
-
-        @tool
-        async def search_knowledge(query: str, category: str | None = None, top_k: int = 8) -> str:
-            """Search the tenant business knowledge base."""
-            hits = await knowledge.search(
-                AgentKnowledgeSearchRequest(query=query, category=category, topK=top_k)
-            )
-            visible = [
-                {
-                    **{
-                        key: hit.get(key)
-                        for key in (
-                            "documentId",
-                            "category",
-                            "fileName",
-                            "sourcePath",
-                            "remoteUrl",
-                            "breadcrumb",
-                            "score",
-                        )
-                    },
-                    "content": str(hit.get("content", ""))[:1200],
-                }
-                for hit in hits
-            ]
-            return self._json(visible)
-
-        @tool
-        async def get_document(document_id: int | str) -> str:
-            """Get one tenant knowledge document."""
-            document = await knowledge.get_document(int(document_id))
-            keys = (
-                "id",
-                "category",
-                "fileName",
-                "sourcePath",
-                "status",
-                "chunkCount",
-                "actualChunkCount",
-                "breadcrumb",
-                "remoteUrl",
-                "updatedAt",
-            )
-            return self._json({key: document.get(key) for key in keys})
-
-        @tool
-        async def get_document_chunks(
-            document_id: int | str, page: int = 1, page_size: int = 10
-        ) -> str:
-            """Page chunks belonging to one tenant knowledge document."""
-            result = await knowledge.page_chunks(
-                int(document_id), PageRequest(page=page, pageSize=page_size)
-            )
-            return self._json(
-                {
-                    "total": result["total"],
-                    "list": [
-                        {**item, "content": str(item.get("content", ""))[:1200]}
-                        for item in result["list"]
-                    ],
-                }
-            )
-
-        @tool
-        def get_current_time() -> str:
-            """Get current Asia/Shanghai date and time."""
-            return time_provider()
-
-        @tool
-        def calculate(expression: str) -> str:
-            """Safely calculate an arithmetic expression."""
-            return self._json({"expression": expression, "result": calculate_expression(expression)})
-
-        @tool
-        def list_ds_orders(page: int = 1, page_size: int = 10, status: str | None = None) -> str:
-            """Page tenant drop-shipping orders."""
-            payload: dict[str, Any] = {"page": page, "pageSize": page_size}
-            if status:
-                payload["statusList"] = status
-            return self._json(orders.page(DsOrderPageRequest.model_validate(payload)))
-
-        @tool
-        def get_ds_order(ds_order_no: str, query_available_quantity: int = 0) -> str:
-            """Get one drop-shipping order."""
-            request = DsOrderInfoRequest.model_validate(
-                {
-                    "dsOrderNo": ds_order_no,
-                    "queryAvailableQuantity": query_available_quantity,
-                }
-            )
-            return self._json(orders.info(request))
-
-        @tool
-        def list_ds_order_logs(ds_order_no: str, page: int = 1, page_size: int = 10) -> str:
-            """Page operation logs for one drop-shipping order."""
-            request = DsOrderLogPageRequest.model_validate(
-                {"dsOrderNo": ds_order_no, "page": page, "pageSize": page_size}
-            )
-            return self._json(orders.log_page(request))
-
-        @tool
-        def audit_ds_order(ds_order_no: str, passed: int, message: str | None = None) -> str:
-            """Approve or reject a drop-shipping order audit."""
-            request = DsOrderAuditRequest.model_validate(
-                {"dsOrderNo": ds_order_no, "passed": passed, "msg": message}
-            )
-            return self._json(orders.audit(request))
-
-        @tool
-        def cancel_ds_order(ds_order_no: str, cancel_message: str) -> str:
-            """Submit cancellation for a drop-shipping order."""
-            request = DsOrderCancelRequest.model_validate(
-                {"dsOrderNo": ds_order_no, "cancelMsg": cancel_message}
-            )
-            return self._json(orders.cancel(request))
-
         return [
-            search_knowledge,
-            get_document,
-            get_document_chunks,
-            get_current_time,
-            calculate,
-            list_ds_orders,
-            get_ds_order,
-            list_ds_order_logs,
-            audit_ds_order,
-            cancel_ds_order,
+            *build_knowledge_tools(self.knowledge, self._json),
+            *build_utility_tools(self.time_provider, self._json),
+            *build_ds_order_tools(self.orders, self._json),
         ]
 
     @staticmethod

@@ -3,14 +3,14 @@ from typing import Any
 from fastapi import APIRouter, Depends
 
 from python_api.modules.auth.dependencies import require_composite_auth
-from python_api.modules.ds_order.schemas import (
+from python_api.modules.business.ds_order.schemas import (
     DsOrderAuditRequest,
     DsOrderCancelRequest,
     DsOrderInfoRequest,
     DsOrderLogPageRequest,
     DsOrderPageRequest,
 )
-from python_api.modules.ds_order.service import DsOrderService
+from python_api.modules.business.ds_order.service import DsOrderService
 
 router = APIRouter(
     prefix="/oms/admin/dsOrder",

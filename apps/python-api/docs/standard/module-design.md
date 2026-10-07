@@ -60,12 +60,12 @@ schemas/models -> Python and framework primitives
 
 新增业务模块时：
 
-1. 单一能力模块可直接在 `modules/<domain>/` 内组织；包含多个业务能力时，按 `modules/<domain>/<capability>/` 建立子域包，不按 routers、services、schemas 等技术层横向分目录。
+1. 平台领域可直接在 `modules/<domain>/` 内组织；面向业务的 API 能力统一放在 `modules/business/<capability>/`，不按 routers、services、schemas 等技术层横向分目录。
 2. 在子域的 `schemas.py` 中定义输入与稳定输出结构，在 `service.py` 中定义业务用例，在 `router.py` 中定义 HTTP 映射和鉴权。
 3. 跨子域共享的 ORM model、repository 或领域常量保留在 `modules/<domain>/` 根层；仅供单个子域使用的实现留在子域包内。
 4. 在 `main.py` 注册 router。
 5. 需要持久化时映射既有表，并明确租户字段。
 6. 更新路由清单测试、架构模块表和相关验证。
 
-`ds_order` 当前保持既有平铺结构，后续只有在出现多个明确业务能力时再按本规则迁移。
+Agent Chat 的可调用工具放在 `modules/agent/chat/tools/`，按业务领域拆分构建函数，由 runtime 注入 service、时间 provider 等依赖并统一组装。
 

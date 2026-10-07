@@ -5,6 +5,7 @@ from typing import Any
 
 BASE_CREATED_AT = int(datetime.fromisoformat("2026-09-01T08:00:00+08:00").timestamp() * 1000)
 
+
 def build_fixture(tenant: str) -> dict[str, Any]:
     """Builds deterministic tenant-local order and log fixtures."""
     statuses = [

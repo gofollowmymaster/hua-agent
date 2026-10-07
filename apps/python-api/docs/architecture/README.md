@@ -26,5 +26,5 @@
 - Python 包保持 `src/python_api/` 布局，模块统一使用 `python_api.*` 绝对导入。
 - 应用读取既有 PostgreSQL schema，不在本项目中创建或执行数据库迁移。
 - 数据库结构、外部目录和远程服务仅按 Python API 所需契约记录，不展开其内部实现。
-- `modules/` 按 auth、rag、agent、ds_order、health 组织业务；`core/` 只承载共享机制，`integrations/` 承载外部系统 adapter。
+- `modules/` 按 auth、rag、agent、business、health 组织能力；业务 API 聚合在 `business/` 下，`core/` 只承载共享机制，`integrations/` 承载外部系统 adapter。
 - 所有持久化业务数据都必须显式遵守租户隔离要求。

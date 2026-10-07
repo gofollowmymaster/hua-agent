@@ -4,7 +4,12 @@ import ast
 import operator
 from collections.abc import Callable
 from datetime import datetime
+from typing import Any
 from zoneinfo import ZoneInfo
+
+from langchain_core.tools import BaseTool, tool
+
+JsonSerializer = Callable[[Any], str]
 
 _BINARY_OPERATORS: dict[type[ast.operator], Callable[[float, float], float]] = {
     ast.Add: operator.add,
@@ -41,3 +46,21 @@ def calculate_expression(expression: str) -> int | float:
 
     result = evaluate(ast.parse(expression, mode="eval"))
     return int(result) if result.is_integer() else result
+
+
+def build_utility_tools(
+    time_provider: Callable[[], str], serialize: JsonSerializer
+) -> list[BaseTool]:
+    """Builds deterministic time and arithmetic tools."""
+
+    @tool
+    def get_current_time() -> str:
+        """Get current Asia/Shanghai date and time."""
+        return time_provider()
+
+    @tool
+    def calculate(expression: str) -> str:
+        """Safely calculate an arithmetic expression."""
+        return serialize({"expression": expression, "result": calculate_expression(expression)})
+
+    return [get_current_time, calculate]

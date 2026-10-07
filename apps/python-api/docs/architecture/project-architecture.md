@@ -24,8 +24,8 @@ apps/python-api/
 │   ├── integrations/        # Redis、飞书与 embedding adapter
 │   ├── modules/auth/        # session、users 子域及共享鉴权、身份与 ORM
 │   ├── modules/rag/         # admin、chat 子域及共享 ORM、repository
-│   ├── modules/agent/       # chat、knowledge、skills 子域及共享 ORM、repository
-│   ├── modules/ds_order/    # 暂保留平铺的租户隔离 mock 服务与 fixture
+│   ├── modules/agent/       # chat、knowledge、skills 子域及按领域拆分的 Agent tools
+│   ├── modules/business/    # ds_order 等业务 API 能力
 │   ├── modules/health/      # checks 子域中的 liveness 与 readiness
 │   ├── main.py              # FastAPI 工厂、中间件、lifespan 和路由装配
 │   └── run.py               # Uvicorn 启动入口

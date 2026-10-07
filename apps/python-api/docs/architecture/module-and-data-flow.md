@@ -59,12 +59,14 @@ flowchart TD
 
 Agent runtime 使用 Deep Agents 创建模型代理，并注册以下工具：
 
-- `search_knowledge`、`get_document`、`get_document_chunks`。
+- `search_knowledge`、`get_document`。
 - `get_current_time`、`calculate`。
 - `list_ds_orders`、`get_ds_order`、`list_ds_order_logs`。
 - `audit_ds_order`、`cancel_ds_order`。
 
 单次运行最多执行 5 次工具调用。runtime 将原始模型事件规范化为 reasoning、tool 和 text 事件；service 再转换为 UI Message SSE，并按可见顺序构建 `parts`。最终消息同时保存正文、工具调用摘要和有序 parts。
+
+Agent 工具位于 `agent/chat/tools/`，按 knowledge、utilities 和 ds_order 领域分别构建；runtime 只负责注入依赖并按稳定顺序组装 9 个工具。
 
 每次 Agent 运行按“核心规则、系统 Skill、用户 Skill”重新构造提示词。系统 Skill 由 Python 代码清单按固定顺序提供；Bearer JWT 会话再按创建时间和 ID 装载当前租户用户启用的个人 Skill。固定 token 会话只装载系统 Skill，`participantId` 只参与会话记忆，不参与 Skill 所有者查询。
 

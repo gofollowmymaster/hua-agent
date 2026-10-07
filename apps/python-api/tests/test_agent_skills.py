@@ -337,7 +337,6 @@ def test_runtime_keeps_tool_set_and_five_call_limit(monkeypatch: pytest.MonkeyPa
     assert [tool.name for tool in captured["tools"]] == [
         "search_knowledge",
         "get_document",
-        "get_document_chunks",
         "get_current_time",
         "calculate",
         "list_ds_orders",
