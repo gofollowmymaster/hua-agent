@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from typing import Any, cast
+from unittest.mock import AsyncMock
 
 import pytest
 
@@ -31,6 +32,13 @@ class FakeKnowledgeService:
     def __init__(self) -> None:
         self.search_request: Any = None
         self.document_id: int | None = None
+
+    async def resolve_search_category_for_tool(self, category: str | None) -> str | None:
+        """Mimics exact tenant-category resolution at the tool boundary."""
+        normalized = (category or "").strip()
+        if not normalized or normalized.lower() in {"null", "none", "undefined", "nil"}:
+            return None
+        return normalized if normalized == "流程" else None
 
     async def search(self, request: Any) -> list[dict[str, Any]]:
         """Returns one oversized hit so projection and truncation can be verified."""
@@ -107,6 +115,9 @@ async def test_knowledge_tools_project_and_truncate_service_results() -> None:
     assert service.search_request.query == "退款"
     assert service.search_request.category == "流程"
     assert service.search_request.top_k == 3
+    assert "never pass blanks" in search.args_schema.model_json_schema()["properties"][
+        "category"
+    ]["description"]
     assert len(search_result[0]["content"]) == 1200
     assert "internal" not in search_result[0]
     assert service.document_id == 7
@@ -114,6 +125,56 @@ async def test_knowledge_tools_project_and_truncate_service_results() -> None:
     assert len(document_result["content"]) > 1200
     assert document_result["content"].endswith("完整正文")
     assert "internal" not in document_result
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("category", [None, "", "   ", "\nnull", "NONE", "无意义字符"])
+async def test_search_knowledge_ignores_invalid_categories(category: str | None) -> None:
+    service = FakeKnowledgeService()
+    search, _ = build_knowledge_tools(cast(AgentKnowledgeService, service), _serialize)
+
+    await search.ainvoke({"query": "广告配置 设置 方法", "category": category})
+
+    assert service.search_request.category is None
+
+
+@pytest.mark.asyncio
+async def test_search_knowledge_trims_an_exact_known_category() -> None:
+    service = FakeKnowledgeService()
+    search, _ = build_knowledge_tools(cast(AgentKnowledgeService, service), _serialize)
+
+    await search.ainvoke({"query": "退款", "category": "  流程\n"})
+
+    assert service.search_request.category == "流程"
+
+
+@pytest.mark.asyncio
+async def test_tool_category_resolution_is_scoped_to_searchable_tenant_chunks() -> None:
+    service = object.__new__(AgentKnowledgeService)
+    service.tenant = "yurex"
+    service.db = AsyncMock()
+    service.db.scalar.return_value = "业务流程"
+
+    result = await service.resolve_search_category_for_tool("  业务流程\n")
+
+    statement = service.db.scalar.await_args.args[0]
+    parameters = statement.compile().params
+    assert result == "业务流程"
+    assert parameters["tenant_code_1"] == "yurex"
+    assert parameters["tenant_code_2"] == "yurex"
+    assert parameters["category_1"] == "业务流程"
+
+
+@pytest.mark.asyncio
+async def test_tool_category_resolution_drops_unknown_category() -> None:
+    service = object.__new__(AgentKnowledgeService)
+    service.tenant = "yurex"
+    service.db = AsyncMock()
+    service.db.scalar.return_value = None
+
+    result = await service.resolve_search_category_for_tool("其他租户分类")
+
+    assert result is None
 
 
 def test_utility_tools_use_injected_time_and_safe_calculator() -> None:

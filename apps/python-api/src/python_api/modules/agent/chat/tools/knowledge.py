@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from typing import Annotated
+
 from langchain_core.tools import BaseTool, tool
+from pydantic import Field
 
 from python_api.modules.agent.chat.tools.utilities import JsonSerializer
 from python_api.modules.agent.knowledge.schemas import AgentKnowledgeSearchRequest
@@ -14,11 +17,22 @@ def build_knowledge_tools(
 
     @tool
     async def search_knowledge(
-        query: str, category: str | None = None, top_k: int = 8
+        query: str,
+        category: Annotated[
+            str | None,
+            Field(
+                description=(
+                    "Optional exact known business category. Omit it when uncertain; "
+                    "never pass blanks, null strings, or guessed values."
+                )
+            ),
+        ] = None,
+        top_k: int = 8,
     ) -> str:
-        """Search the tenant business knowledge base."""
+        """Search tenant knowledge. Only pass an exact known category; otherwise omit it."""
+        resolved_category = await knowledge.resolve_search_category_for_tool(category)
         hits = await knowledge.search(
-            AgentKnowledgeSearchRequest(query=query, category=category, topK=top_k)
+            AgentKnowledgeSearchRequest(query=query, category=resolved_category, topK=top_k)
         )
         visible = [
             {

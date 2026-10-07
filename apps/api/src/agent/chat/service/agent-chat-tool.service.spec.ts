@@ -13,6 +13,7 @@ describe('AgentChatToolService', () => {
   let knowledgeSearchService: { search: jest.Mock };
   let knowledgeService: {
     getDocumentForTool: jest.Mock;
+    resolveSearchCategoryForTool: jest.Mock;
   };
   let tenantContext: { tenant?: string };
   let dsOrderToolService: { getTools: jest.Mock };
@@ -34,6 +35,12 @@ describe('AgentChatToolService', () => {
       ]),
     };
     knowledgeService = {
+      resolveSearchCategoryForTool: jest.fn(
+        async (category?: string | null) => {
+          const normalized = category?.trim();
+          return normalized === '业务流程' ? normalized : undefined;
+        },
+      ),
       getDocumentForTool: jest.fn().mockResolvedValue({
         id: '1',
         category: '业务流程',
@@ -82,6 +89,35 @@ describe('AgentChatToolService', () => {
       expect.objectContaining({ tenantCode: 'yurex', mode: 'hybrid' }),
     );
     expect(result).toContain('guide.md');
+  });
+
+  it.each([undefined, null, '', '   ', '\nnull', 'NONE', '无意义字符'])(
+    'ignores invalid knowledge category %p',
+    async (category) => {
+      const tool = service
+        .getTools()
+        .find((item) => item.name === 'search_knowledge');
+
+      await tool!.invoke({ query: '广告配置 设置 方法', category });
+
+      expect(knowledgeSearchService.search).toHaveBeenLastCalledWith(
+        '广告配置 设置 方法',
+        expect.objectContaining({ category: undefined }),
+      );
+    },
+  );
+
+  it('trims and retains an exact known knowledge category', async () => {
+    const tool = service
+      .getTools()
+      .find((item) => item.name === 'search_knowledge');
+
+    await tool!.invoke({ query: '退款', category: '  业务流程\n' });
+
+    expect(knowledgeSearchService.search).toHaveBeenLastCalledWith(
+      '退款',
+      expect.objectContaining({ category: '业务流程' }),
+    );
   });
 
   it('executes calculate tool', async () => {

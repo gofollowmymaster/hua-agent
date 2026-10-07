@@ -39,10 +39,12 @@ export class AgentChatToolService {
   private buildSearchKnowledgeTool() {
     return tool(
       async ({ query, category, topK }) => {
+        const resolvedCategory =
+          await this.knowledgeService.resolveSearchCategoryForTool(category);
         const hits = await this.knowledgeSearchService.search(query, {
           tenantCode: this.currentTenant(),
           mode: 'hybrid',
-          category,
+          category: resolvedCategory,
           topK: topK ?? 8,
         });
         const res = JSON.stringify(
@@ -62,10 +64,16 @@ export class AgentChatToolService {
       },
       {
         name: 'search_knowledge',
-        description: '在业务 Agent 知识库中检索相关知识片段',
+        description:
+          '在业务 Agent 知识库中检索相关知识片段；仅在用户明确给出且分类确定时传 category，否则省略',
         schema: z.object({
           query: z.string().describe('检索问题或关键词'),
-          category: z.string().optional().describe('业务分类，如 业务流程'),
+          category: z
+            .string()
+            .nullish()
+            .describe(
+              '可选的精确业务分类，如 业务流程；禁止传空值、null 字符串或猜测值',
+            ),
           topK: z.number().int().min(1).max(20).optional(),
         }),
       },

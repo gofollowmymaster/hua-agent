@@ -45,6 +45,8 @@ const AGENT_DOCUMENT_SUMMARY_SELECT = {
   _count: { select: { chunks: true } },
 } satisfies Prisma.AgentDocumentSelect;
 
+const NULLISH_CATEGORY_VALUES = new Set(['null', 'none', 'undefined', 'nil']);
+
 /** 编排业务 Agent 知识库的租户级入库、检索和文档管理。 */
 @Injectable()
 export class AgentKnowledgeService {
@@ -138,6 +140,26 @@ export class AgentKnowledgeService {
       ...this.serializeDocument(document),
       content: document.content,
     };
+  }
+
+  /** 返回当前租户可检索的精确分类；无效工具参数降级为不筛选。 */
+  async resolveSearchCategoryForTool(
+    category?: string | null,
+  ): Promise<string | undefined> {
+    const normalized = category?.trim();
+    if (!normalized || NULLISH_CATEGORY_VALUES.has(normalized.toLowerCase())) {
+      return undefined;
+    }
+    const tenantCode = this.currentTenant();
+    const document = await this.ragPrisma.agentDocument.findFirst({
+      where: {
+        tenantCode,
+        category: normalized,
+        chunks: { some: { tenantCode } },
+      },
+      select: { category: true },
+    });
+    return document?.category;
   }
 
   /** 校验租户归属后分页返回文档切片。 */

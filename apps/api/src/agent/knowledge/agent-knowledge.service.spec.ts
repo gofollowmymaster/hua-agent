@@ -118,6 +118,42 @@ describe('AgentKnowledgeService', () => {
     });
   });
 
+  it.each([undefined, null, '', '   ', '\nnull', 'NONE'])(
+    'does not query categories for nullish tool input %p',
+    async (category) => {
+      await expect(
+        service.resolveSearchCategoryForTool(category),
+      ).resolves.toBeUndefined();
+      expect(ragPrisma.agentDocument.findFirst).not.toHaveBeenCalled();
+    },
+  );
+
+  it('resolves only an exact searchable category for the current tenant', async () => {
+    ragPrisma.agentDocument.findFirst.mockResolvedValue({
+      category: '业务流程',
+    });
+
+    await expect(
+      service.resolveSearchCategoryForTool('  业务流程\n'),
+    ).resolves.toBe('业务流程');
+    expect(ragPrisma.agentDocument.findFirst).toHaveBeenCalledWith({
+      where: {
+        tenantCode: 'yurex',
+        category: '业务流程',
+        chunks: { some: { tenantCode: 'yurex' } },
+      },
+      select: { category: true },
+    });
+  });
+
+  it('drops a category that has no searchable chunks for the current tenant', async () => {
+    ragPrisma.agentDocument.findFirst.mockResolvedValue(null);
+
+    await expect(
+      service.resolveSearchCategoryForTool('其他租户分类'),
+    ).resolves.toBeUndefined();
+  });
+
   it('returns paginated documents with serialized ids', async () => {
     const result = await service.pageDocuments({
       page: 1,

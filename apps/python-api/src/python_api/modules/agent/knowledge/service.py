@@ -24,6 +24,7 @@ from python_api.modules.agent.models import AgentChunk, AgentDocument
 from python_api.modules.agent.repository import AgentRepository
 
 TENANT_PREFIX = {"aplus": "Aplus", "boat": "Boat", "yurex": "Yurex"}
+NULLISH_CATEGORY_VALUES = frozenset({"null", "none", "undefined", "nil"})
 
 
 def _markdown_paths(root: Path) -> list[Path]:
@@ -102,6 +103,22 @@ class AgentKnowledgeService:
         if not document:
             raise HTTPException(400, f"Agent document #{document_id} not found")
         return {**(await self._serialize_document(document)), "content": document.content}
+
+    async def resolve_search_category_for_tool(self, category: str | None) -> str | None:
+        """Returns an exact searchable category for this tenant, or no filter."""
+        normalized = (category or "").strip()
+        if not normalized or normalized.lower() in NULLISH_CATEGORY_VALUES:
+            return None
+        return await self.db.scalar(
+            select(AgentDocument.category)
+            .join(AgentChunk, AgentChunk.document_id == AgentDocument.id)
+            .where(
+                AgentDocument.tenant_code == self.tenant,
+                AgentChunk.tenant_code == self.tenant,
+                AgentDocument.category == normalized,
+            )
+            .limit(1)
+        )
 
     async def page_chunks(self, document_id: int, request: PageRequest) -> dict[str, Any]:
         """Pages ordered chunks for one Agent document."""
