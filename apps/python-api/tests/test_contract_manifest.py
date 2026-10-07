@@ -24,6 +24,7 @@ EXPECTED_ROUTES = {
     ("GET", "/agent/knowledge/documents/{document_id}/preview"),
     ("DELETE", "/agent/knowledge/documents/{document_id}"),
     ("POST", "/agent/chat"),
+    ("POST", "/agent/chat/a2ui/actions"),
     ("POST", "/agent/chat/sessions/page"),
     ("GET", "/agent/chat/sessions/{session_id}/messages"),
     ("GET", "/agent/skills/system"),
@@ -58,4 +59,4 @@ def test_all_nestjs_contract_routes_are_exposed() -> None:
         if method in {"get", "post", "put", "patch", "delete"} and not path.startswith("/health/")
     }
     assert actual == EXPECTED_ROUTES
-    assert len(actual) == 44
+    assert len(actual) == 45

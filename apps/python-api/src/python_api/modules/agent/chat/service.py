@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from python_api.core.config import Settings
 from python_api.core.context import get_request_context
 from python_api.core.session import ResolvedSession
+from python_api.modules.agent.chat.a2ui import compile_tool_result
 from python_api.modules.agent.chat.memory import AgentMemoryService
 from python_api.modules.agent.chat.runtime import (
     FALLBACK_ANSWER,
@@ -113,6 +114,11 @@ class AgentChatService:
                     arguments=event["arguments"],
                     result=event["result"],
                 )
+                card = compile_tool_result(event["name"], event["result"])
+                if card:
+                    card["conversationId"] = session.conversation_id
+                    parts.append({"type": "data-a2ui", "data": card})
+                    yield {"type": "data-a2ui", "data": card}
             elif event_type == "text_delta":
                 if active_reasoning:
                     yield {"type": "reasoning-end", "id": active_reasoning}

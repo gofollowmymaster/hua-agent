@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,10 +8,15 @@ from python_api.core.config import Settings
 from python_api.core.database import get_db
 from python_api.core.resources import get_app_settings
 from python_api.core.stream import stream_response
+from python_api.modules.agent.chat.a2ui_service import AgentA2uiActionService
 from python_api.modules.agent.chat.memory import AgentMemoryService
-from python_api.modules.agent.chat.schemas import AgentSessionPageRequest, ChatRequest
+from python_api.modules.agent.chat.schemas import (
+    AgentA2uiActionRequest,
+    AgentSessionPageRequest,
+    ChatRequest,
+)
 from python_api.modules.agent.chat.service import AgentChatService
-from python_api.modules.auth.dependencies import require_composite_auth
+from python_api.modules.auth.dependencies import require_bearer, require_composite_auth
 
 router = APIRouter(prefix="/agent/chat", tags=["业务 Agent Chat"])
 
@@ -30,6 +35,19 @@ async def chat(
         db, settings=settings, user_id=user_id
     ).prepare_stream(body)
     return stream_response(events, stream_name="agent_chat")
+
+
+@router.post("/a2ui/actions")
+async def a2ui_action(
+    body: AgentA2uiActionRequest,
+    db: AsyncSession = Depends(get_db),
+    identity: dict[str, Any] = Depends(require_bearer),
+) -> dict[str, Any]:
+    """Executes one confirmed A2UI order-card action for the JWT user."""
+    user_id = identity.get("userId")
+    if not isinstance(user_id, int) or isinstance(user_id, bool):
+        raise HTTPException(401, "无效的登录用户")
+    return await AgentA2uiActionService(db).execute(body, str(user_id))
 
 
 @router.post("/sessions/page")

@@ -1,3 +1,4 @@
+import { createElement } from 'react';
 import dayjs from 'dayjs';
 import { DefaultChatTransport, type UIMessage } from 'ai';
 import type { ChatAdapter } from '@aplus-sql/react-ui-kit';
@@ -9,6 +10,7 @@ import {
   type AgentChatMessagePart,
 } from '@/api/business-agent/chat';
 import { currentAccessToken } from '@/auth/storage';
+import { AgentA2uiOrderCards } from './a2ui-order-cards';
 
 interface LegacyToolCall {
   name: string;
@@ -38,6 +40,7 @@ export function createAgentChatAdapter(): ChatAdapter {
     toUiMessages: (messages) =>
       toAgentUiMessages(messages as AgentChatMessageItem[]),
     formatStatus,
+    renderA2uiPart: (data) => createElement(AgentA2uiOrderCards, { data }),
     formatTime: (value) =>
       value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-',
   };
@@ -72,10 +75,16 @@ function isOrderedPart(part: unknown): part is AgentChatMessagePart {
     return typeof value.text === 'string';
   }
   return (
-    value.type === 'data-status' &&
-    Boolean(value.data) &&
-    typeof value.data === 'object' &&
-    !Array.isArray(value.data)
+    (value.type === 'data-status' &&
+      Boolean(value.data) &&
+      typeof value.data === 'object' &&
+      !Array.isArray(value.data)) ||
+    (value.type === 'data-a2ui' &&
+      Boolean(value.data) &&
+      typeof value.data === 'object' &&
+      !Array.isArray(value.data) &&
+      typeof (value.data as { surfaceId?: unknown }).surfaceId === 'string' &&
+      Array.isArray((value.data as { commands?: unknown }).commands))
   );
 }
 

@@ -1,11 +1,22 @@
-import { DeleteOutlined, RobotOutlined, UserOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  RobotOutlined,
+  ToolOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import { Bubble, Sender, Think, ThoughtChain, Welcome } from '@ant-design/x';
 import type { BubbleItemType } from '@ant-design/x';
 import { Alert, Button, Collapse, Tooltip, theme } from 'antd';
 import type { UIMessage } from 'ai';
+import { Fragment } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import type { ChatAdapter, ChatReferenceItem, ChatStatusData } from './types';
+import type {
+  ChatAdapter,
+  ChatA2uiData,
+  ChatReferenceItem,
+  ChatStatusData,
+} from './types';
 
 export interface ChatBoxProps {
   messages: UIMessage[];
@@ -245,12 +256,20 @@ function renderPart(
           className={`react-ui-kit-status react-ui-kit-status-${tone}`}
           data-stage={String(data.stage || '')}
           title={adapter.formatStatus(data)}
+          icon={data.stage === 'tool_call' ? <ToolOutlined /> : undefined}
           status={resolveThoughtStatus(data.stage)}
           variant="outlined"
         />
       </div>
     ) : (
       <ToolResult data={data} />
+    );
+  }
+  if (part.type === 'data-a2ui') {
+    return (
+      <Fragment key={index}>
+        {adapter.renderA2uiPart?.(part.data as ChatA2uiData)}
+      </Fragment>
     );
   }
   return null;
@@ -295,7 +314,7 @@ function ToolResult({ data }: { data: ChatStatusData }) {
 }
 
 function resolveThoughtStatus(stage?: string) {
-  if (stage === 'tool_call' || stage === 'generate_start') return 'loading';
+  if (stage === 'generate_start') return 'loading';
   if (stage === 'error') return 'error';
   if (stage === 'abort' || stage === 'aborted') return 'abort';
   if (stage === 'tool_result' || stage === 'done') return 'success';

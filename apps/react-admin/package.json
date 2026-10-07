@@ -26,6 +26,7 @@
     "@ant-design/icons": "^6.1.0",
     "@ant-design/pro-components": "3.1.15-5",
     "@ant-design/x": "2.9.0",
+    "@ant-design/x-card": "2.9.0",
     "@aplus-sql/http-client": "workspace:*",
     "@aplus-sql/react-ui-kit": "workspace:*",
     "@open-file-viewer/core": "0.1.17",

@@ -179,6 +179,54 @@ describe('ChatBox', () => {
     expect(screen.getByText('completed')).toBeVisible();
   });
 
+  it('uses a fixed tool icon while retaining loading for generation', () => {
+    const statusMessages = [
+      {
+        id: 'assistant-status',
+        role: 'assistant',
+        parts: [
+          {
+            type: 'data-status',
+            data: {
+              stage: 'tool_call',
+              message: '调用工具：search_knowledge',
+            },
+          },
+          {
+            type: 'data-status',
+            data: {
+              stage: 'generate_start',
+              message: '正在生成回答',
+            },
+          },
+        ],
+      },
+    ] as UIMessage[];
+
+    render(
+      <ChatBox
+        messages={statusMessages}
+        adapter={adapter}
+        value=""
+        statusText="生成中"
+        onChange={vi.fn()}
+        onSubmit={vi.fn()}
+        onStop={vi.fn()}
+        onClear={vi.fn()}
+        onClearError={vi.fn()}
+      />,
+    );
+
+    const toolCall = screen
+      .getByText('调用工具：search_knowledge')
+      .closest('[data-stage]');
+    expect(toolCall?.querySelector('.anticon-tool')).toBeInTheDocument();
+    expect(toolCall?.querySelector('.anticon-loading')).not.toBeInTheDocument();
+
+    const generation = screen.getByText('正在生成回答').closest('[data-stage]');
+    expect(generation?.querySelector('.anticon-loading')).toBeInTheDocument();
+  });
+
   it('delegates sender, stop, clear, and error actions', () => {
     const onChange = vi.fn();
     const onStop = vi.fn();

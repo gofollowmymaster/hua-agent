@@ -1,4 +1,11 @@
+import type { ReactNode } from 'react';
 import type { DefaultChatTransport, UIMessage } from 'ai';
+
+export interface ChatA2uiData {
+  surfaceId: string;
+  conversationId?: string;
+  commands: Record<string, unknown>[];
+}
 
 export interface ChatPageResult<T> {
   list: T[];
@@ -46,6 +53,7 @@ export interface ChatAdapter {
   toUiMessages(messages: unknown[]): UIMessage[];
   formatStatus(data: unknown): string;
   formatTime(value?: string): string;
+  renderA2uiPart?(data: ChatA2uiData): ReactNode;
   resolvePreview?(href: string, label: string): ChatReferenceItem | null;
 }
 

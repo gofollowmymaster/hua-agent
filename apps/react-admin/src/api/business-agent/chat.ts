@@ -12,7 +12,15 @@ export interface AgentChatSessionItem {
 export type AgentChatMessagePart =
   | { type: 'reasoning'; text: string }
   | { type: 'text'; text: string }
-  | { type: 'data-status'; data: Record<string, unknown> };
+  | { type: 'data-status'; data: Record<string, unknown> }
+  | {
+      type: 'data-a2ui';
+      data: {
+        surfaceId: string;
+        conversationId?: string;
+        commands: Record<string, unknown>[];
+      };
+    };
 
 export interface AgentChatMessageItem {
   id: string | number;
@@ -31,4 +39,20 @@ export function pageAgentChatSessions(params: Record<string, unknown>) {
 }
 export function listAgentChatMessages(id: string | number) {
   return get<AgentChatMessageItem[]>(`/agent/chat/sessions/${id}/messages`);
+}
+
+export interface AgentA2uiActionRequest {
+  conversationId: string;
+  surfaceId: string;
+  action: 'approve' | 'reject' | 'cancel' | 'approve_cancel' | 'reject_cancel';
+  reason?: string;
+}
+
+export interface AgentA2uiActionResult {
+  surfaceId: string;
+  commands: Record<string, unknown>[];
+}
+
+export function executeAgentA2uiAction(body: AgentA2uiActionRequest) {
+  return post<AgentA2uiActionResult>('/agent/chat/a2ui/actions', body);
 }

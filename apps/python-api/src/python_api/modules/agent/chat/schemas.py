@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import Field
 
 from python_api.core.schemas import ApiModel, PageRequest
@@ -33,3 +35,12 @@ class AgentSessionPageRequest(PageRequest):
     conversation_type: str | None = Field(default=None, alias="conversationType")
     user_id: str | None = Field(default=None, alias="userId")
     keyword: str | None = None
+
+
+class AgentA2uiActionRequest(ApiModel):
+    """Carries a user-confirmed action for one persisted A2UI order surface."""
+
+    conversation_id: str = Field(alias="conversationId", min_length=1, max_length=128)
+    surface_id: str = Field(alias="surfaceId", min_length=1, max_length=128)
+    action: Literal["approve", "reject", "cancel", "approve_cancel", "reject_cancel"]
+    reason: str | None = Field(default=None, max_length=500)

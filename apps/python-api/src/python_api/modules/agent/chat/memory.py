@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import Any
 
 from sqlalchemy import func, or_, select
@@ -209,4 +210,75 @@ class AgentMemoryService:
             )
             for item in messages
         ]
+
+    async def find_a2ui_surface(
+        self, session: ResolvedSession, surface_id: str
+    ) -> dict[str, Any] | None:
+        """Loads a tenant-owned persisted A2UI surface by its opaque identifier."""
+        found = await self.db.scalar(
+            select(AgentChatSession).where(
+                AgentChatSession.tenant_code == session.tenant_code,
+                AgentChatSession.channel == session.channel,
+                AgentChatSession.session_key == session.session_key,
+            )
+        )
+        if not found:
+            return None
+        messages = (
+            await self.db.scalars(
+                select(AgentChatMessage)
+                .where(
+                    AgentChatMessage.tenant_code == session.tenant_code,
+                    AgentChatMessage.session_id == found.id,
+                )
+                .order_by(AgentChatMessage.created_at.desc())
+            )
+        ).all()
+        for message in messages:
+            for part in message.parts or []:
+                if not isinstance(part, dict):
+                    continue
+                data = part.get("data")
+                if part.get("type") == "data-a2ui" and isinstance(data, dict) and data.get("surfaceId") == surface_id:
+                    return deepcopy(data)
+        return None
+
+    async def append_a2ui_command(
+        self, session: ResolvedSession, surface_id: str, command: dict[str, Any]
+    ) -> bool:
+        """Appends one validated update command to its tenant-owned persisted surface."""
+        found = await self.db.scalar(
+            select(AgentChatSession).where(
+                AgentChatSession.tenant_code == session.tenant_code,
+                AgentChatSession.channel == session.channel,
+                AgentChatSession.session_key == session.session_key,
+            )
+        )
+        if not found:
+            return False
+        messages = (
+            await self.db.scalars(
+                select(AgentChatMessage)
+                .where(
+                    AgentChatMessage.tenant_code == session.tenant_code,
+                    AgentChatMessage.session_id == found.id,
+                )
+                .order_by(AgentChatMessage.created_at.desc())
+            )
+        ).all()
+        for message in messages:
+            parts = deepcopy(message.parts or [])
+            for part in parts:
+                if not isinstance(part, dict):
+                    continue
+                data = part.get("data")
+                if part.get("type") == "data-a2ui" and isinstance(data, dict) and data.get("surfaceId") == surface_id:
+                    commands = data.get("commands")
+                    if not isinstance(commands, list):
+                        return False
+                    commands.append(command)
+                    message.parts = parts
+                    await self.db.commit()
+                    return True
+        return False
 
