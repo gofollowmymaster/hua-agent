@@ -23,7 +23,7 @@
 ## 数据与配置
 
 - `prisma/rag/schema.prisma` 是运行时数据模型，包含本地 RAG Admin 用户、知识问答文档/分块/会话/消息、业务Agent对应模型和用户私有 Skill。
-- 业务Agent入库将去除 UTF-8 BOM 后的原始 Markdown 全文保存到 `agent_documents.content`，清洗后的正文只用于 `agent_chunks` 切片和向量化；管理列表与详情不加载全文，`get_document` 工具通过租户隔离的专用查询读取全文。
+- 业务Agent入库将去除 UTF-8 BOM 后的原始 Markdown 全文保存到 `agent_documents.content`，清洗后的正文只用于 `agent_chunks` 切片和向量化；管理列表与详情不加载全文，但管理关键词筛选通过文档 content 的 zhparser GIN 索引匹配原文，`get_document` 工具通过租户隔离的专用查询读取全文。Business Agent 的 `search_knowledge` 仍使用 chunk 全文索引返回切片级命中。
 - 系统 Skill 由代码清单发布并强制装载；用户 Skill 按租户和登录用户隔离，NestJS Agent 每次运行时动态组合启用指令。
 - `prisma/schema.prisma` 仅保留 MySQL datasource，用于维护历史迁移链；运行时不生成或注入 MySQL Prisma client。
 - `src/config/index.ts` 聚合环境变量和 `aplus`、`boat`、`yurex` 三套租户配置。

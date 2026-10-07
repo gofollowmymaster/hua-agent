@@ -151,6 +151,9 @@ CREATE INDEX IF NOT EXISTS idx_agent_documents_tenant_code
 CREATE INDEX IF NOT EXISTS idx_agent_documents_tenant_category
   ON agent_documents (tenant_code, category);
 
+CREATE INDEX IF NOT EXISTS idx_agent_documents_content_fts
+  ON agent_documents USING gin (to_tsvector('zhparser', content));
+
 CREATE INDEX IF NOT EXISTS idx_agent_chunks_tenant_code
   ON agent_chunks (tenant_code);
 

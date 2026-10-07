@@ -185,18 +185,30 @@ describe('AgentKnowledgeService', () => {
       keyword: '报销流程',
       category: 'yurex',
       status: 'ready',
-      page: 1,
+      page: 3,
       pageSize: 10,
     });
 
     expect(ragPrisma.$queryRaw).toHaveBeenCalledTimes(2);
     const countQuery = ragPrisma.$queryRaw.mock.calls[0][0];
-    expect(countQuery.strings.join(' ')).toContain(
-      "to_tsvector('zhparser', c.content)",
-    );
+    const countSql = countQuery.strings.join(' ');
+    expect(countSql).toContain("to_tsvector('zhparser', d.content)");
+    expect(countSql).not.toContain('agent_chunks');
+    expect(countSql).toContain('d.tenant_code =');
+    expect(countSql).toContain('d.category =');
+    expect(countSql).toContain('d.status =');
+    expect(countSql).toContain('strpos(d.file_name,');
+    expect(countSql).toContain('strpos(d.source_path,');
+    expect(countSql).toContain("strpos(COALESCE(d.breadcrumb, ''),");
+    expect(countSql).toContain('keyword_query.query IS NOT NULL');
     expect(countQuery.values).toEqual(
       expect.arrayContaining(['报销流程', 'yurex', 'ready']),
     );
+    const pageQuery = ragPrisma.$queryRaw.mock.calls[1][0];
+    expect(pageQuery.strings.join(' ')).toContain(
+      'ORDER BY updated_at DESC, id DESC',
+    );
+    expect(pageQuery.values).toEqual(expect.arrayContaining([10, 20]));
     expect(ragPrisma.agentDocument.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: { in: [BigInt(1)] } },
@@ -205,7 +217,7 @@ describe('AgentKnowledgeService', () => {
     );
     expect(result).toMatchObject({
       total: 1,
-      page: 1,
+      page: 3,
       pageSize: 10,
       list: [{ id: '1', tenantCode: 'yurex' }],
     });

@@ -328,7 +328,7 @@ class AgentKnowledgeService:
         return [self._hit(row) for row in rows]
 
     async def _page_by_keyword(self, request: AgentDocumentPageRequest) -> dict[str, Any]:
-        """Pages documents matching metadata or zhparser-indexed chunk content."""
+        """Pages documents matching metadata or zhparser-indexed original content."""
         keyword = (request.keyword or "").strip()
         ids, total = await self.repository.page_document_ids_by_keyword(
             keyword,

@@ -55,7 +55,7 @@ flowchart TD
 
 所有查询同时限制 chunk 与 document 的 `tenant_code`。
 
-管理列表和详情查询不加载或返回完整原文。Business Agent 的 `get_document` 工具使用单独的租户隔离查询加载 `content`，并将完整原文不截断地交给模型；工具过程摘要仍只展示文件名。
+管理列表和详情查询不加载或返回完整原文；带 `keyword` 的管理分页通过文档 content 的 zhparser GIN 索引匹配原文，不再关联切片表。Business Agent 的 `search_knowledge` 仍使用 chunk 全文索引返回切片级命中；`get_document` 工具使用单独的租户隔离查询加载 `content`，并将完整原文不截断地交给模型。工具过程摘要仍只展示文件名。
 
 ## Agent Chat
 

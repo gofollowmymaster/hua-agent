@@ -94,7 +94,6 @@ export default function AgentKnowledgePage() {
           <Button type="link" onClick={() => setPreviewItem(item)}>
             {item.fileName || '-'}
           </Button>
-          <div className="muted">{item.sourcePath || '-'}</div>
           {item.breadcrumb && <div className="muted">{item.breadcrumb}</div>}
           {item.error && <div className="error-text">{item.error}</div>}
         </div>

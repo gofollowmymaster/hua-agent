@@ -282,7 +282,7 @@ export class AgentKnowledgeService {
     return where;
   }
 
-  /** 使用元数据包含匹配与 zhparser 切片全文匹配分页查询文档。 */
+  /** 使用元数据包含匹配与 zhparser 文档原文匹配分页查询文档。 */
   private async pageDocumentsByKeyword(
     params: AgentKnowledgeDocumentPageDto,
     tenantCode: string,
@@ -314,13 +314,7 @@ export class AgentKnowledgeService {
             OR strpos(COALESCE(d.breadcrumb, ''), ${keyword}) > 0
             OR (
               keyword_query.query IS NOT NULL
-              AND EXISTS (
-                SELECT 1
-                FROM agent_chunks c
-                WHERE c.tenant_code = ${tenantCode}
-                  AND c.document_id = d.id
-                  AND to_tsvector('zhparser', c.content) @@ keyword_query.query
-              )
+              AND to_tsvector('zhparser', d.content) @@ keyword_query.query
             )
           )
       )

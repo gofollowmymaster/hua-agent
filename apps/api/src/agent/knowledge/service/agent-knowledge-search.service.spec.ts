@@ -49,6 +49,11 @@ describe('AgentKnowledgeSearchService', () => {
       sourcePath: 'yurex/guide.md',
     });
     expect(ragPrisma.$queryRaw).toHaveBeenCalledTimes(1);
+    const queryStrings = ragPrisma.$queryRaw.mock.calls[0][0];
+    expect(queryStrings.join(' ')).toContain('FROM agent_chunks c');
+    expect(queryStrings.join(' ')).toContain(
+      "to_tsvector('zhparser', c.content)",
+    );
   });
 
   it('returns vector hits using query embedding', async () => {

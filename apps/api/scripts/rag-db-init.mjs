@@ -16,6 +16,10 @@ const requiredSkillIndexes = [
   'idx_agent_user_skills_tenant_user',
   'idx_agent_user_skills_tenant_user_enabled',
 ];
+const requiredAgentKnowledgeIndexes = [
+  'idx_agent_documents_content_fts',
+  'idx_agent_chunks_content_fts',
+];
 
 const pool = new Pool({ connectionString });
 
@@ -64,6 +68,24 @@ try {
   if (missingIndexes.length > 0) {
     throw new Error(
       `RAG database schema check failed: missing indexes ${missingIndexes.join(', ')}.`,
+    );
+  }
+
+  const agentKnowledgeIndexResult = await pool.query(
+    `SELECT indexname
+       FROM pg_indexes
+      WHERE schemaname = 'public'
+        AND tablename IN ('agent_documents', 'agent_chunks')`,
+  );
+  const actualAgentKnowledgeIndexes = new Set(
+    agentKnowledgeIndexResult.rows.map((row) => row.indexname),
+  );
+  const missingAgentKnowledgeIndexes = requiredAgentKnowledgeIndexes.filter(
+    (indexName) => !actualAgentKnowledgeIndexes.has(indexName),
+  );
+  if (missingAgentKnowledgeIndexes.length > 0) {
+    throw new Error(
+      `RAG database schema check failed: missing indexes ${missingAgentKnowledgeIndexes.join(', ')}.`,
     );
   }
 
