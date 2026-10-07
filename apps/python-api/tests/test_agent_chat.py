@@ -92,6 +92,62 @@ class RecordingRuntime:
         yield {"type": "done", "answer": "完成", "toolCalls": []}
 
 
+class OrderCardRuntime:
+    """Returns an order result followed by model prose that cards must replace."""
+
+    async def stream(self, _messages: list[Any], _skills: list[Any]):
+        arguments = {"ds_order_no": "DS-001"}
+        result = '{"dsOrderNo":"DS-001","status":"PENDING_AUDIT"}'
+        yield {"type": "tool_start", "name": "get_ds_order", "arguments": arguments}
+        yield {
+            "type": "tool_end",
+            "name": "get_ds_order",
+            "arguments": arguments,
+            "result": result,
+        }
+        yield {"type": "text_delta", "delta": "这是一段不应展示的模型长文案"}
+        yield {
+            "type": "done",
+            "answer": "这是一段不应展示的模型长文案",
+            "toolCalls": [{"name": "get_ds_order", "arguments": arguments, "result": result}],
+        }
+
+
+class MultipleOrderCardRuntime:
+    """Returns two order surfaces so final card order can be asserted."""
+
+    async def stream(self, _messages: list[Any], _skills: list[Any]):
+        calls = [
+            (
+                "list_ds_orders",
+                {},
+                '{"records":[{"dsOrderNo":"DS-001","status":"PENDING_AUDIT"}]}',
+            ),
+            (
+                "get_ds_order",
+                {"ds_order_no": "DS-001"},
+                '{"dsOrderNo":"DS-001","status":"PENDING_AUDIT"}',
+            ),
+        ]
+        for name, arguments, result in calls:
+            yield {"type": "tool_start", "name": name, "arguments": arguments}
+            yield {
+                "type": "tool_end",
+                "name": name,
+                "arguments": arguments,
+                "result": result,
+            }
+        yield {"type": "text_delta", "delta": "模型总结"}
+        yield {
+            "type": "done",
+            "answer": "模型总结",
+            "toolCalls": [
+                {"name": name, "arguments": arguments, "result": result}
+                for name, arguments, result in calls
+            ],
+        }
+
+
 class FailingSkills:
     """Fails while loading the required pre-stream Skill state."""
 
@@ -173,6 +229,93 @@ async def test_agent_stream_and_persisted_parts_preserve_visible_order() -> None
         {"type": "text", "text": "答案"},
         {"type": "data-status", "data": {"stage": "done", "message": "生成完成"}},
     ]
+
+
+@pytest.mark.asyncio
+async def test_order_card_is_emitted_after_fixed_final_text() -> None:
+    memory = FakeMemory()
+    service = AgentChatService(
+        cast(AsyncSession, None),
+        lambda _db: cast(Any, OrderCardRuntime()),
+        memory=cast(Any, memory),
+    )
+    request = ChatRequest.model_validate(
+        {
+            "id": "conversation-1",
+            "messages": [
+                {
+                    "id": "message-1",
+                    "role": "user",
+                    "parts": [{"type": "text", "text": "审核 DS-001"}],
+                }
+            ],
+        }
+    )
+
+    stream = await service.prepare_stream(request)
+    events = [event async for event in stream]
+    visible = [event.get("data", {}).get("stage") or event["type"] for event in events]
+
+    assert visible == [
+        "analyze_start",
+        "tool_call",
+        "tool_result",
+        "generate_start",
+        "text-start",
+        "text-delta",
+        "text-end",
+        "data-a2ui",
+        "done",
+    ]
+    assert events[5]["delta"] == "请核对订单信息并完成审核。"
+    assert events[7]["data"]["conversationId"] == "conversation-1"
+    assert memory.appended[-1]["content"] == "请核对订单信息并完成审核。"
+    assert [part["type"] for part in memory.appended[-1]["parts"][-3:]] == [
+        "text",
+        "data-a2ui",
+        "data-status",
+    ]
+
+
+@pytest.mark.asyncio
+async def test_multiple_order_cards_keep_tool_order_after_one_final_intro() -> None:
+    memory = FakeMemory()
+    service = AgentChatService(
+        cast(AsyncSession, None),
+        lambda _db: cast(Any, MultipleOrderCardRuntime()),
+        memory=cast(Any, memory),
+    )
+    request = ChatRequest.model_validate(
+        {
+            "id": "conversation-1",
+            "messages": [
+                {
+                    "id": "message-1",
+                    "role": "user",
+                    "parts": [{"type": "text", "text": "查看并审核 DS-001"}],
+                }
+            ],
+        }
+    )
+
+    stream = await service.prepare_stream(request)
+    events = [event async for event in stream]
+    final_events = events[-6:]
+
+    assert [event["type"] for event in final_events] == [
+        "text-start",
+        "text-delta",
+        "text-end",
+        "data-a2ui",
+        "data-a2ui",
+        "data-status",
+    ]
+    assert final_events[1]["delta"] == "已为你整理相关订单，请在下方查看或处理。"
+    components = [
+        event["data"]["commands"][1]["updateComponents"]["components"][0]["component"]
+        for event in final_events[3:5]
+    ]
+    assert components == ["OrderList", "OrderDetail"]
 
 
 @pytest.mark.asyncio

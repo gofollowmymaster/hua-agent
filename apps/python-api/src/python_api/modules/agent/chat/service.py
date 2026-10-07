@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from python_api.core.config import Settings
 from python_api.core.context import get_request_context
 from python_api.core.session import ResolvedSession
-from python_api.modules.agent.chat.a2ui import compile_tool_result
+from python_api.modules.agent.chat.a2ui import compile_tool_result, final_card_intro
 from python_api.modules.agent.chat.memory import AgentMemoryService
 from python_api.modules.agent.chat.runtime import (
     FALLBACK_ANSWER,
@@ -53,9 +53,7 @@ class AgentChatService:
         history = await self.memory.recent(session, 10)
         skills = await self.skills.list_enabled_instructions()
         messages: list[BaseMessage] = [
-            HumanMessage(item["content"])
-            if item["role"] == "user"
-            else AIMessage(item["content"])
+            HumanMessage(item["content"]) if item["role"] == "user" else AIMessage(item["content"])
             for item in history
         ]
         messages.append(HumanMessage(question))
@@ -77,6 +75,8 @@ class AgentChatService:
         active_text: str | None = None
         generation_started = False
         has_text = False
+        defer_order_text = False
+        pending_cards: list[dict[str, Any]] = []
 
         async for event in self.runtime.stream(messages, skills):
             event_type = event["type"]
@@ -100,6 +100,8 @@ class AgentChatService:
                 if active_text:
                     yield {"type": "text-end", "id": active_text}
                     active_text = None
+                if event["name"] in {"list_ds_orders", "get_ds_order"}:
+                    defer_order_text = True
                 yield self._status(
                     parts, "tool_call", f"调用工具：{event['name']}", tool=event["name"]
                 )
@@ -117,12 +119,14 @@ class AgentChatService:
                 card = compile_tool_result(event["name"], event["result"])
                 if card:
                     card["conversationId"] = session.conversation_id
-                    parts.append({"type": "data-a2ui", "data": card})
-                    yield {"type": "data-a2ui", "data": card}
+                    pending_cards.append(card)
             elif event_type == "text_delta":
                 if active_reasoning:
                     yield {"type": "reasoning-end", "id": active_reasoning}
                     active_reasoning = None
+                answer += event["delta"]
+                if defer_order_text:
+                    continue
                 if not generation_started:
                     generation_started = True
                     yield self._status(parts, "generate_start", "开始生成答案")
@@ -130,13 +134,32 @@ class AgentChatService:
                     active_text = str(uuid4())
                     yield {"type": "text-start", "id": active_text}
                 has_text = True
-                answer += event["delta"]
                 yield {"type": "text-delta", "id": active_text, "delta": event["delta"]}
                 self._append_text_part(parts, "text", event["delta"])
             elif event_type == "done":
                 answer = event.get("answer") or answer
                 tool_calls = event.get("toolCalls") or tool_calls
 
+        if pending_cards:
+            answer = final_card_intro(pending_cards)
+            if active_reasoning:
+                yield {"type": "reasoning-end", "id": active_reasoning}
+                active_reasoning = None
+            if active_text:
+                yield {"type": "text-end", "id": active_text}
+                active_text = None
+            if not generation_started:
+                generation_started = True
+                yield self._status(parts, "generate_start", "开始生成答案")
+            final_text_id = str(uuid4())
+            yield {"type": "text-start", "id": final_text_id}
+            yield {"type": "text-delta", "id": final_text_id, "delta": answer}
+            yield {"type": "text-end", "id": final_text_id}
+            self._append_text_part(parts, "text", answer)
+            for card in pending_cards:
+                parts.append({"type": "data-a2ui", "data": card})
+                yield {"type": "data-a2ui", "data": card}
+            has_text = True
         if not answer:
             answer = FALLBACK_ANSWER
         if not has_text:

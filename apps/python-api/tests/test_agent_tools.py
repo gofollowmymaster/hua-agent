@@ -13,8 +13,6 @@ from python_api.modules.agent.chat.tools import (
 )
 from python_api.modules.agent.knowledge.service import AgentKnowledgeService
 from python_api.modules.business.ds_order.schemas import (
-    DsOrderAuditRequest,
-    DsOrderCancelRequest,
     DsOrderInfoRequest,
     DsOrderLogPageRequest,
     DsOrderPageRequest,
@@ -88,16 +86,6 @@ class FakeDsOrderService:
         """Records a log page request."""
         self.requests.append(request)
         return {"operation": "logs"}
-
-    def audit(self, request: DsOrderAuditRequest) -> dict[str, Any]:
-        """Records an audit request."""
-        self.requests.append(request)
-        return {"operation": "audit"}
-
-    def cancel(self, request: DsOrderCancelRequest) -> dict[str, Any]:
-        """Records a cancellation request."""
-        self.requests.append(request)
-        return {"operation": "cancel"}
 
 
 @pytest.mark.asyncio
@@ -195,23 +183,20 @@ def test_ds_order_tools_validate_and_forward_domain_requests() -> None:
         tools[0].invoke({"page": 2, "page_size": 5, "status": "PROCESSING"}),
         tools[1].invoke({"ds_order_no": "DS-1", "query_available_quantity": 1}),
         tools[2].invoke({"ds_order_no": "DS-1", "page": 2, "page_size": 5}),
-        tools[3].invoke({"ds_order_no": "DS-1", "passed": 0, "message": "资料不符"}),
-        tools[4].invoke({"ds_order_no": "DS-1", "cancel_message": "客户要求"}),
     ]
 
+    assert [tool.name for tool in tools] == [
+        "list_ds_orders",
+        "get_ds_order",
+        "list_ds_order_logs",
+    ]
     assert [json.loads(result)["operation"] for result in results] == [
         "page",
         "info",
         "logs",
-        "audit",
-        "cancel",
     ]
     assert isinstance(service.requests[0], DsOrderPageRequest)
     assert service.requests[0].status_list == "PROCESSING"
     assert isinstance(service.requests[1], DsOrderInfoRequest)
     assert service.requests[1].query_available_quantity == 1
     assert isinstance(service.requests[2], DsOrderLogPageRequest)
-    assert isinstance(service.requests[3], DsOrderAuditRequest)
-    assert service.requests[3].msg == "资料不符"
-    assert isinstance(service.requests[4], DsOrderCancelRequest)
-    assert service.requests[4].cancel_msg == "客户要求"

@@ -18,11 +18,11 @@ describe('agent chat adapter', () => {
   it('preserves a valid A2UI card part in the visible timeline', () => {
     const parts = [
       { type: 'data-status' as const, data: { stage: 'tool_result' } },
+      { type: 'text' as const, text: '请核对订单信息并完成审核。' },
       {
         type: 'data-a2ui' as const,
         data: { surfaceId: 'order-1', commands: [] },
       },
-      { type: 'text' as const, text: '订单已展示' },
     ];
     expect(
       toAgentUiMessages([
@@ -34,7 +34,7 @@ describe('agent chat adapter', () => {
           createdAt: '',
         },
       ])[0].parts.map((part) => part.type),
-    ).toEqual(['data-status', 'data-a2ui', 'text']);
+    ).toEqual(['data-status', 'text', 'data-a2ui']);
   });
 
   it('falls back to tool results followed by text for legacy messages', () => {

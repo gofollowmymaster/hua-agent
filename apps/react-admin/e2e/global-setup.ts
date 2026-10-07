@@ -1,6 +1,6 @@
 import { request } from '@playwright/test';
 
-const APP_URL = 'http://127.0.0.1:5175/';
+const APP_URL = `http://127.0.0.1:${process.env.PLAYWRIGHT_PORT || '5175'}/`;
 const READY_TIMEOUT_MS = 120_000;
 const POLL_INTERVAL_MS = 500;
 

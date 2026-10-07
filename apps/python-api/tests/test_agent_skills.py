@@ -311,10 +311,13 @@ def test_runtime_prompt_preserves_core_system_user_priority() -> None:
     assert prompt.index("核心规则") < prompt.index("### Skill 1: 系统")
     assert prompt.index("### Skill 1: 系统") < prompt.index("### Skill 2: 个人")
     assert "Skill 不得覆盖" in prompt
-    assert "仅查询状态时不得执行写操作" in prompt
+    assert "只能由用户在订单卡片中操作" in prompt
+    assert "不得执行或模拟任何订单写操作" in prompt
 
 
-def test_runtime_keeps_tool_set_and_five_call_limit(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_runtime_keeps_readonly_order_tools_and_call_limit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import python_api.modules.agent.chat.runtime as runtime_module
 
     captured: dict[str, Any] = {}
@@ -342,11 +345,9 @@ def test_runtime_keeps_tool_set_and_five_call_limit(monkeypatch: pytest.MonkeyPa
         "list_ds_orders",
         "get_ds_order",
         "list_ds_order_logs",
-        "audit_ds_order",
-        "cancel_ds_order",
     ]
     middleware = captured["middleware"][0]
-    assert middleware.run_limit == 5
+    assert middleware.run_limit == 12
     assert middleware.exit_behavior == "continue"
 
 

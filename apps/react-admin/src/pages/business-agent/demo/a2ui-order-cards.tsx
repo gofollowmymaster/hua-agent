@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { XCard, registerCatalog } from '@ant-design/x-card';
-import { App, Button, Card, Flex, Input, Modal, Space, Typography } from 'antd';
+import { App, Button, Card, Flex, Form, Input, Space, Typography } from 'antd';
 import { SemanticTag } from '@/components/semantic-tag';
 import {
   executeAgentA2uiAction,
@@ -18,6 +18,7 @@ interface Order {
   warehouseName?: string;
   totalQuantity?: number;
   trackingNo?: string;
+  cancelMsg?: string;
   tipMsg?: string;
 }
 
@@ -27,6 +28,18 @@ interface CardActionProps {
 }
 
 const catalogId = 'local://aplus-agent-order-v0.9';
+
+interface OrderActionContextValue {
+  reason: string;
+  validationError?: string;
+  submittingAction?: OrderAction;
+  setReason: (value: string) => void;
+}
+
+const OrderActionContext = createContext<OrderActionContextValue>({
+  reason: '',
+  setReason: () => undefined,
+});
 
 registerCatalog({
   $id: catalogId,
@@ -41,21 +54,22 @@ registerCatalog({
 export function AgentA2uiOrderCards({ data }: { data: ChatA2uiData }) {
   const { message } = App.useApp();
   const [commands, setCommands] = useState(data.commands);
-  const [action, setAction] = useState<OrderAction>();
   const [reason, setReason] = useState('');
-  const [submitting, setSubmitting] = useState(false);
+  const [validationError, setValidationError] = useState<string>();
+  const [submittingAction, setSubmittingAction] = useState<OrderAction>();
 
   useEffect(() => setCommands(data.commands), [data.commands]);
 
-  const needsReason =
-    action === 'reject' || action === 'cancel' || action === 'reject_cancel';
-  const submit = async () => {
-    if (!action || !data.conversationId) return;
+  const submit = async (action: OrderAction) => {
+    if (!data.conversationId) return;
+    const needsReason =
+      action === 'reject' || action === 'cancel' || action === 'reject_cancel';
     if (needsReason && !reason.trim()) {
-      message.error('请填写操作原因');
+      setValidationError('请填写操作原因');
       return;
     }
-    setSubmitting(true);
+    setValidationError(undefined);
+    setSubmittingAction(action);
     try {
       const result = await executeAgentA2uiAction({
         conversationId: data.conversationId,
@@ -64,7 +78,6 @@ export function AgentA2uiOrderCards({ data }: { data: ChatA2uiData }) {
         ...(reason.trim() ? { reason: reason.trim() } : {}),
       });
       setCommands((current) => [...current, ...result.commands]);
-      setAction(undefined);
       setReason('');
       message.success('订单状态已更新');
     } catch (error) {
@@ -72,41 +85,30 @@ export function AgentA2uiOrderCards({ data }: { data: ChatA2uiData }) {
         error instanceof Error ? error.message : '操作失败，请刷新后重试',
       );
     } finally {
-      setSubmitting(false);
+      setSubmittingAction(undefined);
     }
   };
 
   return (
-    <>
+    <OrderActionContext.Provider
+      value={{
+        reason,
+        validationError,
+        submittingAction,
+        setReason: (value) => {
+          setReason(value);
+          if (validationError) setValidationError(undefined);
+        },
+      }}
+    >
       <XCard.Box
         commands={commands as never}
         components={{ OrderList, OrderDetail, OrderMutation }}
-        onAction={({ name }) => setAction(name as OrderAction)}
+        onAction={({ name }) => void submit(name as OrderAction)}
       >
         <XCard.Card id={data.surfaceId} />
       </XCard.Box>
-      <Modal
-        open={Boolean(action)}
-        title={actionLabel(action)}
-        okText="确认"
-        confirmLoading={submitting}
-        onCancel={() => {
-          if (!submitting) setAction(undefined);
-        }}
-        onOk={() => void submit()}
-      >
-        <p>确认执行此订单操作？</p>
-        {needsReason && (
-          <Input.TextArea
-            autoSize={{ minRows: 3, maxRows: 5 }}
-            maxLength={500}
-            placeholder="请输入操作原因"
-            value={reason}
-            onChange={(event) => setReason(event.target.value)}
-          />
-        )}
-      </Modal>
-    </>
+    </OrderActionContext.Provider>
   );
 }
 
@@ -154,6 +156,9 @@ function OrderDetail({ value, onAction }: CardActionProps) {
         {order.trackingNo && (
           <Typography.Text>运单号：{order.trackingNo}</Typography.Text>
         )}
+        {order.status === 'CANCEL_PENDING_AUDIT' && order.cancelMsg && (
+          <Typography.Text>取消原因：{order.cancelMsg}</Typography.Text>
+        )}
         {order.tipMsg && (
           <Typography.Text type="secondary">{order.tipMsg}</Typography.Text>
         )}
@@ -174,40 +179,97 @@ function OrderActions({
   status?: string;
   onAction?: (name: OrderAction) => void;
 }) {
+  const { reason, validationError, submittingAction, setReason } =
+    useContext(OrderActionContext);
   if (!onAction) return null;
+  const disabled = Boolean(submittingAction);
+  const reasonInput = (label: string, placeholder: string) => (
+    <Form.Item
+      label={label}
+      validateStatus={validationError ? 'error' : undefined}
+      help={validationError}
+      style={{ marginBottom: 8 }}
+    >
+      <Input.TextArea
+        aria-label={label}
+        disabled={disabled}
+        maxLength={500}
+        placeholder={placeholder}
+        rows={2}
+        showCount
+        value={reason}
+        onChange={(event) => setReason(event.target.value)}
+      />
+    </Form.Item>
+  );
   if (status === 'PENDING_AUDIT') {
     return (
-      <Space>
-        <Button type="primary" size="small" onClick={() => onAction('approve')}>
-          审核通过
-        </Button>
-        <Button danger size="small" onClick={() => onAction('reject')}>
-          驳回
-        </Button>
-      </Space>
+      <Form layout="vertical" size="small" requiredMark={false}>
+        {reasonInput('审核意见（驳回时必填）', '请输入审核意见')}
+        <Space wrap>
+          <Button
+            type="primary"
+            size="small"
+            disabled={disabled}
+            loading={submittingAction === 'approve'}
+            onClick={() => onAction('approve')}
+          >
+            审核通过
+          </Button>
+          <Button
+            danger
+            size="small"
+            disabled={disabled}
+            loading={submittingAction === 'reject'}
+            onClick={() => onAction('reject')}
+          >
+            驳回
+          </Button>
+        </Space>
+      </Form>
     );
   }
   if (status === 'PROCESSING' || status === 'IN_DISTRIBUTION') {
     return (
-      <Button danger size="small" onClick={() => onAction('cancel')}>
-        申请取消
-      </Button>
+      <Form layout="vertical" size="small" requiredMark={false}>
+        {reasonInput('取消原因', '请输入取消原因')}
+        <Button
+          danger
+          size="small"
+          disabled={disabled}
+          loading={submittingAction === 'cancel'}
+          onClick={() => onAction('cancel')}
+        >
+          申请取消
+        </Button>
+      </Form>
     );
   }
   if (status === 'CANCEL_PENDING_AUDIT') {
     return (
-      <Space>
-        <Button
-          type="primary"
-          size="small"
-          onClick={() => onAction('approve_cancel')}
-        >
-          同意取消
-        </Button>
-        <Button danger size="small" onClick={() => onAction('reject_cancel')}>
-          驳回取消
-        </Button>
-      </Space>
+      <Form layout="vertical" size="small" requiredMark={false}>
+        {reasonInput('审核意见（驳回时必填）', '请输入审核意见')}
+        <Space wrap>
+          <Button
+            type="primary"
+            size="small"
+            disabled={disabled}
+            loading={submittingAction === 'approve_cancel'}
+            onClick={() => onAction('approve_cancel')}
+          >
+            同意取消
+          </Button>
+          <Button
+            danger
+            size="small"
+            disabled={disabled}
+            loading={submittingAction === 'reject_cancel'}
+            onClick={() => onAction('reject_cancel')}
+          >
+            驳回取消
+          </Button>
+        </Space>
+      </Form>
     );
   }
   return null;
@@ -223,16 +285,4 @@ function OrderStatus({ status }: { status?: string }) {
           ? 'warning'
           : 'info';
   return <SemanticTag tone={tone}>{status || '-'}</SemanticTag>;
-}
-
-function actionLabel(action?: OrderAction) {
-  return (
-    {
-      approve: '审核通过',
-      reject: '驳回订单',
-      cancel: '申请取消',
-      approve_cancel: '同意取消',
-      reject_cancel: '驳回取消',
-    } as const
-  )[action || 'approve'];
 }
