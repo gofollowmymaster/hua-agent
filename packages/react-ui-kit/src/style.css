@@ -78,8 +78,10 @@
   overflow: hidden;
 }
 
-.react-ui-kit-messages > .ant-x-bubble-list {
+.react-ui-kit-bubble-list,
+.react-ui-kit-bubble-scroll {
   height: 100%;
+  min-height: 0;
 }
 
 .react-ui-kit-welcome {
@@ -147,6 +149,8 @@
   }
 
   .react-ui-kit-chat-box {
+    height: calc(100vh - 166px);
     min-height: 440px;
+    max-height: calc(100vh - 166px);
   }
 }

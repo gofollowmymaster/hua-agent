@@ -62,6 +62,9 @@ describe('ChatBox', () => {
     );
 
     const list = screen.getByTestId('chat-message-list');
+    expect(
+      list.querySelector('.react-ui-kit-bubble-scroll'),
+    ).toBeInTheDocument();
     expect(list).toHaveTextContent(
       /思考过程.*先查库存.*库存查询完成.*工具入参.*A-1.*工具输出.*12.*库存充足/s,
     );

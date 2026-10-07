@@ -93,6 +93,8 @@ export function ChatBox({
           />
         ) : (
           <Bubble.List
+            className="react-ui-kit-bubble-list"
+            classNames={{ scroll: 'react-ui-kit-bubble-scroll' }}
             autoScroll
             items={items}
             role={{

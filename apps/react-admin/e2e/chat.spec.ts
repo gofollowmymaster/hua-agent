@@ -58,6 +58,19 @@ test('loads RAG and business Agent histories with ordered visible parts', async 
       .locator('[data-stage]')
       .evaluateAll((items) => items.map((item) => item.dataset.stage)),
   ).toEqual(['tool_call', 'tool_result', 'generate_start', 'done']);
+  const messageScroll = page.locator('.react-ui-kit-bubble-scroll');
+  await expect(messageScroll).toHaveCSS('overflow-y', 'auto');
+  const scrollSize = await messageScroll.evaluate((element) => ({
+    clientHeight: element.clientHeight,
+    scrollHeight: element.scrollHeight,
+  }));
+  expect(scrollSize.scrollHeight).toBeGreaterThan(scrollSize.clientHeight);
+  await messageScroll.evaluate((element) => {
+    element.scrollTop = -element.scrollHeight;
+  });
+  expect(
+    await messageScroll.evaluate((element) => element.scrollTop),
+  ).toBeLessThan(0);
   await page.screenshot({
     path: testInfo.outputPath('business-agent-theme.png'),
     fullPage: true,

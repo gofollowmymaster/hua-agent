@@ -37,6 +37,14 @@ const agentKnowledgeItem = {
   updatedAt: '2026-10-05T00:00:00Z',
 };
 
+const longAgentAnswer = [
+  '库存充足',
+  ...Array.from(
+    { length: 30 },
+    (_, index) => `库存明细 ${index + 1}：当前仓库可正常履约。`,
+  ),
+].join('\n\n');
+
 export async function installAdminApiMocks(page: Page) {
   await page.route('**/auth/login', (route) =>
     route.fulfill({
@@ -201,7 +209,7 @@ export async function installAdminApiMocks(page: Page) {
         {
           id: 311,
           role: 'assistant',
-          content: '库存充足',
+          content: longAgentAnswer,
           parts: [
             { type: 'reasoning', text: '先查库存' },
             {
@@ -216,7 +224,7 @@ export async function installAdminApiMocks(page: Page) {
               type: 'data-status',
               data: { stage: 'generate_start', message: '开始生成回答' },
             },
-            { type: 'text', text: '库存充足' },
+            { type: 'text', text: longAgentAnswer },
             {
               type: 'data-status',
               data: { stage: 'done', message: '回答完成' },
