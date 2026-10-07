@@ -13,4 +13,15 @@ describe('drawer query', () => {
     });
     expect(updateDrawerQuery(opened)).toBe('?keyword=a');
   });
+
+  it('restores the digital avatar chunk drawer', () => {
+    const opened = updateDrawerQuery('', {
+      drawer: 'digital-avatar-chunks',
+      drawerCode: 9,
+    });
+    expect(readDrawerQuery(opened)).toEqual({
+      drawer: 'digital-avatar-chunks',
+      drawerCode: '9',
+    });
+  });
 });

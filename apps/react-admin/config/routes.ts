@@ -43,6 +43,14 @@ export default [
         path: '/business-agent/demo',
         component: '@/pages/business-agent/demo',
       },
+      {
+        path: '/digital-avatar',
+        redirect: '/digital-avatar/documents',
+      },
+      {
+        path: '/digital-avatar/documents',
+        component: '@/pages/digital-avatar/documents',
+      },
       { path: '/documents', redirect: '/knowledge/documents' },
       { path: '/sessions', redirect: '/knowledge/sessions' },
       { path: '/assistant', redirect: '/knowledge/assistant' },

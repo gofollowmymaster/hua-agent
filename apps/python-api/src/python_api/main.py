@@ -24,6 +24,7 @@ from python_api.modules.auth.session.router import router as auth_session_router
 from python_api.modules.auth.users.router import router as auth_users_router
 from python_api.modules.auth.users.service import bootstrap_admin
 from python_api.modules.business.ds_order.router import router as ds_order_router
+from python_api.modules.digital_avatar.router import router as digital_avatar_router
 from python_api.modules.health.checks.router import router as health_router
 from python_api.modules.rag.admin.router import router as rag_admin_router
 from python_api.modules.rag.chat.router import router as rag_chat_router
@@ -75,6 +76,7 @@ def create_app(
     app.include_router(agent_chat_router)
     app.include_router(agent_skill_router)
     app.include_router(ds_order_router)
+    app.include_router(digital_avatar_router)
     app.include_router(rag_chat_router)
     if resolved_settings.public_dir.exists():
         app.mount(

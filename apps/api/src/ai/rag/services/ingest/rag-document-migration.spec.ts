@@ -38,4 +38,22 @@ describe('RAG document file-hash migration', () => {
       /document_id BIGINT NOT NULL REFERENCES aplus_documents\(id\) ON DELETE CASCADE/,
     );
   });
+
+  it('defines global digital avatar documents and vector chunks', () => {
+    expect(schema).toContain(
+      'CREATE TABLE IF NOT EXISTS digital_avatar_documents',
+    );
+    expect(schema).toContain(
+      'CREATE TABLE IF NOT EXISTS digital_avatar_chunks',
+    );
+    expect(schema).toContain(
+      'REFERENCES digital_avatar_documents(id) ON DELETE CASCADE',
+    );
+    expect(schema).toContain('embedding vector(1024) NOT NULL');
+    expect(schema).toContain('idx_digital_avatar_chunks_embedding');
+    const documentTable = schema.match(
+      /CREATE TABLE IF NOT EXISTS digital_avatar_documents \([\s\S]*?\n\);/,
+    )?.[0];
+    expect(documentTable).not.toContain('tenant_code');
+  });
 });

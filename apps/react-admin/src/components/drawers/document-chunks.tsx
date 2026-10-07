@@ -14,18 +14,26 @@ import {
   type AgentKnowledgeDocumentItem,
 } from '@/api/business-agent/knowledge';
 import { SemanticTag } from '@/components/semantic-tag';
+import {
+  getDigitalAvatarDocument,
+  pageDigitalAvatarChunks,
+  type DigitalAvatarChunkItem,
+  type DigitalAvatarDocumentItem,
+} from '@/api/digital-avatar/documents';
 
 interface DocumentChunksProps {
   id: string;
-  source: 'rag' | 'agent';
+  source: 'rag' | 'agent' | 'digital-avatar';
 }
 
 export function DocumentChunks({ id, source }: DocumentChunksProps) {
   const [document, setDocument] = useState<
-    RagDocumentItem | AgentKnowledgeDocumentItem
+    RagDocumentItem | AgentKnowledgeDocumentItem | DigitalAvatarDocumentItem
   >();
   const [chunks, setChunks] = useState<
-    Array<RagDocumentChunkItem | AgentKnowledgeChunkItem>
+    Array<
+      RagDocumentChunkItem | AgentKnowledgeChunkItem | DigitalAvatarChunkItem
+    >
   >([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -41,11 +49,17 @@ export function DocumentChunks({ id, source }: DocumentChunksProps) {
     setLoading(true);
     setError('');
     const documentRequest =
-      source === 'rag' ? getDocument(id) : getAgentKnowledgeDocument(id);
+      source === 'rag'
+        ? getDocument(id)
+        : source === 'agent'
+          ? getAgentKnowledgeDocument(id)
+          : getDigitalAvatarDocument(id);
     const chunksRequest =
       source === 'rag'
         ? pageDocumentChunks(id, { page, pageSize: 10 })
-        : pageAgentKnowledgeDocumentChunks(id, { page, pageSize: 10 });
+        : source === 'agent'
+          ? pageAgentKnowledgeDocumentChunks(id, { page, pageSize: 10 })
+          : pageDigitalAvatarChunks(id, { page, pageSize: 10 });
     void Promise.all([documentRequest, chunksRequest])
       .then(([item, result]) => {
         if (!active) return;
@@ -78,6 +92,13 @@ export function DocumentChunks({ id, source }: DocumentChunksProps) {
               {document.status}
             </SemanticTag>
           </Descriptions.Item>
+          {'summary' in document && (
+            <Descriptions.Item label="摘要">
+              <div style={{ whiteSpace: 'pre-wrap' }}>
+                {document.summary || '-'}
+              </div>
+            </Descriptions.Item>
+          )}
         </Descriptions>
       )}
       {chunks.length > 0 ? (

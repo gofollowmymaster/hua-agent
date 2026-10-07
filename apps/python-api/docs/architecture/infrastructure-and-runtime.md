@@ -23,6 +23,7 @@ ORM 由 `modules/auth/models.py`、`modules/rag/models.py` 和 `modules/agent/mo
 - `aplus_rag_sessions`、`aplus_rag_messages`。
 - `agent_chat_sessions`、`agent_chat_messages`。
 - `agent_user_skills`。
+- `digital_avatar_documents`、`digital_avatar_chunks`（全局共享，不按租户过滤）。
 
 本项目不创建数据库迁移。常规读写优先使用 SQLAlchemy ORM；需要 pgvector、zhparser、JSONB cast 或 PostgreSQL upsert 时使用参数化 `text()`。
 
@@ -62,6 +63,7 @@ Chat 和 embedding 使用 OpenAI-compatible client：
 ## 文件系统
 
 - RAG 原始文档位于 `WORKSPACE_ROOT/RAW_DIR/<tenant>`。
+- 数字分身原始文档位于 `WORKSPACE_ROOT/RAW_DIR/digital-avatar`，只接受 UTF-8 txt。
 - Agent 文档目录由 `AGENT_DOCS_DIR` 配置；相对路径根据代码定义的 workspace 位置解析。
 - `/public` 仅在配置对应目录存在时挂载。
 - 上传支持 PDF、DOC/DOCX、XLS/XLSX、PPT/PPTX、TXT 和 Markdown；数量与单文件大小受配置限制。
@@ -87,7 +89,12 @@ pnpm python-api:test
 pnpm python-api:lint
 pnpm python-api:typecheck
 pnpm python-api:build
+pnpm digital-avatar:import:dev
+pnpm digital-avatar:import:test
+pnpm digital-avatar:import:prod
 ```
+
+数字分身导入命令默认读取 `data/管理知识文档/`，可通过 `--source <目录>` 指定其他来源；命令复制源文件后幂等入库，不修改来源目录。
 
 `python -m python_api.run` 从 `Settings` 读取 host、port、worker 和 reload 配置并启动 Uvicorn。开发、测试和生产脚本分别显式选择环境。
 

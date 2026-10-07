@@ -67,6 +67,7 @@ apps/python-api/.env.*.local
 .temp
 .tmp
 apps/api/raw/*
+/raw/
 
 # Runtime data
 pids

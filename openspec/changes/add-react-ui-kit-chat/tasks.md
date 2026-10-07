@@ -24,3 +24,4 @@
 - [x] 4.2 运行包级 build/test/lint/format 检查
 - [x] 4.3 运行 React Admin check、antd lint、build 和桌面/窄屏 E2E
 - [x] 4.4 运行依赖树、Vue Admin、HTTP client、根构建和 diff 检查
+- [x] 4.5 修复 Umi MFSU 重复 React Hook dispatcher，并回归桌面与窄屏流式聊天

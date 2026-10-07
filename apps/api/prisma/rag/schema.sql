@@ -102,6 +102,45 @@ CREATE INDEX IF NOT EXISTS idx_aplus_chunks_embedding
 CREATE INDEX IF NOT EXISTS idx_aplus_chunks_content_fts
   ON aplus_chunks USING gin (to_tsvector('zhparser', content));
 
+CREATE TABLE IF NOT EXISTS digital_avatar_documents (
+  id BIGSERIAL PRIMARY KEY,
+  source_path TEXT NOT NULL UNIQUE,
+  file_name TEXT NOT NULL,
+  file_type TEXT NOT NULL,
+  file_hash TEXT NOT NULL UNIQUE,
+  file_size BIGINT NOT NULL,
+  summary TEXT NOT NULL DEFAULT '',
+  chunk_count INTEGER NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'ready',
+  error TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  ingested_at TIMESTAMPTZ
+);
+
+CREATE TABLE IF NOT EXISTS digital_avatar_chunks (
+  id BIGSERIAL PRIMARY KEY,
+  document_id BIGINT NOT NULL REFERENCES digital_avatar_documents(id) ON DELETE CASCADE,
+  chunk_index INTEGER NOT NULL,
+  content TEXT NOT NULL,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+  embedding vector(1024) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (document_id, chunk_index)
+);
+
+CREATE INDEX IF NOT EXISTS idx_digital_avatar_documents_updated_at
+  ON digital_avatar_documents (updated_at);
+
+CREATE INDEX IF NOT EXISTS idx_digital_avatar_chunks_document_id
+  ON digital_avatar_chunks (document_id);
+
+CREATE INDEX IF NOT EXISTS idx_digital_avatar_chunks_embedding
+  ON digital_avatar_chunks USING hnsw (embedding vector_cosine_ops);
+
+CREATE INDEX IF NOT EXISTS idx_digital_avatar_chunks_content_fts
+  ON digital_avatar_chunks USING gin (to_tsvector('zhparser', content));
+
 CREATE TABLE IF NOT EXISTS agent_documents (
   id BIGSERIAL PRIMARY KEY,
   tenant_code TEXT NOT NULL,

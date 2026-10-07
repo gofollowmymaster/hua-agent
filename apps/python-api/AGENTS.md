@@ -18,6 +18,9 @@ pnpm python-api:test
 pnpm python-api:lint
 pnpm python-api:typecheck
 pnpm python-api:build
+pnpm digital-avatar:import:dev
+pnpm digital-avatar:import:test
+pnpm digital-avatar:import:prod
 ```
 
 ## 边界约束

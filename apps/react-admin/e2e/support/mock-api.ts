@@ -37,6 +37,21 @@ const agentKnowledgeItem = {
   updatedAt: '2026-10-05T00:00:00Z',
 };
 
+const digitalAvatarItem = {
+  id: 51,
+  sourcePath: '课程-01大纲_2025-05-27.txt',
+  fileName: '课程-01大纲_2025-05-27.txt',
+  fileType: 'txt',
+  fileHash: 'digital-avatar-document-hash',
+  fileSize: 4096,
+  summary: '这是最后一节派生的文档摘要。',
+  chunkCount: 3,
+  actualChunkCount: 3,
+  status: 'ready',
+  createdAt: '2026-10-07T00:00:00Z',
+  updatedAt: '2026-10-07T00:00:00Z',
+};
+
 const longAgentAnswer = [
   '库存充足',
   ...Array.from(
@@ -112,6 +127,76 @@ export async function installAdminApiMocks(page: Page) {
             chunks: 1,
           },
         ],
+      }),
+    }),
+  );
+  await page.route('**/digital-avatar/admin/documents/page', (route) =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: json({
+        list: [digitalAvatarItem],
+        total: 1,
+        page: 1,
+        pageSize: 20,
+      }),
+    }),
+  );
+  await page.route('**/digital-avatar/admin/documents/51/preview', (route) =>
+    route.fulfill({
+      contentType: 'text/plain',
+      body: '## 第一节\n数字分身预览正文',
+    }),
+  );
+  await page.route(
+    '**/digital-avatar/admin/documents/51/chunks/page',
+    (route) =>
+      route.fulfill({
+        contentType: 'application/json',
+        body: json({
+          list: [
+            {
+              id: 511,
+              documentId: 51,
+              chunkIndex: 0,
+              content: '## 第一节\n数字分身切片正文',
+              metadata: { heading: '第一节', isSummary: false },
+              createdAt: '2026-10-07T00:00:00Z',
+            },
+          ],
+          total: 1,
+          page: 1,
+          pageSize: 10,
+        }),
+      }),
+  );
+  await page.route('**/digital-avatar/admin/documents/51/summary', (route) =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: json(digitalAvatarItem),
+    }),
+  );
+  await page.route('**/digital-avatar/admin/documents/51/reingest', (route) =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: json(digitalAvatarItem),
+    }),
+  );
+  await page.route('**/digital-avatar/admin/documents/51', (route) =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: json(digitalAvatarItem),
+    }),
+  );
+  await page.route('**/digital-avatar/admin/documents/upload', (route) =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: json({
+        totalFiles: 1,
+        indexedFiles: 1,
+        duplicateFiles: 0,
+        failedFiles: 0,
+        chunks: 2,
+        files: [{ fileName: '新增课程.txt', status: 'indexed', chunks: 2 }],
       }),
     }),
   );

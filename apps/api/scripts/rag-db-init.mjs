@@ -20,6 +20,17 @@ const requiredAgentKnowledgeIndexes = [
   'idx_agent_documents_content_fts',
   'idx_agent_chunks_content_fts',
 ];
+const requiredDigitalAvatarIndexes = [
+  'digital_avatar_documents_pkey',
+  'digital_avatar_documents_source_path_key',
+  'digital_avatar_documents_file_hash_key',
+  'idx_digital_avatar_documents_updated_at',
+  'digital_avatar_chunks_pkey',
+  'digital_avatar_chunks_document_id_chunk_index_key',
+  'idx_digital_avatar_chunks_document_id',
+  'idx_digital_avatar_chunks_embedding',
+  'idx_digital_avatar_chunks_content_fts',
+];
 
 const pool = new Pool({ connectionString });
 
@@ -55,6 +66,19 @@ try {
     );
   }
 
+  const digitalAvatarTablesResult = await pool.query(
+    `SELECT to_regclass('public.digital_avatar_documents') IS NOT NULL AS documents,
+            to_regclass('public.digital_avatar_chunks') IS NOT NULL AS chunks`,
+  );
+  if (
+    !digitalAvatarTablesResult.rows[0]?.documents ||
+    !digitalAvatarTablesResult.rows[0]?.chunks
+  ) {
+    throw new Error(
+      'RAG database schema check failed: missing digital avatar tables.',
+    );
+  }
+
   const indexResult = await pool.query(
     `SELECT indexname
        FROM pg_indexes
@@ -86,6 +110,25 @@ try {
   if (missingAgentKnowledgeIndexes.length > 0) {
     throw new Error(
       `RAG database schema check failed: missing indexes ${missingAgentKnowledgeIndexes.join(', ')}.`,
+    );
+  }
+
+
+  const digitalAvatarIndexResult = await pool.query(
+    `SELECT indexname
+       FROM pg_indexes
+      WHERE schemaname = 'public'
+        AND tablename IN ('digital_avatar_documents', 'digital_avatar_chunks')`,
+  );
+  const actualDigitalAvatarIndexes = new Set(
+    digitalAvatarIndexResult.rows.map((row) => row.indexname),
+  );
+  const missingDigitalAvatarIndexes = requiredDigitalAvatarIndexes.filter(
+    (indexName) => !actualDigitalAvatarIndexes.has(indexName),
+  );
+  if (missingDigitalAvatarIndexes.length > 0) {
+    throw new Error(
+      `RAG database schema check failed: missing indexes ${missingDigitalAvatarIndexes.join(', ')}.`,
     );
   }
 

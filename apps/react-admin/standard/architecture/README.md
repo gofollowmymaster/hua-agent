@@ -7,3 +7,5 @@ React Admin 是与 Vue RAG Admin 并行的 Umi Max 管理后台，使用 React 1
 `.umirc.ts` 只承载构建、插件、环境变量和代理配置，声明式路由位于 `config/routes.ts`。Ant Design 核心组件 API 通过与 antd 版本一致的 `@ant-design/cli` 查询和检查；Umi 插件通过 workspace override 与应用共用 ProComponents 3.1。
 
 认证通过 `POST /auth/login` 建立，持久化兼容 `localStorage['authToken']`，普通请求与流式 fetch 均在 401 时清理状态并跳转登录页。
+
+导航提供知识问答、业务 Agent 和数字分身三个顶级模块。数字分身当前仅包含 `/digital-avatar/documents`，使用独立 `/digital-avatar/admin/*` API client；切片详情通过 `drawer=digital-avatar-chunks` 与 `drawerCode` 保持 URL 可恢复。

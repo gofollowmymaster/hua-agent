@@ -51,6 +51,9 @@ pnpm python-api:test        # FastAPI pytest
 pnpm python-api:lint        # FastAPI Ruff 只检查
 pnpm python-api:typecheck   # FastAPI mypy
 pnpm python-api:build       # 构建 Python wheel/sdist
+pnpm digital-avatar:import:dev  # 将数字分身 txt 导入开发数据库
+pnpm digital-avatar:import:test # 将数字分身 txt 导入测试数据库
+pnpm digital-avatar:import:prod # 将数字分身 txt 导入生产数据库
 pnpm rag:db:init            # 使用开发环境配置初始化共享 RAG 数据库
 pnpm rag:db:check           # 使用开发环境配置检查 Skill 表及索引
 pnpm ui-kit:build          # UI Kit 类型检查

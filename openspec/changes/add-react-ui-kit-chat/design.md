@@ -25,6 +25,8 @@ React Admin 已有 adapter 驱动的 `ChatDemo`，负责会话分页、历史切
 
 使用 `@aplus-sql/react-ui-kit`，通过 package exports 直接暴露 TypeScript/TSX 源码。React、React DOM、antd、Ant Design X、AI SDK 和 Markdown 依赖声明为 peer dependencies，并在 dev dependencies 中固定当前验证版本。
 
+React Admin 的 Umi MFSU 配置继续排除 workspace 源码包，并将 `react` 与 `react-dom` 声明为 singleton shared dependencies，确保应用渲染器、Ant Design X 和 `@ai-sdk/react` 使用同一个 Hook dispatcher。
+
 ### 三层公共接口
 
 `ConversationList` 与 `ChatBox` 是受控展示组件；`ChatWorkspace` 组合二者并管理会话加载、切换、新建、发送、停止、清空、错误和自动滚动。消费端默认使用 `ChatWorkspace`，仍可单独组合两个受控组件。
@@ -44,6 +46,7 @@ React Admin 已有 adapter 驱动的 `ChatDemo`，负责会话分页、历史切
 ## Risks / Trade-offs
 
 - [源码包依赖消费端构建配置] -> 用 React Admin 生产构建验证 TSX、CSS 和 tree shaking。
+- [MFSU 将 workspace 包依赖编入独立 React 运行时] -> 将 React 与 React DOM 配置为 singleton，并用真实开发构建运行聊天 E2E。
 - [Ant Design X DOM 变化影响测试] -> 测试只依赖公共 props、可访问文本和包级稳定 class/data 属性。
 - [迁移打乱 Agent parts] -> 单元测试与 Playwright 同时固定 reasoning、状态和文本顺序。
 

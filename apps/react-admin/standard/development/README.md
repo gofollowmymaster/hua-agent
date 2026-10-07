@@ -8,3 +8,4 @@
 - 主题色统一从 `src/theme/` 的 Ant Design token、ProLayout token 或业务 CSS 变量读取，不在页面中添加临时硬编码颜色。
 - 列表、抽屉和结果区域的分类与状态字段使用 `SemanticTag`，不直接使用 Ant Design 的深色预设标签。
 - 变更至少运行 `pnpm lint:check`、`pnpm test` 和 `pnpm build`。
+- 数字分身文档管理只接受 txt，摘要和切片接口必须使用 `src/api/digital-avatar/`，不得复用知识问答文档接口。

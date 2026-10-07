@@ -23,7 +23,7 @@ if os.getenv("PYTHON_API_INTEGRATION") != "1":
 async def test_postgres_extensions_vector_and_zhparser() -> None:
     engine = create_database_engine(get_settings())
     try:
-        async with engine.connect() as connection:
+        async with engine.begin() as connection:
             extensions = set(
                 (await connection.execute(text("SELECT extname FROM pg_extension"))).scalars()
             )
@@ -166,3 +166,70 @@ async def test_redis_ttl_limiter_idempotency_and_tenant_keys() -> None:
             f"frontend-node:idempotent:integration:{namespace}",
         )
         await client.aclose()
+
+
+async def test_digital_avatar_global_schema_vector_and_cascade() -> None:
+    engine = create_database_engine(get_settings())
+    suffix = uuid.uuid4().hex
+    source = f"integration/{suffix}.txt"
+    file_hash = f"hash-{suffix}"
+    try:
+        async with engine.begin() as connection:
+            columns = set(
+                (
+                    await connection.execute(
+                        text(
+                            "SELECT column_name FROM information_schema.columns "
+                            "WHERE table_schema='public' "
+                            "AND table_name='digital_avatar_documents'"
+                        )
+                    )
+                ).scalars()
+            )
+            assert "tenant_code" not in columns
+            document_id = await connection.scalar(
+                text(
+                    """INSERT INTO digital_avatar_documents
+                       (source_path,file_name,file_type,file_hash,file_size,summary)
+                       VALUES (:source,'integration.txt','txt',:hash,10,'summary')
+                       RETURNING id"""
+                ),
+                {"source": source, "hash": file_hash},
+            )
+            await connection.execute(
+                text(
+                    """INSERT INTO digital_avatar_chunks
+                       (document_id,chunk_index,content,metadata,embedding)
+                       VALUES (:id,0,'## 标题\n正文','{}'::jsonb,
+                               CAST(:embedding AS vector))"""
+                ),
+                {
+                    "id": document_id,
+                    "embedding": "[" + ",".join(["0"] * 1024) + "]",
+                },
+            )
+        async with engine.connect() as connection:
+            vector_dimensions = await connection.scalar(
+                text(
+                    "SELECT vector_dims(embedding) FROM digital_avatar_chunks "
+                    "WHERE document_id=:id"
+                ),
+                {"id": document_id},
+            )
+            assert vector_dimensions == 1024
+            await connection.execute(
+                text("DELETE FROM digital_avatar_documents WHERE id=:id"),
+                {"id": document_id},
+            )
+            remaining = await connection.scalar(
+                text("SELECT count(*) FROM digital_avatar_chunks WHERE document_id=:id"),
+                {"id": document_id},
+            )
+            assert remaining == 0
+    finally:
+        async with engine.begin() as connection:
+            await connection.execute(
+                text("DELETE FROM digital_avatar_documents WHERE source_path=:source"),
+                {"source": source},
+            )
+        await engine.dispose()

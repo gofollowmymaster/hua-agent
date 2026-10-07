@@ -43,6 +43,14 @@ flowchart TD
 
 服务将历史消息、问题和检索片段组织为 prompt，通过 OpenAI-compatible chat model 流式生成推理和正文。主模型流式调用失败时使用 fallback model 生成完整回答。用户问题和最终回答写入会话存储。
 
+## 数字分身文档管理
+
+`modules/digital_avatar/` 提供全局共享的数字分身 txt 文档管理，不读取请求租户，也不复用 `aplus_documents`。路由统一位于 `/digital-avatar/admin` 并继续使用 Bearer 鉴权。
+
+上传或目录导入先把文件保存到 `WORKSPACE_ROOT/RAW_DIR/digital-avatar`，随后只按行首 `## ` 切分；标题前内容单独成片，每个二级标题章节保持为单个切片，最后一节正文同时派生为可编辑摘要。重新入库会重建向量切片并覆盖人工摘要。
+
+`digital_avatar_documents` 和 `digital_avatar_chunks` 不包含 `tenant_code`。文件路径与 SHA-256 全局唯一，向量写入仍通过参数化 `CAST(:embedding AS vector)` 完成。
+
 ## Agent 知识库
 
 `AgentKnowledgeService` 扫描租户对应的 Markdown 文档，将去除 UTF-8 BOM 后、尚未清洗的完整原文保存到 `agent_documents.content`，再从去除 front matter、图片引用和冗余空白的正文生成分块与 embedding。远程文档标识、面包屑、版本等 front matter 同时写入元数据列；历史空内容记录会在下一次普通入库时自动补齐。

@@ -9,6 +9,7 @@ import {
   RobotOutlined,
   SettingOutlined,
   ThunderboltOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import { PageContainer, ProLayout } from '@ant-design/pro-components';
 import { App, ConfigProvider, Dropdown, Space } from 'antd';
@@ -73,6 +74,18 @@ const menuRoutes = [
       },
     ],
   },
+  {
+    path: '/digital-avatar',
+    name: '数字分身',
+    icon: <UserOutlined />,
+    routes: [
+      {
+        path: '/digital-avatar/documents',
+        name: '文档管理',
+        icon: <FileTextOutlined />,
+      },
+    ],
+  },
 ];
 
 const pageMeta: Record<string, { title: string; subtitle: string }> = {
@@ -107,6 +120,10 @@ const pageMeta: Record<string, { title: string; subtitle: string }> = {
   '/business-agent/demo': {
     title: '演示 Demo',
     subtitle: '体验业务 Agent 多工具对话与历史会话。',
+  },
+  '/digital-avatar/documents': {
+    title: '数字分身文档管理',
+    subtitle: '管理全局共享的 TXT 文档、章节切片和摘要。',
   },
 };
 

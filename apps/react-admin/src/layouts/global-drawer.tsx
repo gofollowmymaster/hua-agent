@@ -7,6 +7,7 @@ const titles = {
   'document-chunks': '文档切片实况',
   'session-messages': '消息记录',
   'agent-knowledge-chunks': '业务知识切片实况',
+  'digital-avatar-chunks': '数字分身文档切片',
 };
 
 export function GlobalDrawer() {
@@ -25,6 +26,9 @@ export function GlobalDrawer() {
       )}
       {query.drawer === 'agent-knowledge-chunks' && (
         <DocumentChunks id={query.drawerCode} source="agent" />
+      )}
+      {query.drawer === 'digital-avatar-chunks' && (
+        <DocumentChunks id={query.drawerCode} source="digital-avatar" />
       )}
       {query.drawer === 'session-messages' && (
         <SessionMessages id={query.drawerCode} />

@@ -37,6 +37,14 @@ EXPECTED_ROUTES = {
     ("POST", "/oms/admin/dsOrder/audit"),
     ("POST", "/oms/admin/dsOrder/cancel"),
     ("POST", "/ai/rag/chat"),
+    ("POST", "/digital-avatar/admin/documents/page"),
+    ("GET", "/digital-avatar/admin/documents/{document_id}"),
+    ("POST", "/digital-avatar/admin/documents/upload"),
+    ("DELETE", "/digital-avatar/admin/documents/{document_id}"),
+    ("POST", "/digital-avatar/admin/documents/{document_id}/summary"),
+    ("POST", "/digital-avatar/admin/documents/{document_id}/chunks/page"),
+    ("GET", "/digital-avatar/admin/documents/{document_id}/preview"),
+    ("POST", "/digital-avatar/admin/documents/{document_id}/reingest"),
 }
 
 
@@ -50,4 +58,4 @@ def test_all_nestjs_contract_routes_are_exposed() -> None:
         if method in {"get", "post", "put", "patch", "delete"} and not path.startswith("/health/")
     }
     assert actual == EXPECTED_ROUTES
-    assert len(actual) == 36
+    assert len(actual) == 44

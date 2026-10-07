@@ -1,7 +1,10 @@
 import { history, useLocation } from '@umijs/max';
 
 export type DrawerKey =
-  'document-chunks' | 'session-messages' | 'agent-knowledge-chunks';
+  | 'document-chunks'
+  | 'session-messages'
+  | 'agent-knowledge-chunks'
+  | 'digital-avatar-chunks';
 
 export function readDrawerQuery(search: string) {
   const params = new URLSearchParams(search);

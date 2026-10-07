@@ -9,6 +9,10 @@ from python_api.modules.agent.models import (
     AgentUserSkill,
 )
 from python_api.modules.auth.models import RagAdminUser
+from python_api.modules.digital_avatar.models import (
+    DigitalAvatarChunk,
+    DigitalAvatarDocument,
+)
 from python_api.modules.rag.models import (
     AplusChunk,
     AplusDocument,
@@ -27,6 +31,8 @@ EXPECTED_TABLES = {
     "aplus_rag_messages",
     "aplus_rag_sessions",
     "rag_admin_users",
+    "digital_avatar_documents",
+    "digital_avatar_chunks",
 }
 
 
@@ -45,6 +51,8 @@ def test_model_package_registers_all_prisma_owned_tables() -> None:
         AplusRagMessage.__tablename__,
         AplusRagSession.__tablename__,
         RagAdminUser.__tablename__,
+        DigitalAvatarDocument.__tablename__,
+        DigitalAvatarChunk.__tablename__,
     }
 
     assert exported_tables == EXPECTED_TABLES
