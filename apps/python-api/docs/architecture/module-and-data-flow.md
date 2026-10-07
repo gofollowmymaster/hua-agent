@@ -4,7 +4,7 @@
 
 | 模块 | 路由前缀 | 鉴权 | 主要 service | 主要状态 |
 | --- | --- | --- | --- | --- |
-| 本地认证 | `/auth` | 登录公开；用户管理要求系统管理员 | `AuthService` | `rag_admin_users` |
+| 本地认证 | `/auth` | 登录公开；用户管理要求系统管理员 | `AuthSessionService`、`AuthUserService` | `rag_admin_users` |
 | RAG 管理 | `/ai/rag/admin` | Bearer JWT | `RagAdminService`、`DocumentIngestService` | 文档、分块、会话、消息、原始文件 |
 | RAG Chat | `/ai/rag/chat` | Bearer JWT | `RagChatService`、`RagMemoryService` | 检索结果、Redis 记忆、会话消息 |
 | Agent 知识库 | `/agent/knowledge` | Bearer JWT | `AgentKnowledgeService` | Agent 文档、分块和向量 |

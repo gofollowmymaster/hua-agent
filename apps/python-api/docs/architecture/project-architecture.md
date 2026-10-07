@@ -22,11 +22,11 @@ apps/python-api/
 ├── src/python_api/
 │   ├── core/                # 配置、数据库、lifespan 资源、异常、中间件与流协议
 │   ├── integrations/        # Redis、飞书与 embedding adapter
-│   ├── modules/auth/        # 本地用户、JWT、固定 token 与 ORM
-│   ├── modules/rag/         # RAG 管理、对话、文档、解析、记忆与 ORM
-│   ├── modules/agent/       # Agent 知识、对话、runtime、tools、记忆与 ORM
-│   ├── modules/ds_order/    # 租户隔离 mock 服务与 fixture
-│   ├── modules/health/      # liveness 与 readiness
+│   ├── modules/auth/        # session、users 子域及共享鉴权、身份与 ORM
+│   ├── modules/rag/         # admin、chat 子域及共享 ORM、repository
+│   ├── modules/agent/       # chat、knowledge、skills 子域及共享 ORM、repository
+│   ├── modules/ds_order/    # 暂保留平铺的租户隔离 mock 服务与 fixture
+│   ├── modules/health/      # checks 子域中的 liveness 与 readiness
 │   ├── main.py              # FastAPI 工厂、中间件、lifespan 和路由装配
 │   └── run.py               # Uvicorn 启动入口
 ├── tests/                   # 单元、契约和配置测试
@@ -58,6 +58,7 @@ flowchart LR
 - schema 只负责输入约束、字段别名和公共 JSON 转换，不访问基础设施。
 - service 负责编排业务流程，可使用数据库、Redis、模型、文件和外部服务。
 - model 只映射既有表结构，不负责迁移。
+- 领域包含多个业务能力时使用子域包组织；跨子域共享的 model 和 repository 保留在领域根层。
 - `core/` 不依赖业务领域；`integrations/` 可依赖 core，领域通过显式依赖使用 integration。
 
 ## 应用生命周期

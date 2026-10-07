@@ -11,14 +11,14 @@ from python_api.core.database import get_db
 from python_api.core.resources import get_app_settings
 from python_api.core.schemas import PageRequest
 from python_api.modules.auth.dependencies import require_bearer
-from python_api.modules.rag.admin import RagAdminService
-from python_api.modules.rag.admin_schemas import (
+from python_api.modules.rag.admin.documents import DocumentIngestService
+from python_api.modules.rag.admin.schemas import (
     DocumentMetadataRequest,
     DocumentPageRequest,
     IngestRequest,
     SessionPageRequest,
 )
-from python_api.modules.rag.documents import DocumentIngestService
+from python_api.modules.rag.admin.service import RagAdminService
 
 router = APIRouter(
     prefix="/ai/rag/admin", tags=["RAG 管理后台"], dependencies=[Depends(require_bearer)]

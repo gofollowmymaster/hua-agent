@@ -13,12 +13,12 @@ from python_api.core.concurrency import run_file_work
 from python_api.core.config import Settings, get_settings
 from python_api.core.context import get_request_context
 from python_api.integrations.embeddings import create_embeddings
-from python_api.modules.rag.models import AplusDocument
-from python_api.modules.rag.parser import (
+from python_api.modules.rag.admin.parser import (
     SUPPORTED_EXTENSIONS,
     DocumentLoader,
     RawDocument,
 )
+from python_api.modules.rag.models import AplusDocument
 from python_api.modules.rag.repository import RagRepository
 
 

@@ -18,11 +18,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.core.config import Settings, get_settings
 from python_api.core.schemas import PageRequest
-from python_api.modules.agent.event_adapter import CumulativeDeltaNormalizer
-from python_api.modules.agent.knowledge import AgentKnowledgeService
-from python_api.modules.agent.knowledge_schemas import AgentKnowledgeSearchRequest
-from python_api.modules.agent.skill_schemas import SkillInstruction
-from python_api.modules.agent.tools import calculate_expression, current_time
+from python_api.modules.agent.chat.event_adapter import CumulativeDeltaNormalizer
+from python_api.modules.agent.chat.tools import calculate_expression, current_time
+from python_api.modules.agent.knowledge.schemas import AgentKnowledgeSearchRequest
+from python_api.modules.agent.knowledge.service import AgentKnowledgeService
+from python_api.modules.agent.skills.schemas import SkillInstruction
 from python_api.modules.ds_order.schemas import (
     DsOrderAuditRequest,
     DsOrderCancelRequest,

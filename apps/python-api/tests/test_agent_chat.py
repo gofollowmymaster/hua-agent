@@ -4,10 +4,10 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.core.session import ResolvedSession
-from python_api.modules.agent.chat import AgentChatService
-from python_api.modules.agent.event_adapter import CumulativeDeltaNormalizer
-from python_api.modules.agent.schemas import ChatRequest
-from python_api.modules.agent.tools import current_time
+from python_api.modules.agent.chat.event_adapter import CumulativeDeltaNormalizer
+from python_api.modules.agent.chat.schemas import ChatRequest
+from python_api.modules.agent.chat.service import AgentChatService
+from python_api.modules.agent.chat.tools import current_time
 
 
 class FakeRuntime:

@@ -9,12 +9,12 @@ from python_api.core.config import Settings
 from python_api.core.database import get_db
 from python_api.core.resources import get_app_settings
 from python_api.core.schemas import PageRequest
-from python_api.modules.agent.knowledge import AgentKnowledgeService
-from python_api.modules.agent.knowledge_schemas import (
+from python_api.modules.agent.knowledge.schemas import (
     AgentDocumentPageRequest,
     AgentKnowledgeIngestRequest,
     AgentKnowledgeSearchRequest,
 )
+from python_api.modules.agent.knowledge.service import AgentKnowledgeService
 from python_api.modules.auth.dependencies import require_bearer
 
 router = APIRouter(

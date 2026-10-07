@@ -17,15 +17,16 @@ from python_api.core.middleware import (
     TenantMiddleware,
 )
 from python_api.core.resources import AppResources, create_app_resources
-from python_api.modules.agent.chat_router import router as agent_chat_router
-from python_api.modules.agent.knowledge_router import router as agent_knowledge_router
-from python_api.modules.agent.skill_router import router as agent_skill_router
-from python_api.modules.auth.router import router as auth_router
-from python_api.modules.auth.service import bootstrap_admin
+from python_api.modules.agent.chat.router import router as agent_chat_router
+from python_api.modules.agent.knowledge.router import router as agent_knowledge_router
+from python_api.modules.agent.skills.router import router as agent_skill_router
+from python_api.modules.auth.session.router import router as auth_session_router
+from python_api.modules.auth.users.router import router as auth_users_router
+from python_api.modules.auth.users.service import bootstrap_admin
 from python_api.modules.ds_order.router import router as ds_order_router
-from python_api.modules.health.router import router as health_router
-from python_api.modules.rag.admin_router import router as rag_admin_router
-from python_api.modules.rag.chat_router import router as rag_chat_router
+from python_api.modules.health.checks.router import router as health_router
+from python_api.modules.rag.admin.router import router as rag_admin_router
+from python_api.modules.rag.chat.router import router as rag_chat_router
 
 
 def create_app(
@@ -67,7 +68,8 @@ def create_app(
     )
     install_exception_handlers(app)
     app.include_router(health_router)
-    app.include_router(auth_router)
+    app.include_router(auth_session_router)
+    app.include_router(auth_users_router)
     app.include_router(rag_admin_router)
     app.include_router(agent_knowledge_router)
     app.include_router(agent_chat_router)

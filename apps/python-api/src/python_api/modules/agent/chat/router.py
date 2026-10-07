@@ -8,9 +8,9 @@ from python_api.core.config import Settings
 from python_api.core.database import get_db
 from python_api.core.resources import get_app_settings
 from python_api.core.stream import stream_response
-from python_api.modules.agent.chat import AgentChatService
-from python_api.modules.agent.memory import AgentMemoryService
-from python_api.modules.agent.schemas import AgentSessionPageRequest, ChatRequest
+from python_api.modules.agent.chat.memory import AgentMemoryService
+from python_api.modules.agent.chat.schemas import AgentSessionPageRequest, ChatRequest
+from python_api.modules.agent.chat.service import AgentChatService
 from python_api.modules.auth.dependencies import require_composite_auth
 
 router = APIRouter(prefix="/agent/chat", tags=["业务 Agent Chat"])

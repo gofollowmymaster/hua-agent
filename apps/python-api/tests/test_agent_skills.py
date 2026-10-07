@@ -18,16 +18,16 @@ from python_api.core.config import get_settings
 from python_api.core.database import get_db
 from python_api.core.errors import NotReportError
 from python_api.main import create_app
+from python_api.modules.agent.chat.runtime import AgentChatRuntime
 from python_api.modules.agent.models import AgentUserSkill
-from python_api.modules.agent.runtime import AgentChatRuntime
-from python_api.modules.agent.skill_catalog import SYSTEM_SKILLS
-from python_api.modules.agent.skill_schemas import (
+from python_api.modules.agent.skills.catalog import SYSTEM_SKILLS
+from python_api.modules.agent.skills.schemas import (
     CreateUserSkillRequest,
     SkillInstruction,
     UpdateUserSkillRequest,
     UserSkillPageRequest,
 )
-from python_api.modules.agent.skills import AgentSkillService
+from python_api.modules.agent.skills.service import AgentSkillService
 from python_api.modules.auth.dependencies import create_access_token
 
 
@@ -315,7 +315,7 @@ def test_runtime_prompt_preserves_core_system_user_priority() -> None:
 
 
 def test_runtime_keeps_tool_set_and_five_call_limit(monkeypatch: pytest.MonkeyPatch) -> None:
-    import python_api.modules.agent.runtime as runtime_module
+    import python_api.modules.agent.chat.runtime as runtime_module
 
     captured: dict[str, Any] = {}
 

@@ -13,8 +13,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from python_api.core.config import Settings, get_settings
 from python_api.integrations.embeddings import create_embeddings
 from python_api.integrations.redis import RedisService
-from python_api.modules.rag.chat_schemas import ChatRequest
-from python_api.modules.rag.memory import RagMemoryService
+from python_api.modules.rag.chat.memory import RagMemoryService
+from python_api.modules.rag.chat.schemas import ChatRequest
 from python_api.modules.rag.repository import RagRepository
 
 

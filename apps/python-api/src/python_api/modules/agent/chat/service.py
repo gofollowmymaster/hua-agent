@@ -11,13 +11,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.core.config import Settings
 from python_api.core.context import get_request_context
-from python_api.modules.agent.memory import AgentMemoryService
-from python_api.modules.agent.runtime import (
+from python_api.modules.agent.chat.memory import AgentMemoryService
+from python_api.modules.agent.chat.runtime import (
     FALLBACK_ANSWER,
     AgentChatRuntime,
 )
-from python_api.modules.agent.schemas import ChatRequest
-from python_api.modules.agent.skills import AgentSkillService
+from python_api.modules.agent.chat.schemas import ChatRequest
+from python_api.modules.agent.skills.service import AgentSkillService
 
 
 class AgentChatService:

@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from python_api.core.config import Settings, get_settings
 from python_api.core.context import get_request_context
 from python_api.core.schemas import PageRequest, json_value
-from python_api.modules.rag.admin_schemas import (
+from python_api.modules.rag.admin.schemas import (
     DocumentMetadataRequest,
     DocumentPageRequest,
     SessionPageRequest,

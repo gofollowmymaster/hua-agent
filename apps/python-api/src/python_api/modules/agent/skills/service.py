@@ -9,8 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.core.errors import NotReportError
 from python_api.modules.agent.models import AgentUserSkill
-from python_api.modules.agent.skill_catalog import SYSTEM_SKILLS
-from python_api.modules.agent.skill_schemas import (
+from python_api.modules.agent.skills.catalog import SYSTEM_SKILLS
+from python_api.modules.agent.skills.schemas import (
     CreateUserSkillRequest,
     SkillInstruction,
     UpdateUserSkillRequest,

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import time
-from collections.abc import Callable
 from typing import Any
 
 from sqlalchemy import func, or_, select
@@ -11,52 +9,22 @@ from python_api.core.config import Settings
 from python_api.core.context import get_request_context
 from python_api.core.errors import NotReportError
 from python_api.core.schemas import json_value
-from python_api.modules.auth.dependencies import create_access_token, hash_password, verify_password
+from python_api.modules.auth.dependencies import hash_password
+from python_api.modules.auth.identity import TENANT_IDENTITIES
 from python_api.modules.auth.models import RagAdminUser
-from python_api.modules.auth.schemas import (
+from python_api.modules.auth.users.schemas import (
     CreateUserRequest,
-    LoginRequest,
     QueryUsersRequest,
     ResetPasswordRequest,
     UpdateUserRequest,
 )
 
-TENANT_IDENTITIES = {
-    "aplus": {"supplierCode": "A", "supplierName": "Aplus", "tenantName": "Aplus"},
-    "boat": {"supplierCode": "C", "supplierName": "Boat", "tenantName": "Boat"},
-    "yurex": {"supplierCode": "D", "supplierName": "Yurex", "tenantName": "Yurex"},
-}
 
+class AuthUserService:
+    """Manages tenant-local user identities."""
 
-class AuthService:
-    """Manages local identities and cross-backend compatible JWTs."""
-
-    def __init__(
-        self,
-        db: AsyncSession,
-        settings: Settings | None = None,
-        clock: Callable[[], float] = time.time,
-    ) -> None:
+    def __init__(self, db: AsyncSession) -> None:
         self.db = db
-        self.settings = settings
-        self.clock = clock
-
-    async def login(self, request: LoginRequest) -> dict[str, str]:
-        """Checks tenant credentials and issues a compatible access token."""
-        tenant = get_request_context().tenant_code
-        user = await self.db.scalar(
-            select(RagAdminUser).where(
-                RagAdminUser.tenant_code == tenant,
-                RagAdminUser.username == request.username.strip(),
-            )
-        )
-        if (
-            not user
-            or not user.is_enabled
-            or not await verify_password(request.password, user.password_hash)
-        ):
-            raise NotReportError("无效账号或密码", 401)
-        return {"token": self._create_token(user)}
 
     async def list_users(self, request: QueryUsersRequest) -> dict[str, Any]:
         """Returns a tenant-scoped page without password hashes."""
@@ -141,27 +109,6 @@ class AuthService:
         if not user:
             raise NotReportError("用户不存在", 404)
         return user
-
-    def _create_token(self, user: RagAdminUser) -> str:
-        """Builds the JWT claims expected by existing API and frontend consumers."""
-        identity = TENANT_IDENTITIES[user.tenant_code]
-        return create_access_token(
-            {
-                "userId": user.id,
-                "userCode": user.username,
-                "username": user.display_name,
-                "loginId": user.username,
-                "supplierCode": user.supplier_code,
-                "supplierName": identity["supplierName"],
-                "tenantCode": user.tenant_code,
-                "tenantName": identity["tenantName"],
-                "appCode": "ADMIN",
-                "scope": "WEB",
-                "isSystemAdmin": user.is_system_admin,
-                "loginTime": int(self.clock()),
-            },
-            self.settings,
-        )
 
     def _summary(self, user: RagAdminUser) -> dict[str, Any]:
         """Serializes a user without exposing password material."""

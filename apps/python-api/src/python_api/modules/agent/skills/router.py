@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.core.context import get_request_context
 from python_api.core.database import get_db
-from python_api.modules.agent.skill_schemas import (
+from python_api.modules.agent.skills.schemas import (
     CreateUserSkillRequest,
     SystemSkillQuery,
     UpdateUserSkillRequest,
@@ -15,7 +15,7 @@ from python_api.modules.agent.skill_schemas import (
     UserSkillPage,
     UserSkillPageRequest,
 )
-from python_api.modules.agent.skills import AgentSkillService
+from python_api.modules.agent.skills.service import AgentSkillService
 from python_api.modules.auth.dependencies import require_bearer
 
 router = APIRouter(prefix="/agent/skills", tags=["业务 Agent Skill"])

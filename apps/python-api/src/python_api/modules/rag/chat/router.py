@@ -8,8 +8,8 @@ from python_api.core.resources import get_app_settings, get_redis
 from python_api.core.stream import stream_response
 from python_api.integrations.redis import RedisService
 from python_api.modules.auth.dependencies import require_bearer
-from python_api.modules.rag.chat import RagChatService
-from python_api.modules.rag.chat_schemas import ChatRequest
+from python_api.modules.rag.chat.schemas import ChatRequest
+from python_api.modules.rag.chat.service import RagChatService
 
 router = APIRouter(prefix="/ai/rag", tags=["RAG 企业知识库"])
 

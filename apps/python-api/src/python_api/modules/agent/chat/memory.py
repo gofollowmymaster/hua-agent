@@ -8,9 +8,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from python_api.core.context import get_request_context
 from python_api.core.schemas import json_value
 from python_api.core.session import ResolvedSession
+from python_api.modules.agent.chat.schemas import AgentSessionPageRequest
 from python_api.modules.agent.models import AgentChatMessage, AgentChatSession
 from python_api.modules.agent.repository import AgentRepository
-from python_api.modules.agent.schemas import AgentSessionPageRequest
 
 
 class AgentMemoryService:

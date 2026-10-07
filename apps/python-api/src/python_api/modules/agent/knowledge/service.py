@@ -15,7 +15,7 @@ from python_api.core.config import Settings, get_settings
 from python_api.core.context import get_request_context
 from python_api.core.schemas import PageRequest, json_value
 from python_api.integrations.embeddings import create_embeddings
-from python_api.modules.agent.knowledge_schemas import (
+from python_api.modules.agent.knowledge.schemas import (
     AgentDocumentPageRequest,
     AgentKnowledgeSearchRequest,
 )
