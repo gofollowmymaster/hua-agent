@@ -16,6 +16,9 @@ export default defineConfig({
   hash: true,
   esbuildMinifyIIFE: true,
   npmClient: 'pnpm',
+  mfsu: {
+    exclude: ['@aplus-sql/react-ui-kit'],
+  },
   publicPath: '/public/react-admin/',
   outputPath: '../api/public/react-admin',
   define: {

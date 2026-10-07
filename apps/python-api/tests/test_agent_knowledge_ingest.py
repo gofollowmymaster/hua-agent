@@ -49,6 +49,18 @@ class FakeEmbeddings:
         return [[0.1, 0.2] for _ in texts]
 
 
+class RecordingEmbeddings:
+    """Records provider batches and returns vectors derived from input order."""
+
+    def __init__(self) -> None:
+        self.calls: list[list[str]] = []
+
+    async def aembed_documents(self, texts: list[str]) -> list[list[float]]:
+        """Records one batch and returns its numeric chunk identifiers."""
+        self.calls.append(texts)
+        return [[float(text.removeprefix("chunk-"))] for text in texts]
+
+
 class FakeSplitter:
     """Keeps the cleaned document as one chunk for assertion clarity."""
 
@@ -84,7 +96,11 @@ async def test_ingest_backfills_original_content_and_keeps_chunks_clean(tmp_path
     service.db = database
     service.repository = repository
     service.tenant = "yurex"
-    service.settings = SimpleNamespace(agent_docs_dir=str(root), workspace_root=tmp_path)
+    service.settings = SimpleNamespace(
+        agent_docs_dir=str(root),
+        workspace_root=tmp_path,
+        agent_embedding_batch_size=10,
+    )
     service.embeddings = FakeEmbeddings()
     service.splitter = FakeSplitter()
 
@@ -98,3 +114,19 @@ async def test_ingest_backfills_original_content_and_keeps_chunks_clean(tmp_path
     assert "![截图]" not in repository.payload["chunks"][0]["content"]
     assert "完整正文" in repository.payload["chunks"][0]["content"]
     assert database.commits == 1
+
+
+@pytest.mark.asyncio
+async def test_embed_documents_caps_provider_batches_and_preserves_order() -> None:
+    """Limits oversized configuration to the provider maximum without reordering vectors."""
+    embeddings = RecordingEmbeddings()
+    service = object.__new__(AgentKnowledgeService)
+    service.settings = SimpleNamespace(agent_embedding_batch_size=16)
+    service.embeddings = embeddings
+    texts = [f"chunk-{index}" for index in range(23)]
+
+    vectors = await service._embed_documents(texts)
+
+    assert [len(batch) for batch in embeddings.calls] == [10, 10, 3]
+    assert all(len(batch) <= 10 for batch in embeddings.calls)
+    assert vectors == [[float(index)] for index in range(23)]

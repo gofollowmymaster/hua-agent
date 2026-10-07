@@ -126,7 +126,7 @@ class AgentChatRuntime:
             model=model,
             tools=self._build_tools(),
             system_prompt=self.build_system_prompt(skills),
-            middleware=[ToolCallLimitMiddleware(run_limit=1, exit_behavior="continue")],
+            middleware=[ToolCallLimitMiddleware(run_limit=2, exit_behavior="continue")],
             subagents=[],
         )
 

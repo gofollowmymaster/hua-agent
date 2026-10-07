@@ -114,9 +114,13 @@
   width: 100%;
 }
 
+.react-ui-kit-tool-details {
+  width: 100%;
+  margin-top: 6px;
+}
+
 .react-ui-kit-tool-result {
   display: grid;
-  margin-top: 6px;
   gap: 8px;
 }
 

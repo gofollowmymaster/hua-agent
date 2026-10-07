@@ -278,7 +278,7 @@ class AgentKnowledgeService:
                 ]
                 if not chunks:
                     raise ValueError("no extractable content")
-                vectors = await self.embeddings.aembed_documents(
+                vectors = await self._embed_documents(
                     [str(item["content"]) for item in chunks]
                 )
                 document_id = await self._replace_document(
@@ -304,6 +304,14 @@ class AgentKnowledgeService:
                     {"sourcePath": source, "status": "failed", "reason": str(error)}
                 )
         return summary
+
+    async def _embed_documents(self, texts: list[str]) -> list[list[float]]:
+        """Embeds Agent chunks in provider-compatible batches while preserving order."""
+        result: list[list[float]] = []
+        size = min(max(self.settings.agent_embedding_batch_size, 1), 10)
+        for index in range(0, len(texts), size):
+            result.extend(await self.embeddings.aembed_documents(texts[index : index + size]))
+        return result
 
     async def _fulltext(self, query: str, category: str | None, limit: int) -> list[dict[str, Any]]:
         """Retrieves tenant-scoped Agent chunks ranked by zhparser relevance."""

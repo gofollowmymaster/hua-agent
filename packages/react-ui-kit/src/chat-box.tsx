@@ -1,7 +1,7 @@
 import { DeleteOutlined, RobotOutlined, UserOutlined } from '@ant-design/icons';
 import { Bubble, Sender, Think, ThoughtChain, Welcome } from '@ant-design/x';
 import type { BubbleItemType } from '@ant-design/x';
-import { Alert, Button, Tooltip, theme } from 'antd';
+import { Alert, Button, Collapse, Tooltip, theme } from 'antd';
 import type { UIMessage } from 'ai';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -239,7 +239,7 @@ function renderPart(
   if (part.type === 'data-status') {
     const data = part.data as ChatStatusData;
     const tone = resolveStatusTone(data.stage);
-    return (
+    return data.stage !== 'tool_result' ? (
       <div key={index} className="react-ui-kit-status-wrapper">
         <ThoughtChain.Item
           className={`react-ui-kit-status react-ui-kit-status-${tone}`}
@@ -247,34 +247,50 @@ function renderPart(
           title={adapter.formatStatus(data)}
           status={resolveThoughtStatus(data.stage)}
           variant="outlined"
-          description={
-            data.stage === 'tool_result' ? (
-              <ToolResult data={data} />
-            ) : undefined
-          }
         />
       </div>
+    ) : (
+      <ToolResult data={data} />
     );
   }
   return null;
 }
 
 function ToolResult({ data }: { data: ChatStatusData }) {
+  const hasArguments = data.arguments != null;
+  const hasResult = data.result != null;
+
+  if (!hasArguments && !hasResult) return null;
+
   return (
-    <div className="react-ui-kit-tool-result">
-      {data.arguments != null && (
-        <section>
-          <strong>工具入参</strong>
-          <pre>{formatToolValue(data.arguments)}</pre>
-        </section>
-      )}
-      {data.result != null && (
-        <section>
-          <strong>工具输出</strong>
-          <pre>{formatToolValue(data.result)}</pre>
-        </section>
-      )}
-    </div>
+    <Collapse
+      className="react-ui-kit-tool-details"
+      size="small"
+      expandIconPlacement="end"
+      destroyOnHidden
+      items={[
+        {
+          key: 'details',
+          label: '工具调用详情',
+          children: (
+            <div className="react-ui-kit-tool-result">
+              {hasArguments && (
+                <section>
+                  <strong>工具入参</strong>
+                  <pre>{formatToolValue(data.arguments)}</pre>
+                </section>
+              )}
+              {hasResult && (
+                <section>
+                  <strong>工具输出</strong>
+                  <pre>{formatToolValue(data.result)}</pre>
+                </section>
+              )}
+            </div>
+          ),
+        },
+      ]}
+    />
   );
 }
 
