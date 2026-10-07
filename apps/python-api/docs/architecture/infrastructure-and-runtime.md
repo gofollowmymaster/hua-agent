@@ -2,7 +2,7 @@
 
 ## 配置加载
 
-`core/config.py` 使用 `PYTHON_API_ENV` 选择 `dev`、`test` 或 `prod`，并兼容 `development`、`production` 别名。配置文件按以下优先级加载，后者覆盖前者：
+`core/config/settings.py` 使用 `PYTHON_API_ENV` 选择 `dev`、`test` 或 `prod`，并兼容 `development`、`production` 别名。配置文件按以下优先级加载，后者覆盖前者：
 
 1. `.env`
 2. `.env.{environment}`

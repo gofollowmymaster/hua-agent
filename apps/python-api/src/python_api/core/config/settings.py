@@ -15,7 +15,7 @@ from pydantic import (
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from python_api.core.config_sections import (
+from python_api.core.config.sections import (
     AIConfig,
     AppConfig,
     AuthConfig,
@@ -24,7 +24,7 @@ from python_api.core.config_sections import (
     RedisConfig,
 )
 
-PYTHON_API_DIR = Path(__file__).resolve().parents[3]
+PYTHON_API_DIR = Path(__file__).resolve().parents[4]
 EnvironmentName = Literal["dev", "test", "prod"]
 
 
@@ -156,7 +156,7 @@ class Settings(BaseSettings):
     python_api_max_upload_files: int = Field(default=20, ge=1)
     python_api_max_upload_size_bytes: int = Field(default=50 * 1024 * 1024, ge=1)
 
-    workspace_root: Path = Field(default_factory=lambda: Path(__file__).resolve().parents[5])
+    workspace_root: Path = Field(default_factory=lambda: PYTHON_API_DIR.parents[1])
 
     @field_validator("rag_database_url", "redis_host", "default_tenant")
     @classmethod
