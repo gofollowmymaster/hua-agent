@@ -11,12 +11,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.core.config import Settings
 from python_api.core.context import get_request_context
+from python_api.core.session import ResolvedSession
 from python_api.modules.agent.chat.memory import AgentMemoryService
 from python_api.modules.agent.chat.runtime import (
     FALLBACK_ANSWER,
     AgentChatRuntime,
 )
 from python_api.modules.agent.chat.schemas import ChatRequest
+from python_api.modules.agent.skills.schemas import SkillInstruction
 from python_api.modules.agent.skills.service import AgentSkillService
 
 
@@ -42,106 +44,112 @@ class AgentChatService:
             db, get_request_context().tenant_code, user_id
         )
 
-    def stream(self, request: ChatRequest) -> AsyncIterator[dict[str, Any]]:
-        """Validates synchronously and returns the ordered UI event iterator."""
+    async def prepare_stream(self, request: ChatRequest) -> AsyncIterator[dict[str, Any]]:
+        """Loads required session state before returning the ordered UI event iterator."""
         question_id, question = self._latest_question(request)
         conversation_id = request.id.strip() if request.id and request.id.strip() else str(uuid4())
+        session = self.memory.resolve(conversation_id, request.participant_id, question_id)
+        history = await self.memory.recent(session, 10)
+        skills = await self.skills.list_enabled_instructions()
+        messages: list[BaseMessage] = [
+            HumanMessage(item["content"])
+            if item["role"] == "user"
+            else AIMessage(item["content"])
+            for item in history
+        ]
+        messages.append(HumanMessage(question))
+        return self._stream_prepared(session, question, messages, skills)
 
-        async def events() -> AsyncIterator[dict[str, Any]]:
-            """Translates runtime events into ordered UI events and persists the turn."""
-            session = self.memory.resolve(conversation_id, request.participant_id, question_id)
-            parts: list[dict[str, Any]] = []
-            yield self._status(parts, "analyze_start", "开始分析问题")
-            history = await self.memory.recent(session, 10)
-            skills = await self.skills.list_enabled_instructions()
-            messages: list[BaseMessage] = [
-                HumanMessage(item["content"])
-                if item["role"] == "user"
-                else AIMessage(item["content"])
-                for item in history
-            ]
-            messages.append(HumanMessage(question))
-            answer = ""
-            tool_calls: list[dict[str, Any]] = []
-            active_reasoning: str | None = None
-            active_text: str | None = None
-            generation_started = False
-            has_text = False
+    async def _stream_prepared(
+        self,
+        session: ResolvedSession,
+        question: str,
+        messages: list[BaseMessage],
+        skills: list[SkillInstruction],
+    ) -> AsyncIterator[dict[str, Any]]:
+        """Translates runtime events and emits completion after persistence succeeds."""
+        parts: list[dict[str, Any]] = []
+        yield self._status(parts, "analyze_start", "开始分析问题")
+        answer = ""
+        tool_calls: list[dict[str, Any]] = []
+        active_reasoning: str | None = None
+        active_text: str | None = None
+        generation_started = False
+        has_text = False
 
-            async for event in self.runtime.stream(messages, skills):
-                event_type = event["type"]
-                if event_type == "reasoning_delta":
-                    if active_text:
-                        yield {"type": "text-end", "id": active_text}
-                        active_text = None
-                    if not active_reasoning:
-                        active_reasoning = str(uuid4())
-                        yield {"type": "reasoning-start", "id": active_reasoning}
-                    yield {
-                        "type": "reasoning-delta",
-                        "id": active_reasoning,
-                        "delta": event["delta"],
-                    }
-                    self._append_text_part(parts, "reasoning", event["delta"])
-                elif event_type == "tool_start":
-                    if active_reasoning:
-                        yield {"type": "reasoning-end", "id": active_reasoning}
-                        active_reasoning = None
-                    if active_text:
-                        yield {"type": "text-end", "id": active_text}
-                        active_text = None
-                    yield self._status(
-                        parts, "tool_call", f"调用工具：{event['name']}", tool=event["name"]
-                    )
-                elif event_type == "tool_end":
-                    tool_call = {key: event[key] for key in ("name", "arguments", "result")}
-                    tool_calls.append(tool_call)
-                    yield self._status(
-                        parts,
-                        "tool_result",
-                        self._tool_summary(tool_call),
-                        tool=event["name"],
-                        arguments=event["arguments"],
-                        result=event["result"],
-                    )
-                elif event_type == "text_delta":
-                    if active_reasoning:
-                        yield {"type": "reasoning-end", "id": active_reasoning}
-                        active_reasoning = None
-                    if not generation_started:
-                        generation_started = True
-                        yield self._status(parts, "generate_start", "开始生成答案")
-                    if not active_text:
-                        active_text = str(uuid4())
-                        yield {"type": "text-start", "id": active_text}
-                    has_text = True
-                    answer += event["delta"]
-                    yield {"type": "text-delta", "id": active_text, "delta": event["delta"]}
-                    self._append_text_part(parts, "text", event["delta"])
-                elif event_type == "done":
-                    answer = event.get("answer") or answer
-                    tool_calls = event.get("toolCalls") or tool_calls
-
-            if not answer:
-                answer = FALLBACK_ANSWER
-            if not has_text:
+        async for event in self.runtime.stream(messages, skills):
+            event_type = event["type"]
+            if event_type == "reasoning_delta":
+                if active_text:
+                    yield {"type": "text-end", "id": active_text}
+                    active_text = None
+                if not active_reasoning:
+                    active_reasoning = str(uuid4())
+                    yield {"type": "reasoning-start", "id": active_reasoning}
+                yield {
+                    "type": "reasoning-delta",
+                    "id": active_reasoning,
+                    "delta": event["delta"],
+                }
+                self._append_text_part(parts, "reasoning", event["delta"])
+            elif event_type == "tool_start":
                 if active_reasoning:
                     yield {"type": "reasoning-end", "id": active_reasoning}
                     active_reasoning = None
-                yield self._status(parts, "generate_start", "开始生成答案")
-                active_text = str(uuid4())
-                yield {"type": "text-start", "id": active_text}
-                yield {"type": "text-delta", "id": active_text, "delta": answer}
-                self._append_text_part(parts, "text", answer)
-            if active_text:
-                yield {"type": "text-end", "id": active_text}
+                if active_text:
+                    yield {"type": "text-end", "id": active_text}
+                    active_text = None
+                yield self._status(
+                    parts, "tool_call", f"调用工具：{event['name']}", tool=event["name"]
+                )
+            elif event_type == "tool_end":
+                tool_call = {key: event[key] for key in ("name", "arguments", "result")}
+                tool_calls.append(tool_call)
+                yield self._status(
+                    parts,
+                    "tool_result",
+                    self._tool_summary(tool_call),
+                    tool=event["name"],
+                    arguments=event["arguments"],
+                    result=event["result"],
+                )
+            elif event_type == "text_delta":
+                if active_reasoning:
+                    yield {"type": "reasoning-end", "id": active_reasoning}
+                    active_reasoning = None
+                if not generation_started:
+                    generation_started = True
+                    yield self._status(parts, "generate_start", "开始生成答案")
+                if not active_text:
+                    active_text = str(uuid4())
+                    yield {"type": "text-start", "id": active_text}
+                has_text = True
+                answer += event["delta"]
+                yield {"type": "text-delta", "id": active_text, "delta": event["delta"]}
+                self._append_text_part(parts, "text", event["delta"])
+            elif event_type == "done":
+                answer = event.get("answer") or answer
+                tool_calls = event.get("toolCalls") or tool_calls
+
+        if not answer:
+            answer = FALLBACK_ANSWER
+        if not has_text:
             if active_reasoning:
                 yield {"type": "reasoning-end", "id": active_reasoning}
-            yield self._status(parts, "done", "生成完成")
-            await self.memory.append(session, "user", question)
-            await self.memory.append(session, "assistant", answer, tool_calls, parts)
-
-        return events()
+                active_reasoning = None
+            yield self._status(parts, "generate_start", "开始生成答案")
+            active_text = str(uuid4())
+            yield {"type": "text-start", "id": active_text}
+            yield {"type": "text-delta", "id": active_text, "delta": answer}
+            self._append_text_part(parts, "text", answer)
+        if active_text:
+            yield {"type": "text-end", "id": active_text}
+        if active_reasoning:
+            yield {"type": "reasoning-end", "id": active_reasoning}
+        done_event = self._status(parts, "done", "生成完成")
+        await self.memory.append(session, "user", question)
+        await self.memory.append(session, "assistant", answer, tool_calls, parts)
+        yield done_event
 
     @staticmethod
     def _latest_question(request: ChatRequest) -> tuple[str | None, str]:

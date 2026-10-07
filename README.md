@@ -41,6 +41,17 @@ Root scripts remain compatible and forward to workspace packages.
 The NestJS and FastAPI services are long-lived alternatives. They share PostgreSQL and Redis but a
 single request must be routed to only one backend.
 
+Before starting either backend against a new or upgraded database, apply and verify the shared RAG
+schema using the target environment:
+
+```bash
+pnpm rag:db:init:dev
+pnpm rag:db:check:dev
+```
+
+Replace `dev` with `test` or `prod` as appropriate. Database DDL remains owned by
+`apps/api/prisma/rag`; the FastAPI service does not create its own migration history.
+
 ## Environment Files
 
 API environment files live in `apps/api/.env*`. Vue RAG Admin only exposes `VITE_` variables, while React Admin uses browser-safe `UMI_APP_` variables from `apps/react-admin/.env*`.

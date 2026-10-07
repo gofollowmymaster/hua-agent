@@ -49,6 +49,14 @@ FastAPI 不读取 `apps/api/.env*`。`PYTHON_API_ENV`（兼容回退 `NODE_ENV`�
 
 系统 Skill 在 TypeScript 与 Python 中分别以代码清单维护，并通过差异契约测试校验 key、内容和顺序。FastAPI 映射 Prisma 管理的 `agent_user_skills` 表，不引入 Alembic；管理接口只接受 Bearer JWT。每次 Agent 运行重新查询当前 JWT 用户启用的 Skill 并创建本次运行的 agent，固定密钥会话只装载系统 Skill，`participantId` 不参与用户 Skill 归属判断。
 
+### 8. 共享 RAG schema 显式初始化
+
+NestJS 与 FastAPI 部署前统一通过 `apps/api` 提供的环境化 RAG schema 命令应用幂等基线 SQL，并校验 `agent_user_skills` 表、所有者唯一约束和查询索引。应用进程不在启动或请求期间执行 DDL，Python 侧继续不维护独立迁移历史。
+
+### 9. 流启动前预检与统一运行期错误边界
+
+Agent 与 RAG 在创建 `StreamingResponse` 前完成历史、Skill 和用户消息写入等必要准备，使启动依赖失败继续由全局异常处理器返回 JSON。响应开始后的普通异常由 `core.stream` 记录脱敏诊断并转换为 AI SDK `error` 事件；异常流不发送业务完成状态或 `[DONE]`，客户端取消继续按取消语义传播。
+
 ## Risks / Trade-offs
 
 - [Python 与 TypeScript AI 库事件存在差异] -> 使用内部事件模型和固定 provider mock 做流差异测试。

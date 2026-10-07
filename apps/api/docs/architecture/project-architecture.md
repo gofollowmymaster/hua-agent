@@ -30,6 +30,8 @@
 
 修改 schema 后运行 `pnpm pg` 生成 RAG client；迁移文件只表达数据库变更，执行迁移前必须确认目标环境和备份策略。
 
+NestJS 与 FastAPI 共用该 RAG schema。部署任一后端前，由 API workspace 使用目标环境对应的 `pnpm rag:db:init:dev|test|prod` 显式应用幂等基线 SQL，再使用 `pnpm rag:db:check:dev|test|prod` 校验用户 Skill 表及索引。应用启动和请求处理期间不执行 DDL；Python API 不维护独立迁移历史。
+
 ## 静态发布
 
 Vue RAG Admin 生产构建输出到 `apps/api/public/rag-admin`，React Admin 输出到 `apps/api/public/react-admin`，均由 API 的 `/public` 静态根路径发布。两套后台并行存在且互不覆盖。

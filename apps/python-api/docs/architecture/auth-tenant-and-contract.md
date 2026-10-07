@@ -86,9 +86,10 @@ data: [DONE]\n\n
 
 响应使用 `text/event-stream`，设置 `x-vercel-ai-ui-message-stream: v1`、`x-accel-buffering: no` 和禁止缓存的 header。
 
-RAG 与 Agent 可发送 `data-status`、`reasoning-start/delta/end`、`text-start/delta/end` 以及工具状态事件。事件必须按用户可见顺序产生；同一 reasoning 或 text id 必须先 start、再 delta、最后 end。流结束后发送 `[DONE]`。
+RAG 与 Agent 在创建流响应前完成历史、Skill 和启动消息写入等必要准备，准备失败仍由全局异常处理器返回 JSON。流内可发送 `data-status`、`reasoning-start/delta/end`、`text-start/delta/end` 以及工具状态事件。事件必须按用户可见顺序产生；同一 reasoning 或 text id 必须先 start、再 delta、最后 end。
+
+正常流在助手消息持久化后发送完成状态，并最终发送 `[DONE]`。响应开始后的普通异常会记录不含请求内容和原始异常消息的诊断日志，并发送 `{"type":"error","errorText":"生成失败，请稍后重试"}`；异常流不再发送完成状态或 `[DONE]`。客户端取消不会转换为错误事件。
 
 ## OpenAPI
 
 非生产环境默认暴露 `/swagger` 和 `/swagger/json`。生产环境默认关闭，可通过 `PYTHON_API_DOCS_ENABLED` 显式覆盖。OpenAPI JSON 必须保持原始 schema，不能套用业务 envelope。
-

@@ -22,4 +22,5 @@ async def chat(
     settings: Settings = Depends(get_app_settings),
 ) -> StreamingResponse:
     """Streams a RAG answer using the AI SDK UI Message protocol."""
-    return stream_response(RagChatService(db, redis, settings).stream(body))
+    events = await RagChatService(db, redis, settings).prepare_stream(body)
+    return stream_response(events, stream_name="rag_chat")

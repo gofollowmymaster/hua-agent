@@ -39,8 +39,10 @@ class FakeRuntime:
 class FakeMemory:
     """Captures persisted messages for event-order assertions."""
 
-    def __init__(self) -> None:
+    def __init__(self, *, fail_assistant: bool = False) -> None:
         self.appended: list[dict[str, Any]] = []
+        self.recent_calls = 0
+        self.fail_assistant = fail_assistant
 
     def resolve(self, conversation_id: str, participant_id: str | None, message_id: str | None):
         return ResolvedSession(
@@ -48,11 +50,14 @@ class FakeMemory:
         )
 
     async def recent(self, _session: ResolvedSession, _limit: int):
+        self.recent_calls += 1
         return []
 
     async def append(
         self, _session: ResolvedSession, role: str, content: str, tool_calls=None, parts=None
     ):
+        if role == "assistant" and self.fail_assistant:
+            raise RuntimeError("assistant persistence failed")
         self.appended.append(
             {"role": role, "content": content, "toolCalls": tool_calls, "parts": parts}
         )
@@ -87,6 +92,14 @@ class RecordingRuntime:
         yield {"type": "done", "answer": "完成", "toolCalls": []}
 
 
+class FailingSkills:
+    """Fails while loading the required pre-stream Skill state."""
+
+    async def list_enabled_instructions(self):
+        """Raises before an Agent event iterator can be returned."""
+        raise RuntimeError("agent_user_skills query failed")
+
+
 def test_cumulative_delta_normalization_keeps_channels_separate() -> None:
     normalizer = CumulativeDeltaNormalizer()
 
@@ -118,7 +131,8 @@ async def test_agent_stream_and_persisted_parts_preserve_visible_order() -> None
         }
     )
 
-    events = [event async for event in service.stream(request)]
+    stream = await service.prepare_stream(request)
+    events = [event async for event in stream]
     visible = [event.get("data", {}).get("stage") or event["type"] for event in events]
 
     assert visible == [
@@ -183,9 +197,65 @@ async def test_agent_reloads_skills_for_every_run_and_ignores_participant_id() -
         }
     )
 
-    for _ in range(2):
-        _ = [event async for event in service.stream(request)]
+    for expected_calls in range(1, 3):
+        stream = await service.prepare_stream(request)
+        assert skills.calls == expected_calls
+        assert memory.recent_calls == expected_calls
+        assert len(runtime.skills) == expected_calls - 1
+        _ = [event async for event in stream]
 
     assert skills.calls == 2
     assert runtime.skills[0][0]["instruction"] == "版本 1"
     assert runtime.skills[1][0]["instruction"] == "版本 2"
+
+
+@pytest.mark.asyncio
+async def test_agent_preparation_failure_happens_before_streaming() -> None:
+    runtime = RecordingRuntime()
+    memory = FakeMemory()
+    service = AgentChatService(
+        cast(AsyncSession, None),
+        lambda _db: cast(Any, runtime),
+        memory=cast(Any, memory),
+        skill_service=cast(Any, FailingSkills()),
+    )
+    request = ChatRequest.model_validate(
+        {
+            "id": "conversation-1",
+            "messages": [
+                {"id": "message-1", "role": "user", "parts": [{"type": "text", "text": "执行"}]}
+            ],
+        }
+    )
+
+    with pytest.raises(RuntimeError, match="agent_user_skills query failed"):
+        await service.prepare_stream(request)
+
+    assert memory.recent_calls == 1
+    assert runtime.skills == []
+
+
+@pytest.mark.asyncio
+async def test_agent_does_not_emit_done_when_assistant_persistence_fails() -> None:
+    memory = FakeMemory(fail_assistant=True)
+    service = AgentChatService(
+        cast(AsyncSession, None),
+        lambda _db: cast(Any, FakeRuntime()),
+        memory=cast(Any, memory),
+    )
+    request = ChatRequest.model_validate(
+        {
+            "id": "conversation-1",
+            "messages": [
+                {"id": "message-1", "role": "user", "parts": [{"type": "text", "text": "执行"}]}
+            ],
+        }
+    )
+    stream = await service.prepare_stream(request)
+    events: list[dict[str, Any]] = []
+
+    with pytest.raises(RuntimeError, match="assistant persistence failed"):
+        async for event in stream:
+            events.append(event)
+
+    assert all(event.get("data", {}).get("stage") != "done" for event in events)

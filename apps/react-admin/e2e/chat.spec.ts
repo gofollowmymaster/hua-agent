@@ -76,3 +76,27 @@ test('loads RAG and business Agent histories with ordered visible parts', async 
     fullPage: true,
   });
 });
+
+test('shows AI SDK stream errors in the shared chat workspace', async ({
+  page,
+}) => {
+  await page.route('**/agent/chat', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'text/event-stream',
+      headers: {
+        'x-vercel-ai-ui-message-stream': 'v1',
+      },
+      body: 'data: {"type":"error","errorText":"生成失败，请稍后重试"}\n\n',
+    }),
+  );
+  await login(page);
+  await page.goto('/public/react-admin/#/business-agent/demo');
+
+  const sender = page.getByRole('textbox');
+  await sender.fill('触发流错误');
+  await sender.press('Enter');
+
+  await expect(page.getByText('生成失败，请稍后重试')).toBeVisible();
+  await expect(page.getByText('出错')).toBeVisible();
+});

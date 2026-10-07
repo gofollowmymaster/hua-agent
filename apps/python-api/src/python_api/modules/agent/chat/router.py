@@ -26,7 +26,10 @@ async def chat(
     """Streams one business Agent response using the AI SDK protocol."""
     raw_user_id = identity.get("userId")
     user_id = raw_user_id if isinstance(raw_user_id, int) and not isinstance(raw_user_id, bool) else None
-    return stream_response(AgentChatService(db, settings=settings, user_id=user_id).stream(body))
+    events = await AgentChatService(
+        db, settings=settings, user_id=user_id
+    ).prepare_stream(body)
+    return stream_response(events, stream_name="agent_chat")
 
 
 @router.post("/sessions/page")

@@ -11,6 +11,7 @@ from langchain_openai import ChatOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from python_api.core.config import Settings, get_settings
+from python_api.core.session import ResolvedSession
 from python_api.integrations.embeddings import create_embeddings
 from python_api.integrations.redis import RedisService
 from python_api.modules.rag.chat.memory import RagMemoryService
@@ -50,8 +51,8 @@ class RagChatService:
         )
         self.embeddings = embeddings or create_embeddings(self.settings)
 
-    async def stream(self, request: ChatRequest) -> AsyncIterator[dict[str, Any]]:
-        """Emits AI SDK events and persists the completed turn."""
+    async def prepare_stream(self, request: ChatRequest) -> AsyncIterator[dict[str, Any]]:
+        """Loads required history and persists the user turn before streaming starts."""
         question_id, question = self._question(request)
         conversation_id = (
             request.id.strip() if request.id and request.id.strip() else str(uuid.uuid4())
@@ -65,6 +66,16 @@ class RagChatService:
         history = await self.memory.load(session)
         await self.memory.append(session, "user", question)
         direct = self._is_direct(question)
+        return self._stream_prepared(session, question, history, direct)
+
+    async def _stream_prepared(
+        self,
+        session: ResolvedSession,
+        question: str,
+        history: list[dict[str, Any]],
+        direct: bool,
+    ) -> AsyncIterator[dict[str, Any]]:
+        """Emits RAG events and reports completion only after assistant persistence."""
         chunks: list[dict[str, Any]] = []
         if not direct:
             yield {
@@ -149,8 +160,8 @@ class RagChatService:
             yield {"type": "text-start", "id": text_id}
             yield {"type": "text-delta", "id": text_id, "delta": answer}
         yield {"type": "text-end", "id": text_id}
-        yield {"type": "data-status", "data": {"stage": "done", "message": "生成完成"}}
         await self.memory.append(session, "assistant", answer)
+        yield {"type": "data-status", "data": {"stage": "done", "message": "生成完成"}}
 
     async def _retrieve(self, query: str, tenant: str, top_k: int) -> list[dict[str, Any]]:
         """Fuses tenant-scoped full-text and vector candidates using reciprocal rank."""

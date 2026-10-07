@@ -26,6 +26,8 @@ ORM 由 `modules/auth/models.py`、`modules/rag/models.py` 和 `modules/agent/mo
 
 本项目不创建数据库迁移。常规读写优先使用 SQLAlchemy ORM；需要 pgvector、zhparser、JSONB cast 或 PostgreSQL upsert 时使用参数化 `text()`。
 
+NestJS 与 FastAPI 部署前均由 `apps/api` 的 Prisma/RAG schema 管理入口准备共享数据库。根据目标环境运行 `pnpm rag:db:init:dev|test|prod`，随后运行对应的 `pnpm rag:db:check:dev|test|prod`；Python 进程不会在启动或请求期间创建 `agent_user_skills` 等表。
+
 向量列维度由 `EMBEDDINGS_DIMENSIONS` 配置，当前默认值为 1024。向量值序列化为 JSON 数组字符串后通过 `CAST(:embedding AS vector)` 写入，禁止拼接 SQL 字面量。
 
 ## Redis
@@ -90,4 +92,3 @@ pnpm python-api:build
 `python -m python_api.run` 从 `Settings` 读取 host、port、worker 和 reload 配置并启动 Uvicorn。开发、测试和生产脚本分别显式选择环境。
 
 Docker 镜像使用 Python 3.12 slim 和固定版本 uv，按 `uv.lock` 安装生产依赖，复制 `src/` 后构建项目，默认以 `prod` 环境在 8000 端口运行。容器关闭时由 lifespan 释放 Redis 与数据库连接池。
-

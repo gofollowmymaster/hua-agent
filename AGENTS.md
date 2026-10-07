@@ -51,6 +51,8 @@ pnpm python-api:test        # FastAPI pytest
 pnpm python-api:lint        # FastAPI Ruff 只检查
 pnpm python-api:typecheck   # FastAPI mypy
 pnpm python-api:build       # 构建 Python wheel/sdist
+pnpm rag:db:init            # 使用开发环境配置初始化共享 RAG 数据库
+pnpm rag:db:check           # 使用开发环境配置检查 Skill 表及索引
 pnpm ui-kit:build          # UI Kit 类型检查
 pnpm ui-kit:test           # UI Kit Vitest
 pnpm react-ui-kit:build    # React UI Kit 类型检查
@@ -58,6 +60,8 @@ pnpm react-ui-kit:test     # React UI Kit Vitest
 pnpm http-client:build     # HTTP Client 类型检查
 pnpm http-client:test      # HTTP Client Vitest
 ```
+
+共享 RAG 数据库初始化和检查同时提供 `:dev`、`:test`、`:prod` 后缀命令；部署 NestJS 或 FastAPI 前必须选择目标环境执行对应命令。
 
 格式化和 lint 命令会改写文件，执行前确认这是当前任务的一部分：
 
@@ -127,6 +131,7 @@ AI 任务默认先读：
 - 文档和代码冲突时，以代码真实实现为准，并同步修正文档或在交付说明中说明差异。
 
 <!-- antd-cli setup start -->
+
 ## Ant Design CLI Skill
 
 Use the shared Ant Design skill at `.agents/skills/antd/SKILL.md` before working on Ant Design code in this repository.

@@ -28,12 +28,14 @@
 - [x] 4.3 实现 AI SDK UI Message 流编码与 RAG 聊天接口
 - [x] 4.4 迁移 Deep Agents、五次工具限制、工具恢复、日志和严格有序流
 - [x] 4.5 按请求动态装载系统 Skill 与 JWT 用户 Skill，固定密钥会话仅装载系统 Skill
+- [x] 4.6 将 Agent/RAG 启动预检移到响应前，并为运行期 SSE 增加脱敏 AI SDK 错误边界
 
 ## 5. Workspace 与部署
 
 - [x] 5.1 增加根命令、独立 Dockerfile 和生产启动配置
 - [x] 5.2 增加 Python app AGENTS、架构、开发和验证文档并更新 workspace 索引
 - [x] 5.3 将 Python 配置独立为 dev/test/prod 分层文件并接入核心与可选配置校验
+- [x] 5.4 增加 dev/test/prod RAG schema 初始化与 Skill 表索引检查命令，并记录双栈部署前置步骤
 
 ## 6. 验证
 
@@ -42,3 +44,5 @@
 - [ ] 6.3 增加 RAG/Agent 固定 provider 流事件与持久化回归测试
 - [ ] 6.4 运行 Python 质量检查、API 测试及前端/SDK 消费验证
 - [x] 6.5 增加 Skill schema/service/HTTP/runtime/差异与互操作测试，更新 36 路由清单并完成相关质量和前端构建验证
+- [x] 6.7 增加预检 JSON 500、流中 error 事件、持久化顺序、取消语义和 React 消费回归测试
+- [x] 6.6 验证 Skill 表初始化与只读检查、NestJS Skill/Agent 测试和 FastAPI Skill/Agent 质量检查

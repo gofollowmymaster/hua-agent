@@ -70,6 +70,8 @@ Agent 工具位于 `agent/chat/tools/`，按 knowledge、utilities 和 ds_order 
 
 每次 Agent 运行按“核心规则、系统 Skill、用户 Skill”重新构造提示词。系统 Skill 由 Python 代码清单按固定顺序提供；Bearer JWT 会话再按创建时间和 ID 装载当前租户用户启用的个人 Skill。固定 token 会话只装载系统 Skill，`participantId` 只参与会话记忆，不参与 Skill 所有者查询。
 
+RAG 与 Agent 的流式入口先完成历史、Skill 和启动消息写入等必要准备，再创建 SSE 响应。流运行期异常由共享协议边界转换为脱敏 AI SDK `error` 事件；仅持久化成功的回答会发送完成状态。
+
 ## Agent Skill
 
 系统 Skill 只读且强制启用，Python 清单与 NestJS 清单通过差异契约测试保持一致。用户 Skill 映射 Prisma 管理的 `agent_user_skills` 表，所有查询、修改和删除同时限定 `tenant_code` 与 JWT `userId`。用户最多启用 20 个 Skill，启用指令总长度最多 30000 字；FastAPI 不创建 Skill 表或迁移。
@@ -89,4 +91,3 @@ flowchart LR
 ## DS Order Mock
 
 `DsOrderService` 保存进程内 fixture，并在首次访问时按租户复制初始状态。分页、详情和日志为只读操作；审核和取消会校验状态迁移并追加操作日志。状态在进程重启后恢复为初始 fixture，不提供数据库持久化。
-
