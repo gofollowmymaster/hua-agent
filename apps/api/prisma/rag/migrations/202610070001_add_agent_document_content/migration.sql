@@ -1,0 +1,2 @@
+ALTER TABLE agent_documents
+  ADD COLUMN IF NOT EXISTS content TEXT NOT NULL DEFAULT '';

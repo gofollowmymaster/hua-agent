@@ -12,7 +12,7 @@ jest.mock('@src/config/node-config.service', () => ({
 describe('AgentChatToolService', () => {
   let knowledgeSearchService: { search: jest.Mock };
   let knowledgeService: {
-    getDocument: jest.Mock;
+    getDocumentForTool: jest.Mock;
   };
   let tenantContext: { tenant?: string };
   let dsOrderToolService: { getTools: jest.Mock };
@@ -34,7 +34,7 @@ describe('AgentChatToolService', () => {
       ]),
     };
     knowledgeService = {
-      getDocument: jest.fn().mockResolvedValue({
+      getDocumentForTool: jest.fn().mockResolvedValue({
         id: '1',
         category: '业务流程',
         fileName: 'guide.md',
@@ -45,6 +45,7 @@ describe('AgentChatToolService', () => {
         breadcrumb: null,
         remoteUrl: null,
         updatedAt: '2026-01-01',
+        content: `# 指南\n\n${'完整正文'.repeat(500)}`,
       }),
     };
     tenantContext = { tenant: 'yurex' };
@@ -112,6 +113,9 @@ describe('AgentChatToolService', () => {
       id: '1',
       fileName: 'guide.md',
     });
+    expect(JSON.parse(document).content.length).toBeGreaterThan(1200);
+    expect(JSON.parse(document).content).toContain('完整正文');
+    expect(knowledgeService.getDocumentForTool).toHaveBeenCalledWith(1);
   });
 
   it('exposes only business tools', () => {

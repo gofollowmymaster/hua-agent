@@ -42,8 +42,8 @@ def build_knowledge_tools(
 
     @tool
     async def get_document(document_id: int | str) -> str:
-        """Get one tenant knowledge document."""
-        document = await knowledge.get_document(int(document_id))
+        """Get one tenant knowledge document with its complete original content."""
+        document = await knowledge.get_document_for_tool(int(document_id))
         keys = (
             "id",
             "category",
@@ -55,6 +55,7 @@ def build_knowledge_tools(
             "breadcrumb",
             "remoteUrl",
             "updatedAt",
+            "content",
         )
         return serialize({key: document.get(key) for key in keys})
 

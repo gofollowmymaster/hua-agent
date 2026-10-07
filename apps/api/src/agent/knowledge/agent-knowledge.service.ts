@@ -19,6 +19,32 @@ import type {
   AgentKnowledgeDocumentIdRow,
 } from './type/agent-knowledge-document.type';
 
+const AGENT_DOCUMENT_SUMMARY_SELECT = {
+  id: true,
+  tenantCode: true,
+  category: true,
+  sourcePath: true,
+  fileName: true,
+  fileType: true,
+  fileHash: true,
+  fileSize: true,
+  chunkCount: true,
+  status: true,
+  error: true,
+  metadata: true,
+  remoteUrl: true,
+  docId: true,
+  wikiNodeId: true,
+  lastModifiedAt: true,
+  breadcrumb: true,
+  sourceType: true,
+  currentVersion: true,
+  createdAt: true,
+  updatedAt: true,
+  ingestedAt: true,
+  _count: { select: { chunks: true } },
+} satisfies Prisma.AgentDocumentSelect;
+
 /** 编排业务 Agent 知识库的租户级入库、检索和文档管理。 */
 @Injectable()
 export class AgentKnowledgeService {
@@ -68,9 +94,7 @@ export class AgentKnowledgeService {
       this.ragPrisma.agentDocument.count({ where }),
       this.ragPrisma.agentDocument.findMany({
         where,
-        include: {
-          _count: { select: { chunks: true } },
-        },
+        select: AGENT_DOCUMENT_SUMMARY_SELECT,
         orderBy: { updatedAt: 'desc' },
         skip: (page - 1) * pageSize,
         take: pageSize,
@@ -90,14 +114,30 @@ export class AgentKnowledgeService {
     const tenantCode = this.currentTenant();
     const document = await this.ragPrisma.agentDocument.findUnique({
       where: { id },
-      include: {
-        _count: { select: { chunks: true } },
-      },
+      select: AGENT_DOCUMENT_SUMMARY_SELECT,
     });
     if (!document || document.tenantCode !== tenantCode) {
       throw new BadRequestException(`Agent document #${id} not found`);
     }
     return this.serializeDocument(document);
+  }
+
+  /** 返回当前租户文档的管理元数据和完整原文，供 Business Agent 工具使用。 */
+  async getDocumentForTool(id: number) {
+    const document = await this.ragPrisma.agentDocument.findFirst({
+      where: { id, tenantCode: this.currentTenant() },
+      select: {
+        ...AGENT_DOCUMENT_SUMMARY_SELECT,
+        content: true,
+      },
+    });
+    if (!document) {
+      throw new BadRequestException(`Agent document #${id} not found`);
+    }
+    return {
+      ...this.serializeDocument(document),
+      content: document.content,
+    };
   }
 
   /** 校验租户归属后分页返回文档切片。 */
@@ -288,9 +328,7 @@ export class AgentKnowledgeService {
 
     const documents = await this.ragPrisma.agentDocument.findMany({
       where: { id: { in: ids } },
-      include: {
-        _count: { select: { chunks: true } },
-      },
+      select: AGENT_DOCUMENT_SUMMARY_SELECT,
     });
     const order = new Map(ids.map((id, index) => [id.toString(), index]));
     documents.sort(

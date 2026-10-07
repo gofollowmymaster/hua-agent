@@ -103,6 +103,7 @@ class AgentRepository:
         file_name: str,
         file_hash: str,
         file_size: int,
+        content: str,
         metadata: dict[str, str],
         chunks: list[dict[str, Any]],
         vectors: list[list[float]],
@@ -114,7 +115,7 @@ class AgentRepository:
 
         result = await self.db.execute(
             text(
-                """INSERT INTO agent_documents (tenant_code,category,source_path,file_name,file_type,file_hash,file_size,status,metadata,remote_url,doc_id,wiki_node_id,last_modified_at,breadcrumb,source_type,current_version,updated_at) VALUES (:tenant,:category,:source,:name,'md',:hash,:size,'processing',CAST(:metadata AS jsonb),:remote,:doc_id,:wiki,:modified,:breadcrumb,:source_type,:version,CURRENT_TIMESTAMP) ON CONFLICT (tenant_code,source_path) DO UPDATE SET category=EXCLUDED.category,file_name=EXCLUDED.file_name,file_hash=EXCLUDED.file_hash,file_size=EXCLUDED.file_size,status='processing',error=NULL,metadata=EXCLUDED.metadata,remote_url=EXCLUDED.remote_url,doc_id=EXCLUDED.doc_id,wiki_node_id=EXCLUDED.wiki_node_id,last_modified_at=EXCLUDED.last_modified_at,breadcrumb=EXCLUDED.breadcrumb,source_type=EXCLUDED.source_type,current_version=EXCLUDED.current_version,updated_at=CURRENT_TIMESTAMP RETURNING id"""
+                """INSERT INTO agent_documents (tenant_code,category,source_path,file_name,file_type,file_hash,file_size,content,status,metadata,remote_url,doc_id,wiki_node_id,last_modified_at,breadcrumb,source_type,current_version,updated_at) VALUES (:tenant,:category,:source,:name,'md',:hash,:size,:content,'processing',CAST(:metadata AS jsonb),:remote,:doc_id,:wiki,:modified,:breadcrumb,:source_type,:version,CURRENT_TIMESTAMP) ON CONFLICT (tenant_code,source_path) DO UPDATE SET category=EXCLUDED.category,file_name=EXCLUDED.file_name,file_hash=EXCLUDED.file_hash,file_size=EXCLUDED.file_size,content=EXCLUDED.content,status='processing',error=NULL,metadata=EXCLUDED.metadata,remote_url=EXCLUDED.remote_url,doc_id=EXCLUDED.doc_id,wiki_node_id=EXCLUDED.wiki_node_id,last_modified_at=EXCLUDED.last_modified_at,breadcrumb=EXCLUDED.breadcrumb,source_type=EXCLUDED.source_type,current_version=EXCLUDED.current_version,updated_at=CURRENT_TIMESTAMP RETURNING id"""
             ),
             {
                 "tenant": tenant,
@@ -123,6 +124,7 @@ class AgentRepository:
                 "name": file_name,
                 "hash": file_hash,
                 "size": file_size,
+                "content": content,
                 "metadata": json.dumps(metadata, ensure_ascii=False),
                 "remote": value("远程文档"),
                 "doc_id": value("文档ID"),
@@ -159,3 +161,45 @@ class AgentRepository:
             {"count": len(chunks), "id": document_id, "tenant": tenant},
         )
         return document_id
+
+    async def mark_document_failed(
+        self,
+        *,
+        tenant: str,
+        category: str,
+        source: str,
+        file_name: str,
+        file_hash: str,
+        file_size: int,
+        content: str,
+        metadata: dict[str, str],
+        error: str,
+    ) -> None:
+        """Persists one failed Agent document while retaining its original text."""
+
+        def value(key: str) -> str:
+            return metadata.get(key, "").strip()
+
+        await self.db.execute(
+            text(
+                """INSERT INTO agent_documents (tenant_code,category,source_path,file_name,file_type,file_hash,file_size,content,chunk_count,status,error,metadata,remote_url,doc_id,wiki_node_id,last_modified_at,breadcrumb,source_type,current_version,updated_at) VALUES (:tenant,:category,:source,:name,'md',:hash,:size,:content,0,'failed',:error,CAST(:metadata AS jsonb),:remote,:doc_id,:wiki,:modified,:breadcrumb,:source_type,:version,CURRENT_TIMESTAMP) ON CONFLICT (tenant_code,source_path) DO UPDATE SET category=EXCLUDED.category,file_name=EXCLUDED.file_name,file_hash=EXCLUDED.file_hash,file_size=EXCLUDED.file_size,content=EXCLUDED.content,chunk_count=0,status='failed',error=EXCLUDED.error,metadata=EXCLUDED.metadata,remote_url=EXCLUDED.remote_url,doc_id=EXCLUDED.doc_id,wiki_node_id=EXCLUDED.wiki_node_id,last_modified_at=EXCLUDED.last_modified_at,breadcrumb=EXCLUDED.breadcrumb,source_type=EXCLUDED.source_type,current_version=EXCLUDED.current_version,updated_at=CURRENT_TIMESTAMP"""
+            ),
+            {
+                "tenant": tenant,
+                "category": category,
+                "source": source,
+                "name": file_name,
+                "hash": file_hash,
+                "size": file_size,
+                "content": content,
+                "error": error,
+                "metadata": json.dumps(metadata, ensure_ascii=False),
+                "remote": value("远程文档"),
+                "doc_id": value("文档ID"),
+                "wiki": value("Wiki节点ID"),
+                "modified": value("最后修改时间"),
+                "breadcrumb": value("文档路径面包屑"),
+                "source_type": value("source_type"),
+                "version": value("当前版本"),
+            },
+        )

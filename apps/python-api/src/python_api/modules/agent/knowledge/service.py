@@ -9,6 +9,7 @@ from fastapi import HTTPException
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import undefer
 
 from python_api.core.concurrency import run_file_work
 from python_api.core.config import Settings, get_settings
@@ -87,6 +88,20 @@ class AgentKnowledgeService:
     async def get_document(self, document_id: int) -> dict[str, Any]:
         """Returns one tenant-owned Agent document."""
         return await self._serialize_document(await self._owned_document(document_id))
+
+    async def get_document_for_tool(self, document_id: int) -> dict[str, Any]:
+        """Returns one tenant-owned Agent document with its complete original text."""
+        document = await self.db.scalar(
+            select(AgentDocument)
+            .options(undefer(AgentDocument.content))
+            .where(
+                AgentDocument.id == document_id,
+                AgentDocument.tenant_code == self.tenant,
+            )
+        )
+        if not document:
+            raise HTTPException(400, f"Agent document #{document_id} not found")
+        return {**(await self._serialize_document(document)), "content": document.content}
 
     async def page_chunks(self, document_id: int, request: PageRequest) -> dict[str, Any]:
         """Pages ordered chunks for one Agent document."""
@@ -185,12 +200,15 @@ class AgentKnowledgeService:
         for path in paths:
             source = path.relative_to(root).as_posix()
             raw, digest = await run_file_work(_read_markdown, path)
-            metadata, content = self._frontmatter(raw)
-            content = re.sub(r"!\[[^\]]*\]\([^)]*\)", "", content)
-            content = re.sub(r"\n{3,}", "\n\n", content).strip()
+            metadata, body = self._frontmatter(raw)
+            cleaned_content = re.sub(r"!\[[^\]]*\]\([^)]*\)", "", body)
+            cleaned_content = re.sub(r"\n{3,}", "\n\n", cleaned_content).strip()
             existing = await self.db.scalar(
-                select(AgentDocument).where(
-                    AgentDocument.tenant_code == self.tenant, AgentDocument.source_path == source
+                select(AgentDocument)
+                .options(undefer(AgentDocument.content))
+                .where(
+                    AgentDocument.tenant_code == self.tenant,
+                    AgentDocument.source_path == source,
                 )
             )
             duplicate = await self.db.scalar(
@@ -217,6 +235,7 @@ class AgentKnowledgeService:
                 and existing.file_hash == digest
                 and existing.status == "ready"
                 and existing.category == category
+                and existing.content == raw
                 and not force
             ):
                 summary["skippedFiles"] += 1
@@ -237,7 +256,7 @@ class AgentKnowledgeService:
                             "fileType": "md",
                         },
                     }
-                    for value in self.splitter.split_text(content)
+                    for value in self.splitter.split_text(cleaned_content)
                     if value.strip()
                 ]
                 if not chunks:
@@ -246,7 +265,7 @@ class AgentKnowledgeService:
                     [str(item["content"]) for item in chunks]
                 )
                 document_id = await self._replace_document(
-                    path, source, digest, category, metadata, chunks, vectors
+                    path, source, digest, category, raw, metadata, chunks, vectors
                 )
                 summary["indexedFiles"] += 1
                 summary["chunks"] += len(chunks)
@@ -260,6 +279,9 @@ class AgentKnowledgeService:
                 )
             except Exception as error:
                 await self.db.rollback()
+                await self._mark_document_failed(
+                    path, source, digest, category, raw, metadata, str(error)
+                )
                 summary["failedFiles"] += 1
                 summary["files"].append(
                     {"sourcePath": source, "status": "failed", "reason": str(error)}
@@ -310,6 +332,7 @@ class AgentKnowledgeService:
         source: str,
         digest: str,
         category: str,
+        content: str,
         metadata: dict[str, str],
         chunks: list[dict[str, Any]],
         vectors: list[list[float]],
@@ -324,12 +347,38 @@ class AgentKnowledgeService:
             file_name=path.name,
             file_hash=digest,
             file_size=file_size,
+            content=content,
             metadata=metadata,
             chunks=chunks,
             vectors=vectors,
         )
         await self.db.commit()
         return document_id
+
+    async def _mark_document_failed(
+        self,
+        path: Path,
+        source: str,
+        digest: str,
+        category: str,
+        content: str,
+        metadata: dict[str, str],
+        error: str,
+    ) -> None:
+        """Persists a failed document and its original text after rolling back its work."""
+        file_size = (await run_file_work(path.stat)).st_size
+        await self.repository.mark_document_failed(
+            tenant=self.tenant,
+            category=category,
+            source=source,
+            file_name=path.name,
+            file_hash=digest,
+            file_size=file_size,
+            content=content,
+            metadata=metadata,
+            error=error,
+        )
+        await self.db.commit()
 
     async def _owned_document(self, document_id: int) -> AgentDocument:
         """Loads one Agent document only when it belongs to the current tenant."""

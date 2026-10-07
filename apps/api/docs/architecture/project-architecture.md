@@ -23,6 +23,7 @@
 ## 数据与配置
 
 - `prisma/rag/schema.prisma` 是运行时数据模型，包含本地 RAG Admin 用户、知识问答文档/分块/会话/消息、业务Agent对应模型和用户私有 Skill。
+- 业务Agent入库将去除 UTF-8 BOM 后的原始 Markdown 全文保存到 `agent_documents.content`，清洗后的正文只用于 `agent_chunks` 切片和向量化；管理列表与详情不加载全文，`get_document` 工具通过租户隔离的专用查询读取全文。
 - 系统 Skill 由代码清单发布并强制装载；用户 Skill 按租户和登录用户隔离，NestJS Agent 每次运行时动态组合启用指令。
 - `prisma/schema.prisma` 仅保留 MySQL datasource，用于维护历史迁移链；运行时不生成或注入 MySQL Prisma client。
 - `src/config/index.ts` 聚合环境变量和 `aplus`、`boat`、`yurex` 三套租户配置。
@@ -30,7 +31,7 @@
 
 修改 schema 后运行 `pnpm pg` 生成 RAG client；迁移文件只表达数据库变更，执行迁移前必须确认目标环境和备份策略。
 
-NestJS 与 FastAPI 共用该 RAG schema。部署任一后端前，由 API workspace 使用目标环境对应的 `pnpm rag:db:init:dev|test|prod` 显式应用幂等基线 SQL，再使用 `pnpm rag:db:check:dev|test|prod` 校验用户 Skill 表及索引。应用启动和请求处理期间不执行 DDL；Python API 不维护独立迁移历史。
+NestJS 与 FastAPI 共用该 RAG schema。部署任一后端前，由 API workspace 使用目标环境对应的 `pnpm rag:db:init:dev|test|prod` 显式应用幂等基线 SQL，再使用 `pnpm rag:db:check:dev|test|prod` 校验必需表、字段及索引。应用启动和请求处理期间不执行 DDL；Python API 不维护独立迁移历史。
 
 ## 静态发布
 

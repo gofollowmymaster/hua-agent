@@ -109,7 +109,8 @@ export class AgentKnowledgeIngestService {
   ): Promise<AgentKnowledgeDocumentFile> {
     const stat = await fs.stat(absolutePath);
     const raw = await fs.readFile(absolutePath, 'utf8');
-    const parsed = parseAgentKnowledgeDocument(raw);
+    const originalContent = raw.replace(/^\uFEFF/, '');
+    const parsed = parseAgentKnowledgeDocument(originalContent);
     const sourcePath = path.relative(this.docsRoot, absolutePath);
     return {
       absolutePath,
@@ -121,7 +122,8 @@ export class AgentKnowledgeIngestService {
       fileHash: await this.hashFile(absolutePath),
       fileSize: stat.size,
       metadata: parsed.metadata,
-      content: cleanAgentKnowledgeMarkdown(parsed.content),
+      originalContent,
+      cleanedContent: cleanAgentKnowledgeMarkdown(parsed.content),
     };
   }
 
@@ -162,6 +164,7 @@ export class AgentKnowledgeIngestService {
         existing.fileHash === file.fileHash &&
         existing.status === 'ready' &&
         existing.category === file.category &&
+        existing.content === file.originalContent &&
         !force
       ) {
         summary.skippedFiles += 1;
@@ -208,7 +211,7 @@ export class AgentKnowledgeIngestService {
       content: string;
       metadata: Record<string, string>;
     }> = [];
-    const splitTexts = await this.splitter.splitText(file.content);
+    const splitTexts = await this.splitter.splitText(file.cleanedContent);
 
     for (const text of splitTexts) {
       const content = text.trim();
@@ -301,7 +304,7 @@ export class AgentKnowledgeIngestService {
     const result = await client.$queryRaw<Array<{ id: bigint }>>`
       INSERT INTO agent_documents
         (tenant_code, category, source_path, file_name, file_type, file_hash,
-         file_size, status, metadata, remote_url, doc_id, wiki_node_id,
+         file_size, content, status, metadata, remote_url, doc_id, wiki_node_id,
          last_modified_at, breadcrumb, source_type, current_version, updated_at)
       VALUES (
         ${file.tenantCode},
@@ -311,6 +314,7 @@ export class AgentKnowledgeIngestService {
         ${file.fileType},
         ${file.fileHash},
         ${file.fileSize},
+        ${file.originalContent},
         'processing',
         ${JSON.stringify(file.metadata)}::jsonb,
         ${this.metadataValue(file.metadata, '远程文档')},
@@ -328,6 +332,7 @@ export class AgentKnowledgeIngestService {
           file_type = EXCLUDED.file_type,
           file_hash = EXCLUDED.file_hash,
           file_size = EXCLUDED.file_size,
+          content = EXCLUDED.content,
           status = 'processing',
           error = NULL,
           metadata = EXCLUDED.metadata,
@@ -357,7 +362,7 @@ export class AgentKnowledgeIngestService {
     await this.ragPrisma.$executeRaw`
       INSERT INTO agent_documents
         (tenant_code, category, source_path, file_name, file_type, file_hash,
-         file_size, chunk_count, status, error, metadata, remote_url, doc_id,
+         file_size, content, chunk_count, status, error, metadata, remote_url, doc_id,
          wiki_node_id, last_modified_at, breadcrumb, source_type,
          current_version, updated_at)
       VALUES (
@@ -368,6 +373,7 @@ export class AgentKnowledgeIngestService {
         ${file.fileType},
         ${file.fileHash},
         ${file.fileSize},
+        ${file.originalContent},
         0,
         'failed',
         ${error},
@@ -387,6 +393,7 @@ export class AgentKnowledgeIngestService {
           file_type = EXCLUDED.file_type,
           file_hash = EXCLUDED.file_hash,
           file_size = EXCLUDED.file_size,
+          content = EXCLUDED.content,
           chunk_count = 0,
           status = 'failed',
           error = EXCLUDED.error,
@@ -409,7 +416,13 @@ export class AgentKnowledgeIngestService {
   ) {
     const document = await this.ragPrisma.agentDocument.findFirst({
       where: { tenantCode, sourcePath },
-      select: { id: true, fileHash: true, status: true, category: true },
+      select: {
+        id: true,
+        fileHash: true,
+        status: true,
+        category: true,
+        content: true,
+      },
     });
     if (!document) return undefined;
     return {
@@ -417,6 +430,7 @@ export class AgentKnowledgeIngestService {
       fileHash: document.fileHash,
       status: document.status,
       category: document.category,
+      content: document.content,
     };
   }
 

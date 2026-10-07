@@ -23,7 +23,7 @@ SYSTEM_SKILLS: tuple[SystemSkill, ...] = (
         "description": "检索业务知识库，并基于命中文档回答问题。",
         "instruction": """处理业务知识问题时：
 1. 优先调用 search_knowledge 检索相关资料。
-2. 需要核对文档元数据时调用 get_document。
+2. 需要核对文档元数据或阅读完整原文时调用 get_document。
 3. 引用资料时说明文档名或来源路径。
 4. 工具结果不足时明确说明资料未覆盖。""",
         "isEnabled": True,

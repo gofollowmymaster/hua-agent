@@ -13,7 +13,8 @@ export interface AgentKnowledgeDocumentFile {
   fileHash: string;
   fileSize: number;
   metadata: Record<string, string>;
-  content: string;
+  originalContent: string;
+  cleanedContent: string;
 }
 
 export interface AgentKnowledgeIngestSummary {

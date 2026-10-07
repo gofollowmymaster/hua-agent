@@ -49,3 +49,4 @@ def test_model_package_registers_all_prisma_owned_tables() -> None:
 
     assert exported_tables == EXPECTED_TABLES
     assert set(Base.metadata.tables) == EXPECTED_TABLES
+    assert AgentDocument.content.property.deferred is True

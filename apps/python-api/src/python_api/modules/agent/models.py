@@ -61,6 +61,7 @@ class AgentDocument(Base):
     file_type: Mapped[str] = mapped_column(Text)
     file_hash: Mapped[str] = mapped_column(Text)
     file_size: Mapped[int] = mapped_column(BigInteger)
+    content: Mapped[str] = mapped_column(Text, default="", deferred=True)
     chunk_count: Mapped[int] = mapped_column(Integer, default=0)
     status: Mapped[str] = mapped_column(Text, default="ready")
     error: Mapped[str | None] = mapped_column(Text)

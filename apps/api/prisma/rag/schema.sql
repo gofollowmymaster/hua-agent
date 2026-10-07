@@ -111,6 +111,7 @@ CREATE TABLE IF NOT EXISTS agent_documents (
   file_type TEXT NOT NULL,
   file_hash TEXT NOT NULL,
   file_size BIGINT NOT NULL,
+  content TEXT NOT NULL DEFAULT '',
   chunk_count INTEGER NOT NULL DEFAULT 0,
   status TEXT NOT NULL DEFAULT 'ready',
   error TEXT,
@@ -128,6 +129,9 @@ CREATE TABLE IF NOT EXISTS agent_documents (
   UNIQUE (tenant_code, source_path),
   CONSTRAINT agent_documents_tenant_code_file_hash_key UNIQUE (tenant_code, file_hash)
 );
+
+ALTER TABLE agent_documents
+  ADD COLUMN IF NOT EXISTS content TEXT NOT NULL DEFAULT '';
 
 CREATE TABLE IF NOT EXISTS agent_chunks (
   id BIGSERIAL PRIMARY KEY,

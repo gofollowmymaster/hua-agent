@@ -65,7 +65,7 @@ describe('AgentKnowledgeIngestService', () => {
       'binary-data',
       'binary',
     );
-    const service = buildService();
+    const { service, client } = buildService();
 
     const result = await service.ingest({ tenantCode: 'yurex' });
 
@@ -78,6 +78,13 @@ describe('AgentKnowledgeIngestService', () => {
       sourcePath: path.join('yurex', 'guide.md'),
       status: 'indexed',
     });
+    expect(client.$queryRaw.mock.calls[0]).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining(
+          '---\n远程文档: "https://example.com"\n---\n\n# 指南\n\n正文',
+        ),
+      ]),
+    );
   });
 
   it('skips unchanged documents when force is false', async () => {
@@ -98,6 +105,7 @@ describe('AgentKnowledgeIngestService', () => {
       fileHash,
       status: 'ready',
       category: '业务流程',
+      content,
     });
     const service = new AgentKnowledgeIngestService(
       { agentDocument: { findFirst } } as any,
@@ -120,6 +128,51 @@ describe('AgentKnowledgeIngestService', () => {
       reason: 'hash unchanged',
     });
   });
+
+  it('reindexes unchanged historical documents when original content is empty', async () => {
+    const categoryRoot = path.join(docsRoot, 'yurex', 'Yurex业务流程');
+    await fs.mkdir(categoryRoot, { recursive: true });
+    const content = '# 指南\n\n正文';
+    await fs.writeFile(path.join(categoryRoot, 'guide.md'), content, 'utf8');
+    const fileHash = crypto.createHash('sha256').update(content).digest('hex');
+    const client = {
+      $queryRaw: jest.fn().mockResolvedValue([{ id: BigInt(1) }]),
+      $executeRaw: jest.fn().mockResolvedValue(undefined),
+    };
+    const ragPrisma = {
+      agentDocument: {
+        findFirst: jest
+          .fn()
+          .mockResolvedValueOnce({
+            id: BigInt(1),
+            fileHash,
+            status: 'ready',
+            category: '业务流程',
+            content: '',
+          })
+          .mockResolvedValueOnce({ id: BigInt(1) }),
+      },
+      $transaction: jest.fn(
+        async (callback: (transaction: unknown) => Promise<unknown>) =>
+          callback(client),
+      ),
+    };
+    const service = new AgentKnowledgeIngestService(
+      ragPrisma as any,
+      {
+        setContext: jest.fn(),
+        info: jest.fn(),
+        error: jest.fn(),
+      } as any,
+    );
+
+    const result = await service.ingest({ tenantCode: 'yurex' });
+
+    expect(result).toMatchObject({ indexedFiles: 1, skippedFiles: 0 });
+    expect(client.$queryRaw.mock.calls[0]).toEqual(
+      expect.arrayContaining([content]),
+    );
+  });
 });
 
 function buildService() {
@@ -136,12 +189,15 @@ function buildService() {
         callback(client),
     ),
   };
-  return new AgentKnowledgeIngestService(
-    ragPrisma as any,
-    {
-      setContext: jest.fn(),
-      info: jest.fn(),
-      error: jest.fn(),
-    } as any,
-  );
+  return {
+    service: new AgentKnowledgeIngestService(
+      ragPrisma as any,
+      {
+        setContext: jest.fn(),
+        info: jest.fn(),
+        error: jest.fn(),
+      } as any,
+    ),
+    client,
+  };
 }

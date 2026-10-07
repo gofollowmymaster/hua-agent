@@ -75,7 +75,7 @@ export class AgentChatToolService {
   private buildGetDocumentTool() {
     return tool(
       async ({ documentId }) => {
-        const document = await this.knowledgeService.getDocument(
+        const document = await this.knowledgeService.getDocumentForTool(
           Number(documentId),
         );
         return JSON.stringify({
@@ -89,11 +89,12 @@ export class AgentChatToolService {
           breadcrumb: document.breadcrumb,
           remoteUrl: document.remoteUrl,
           updatedAt: document.updatedAt,
+          content: document.content,
         });
       },
       {
         name: 'get_document',
-        description: '获取业务 Agent 知识库文档详情',
+        description: '获取业务 Agent 知识库文档详情和完整原文',
         schema: z.object({
           documentId: z.union([z.number(), z.string()]).describe('文档 ID'),
         }),

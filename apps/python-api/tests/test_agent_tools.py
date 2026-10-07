@@ -49,10 +49,15 @@ class FakeKnowledgeService:
             }
         ]
 
-    async def get_document(self, document_id: int) -> dict[str, Any]:
-        """Returns a document with one internal field that tools must not expose."""
+    async def get_document_for_tool(self, document_id: int) -> dict[str, Any]:
+        """Returns a complete document with one internal field that tools must not expose."""
         self.document_id = document_id
-        return {"id": document_id, "fileName": "退款.md", "internal": "hidden"}
+        return {
+            "id": document_id,
+            "fileName": "退款.md",
+            "content": "完整正文" * 500,
+            "internal": "hidden",
+        }
 
 
 class FakeDsOrderService:
@@ -106,6 +111,8 @@ async def test_knowledge_tools_project_and_truncate_service_results() -> None:
     assert "internal" not in search_result[0]
     assert service.document_id == 7
     assert document_result["id"] == 7
+    assert len(document_result["content"]) > 1200
+    assert document_result["content"].endswith("完整正文")
     assert "internal" not in document_result
 
 

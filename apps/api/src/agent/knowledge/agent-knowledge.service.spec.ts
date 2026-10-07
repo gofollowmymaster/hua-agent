@@ -17,6 +17,7 @@ describe('AgentKnowledgeService', () => {
     agentDocument: {
       count: jest.Mock;
       findMany: jest.Mock;
+      findFirst: jest.Mock;
       findUnique: jest.Mock;
       delete: jest.Mock;
     };
@@ -35,6 +36,7 @@ describe('AgentKnowledgeService', () => {
       $queryRaw: jest.fn(),
       agentDocument: {
         count: jest.fn().mockResolvedValue(1),
+        findFirst: jest.fn(),
         findMany: jest.fn().mockResolvedValue([
           {
             id: BigInt(1),
@@ -126,6 +128,7 @@ describe('AgentKnowledgeService', () => {
     expect(ragPrisma.agentDocument.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { tenantCode: 'yurex', category: 'yurex' },
+        select: expect.not.objectContaining({ content: true }),
         skip: 0,
         take: 20,
       }),
@@ -158,12 +161,12 @@ describe('AgentKnowledgeService', () => {
     expect(countQuery.values).toEqual(
       expect.arrayContaining(['报销流程', 'yurex', 'ready']),
     );
-    expect(ragPrisma.agentDocument.findMany).toHaveBeenCalledWith({
-      where: { id: { in: [BigInt(1)] } },
-      include: {
-        _count: { select: { chunks: true } },
-      },
-    });
+    expect(ragPrisma.agentDocument.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: { in: [BigInt(1)] } },
+        select: expect.not.objectContaining({ content: true }),
+      }),
+    );
     expect(result).toMatchObject({
       total: 1,
       page: 1,
@@ -227,6 +230,51 @@ describe('AgentKnowledgeService', () => {
       category: '业务流程',
       actualChunkCount: 2,
     });
+    expect(ragPrisma.agentDocument.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({
+        select: expect.not.objectContaining({ content: true }),
+      }),
+    );
+  });
+
+  it('returns complete document content only for the tenant-scoped tool query', async () => {
+    const content = `# 指南\n\n${'完整正文'.repeat(500)}`;
+    ragPrisma.agentDocument.findFirst.mockResolvedValue({
+      id: BigInt(1),
+      tenantCode: 'yurex',
+      category: '业务流程',
+      sourcePath: 'yurex/Yurex业务流程/guide.md',
+      fileName: 'guide.md',
+      fileType: 'md',
+      fileHash: 'hash',
+      fileSize: BigInt(12),
+      chunkCount: 2,
+      status: 'ready',
+      error: null,
+      metadata: {},
+      remoteUrl: null,
+      docId: null,
+      wikiNodeId: null,
+      lastModifiedAt: null,
+      breadcrumb: null,
+      sourceType: null,
+      currentVersion: null,
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-01-02T00:00:00.000Z'),
+      ingestedAt: new Date('2026-01-02T00:00:00.000Z'),
+      _count: { chunks: 2 },
+      content,
+    });
+
+    const result = await service.getDocumentForTool(1);
+
+    expect(ragPrisma.agentDocument.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 1, tenantCode: 'yurex' },
+        select: expect.objectContaining({ content: true }),
+      }),
+    );
+    expect(result.content).toBe(content);
   });
 
   it('rejects document detail for another tenant', async () => {

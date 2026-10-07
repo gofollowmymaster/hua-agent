@@ -45,7 +45,7 @@ flowchart TD
 
 ## Agent 知识库
 
-`AgentKnowledgeService` 扫描租户对应的 Markdown 文档，读取 front matter 与正文，生成分块和 embedding，并将远程文档标识、面包屑、版本等元数据写入数据库。
+`AgentKnowledgeService` 扫描租户对应的 Markdown 文档，将去除 UTF-8 BOM 后、尚未清洗的完整原文保存到 `agent_documents.content`，再从去除 front matter、图片引用和冗余空白的正文生成分块与 embedding。远程文档标识、面包屑、版本等 front matter 同时写入元数据列；历史空内容记录会在下一次普通入库时自动补齐。
 
 搜索模式包括：
 
@@ -54,6 +54,8 @@ flowchart TD
 - `hybrid`：分别检索后使用 RRF 合并。
 
 所有查询同时限制 chunk 与 document 的 `tenant_code`。
+
+管理列表和详情查询不加载或返回完整原文。Business Agent 的 `get_document` 工具使用单独的租户隔离查询加载 `content`，并将完整原文不截断地交给模型；工具过程摘要仍只展示文件名。
 
 ## Agent Chat
 

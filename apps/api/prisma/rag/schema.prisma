@@ -96,6 +96,7 @@ model AgentDocument {
   fileType       String       @map("file_type") @db.Text
   fileHash       String       @map("file_hash") @db.Text
   fileSize       BigInt       @map("file_size")
+  content        String       @default("") @db.Text
   chunkCount     Int          @default(0) @map("chunk_count")
   status         String       @default("ready") @db.Text
   error          String?      @db.Text

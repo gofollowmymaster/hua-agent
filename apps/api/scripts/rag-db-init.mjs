@@ -34,6 +34,23 @@ try {
     );
   }
 
+  const documentContentResult = await pool.query(
+    `SELECT EXISTS (
+       SELECT 1
+         FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'agent_documents'
+          AND column_name = 'content'
+          AND data_type = 'text'
+          AND is_nullable = 'NO'
+     ) AS exists`,
+  );
+  if (!documentContentResult.rows[0]?.exists) {
+    throw new Error(
+      'RAG database schema check failed: missing required agent_documents.content column.',
+    );
+  }
+
   const indexResult = await pool.query(
     `SELECT indexname
        FROM pg_indexes
