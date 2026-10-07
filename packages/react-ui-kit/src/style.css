@@ -1,0 +1,152 @@
+.react-ui-kit-workspace {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  height: calc(100vh - 166px);
+  min-height: 480px;
+  gap: 8px;
+}
+
+.react-ui-kit-conversations,
+.react-ui-kit-chat-box {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.react-ui-kit-conversations {
+  display: flex;
+  flex-direction: column;
+}
+
+.react-ui-kit-conversations-header,
+.react-ui-kit-chat-toolbar {
+  display: flex;
+  flex: none;
+  min-height: 44px;
+  padding: 6px 8px 6px 12px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.react-ui-kit-conversations-spin,
+.react-ui-kit-conversations-spin > .ant-spin-container {
+  min-height: 0;
+  height: 100%;
+}
+
+.react-ui-kit-conversations-spin {
+  flex: 1;
+  overflow: auto;
+}
+
+.react-ui-kit-conversations-empty {
+  margin-block: 48px;
+}
+
+.react-ui-kit-conversation-label {
+  display: block;
+  min-width: 0;
+}
+
+.react-ui-kit-conversation-title,
+.react-ui-kit-conversation-meta {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.react-ui-kit-conversation-title {
+  font-weight: 500;
+}
+
+.react-ui-kit-conversation-meta {
+  margin-top: 2px;
+  font-size: 12px;
+}
+
+.react-ui-kit-chat-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.react-ui-kit-messages {
+  flex: 1;
+  min-height: 0;
+  padding: 12px;
+  overflow: hidden;
+}
+
+.react-ui-kit-messages > .ant-x-bubble-list {
+  height: 100%;
+}
+
+.react-ui-kit-welcome {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.react-ui-kit-message-parts {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+
+.react-ui-kit-markdown > :first-child,
+.react-ui-kit-markdown p:first-child {
+  margin-top: 0;
+}
+
+.react-ui-kit-markdown > :last-child,
+.react-ui-kit-markdown p:last-child {
+  margin-bottom: 0;
+}
+
+.react-ui-kit-status {
+  width: 100%;
+}
+
+.react-ui-kit-tool-result {
+  display: grid;
+  margin-top: 6px;
+  gap: 8px;
+}
+
+.react-ui-kit-tool-result section,
+.react-ui-kit-tool-result pre {
+  margin: 0;
+}
+
+.react-ui-kit-tool-result pre {
+  max-height: 300px;
+  margin-top: 4px;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+.react-ui-kit-sender {
+  flex: none;
+  padding: 10px;
+}
+
+@media (max-width: 900px) {
+  .react-ui-kit-workspace {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .react-ui-kit-conversations {
+    min-height: 240px;
+    max-height: 320px;
+  }
+
+  .react-ui-kit-chat-box {
+    min-height: 440px;
+  }
+}

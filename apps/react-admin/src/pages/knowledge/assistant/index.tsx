@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useModel } from '@umijs/max';
-import { ChatDemo } from '@/components/chat/chat-demo';
+import { ChatWorkspace } from '@aplus-sql/react-ui-kit';
 import {
   DocumentPreviewModal,
   type PreviewDocumentItem,
@@ -16,7 +16,7 @@ export default function AssistantPage() {
     auth.userInfo.userId || auth.userInfo.email || auth.displayName;
   return (
     <>
-      <ChatDemo
+      <ChatWorkspace
         adapter={adapter}
         participantId={participantId}
         emptyDescription="助手会检索当前 RAG 文档并以流式方式返回答案。"

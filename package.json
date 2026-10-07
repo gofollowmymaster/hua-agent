@@ -71,6 +71,10 @@
     "ui-kit:test": "pnpm --filter @aplus-sql/ui-kit test",
     "ui-kit:lint:check": "pnpm --filter @aplus-sql/ui-kit lint:check",
     "ui-kit:stylelint:check": "pnpm --filter @aplus-sql/ui-kit stylelint:check",
+    "react-ui-kit:build": "pnpm --filter @aplus-sql/react-ui-kit build",
+    "react-ui-kit:test": "pnpm --filter @aplus-sql/react-ui-kit test",
+    "react-ui-kit:lint:check": "pnpm --filter @aplus-sql/react-ui-kit lint:check",
+    "react-ui-kit:format:check": "pnpm --filter @aplus-sql/react-ui-kit format:check",
     "http-client:build": "pnpm --filter @aplus-sql/http-client build",
     "http-client:test": "pnpm --filter @aplus-sql/http-client test",
     "http-client:lint:check": "pnpm --filter @aplus-sql/http-client lint:check"
@@ -80,6 +84,7 @@
     "apps/rag-admin/src/**/*.{ts,vue}": "pnpm --filter @aplus-sql/rag-admin exec eslint --max-warnings 0",
     "apps/react-admin/**/*.{ts,tsx}": "pnpm --filter @aplus-sql/react-admin exec eslint --max-warnings 0",
     "packages/ui-kit/**/*.{ts,vue}": "pnpm --filter @aplus-sql/ui-kit exec eslint --max-warnings 0",
+    "packages/react-ui-kit/**/*.{ts,tsx}": "pnpm --filter @aplus-sql/react-ui-kit exec eslint --max-warnings 0",
     "packages/http-client/**/*.ts": "pnpm --filter @aplus-sql/http-client exec eslint --max-warnings 0"
   },
   "commitlint": {

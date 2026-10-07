@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { DefaultChatTransport, type UIMessage } from 'ai';
+import type { ChatAdapter } from '@aplus-sql/react-ui-kit';
 import { apiBaseUrl, createUnauthorizedFetch } from '@/api/common/http';
 import {
   listAgentChatMessages,
@@ -8,7 +9,6 @@ import {
   type AgentChatMessagePart,
 } from '@/api/business-agent/chat';
 import { currentAccessToken } from '@/auth/storage';
-import type { ChatDemoAdapter } from '@/components/chat/types';
 
 interface LegacyToolCall {
   name: string;
@@ -16,7 +16,7 @@ interface LegacyToolCall {
   result: string;
 }
 
-export function createAgentChatAdapter(): ChatDemoAdapter {
+export function createAgentChatAdapter(): ChatAdapter {
   return {
     channel: 'agent-web',
     conversationType: 'agent-chat',

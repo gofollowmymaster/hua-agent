@@ -12,55 +12,54 @@ test('loads RAG and business Agent histories with ordered visible parts', async 
 
   await page.goto('/public/react-admin/#/business-agent/demo');
   await page.getByText('查询库存').click();
-  await expect(page.locator('.chat-text').first()).toHaveCSS(
+  await expect(page.locator('.react-ui-kit-markdown').first()).toHaveCSS(
     'font-size',
     '12px',
   );
-  await expect(page.locator('.chat-demo-workspace')).toHaveCSS('gap', '8px');
-  await expect(page.locator('.chat-messages')).toHaveCSS('padding-top', '12px');
-  await expect(page.locator('.chat-composer')).toHaveCSS('padding-top', '10px');
+  await expect(page.locator('.react-ui-kit-workspace')).toHaveCSS('gap', '8px');
+  await expect(page.locator('.react-ui-kit-messages')).toHaveCSS(
+    'padding-top',
+    '12px',
+  );
+  await expect(page.locator('.react-ui-kit-sender')).toHaveCSS(
+    'padding-top',
+    '10px',
+  );
   if (testInfo.project.name === 'desktop') {
-    await expect(page.locator('.chat-demo-workspace')).toHaveCSS(
+    await expect(page.locator('.react-ui-kit-workspace')).toHaveCSS(
       'grid-template-columns',
       /280px/,
     );
   }
-  const agentMessage = page.locator('.chat-message.assistant');
+  const agentMessage = page.locator(
+    '.react-ui-kit-message-parts[data-message-role="assistant"]',
+  );
   await expect(agentMessage).toContainText('先查库存');
   await expect(agentMessage).toContainText('库存查询完成');
   await expect(agentMessage).toContainText('库存充足');
   await expect(agentMessage).toHaveText(
-    /业务 Agent.*思考过程.*先查库存.*库存查询完成.*库存充足/,
+    /思考过程.*先查库存.*库存查询完成.*库存充足/,
   );
-  await expect(agentMessage.locator('.chat-reasoning')).toHaveCSS(
-    'color',
-    'rgb(102, 115, 111)',
-  );
+  await expect(agentMessage.locator('.react-ui-kit-reasoning')).toBeVisible();
   await expect(agentMessage.locator('[data-stage="tool_result"]')).toHaveClass(
-    /chat-status-success/,
-  );
-  await expect(agentMessage.locator('[data-stage="tool_result"]')).toHaveCSS(
-    'border-left-color',
-    'rgb(22, 140, 105)',
+    /react-ui-kit-status-success/,
   );
   await expect(agentMessage.locator('[data-stage="tool_call"]')).toHaveClass(
-    /chat-status-warning/,
+    /react-ui-kit-status-warning/,
   );
   await expect(
     agentMessage.locator('[data-stage="generate_start"]'),
-  ).toHaveClass(/chat-status-info/);
+  ).toHaveClass(/react-ui-kit-status-info/);
   await expect(agentMessage.locator('[data-stage="done"]')).toHaveClass(
-    /chat-status-success/,
+    /react-ui-kit-status-success/,
   );
   expect(
     await agentMessage
       .locator('[data-stage]')
       .evaluateAll((items) => items.map((item) => item.dataset.stage)),
   ).toEqual(['tool_call', 'tool_result', 'generate_start', 'done']);
-  if (testInfo.project.name === 'desktop') {
-    await page.screenshot({
-      path: testInfo.outputPath('business-agent-theme.png'),
-      fullPage: true,
-    });
-  }
+  await page.screenshot({
+    path: testInfo.outputPath('business-agent-theme.png'),
+    fullPage: true,
+  });
 });

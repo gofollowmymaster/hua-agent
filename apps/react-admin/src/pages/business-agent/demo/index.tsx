@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useModel } from '@umijs/max';
-import { ChatDemo } from '@/components/chat/chat-demo';
+import { ChatWorkspace } from '@aplus-sql/react-ui-kit';
 import { createAgentChatAdapter } from './adapter';
 
 export default function AgentDemoPage() {
@@ -9,7 +9,7 @@ export default function AgentDemoPage() {
   const participantId =
     auth.userInfo.userId || auth.userInfo.email || auth.displayName;
   return (
-    <ChatDemo
+    <ChatWorkspace
       adapter={adapter}
       participantId={participantId}
       assistantName="业务 Agent"

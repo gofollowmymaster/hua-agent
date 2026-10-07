@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { DefaultChatTransport, type UIMessage } from 'ai';
+import type { ChatAdapter } from '@aplus-sql/react-ui-kit';
 import { apiBaseUrl, createUnauthorizedFetch } from '@/api/common/http';
 import {
   listSessionMessages,
@@ -7,9 +8,8 @@ import {
   type RagMessageItem,
 } from '@/api/knowledge/sessions';
 import { currentAccessToken } from '@/auth/storage';
-import type { ChatDemoAdapter } from '@/components/chat/types';
 
-export function createRagChatAdapter(): ChatDemoAdapter {
+export function createRagChatAdapter(): ChatAdapter {
   return {
     channel: 'web',
     conversationType: 'rag-chat',
