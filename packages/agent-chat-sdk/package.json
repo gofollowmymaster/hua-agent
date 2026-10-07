@@ -27,11 +27,11 @@
   },
   "devDependencies": {
     "@aplus-sql/ui-kit": "workspace:*",
-    "@ai-sdk/vue": "3.0.148",
+    "@ai-sdk/vue": "catalog:",
     "@eslint/js": "catalog:",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/test-utils": "^2.4.6",
-    "ai": "6.0.148",
+    "ai": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "eslint-plugin-vue": "catalog:",

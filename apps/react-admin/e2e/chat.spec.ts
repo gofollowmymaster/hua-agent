@@ -1,6 +1,12 @@
 import { expect, test } from './support/admin-test';
 import { login } from './support/ui';
 
+function uiMessageStream(events: Record<string, unknown>[]) {
+  return `${events
+    .map((event) => `data: ${JSON.stringify(event)}\n\n`)
+    .join('')}data: [DONE]\n\n`;
+}
+
 test('loads RAG and business Agent histories with ordered visible parts', async ({
   page,
 }, testInfo) => {
@@ -99,4 +105,54 @@ test('shows AI SDK stream errors in the shared chat workspace', async ({
 
   await expect(page.getByText('生成失败，请稍后重试')).toBeVisible();
   await expect(page.getByText('出错')).toBeVisible();
+});
+
+test('shows realtime reasoning from an AI SDK 7 stream', async ({ page }) => {
+  await page.route('**/agent/chat', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'text/event-stream',
+      headers: {
+        'x-vercel-ai-ui-message-stream': 'v1',
+      },
+      body: uiMessageStream([
+        {
+          type: 'data-status',
+          data: { stage: 'analyze_start', message: '开始分析问题' },
+        },
+        { type: 'reasoning-start', id: 'reasoning-live' },
+        {
+          type: 'reasoning-delta',
+          id: 'reasoning-live',
+          delta: '先核对库存与订单状态',
+        },
+        { type: 'reasoning-end', id: 'reasoning-live' },
+        {
+          type: 'data-status',
+          data: { stage: 'generate_start', message: '开始生成答案' },
+        },
+        { type: 'text-start', id: 'text-live' },
+        {
+          type: 'text-delta',
+          id: 'text-live',
+          delta: '库存状态正常',
+        },
+        { type: 'text-end', id: 'text-live' },
+      ]),
+    }),
+  );
+  await login(page);
+  await page.goto('/public/react-admin/#/business-agent/demo');
+
+  const sender = page.getByRole('textbox');
+  await sender.fill('查询实时库存');
+  await sender.press('Enter');
+
+  const message = page.locator(
+    '.react-ui-kit-message-parts[data-message-role="assistant"]',
+  );
+  await expect(message.locator('.react-ui-kit-reasoning')).toBeVisible();
+  await expect(message).toHaveText(
+    /开始分析问题.*思考过程.*先核对库存与订单状态.*开始生成答案.*库存状态正常/,
+  );
 });

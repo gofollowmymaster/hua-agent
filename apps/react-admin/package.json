@@ -22,7 +22,7 @@
     "check": "pnpm typecheck && pnpm lint:check && pnpm format:check && pnpm antd:lint && pnpm test"
   },
   "dependencies": {
-    "@ai-sdk/react": "4.0.130",
+    "@ai-sdk/react": "catalog:",
     "@ant-design/icons": "^6.1.0",
     "@ant-design/pro-components": "3.1.15-5",
     "@ant-design/x": "2.9.0",
@@ -30,7 +30,7 @@
     "@aplus-sql/react-ui-kit": "workspace:*",
     "@open-file-viewer/core": "0.1.17",
     "@umijs/max": "4.7.22",
-    "ai": "6.0.148",
+    "ai": "catalog:",
     "antd": "6.6.5",
     "dayjs": "^1.11.13",
     "pdfjs-dist": "6.1.200",

@@ -195,9 +195,10 @@ function renderPart(
   if (part.type === 'reasoning') {
     return (
       <Think
-        key={String(index)}
+        key={part.id || String(index)}
         className="react-ui-kit-reasoning"
         title="思考过程"
+        loading={part.state === 'streaming'}
         expanded
         destroyOnHidden={false}
       >

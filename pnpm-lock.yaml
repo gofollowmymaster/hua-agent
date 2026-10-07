@@ -6,9 +6,18 @@ settings:
 
 catalogs:
   default:
+    '@ai-sdk/react':
+      specifier: 4.0.133
+      version: 4.0.133
+    '@ai-sdk/vue':
+      specifier: 4.0.130
+      version: 4.0.130
     '@eslint/js':
       specifier: 9.39.5
       version: 9.39.5
+    ai:
+      specifier: 7.0.130
+      version: 7.0.130
     eslint:
       specifier: 9.39.5
       version: 9.39.5
@@ -126,8 +135,8 @@ importers:
         specifier: 5.16.1
         version: 5.16.1(prisma@5.16.1)
       ai:
-        specifier: 6.0.148
-        version: 6.0.148(zod@3.25.76)
+        specifier: 'catalog:'
+        version: 7.0.130(zod@3.25.76)
       axios:
         specifier: ^1.9.0
         version: 1.9.0
@@ -307,8 +316,8 @@ importers:
   apps/rag-admin:
     dependencies:
       '@ai-sdk/vue':
-        specifier: 3.0.148
-        version: 3.0.148(vue@3.5.22(typescript@5.7.2))(zod@4.4.3)
+        specifier: 'catalog:'
+        version: 4.0.130(vue@3.5.22(typescript@5.7.2))(zod@4.4.3)
       '@ant-design/icons-vue':
         specifier: 7.0.1
         version: 7.0.1(vue@3.5.22(typescript@5.7.2))
@@ -334,8 +343,8 @@ importers:
         specifier: ^5.2.1
         version: 5.2.4(vite@7.1.12(@types/node@22.20.0)(jiti@2.7.0)(less@4.8.1)(lightningcss@1.32.0)(terser@5.49.0)(yaml@2.9.0))(vue@3.5.22(typescript@5.7.2))
       ai:
-        specifier: 6.0.148
-        version: 6.0.148(zod@4.4.3)
+        specifier: 'catalog:'
+        version: 7.0.130(zod@4.4.3)
       dayjs:
         specifier: ^1.11.13
         version: 1.11.13
@@ -440,8 +449,8 @@ importers:
   apps/react-admin:
     dependencies:
       '@ai-sdk/react':
-        specifier: 4.0.130
-        version: 4.0.130(react@18.3.1)(zod@4.4.3)
+        specifier: 'catalog:'
+        version: 4.0.133(react@18.3.1)(zod@4.4.3)
       '@ant-design/icons':
         specifier: ^6.1.0
         version: 6.3.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -464,8 +473,8 @@ importers:
         specifier: 4.7.22
         version: 4.7.22(@babel/core@7.29.7)(@types/node@22.20.0)(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(date-fns@2.30.0)(dva@2.5.0-beta.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jest@29.7.0(@types/node@22.20.0)(babel-plugin-macros@3.1.0))(jiti@2.7.0)(lightningcss@1.32.0)(moment@2.31.0)(prettier@3.9.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@4.62.2)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.29.7)(babel-plugin-macros@3.1.0)(react@18.3.1))(type-fest@0.21.3)(typescript@5.7.2)(webpack@5.92.1)(yaml@2.9.0)
       ai:
-        specifier: 6.0.148
-        version: 6.0.148(zod@4.4.3)
+        specifier: 'catalog:'
+        version: 7.0.130(zod@4.4.3)
       antd:
         specifier: 6.6.5
         version: 6.6.5(date-fns@2.30.0)(moment@2.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -555,8 +564,8 @@ importers:
   packages/agent-chat-sdk:
     devDependencies:
       '@ai-sdk/vue':
-        specifier: 3.0.148
-        version: 3.0.148(vue@3.5.22(typescript@5.7.2))(zod@4.4.3)
+        specifier: 'catalog:'
+        version: 4.0.130(vue@3.5.22(typescript@5.7.2))(zod@4.4.3)
       '@aplus-sql/ui-kit':
         specifier: workspace:*
         version: link:../ui-kit
@@ -570,8 +579,8 @@ importers:
         specifier: ^2.4.6
         version: 2.4.11(@vue/compiler-dom@3.5.39)(@vue/server-renderer@3.5.22(vue@3.5.22(typescript@5.7.2)))(vue@3.5.22(typescript@5.7.2))
       ai:
-        specifier: 6.0.148
-        version: 6.0.148(zod@4.4.3)
+        specifier: 'catalog:'
+        version: 7.0.130(zod@4.4.3)
       eslint:
         specifier: 'catalog:'
         version: 9.39.5(jiti@2.7.0)
@@ -637,8 +646,8 @@ importers:
   packages/react-ui-kit:
     devDependencies:
       '@ai-sdk/react':
-        specifier: 4.0.130
-        version: 4.0.130(react@18.3.1)(zod@4.4.3)
+        specifier: 'catalog:'
+        version: 4.0.133(react@18.3.1)(zod@4.4.3)
       '@ant-design/icons':
         specifier: ^6.1.0
         version: 6.3.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -664,8 +673,8 @@ importers:
         specifier: ^4.7.0
         version: 4.7.0(vite@7.1.12(@types/node@22.20.0)(jiti@2.7.0)(less@4.8.1)(lightningcss@1.32.0)(terser@5.49.0)(yaml@2.9.0))
       ai:
-        specifier: 6.0.148
-        version: 6.0.148(zod@4.4.3)
+        specifier: 'catalog:'
+        version: 7.0.130(zod@4.4.3)
       antd:
         specifier: 6.6.5
         version: 6.6.5(date-fns@2.30.0)(moment@2.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -714,8 +723,8 @@ importers:
   packages/ui-kit:
     devDependencies:
       '@ai-sdk/vue':
-        specifier: 3.0.148
-        version: 3.0.148(vue@3.5.22(typescript@5.7.2))(zod@4.4.3)
+        specifier: 'catalog:'
+        version: 4.0.130(vue@3.5.22(typescript@5.7.2))(zod@4.4.3)
       '@aplus-frontend/ui':
         specifier: 7.26.8
         version: 7.26.8(@aplus-frontend/antdv@2.2.0(vue@3.5.22(typescript@5.7.2)))(@aplus-frontend/icon@2.1.5)(@aplus-frontend/oss@2.0.4(@types/lodash-es@4.17.12)(lodash-es@4.18.1)(lodash@4.17.21))(@types/lodash-es@4.17.12)(exceljs@4.4.0)(lodash-es@4.18.1)(lodash@4.17.21)(vue@3.5.22(typescript@5.7.2))(vxe-table@4.19.22(vue@3.5.22(typescript@5.7.2)))
@@ -735,8 +744,8 @@ importers:
         specifier: ^2.4.6
         version: 2.4.11(@vue/compiler-dom@3.5.39)(@vue/server-renderer@3.5.22(vue@3.5.22(typescript@5.7.2)))(vue@3.5.22(typescript@5.7.2))
       ai:
-        specifier: 6.0.148
-        version: 6.0.148(zod@4.4.3)
+        specifier: 'catalog:'
+        version: 7.0.130(zod@4.4.3)
       eslint:
         specifier: 'catalog:'
         version: 9.39.5(jiti@2.7.0)
@@ -811,53 +820,37 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0
 
-  '@ai-sdk/gateway@3.0.90':
-    resolution: {integrity: sha512-vCzFx5E3SZWZN6ukRZzmX8yTSrx6FihDjm3yGI77POA4RPSF6tG88+CcU7o+Taa9fbY4qMcbKmcfCrt8ABqhYQ==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.25.76 || ^4.1.8
-
-  '@ai-sdk/gateway@4.0.103':
-    resolution: {integrity: sha512-nnGTUHzPRQ14jhv9CL4OQrzcRBIFTBMIPKGIi9Z9u/4GtwSRxa/nxUX6np2Iwp5phOzO0a0njj/j9Jolf5AEaA==}
+  '@ai-sdk/gateway@4.0.106':
+    resolution: {integrity: sha512-NprSdFzyVnbEp2SDWtIgsCFIUHFCehOD9S6FQkF/dLrCmnke8w4SOK3KcmUUiEbwtVzlUF8prkaELp+ohcQaQw==}
     engines: {node: '>=22'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/mcp@2.0.66':
-    resolution: {integrity: sha512-wFAL5rL/CQljgrhrtpzvrmLJ1tY7Q3o9+SQR+02ZYff3jzXOpj3vfCdi6PjJ1jS3jDd8rkmE9QFlfOFKztI3pg==}
+  '@ai-sdk/mcp@2.0.69':
+    resolution: {integrity: sha512-DRgUmuESCM8KOcVzlFFVFv9GLu1kCqhdcQ2C1zz2vD0VQ/KKyek37geGPvFsV5tUJfywklh99zIKp4V1V3bhPg==}
     engines: {node: '>=22'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/provider-utils@4.0.23':
-    resolution: {integrity: sha512-z8GlDaCmRSDlqkMF2f4/RFgWxdarvIbyuk+m6WXT1LYgsnGiXRJGTD2Z1+SDl3LqtFuRtGX1aghYvQLoHL/9pg==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.25.76 || ^4.1.8
-
-  '@ai-sdk/provider-utils@5.0.53':
-    resolution: {integrity: sha512-VVe6UDd0y0/B4TfauuKKzcppqvhTmSluwwUVT4WG2/8h7gFbyFm7PM4UGM+ZXe3/RI6bv+Vl1cw/7aiBoQqdxg==}
+  '@ai-sdk/provider-utils@5.0.56':
+    resolution: {integrity: sha512-F7/U1YpVXEfSxRHbxScm0PVdr9lN6GaUWHnt8ws2UjuGeuxWHqCkV25dGpHAkpDHkuIXoC+aak/OqSylKSJmHw==}
     engines: {node: '>=22'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/provider@3.0.8':
-    resolution: {integrity: sha512-oGMAgGoQdBXbZqNG0Ze56CHjDZ1IDYOwGYxYjO5KLSlz5HiNQ9udIXsPZ61VWaHGZ5XW/jyjmr6t2xz2jGVwbQ==}
-    engines: {node: '>=18'}
-
-  '@ai-sdk/provider@4.0.21':
-    resolution: {integrity: sha512-UpbC9C1oht8dhfKPbVXSLRZS3DI8uk8n5v2uMjBPNIYGsC2kL045ywq7D8Hh9KgnH9rP5W/GxQdYtWScRouqlA==}
+  '@ai-sdk/provider@4.0.24':
+    resolution: {integrity: sha512-iztFqJTdxNN0ZzqZAAnVPMhRMaL1bfQFa3GIPAffWQ0+dP2FXIkyMD8kHeEI7EpB/C6TR45cqOkrS7YZZ1sATA==}
     engines: {node: '>=22'}
 
-  '@ai-sdk/react@4.0.130':
-    resolution: {integrity: sha512-6nUGT2mWIPUK/s2nUJH0Hiu90Oqawwo2INAHekOi4hJBb8zhFJS0yMP0aRn/+UO9VmJT/v58d8rWSmGE3B6ApA==}
+  '@ai-sdk/react@4.0.133':
+    resolution: {integrity: sha512-Ah/cW6HOTmKFy0zU5VYfuogOZMVNNqu7FbxjcesKNY03tZZPY/8O/ZQKfrCSUd+ZT6DjR3z07ck6TXLpOdwpBA==}
     engines: {node: '>=22'}
     peerDependencies:
       react: ^18 || ~19.0.1 || ~19.1.2 || ^19.2.1
 
-  '@ai-sdk/vue@3.0.148':
-    resolution: {integrity: sha512-YZLKvBPAs4pDPiH7tfGDJl9ItZS4Uv9GZJpPKE/4PZ68nJ7MR27PDBUuHHGvzLLm6DHGOpLZPhJxSQe9S9psHw==}
-    engines: {node: '>=18'}
+  '@ai-sdk/vue@4.0.130':
+    resolution: {integrity: sha512-vELr/KOp9xQV8qhA+mdMoWtmIlYquxFVmZv3jqJg/lx87UWVEUQnf793/EFXXuFcMhlVwvqg0ohS3/6DWk8W1A==}
+    engines: {node: '>=22'}
     peerDependencies:
       vue: ^3.3.4
 
@@ -4938,10 +4931,6 @@ packages:
   '@vavt/util@2.1.2':
     resolution: {integrity: sha512-L3UbSJthJwr3wq0x93O5TrCepimrmVZaIl2ciZbeL18G5++gBhJXNhcH7RcVk/6rr3SavWOvwhig0mqRLoR7dw==}
 
-  '@vercel/oidc@3.1.0':
-    resolution: {integrity: sha512-Fw28YZpRnA3cAHHDlkt7xQHiJ0fcL+NRcIqsocZQUSmbzeIKRpwttJjik5ZGanXP+vlA4SbTg+AbA3bP363l+w==}
-    engines: {node: '>= 20'}
-
   '@vercel/oidc@3.2.0':
     resolution: {integrity: sha512-UycprH3T6n3jH0k44NHMa7pnFHGu/N05MjojYr+Mc6I7obkoLIJujSWwin1pCvdy/eOxrI/l3uDLQsmcrOb4ug==}
     engines: {node: '>= 20'}
@@ -5238,14 +5227,8 @@ packages:
     resolution: {integrity: sha512-kja8j7PjmncONqaTsB8fQ+wE2mSU2DJ9D4XKoJ5PFWIdRMa6SLSN1ff4mOr4jCbfRSsxR4keIiySJU0N9T5hIQ==}
     engines: {node: '>= 8.0.0'}
 
-  ai@6.0.148:
-    resolution: {integrity: sha512-y2mHmpt7AGMNQMDXM7bm92m3sQfP9BPTI53YfYE8gFvu5VPHN088tVmfVNITGQizuFX6VbCDALBGIE0XorkKmg==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.25.76 || ^4.1.8
-
-  ai@7.0.127:
-    resolution: {integrity: sha512-JNsNPk4ZvRGEJuqdVo2lYFkm7uAuf3p/RwKFWn1Wh/+IK3U1RyFWw2GXoFnhzqNfxEuj7XJB4WpIUhl1sHToWg==}
+  ai@7.0.130:
+    resolution: {integrity: sha512-QkBkCogl46jXUg0SrSsdqQlOI2ZVMCjfnbBQS8t3gE21U/SO17oNMVFyjmcC9z20wOoYUA+2O2vsso0maoS7dw==}
     engines: {node: '>=22'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -13168,82 +13151,66 @@ snapshots:
       lodash.throttle: 4.1.1
       react: 18.3.1
 
-  '@ai-sdk/gateway@3.0.90(zod@3.25.76)':
+  '@ai-sdk/gateway@4.0.106(zod@3.25.76)':
     dependencies:
-      '@ai-sdk/provider': 3.0.8
-      '@ai-sdk/provider-utils': 4.0.23(zod@3.25.76)
-      '@vercel/oidc': 3.1.0
+      '@ai-sdk/provider': 4.0.24
+      '@ai-sdk/provider-utils': 5.0.56(zod@3.25.76)
+      '@vercel/oidc': 3.2.0
       zod: 3.25.76
 
-  '@ai-sdk/gateway@3.0.90(zod@4.4.3)':
+  '@ai-sdk/gateway@4.0.106(zod@4.4.3)':
     dependencies:
-      '@ai-sdk/provider': 3.0.8
-      '@ai-sdk/provider-utils': 4.0.23(zod@4.4.3)
-      '@vercel/oidc': 3.1.0
-      zod: 4.4.3
-
-  '@ai-sdk/gateway@4.0.103(zod@4.4.3)':
-    dependencies:
-      '@ai-sdk/provider': 4.0.21
-      '@ai-sdk/provider-utils': 5.0.53(zod@4.4.3)
+      '@ai-sdk/provider': 4.0.24
+      '@ai-sdk/provider-utils': 5.0.56(zod@4.4.3)
       '@vercel/oidc': 3.2.0
       zod: 4.4.3
 
-  '@ai-sdk/mcp@2.0.66(zod@4.4.3)':
+  '@ai-sdk/mcp@2.0.69(zod@4.4.3)':
     dependencies:
-      '@ai-sdk/provider': 4.0.21
-      '@ai-sdk/provider-utils': 5.0.53(zod@4.4.3)
+      '@ai-sdk/provider': 4.0.24
+      '@ai-sdk/provider-utils': 5.0.56(zod@4.4.3)
       cross-spawn: 7.0.6
       pkce-challenge: 5.0.1
       zod: 4.4.3
 
-  '@ai-sdk/provider-utils@4.0.23(zod@3.25.76)':
+  '@ai-sdk/provider-utils@5.0.56(zod@3.25.76)':
     dependencies:
-      '@ai-sdk/provider': 3.0.8
+      '@ai-sdk/provider': 4.0.24
       '@standard-schema/spec': 1.1.0
+      '@workflow/serde': 4.1.0
       eventsource-parser: 3.1.0
+      undici: 7.30.0
       zod: 3.25.76
 
-  '@ai-sdk/provider-utils@4.0.23(zod@4.4.3)':
+  '@ai-sdk/provider-utils@5.0.56(zod@4.4.3)':
     dependencies:
-      '@ai-sdk/provider': 3.0.8
-      '@standard-schema/spec': 1.1.0
-      eventsource-parser: 3.1.0
-      zod: 4.4.3
-
-  '@ai-sdk/provider-utils@5.0.53(zod@4.4.3)':
-    dependencies:
-      '@ai-sdk/provider': 4.0.21
+      '@ai-sdk/provider': 4.0.24
       '@standard-schema/spec': 1.1.0
       '@workflow/serde': 4.1.0
       eventsource-parser: 3.1.0
       undici: 7.30.0
       zod: 4.4.3
 
-  '@ai-sdk/provider@3.0.8':
+  '@ai-sdk/provider@4.0.24':
     dependencies:
       json-schema: 0.4.0
 
-  '@ai-sdk/provider@4.0.21':
+  '@ai-sdk/react@4.0.133(react@18.3.1)(zod@4.4.3)':
     dependencies:
-      json-schema: 0.4.0
-
-  '@ai-sdk/react@4.0.130(react@18.3.1)(zod@4.4.3)':
-    dependencies:
-      '@ai-sdk/mcp': 2.0.66(zod@4.4.3)
-      '@ai-sdk/provider': 4.0.21
-      '@ai-sdk/provider-utils': 5.0.53(zod@4.4.3)
-      ai: 7.0.127(zod@4.4.3)
+      '@ai-sdk/mcp': 2.0.69(zod@4.4.3)
+      '@ai-sdk/provider': 4.0.24
+      '@ai-sdk/provider-utils': 5.0.56(zod@4.4.3)
+      ai: 7.0.130(zod@4.4.3)
       react: 18.3.1
       swr: 2.5.1(react@18.3.1)
       throttleit: 2.1.0
     transitivePeerDependencies:
       - zod
 
-  '@ai-sdk/vue@3.0.148(vue@3.5.22(typescript@5.7.2))(zod@4.4.3)':
+  '@ai-sdk/vue@4.0.130(vue@3.5.22(typescript@5.7.2))(zod@4.4.3)':
     dependencies:
-      '@ai-sdk/provider-utils': 4.0.23(zod@4.4.3)
-      ai: 6.0.148(zod@4.4.3)
+      '@ai-sdk/provider-utils': 5.0.56(zod@4.4.3)
+      ai: 7.0.130(zod@4.4.3)
       swrv: 1.2.0(vue@3.5.22(typescript@5.7.2))
       vue: 3.5.22(typescript@5.7.2)
     transitivePeerDependencies:
@@ -15747,7 +15714,8 @@ snapshots:
       '@open-file-viewer/core': 0.1.17(pdfjs-dist@6.1.200)
       vue: 3.5.22(typescript@5.7.2)
 
-  '@opentelemetry/api@1.9.0': {}
+  '@opentelemetry/api@1.9.0':
+    optional: true
 
   '@oxc-parser/binding-android-arm-eabi@0.144.0':
     optional: true
@@ -17063,7 +17031,7 @@ snapshots:
     dependencies:
       '@types/yargs-parser': 21.0.3
 
-  '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.7.2))(eslint@8.35.0)(typescript@5.7.2)':
+  '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.7.2))(eslint@9.39.5(jiti@2.7.0))(typescript@5.7.2)':
     dependencies:
       '@eslint-community/regexpp': 4.12.2
       '@typescript-eslint/parser': 5.62.0(eslint@8.35.0)(typescript@5.7.2)
@@ -17071,7 +17039,7 @@ snapshots:
       '@typescript-eslint/type-utils': 5.62.0(eslint@8.35.0)(typescript@5.7.2)
       '@typescript-eslint/utils': 5.62.0(eslint@8.35.0)(typescript@5.7.2)
       debug: 4.4.3
-      eslint: 8.35.0
+      eslint: 9.39.5(jiti@2.7.0)
       graphemer: 1.4.0
       ignore: 5.3.1
       natural-compare-lite: 1.4.1
@@ -17503,10 +17471,10 @@ snapshots:
       '@babel/core': 7.23.6
       '@babel/eslint-parser': 7.23.3(@babel/core@7.23.6)(eslint@8.35.0)
       '@stylelint/postcss-css-in-js': 0.38.0(postcss-syntax@0.36.2(postcss@8.5.16))(postcss@8.5.16)
-      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.7.2))(eslint@8.35.0)(typescript@5.7.2)
+      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.7.2))(eslint@9.39.5(jiti@2.7.0))(typescript@5.7.2)
       '@typescript-eslint/parser': 5.62.0(eslint@8.35.0)(typescript@5.7.2)
       '@umijs/babel-preset-umi': 4.7.22
-      eslint-plugin-jest: 27.2.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.7.2))(eslint@8.35.0)(typescript@5.7.2))(eslint@8.35.0)(jest@29.7.0(@types/node@22.20.0)(babel-plugin-macros@3.1.0))(typescript@5.7.2)
+      eslint-plugin-jest: 27.2.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.35.0)(typescript@5.7.2))(eslint@8.35.0)(typescript@5.7.2))(eslint@8.35.0)(jest@29.7.0(@types/node@22.20.0)(babel-plugin-macros@3.1.0))(typescript@5.7.2)
       eslint-plugin-react: 7.33.2(eslint@8.35.0)
       eslint-plugin-react-hooks: 4.6.0(eslint@8.35.0)
       postcss: 8.5.16
@@ -17917,8 +17885,6 @@ snapshots:
   '@vavt/markdown-theme@5.0.2': {}
 
   '@vavt/util@2.1.2': {}
-
-  '@vercel/oidc@3.1.0': {}
 
   '@vercel/oidc@3.2.0': {}
 
@@ -18334,27 +18300,18 @@ snapshots:
     dependencies:
       humanize-ms: 1.2.1
 
-  ai@6.0.148(zod@3.25.76):
+  ai@7.0.130(zod@3.25.76):
     dependencies:
-      '@ai-sdk/gateway': 3.0.90(zod@3.25.76)
-      '@ai-sdk/provider': 3.0.8
-      '@ai-sdk/provider-utils': 4.0.23(zod@3.25.76)
-      '@opentelemetry/api': 1.9.0
+      '@ai-sdk/gateway': 4.0.106(zod@3.25.76)
+      '@ai-sdk/provider': 4.0.24
+      '@ai-sdk/provider-utils': 5.0.56(zod@3.25.76)
       zod: 3.25.76
 
-  ai@6.0.148(zod@4.4.3):
+  ai@7.0.130(zod@4.4.3):
     dependencies:
-      '@ai-sdk/gateway': 3.0.90(zod@4.4.3)
-      '@ai-sdk/provider': 3.0.8
-      '@ai-sdk/provider-utils': 4.0.23(zod@4.4.3)
-      '@opentelemetry/api': 1.9.0
-      zod: 4.4.3
-
-  ai@7.0.127(zod@4.4.3):
-    dependencies:
-      '@ai-sdk/gateway': 4.0.103(zod@4.4.3)
-      '@ai-sdk/provider': 4.0.21
-      '@ai-sdk/provider-utils': 5.0.53(zod@4.4.3)
+      '@ai-sdk/gateway': 4.0.106(zod@4.4.3)
+      '@ai-sdk/provider': 4.0.24
+      '@ai-sdk/provider-utils': 5.0.56(zod@4.4.3)
       zod: 4.4.3
 
   ajv-formats@2.1.1(ajv@8.12.0):
@@ -20638,12 +20595,12 @@ snapshots:
     dependencies:
       eslint: 9.39.5(jiti@2.7.0)
 
-  eslint-plugin-jest@27.2.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.7.2))(eslint@8.35.0)(typescript@5.7.2))(eslint@8.35.0)(jest@29.7.0(@types/node@22.20.0)(babel-plugin-macros@3.1.0))(typescript@5.7.2):
+  eslint-plugin-jest@27.2.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.35.0)(typescript@5.7.2))(eslint@8.35.0)(typescript@5.7.2))(eslint@8.35.0)(jest@29.7.0(@types/node@22.20.0)(babel-plugin-macros@3.1.0))(typescript@5.7.2):
     dependencies:
       '@typescript-eslint/utils': 5.62.0(eslint@8.35.0)(typescript@5.7.2)
       eslint: 8.35.0
     optionalDependencies:
-      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.7.2))(eslint@8.35.0)(typescript@5.7.2)
+      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.7.2))(eslint@9.39.5(jiti@2.7.0))(typescript@5.7.2)
       jest: 29.7.0(@types/node@22.20.0)(babel-plugin-macros@3.1.0)
     transitivePeerDependencies:
       - supports-color

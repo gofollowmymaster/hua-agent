@@ -19,7 +19,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@ai-sdk/vue": "3.0.148",
+    "@ai-sdk/vue": "catalog:",
     "@ant-design/icons-vue": "7.0.1",
     "@aplus-frontend/antdv": "2.2.0",
     "@aplus-frontend/ui": "7.26.8",
@@ -28,7 +28,7 @@
     "@open-file-viewer/core": "0.1.17",
     "@open-file-viewer/vue": "0.1.17",
     "@vitejs/plugin-vue": "^5.2.1",
-    "ai": "6.0.148",
+    "ai": "catalog:",
     "dayjs": "^1.11.13",
     "md-editor-v3": "^6.5.3",
     "pdfjs-dist": "^6.1.200",
